@@ -157,6 +157,33 @@ function Actions.npc_talk_all(item)
     manage.groupTalk(State.group_choice, item.npc, item.what)
 end
 
+function Actions.npc_give_money(item)
+    manage.removeInvis(State.group_choice)
+    State.status = "Giving " .. item.what .. "pp to " .. item.npc
+    if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
+        mq.cmdf('/target id %s', mq.TLO.Spawn(item.npc).ID())
+        mq.delay(300)
+    end
+    if mq.TLO.Window('InventoryWindow').Open == false then
+        mq.cmd('/keypress INVENTORY')
+    end
+    mq.delay(200)
+    mq.cmd('/notify InventoryWindow IW_Money0 leftmouseup')
+    mq.delay(200)
+    mq.cmd('/notify QuantityWnd QTYW_slider newvalue 1000')
+    mq.delay(200)
+    mq.cmd('/notify QuantityWnd QTYW_Accept_Button leftmouseup')
+    mq.delay(200)
+    mq.cmd('/usetarget')
+    mq.delay("5s", Actions.give_window)
+    mq.cmd('/notify GiveWnd GVW_Give_Button leftmouseup')
+    mq.delay(100)
+    while mq.TLO.Window('GiveWnd').Open() do
+        mq.delay(100)
+    end
+    mq.delay("1s")
+end
+
 function Actions.npc_give(item)
     manage.removeInvis(State.group_choice)
     State.status = "Giving " .. item.what .. " to " .. item.npc
@@ -164,7 +191,7 @@ function Actions.npc_give(item)
         mq.cmdf('/target id %s', mq.TLO.Spawn(item.npc).ID())
         mq.delay(300)
     end
-    mq.cmdf('/itemnotify "%s" leftmouseup', item.what)
+    mq.cmdf('/nomodkey /shift /itemnotify "%s" leftmouseup', item.what)
     mq.delay("2s", Actions.got_cursor)
     mq.cmd('/usetarget')
     mq.delay("5s", Actions.give_window)
@@ -293,12 +320,12 @@ function Actions.combine_do(item)
         mq.delay(100)
     end
     mq.cmd("/autoinv")
-    State.status = "Moving container back to slot 10"
+    --[[State.status = "Moving container back to slot 10"
     mq.cmdf("/nomodkey /shiftkey /itemnotify in pack%s %s leftmouseup", State.bagslot1, State.bagslot2)
     while mq.TLO.Cursor() == nil do
         mq.delay(100)
     end
-    mq.cmd("/nomodkey /shiftkey /itemnotify pack10 leftmouseup")
+    mq.cmd("/nomodkey /shiftkey /itemnotify pack10 leftmouseup")--]]
 end
 
 function Actions.farm(item, class_settings)
@@ -352,15 +379,28 @@ function Actions.farm_radius(item, class_settings)
     manage.locTravelGroup(State.group_choice, item.whereX, item.whereY, item.whereZ)
     manage.campGroup(State.group_choice, item.radius, class_settings)
     manage.unpauseGroup(State.group_choice, class_settings)
-    while mq.TLO.FindItem("=" .. item.what)() == nil do
-        if mq.TLO.AdvLoot.LootInProgress() then
-            for i = 1, mq.TLO.AdvLoot.SCount() do
-                if mq.TLO.AdvLoot.SList(i).Name() == item.what then
-                    mq.cmdf('/advloot shared %s giveto %s', i, mq.TLO.Me.DisplayName())
+    if item.count == nil then
+        while mq.TLO.FindItem("=" .. item.what)() == nil do
+            if mq.TLO.AdvLoot.LootInProgress() then
+                for i = 1, mq.TLO.AdvLoot.SCount() do
+                    if mq.TLO.AdvLoot.SList(i).Name() == item.what then
+                        mq.cmdf('/advloot shared %s giveto %s', i, mq.TLO.Me.DisplayName())
+                    end
                 end
             end
+            mq.delay(200)
         end
-        mq.delay(200)
+    else
+        while mq.TLO.FindItemCount("=" .. item.what)() < item.count do
+            if mq.TLO.AdvLoot.LootInProgress() then
+                for i = 1, mq.TLO.AdvLoot.SCount() do
+                    if mq.TLO.AdvLoot.SList(i).Name() == item.what then
+                        mq.cmdf('/advloot shared %s giveto %s', i, mq.TLO.Me.DisplayName())
+                    end
+                end
+            end
+            mq.delay(200)
+        end
     end
     manage.uncampGroup(State.group_choice, class_settings)
     manage.pauseGroup(State.group_choice, class_settings)
@@ -372,6 +412,12 @@ function Actions.ground_spawn(item)
     mq.cmd("/itemtarget")
     mq.delay(200)
     mq.cmd("/click left itemtarget")
+    while mq.TLO.Cursor.Name() ~= item.what do
+        mq.delay(200)
+        mq.cmd("/itemtarget")
+        mq.delay(200)
+        mq.cmd("/click left itemtarget")
+    end
     Actions.auto_inv(item)
 end
 

@@ -172,6 +172,8 @@ local function run_epic(class, choice)
             mq.delay(tonumber(task_table[State.step].what))
         elseif task_table[State.step].type == "NPC_GIVE_ADD" then
             actions.npc_give_add(task_table[State.step])
+        elseif task_table[State.step].type == "NPC_GIVE_MONEY" then
+            actions.npc_give_money(task_table[State.step])
         elseif task_table[State.step].type == "NPC_GIVE_CLICK" then
             actions.npc_give_click(task_table[State.step])
         elseif task_table[State.step].type == "NPC_STOP_FOLLOW" then
