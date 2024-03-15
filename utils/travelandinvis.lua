@@ -32,8 +32,7 @@ local travel = {
     ['shd_20'] = {
         ['gate'] = 19,
         ['invis'] = 23
-    },
-
+    }
 }
 
 return travel

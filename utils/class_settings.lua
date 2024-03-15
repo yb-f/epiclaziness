@@ -38,6 +38,42 @@ function class_settings.createSettings()
             ['useAOC'] = true,
             ['invisForTravel'] = false,
             ['returnToBind'] = false
+        },
+        ['invis'] = {
+            ['Bard'] = 1,
+            ['Beastlord'] = 1,
+            ['Berserker'] = 1,
+            ['Cleric'] = 1,
+            ['Druid'] = 1,
+            ['Enchanter'] = 1,
+            ['Magician'] = 1,
+            ['Monk'] = 1,
+            ['Necromancer'] = 1,
+            ['Paladin'] = 1,
+            ['Ranger'] = 1,
+            ['Rogue'] = 1,
+            ['Shadow Knight'] = 1,
+            ['Shaman'] = 1,
+            ['Warrior'] = 1,
+            ['Wizard'] = 1
+        },
+        ['class_invis'] = {
+            ['Bard'] = "Shauri's Sonorous Clouding|Potion",
+            ['Beastlord'] = "Natural Invisibility|Potion",
+            ['Berserker'] = "Potion",
+            ['Cleric'] = "Potion",
+            ['Druid'] = "Innate Camouflage|Potion",
+            ['Enchanter'] = "Perfected Invisibility|Potion",
+            ['Magician'] = "Perfected Invisibility|Potion",
+            ['Monk'] = "Potion",
+            ['Necromancer'] = "Cloak of Shadows|Potion",
+            ['Paladin'] = "Potion",
+            ['Ranger'] = "Innate Camouflage|Potion",
+            ['Rogue'] = "Hide/Sneak|Potion",
+            ['Shadow Knight'] = "Cloak of Shadows|Potion",
+            ['Shaman'] = "Silent Presence|Potion",
+            ['Warrior'] = "Potion",
+            ['Wizard'] = "Perfected Invisibility|Potion"
         }
     }
     class_settings.saveSettings()

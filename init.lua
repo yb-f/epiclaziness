@@ -29,6 +29,9 @@ local class_list = { 'Bard', 'Beastlord', 'Berserker', 'Cleric', 'Druid', 'Encha
     'Paladin', 'Ranger', 'Rogue', 'Shadow Knight', 'Shaman', 'Warrior', 'Wizard' }
 
 local automation_list = { 'CWTN', 'RGMercs (Lua)', 'RGMercs (Macro)', 'KissAssist', 'MuleAssist' }
+
+local invis_type = {}
+
 State = {}
 
 State.bind_travel = false
@@ -119,9 +122,9 @@ local function run_epic(class, choice)
         end
         State.step = State.step + 1
         if task_table[State.step].type == "ZONE_TRAVEL" then
-            actions.zone_travel(task_table[State.step])
+            actions.zone_travel(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "NPC_TRAVEL" then
-            actions.npc_travel(task_table[State.step])
+            actions.npc_travel(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "NPC_KILL" then
             actions.npc_kill(task_table[State.step], class_settings.settings, task_table[State.step + 1].type)
         elseif task_table[State.step].type == "NPC_WAIT" then
@@ -135,7 +138,7 @@ local function run_epic(class, choice)
         elseif task_table[State.step].type == "NPC_HAIL" then
             actions.npc_hail(task_table[State.step])
         elseif task_table[State.step].type == "NPC_FOLLOW" then
-            actions.npc_follow(task_table[State.step])
+            actions.npc_follow(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "PRE_FARM_CHECK" then
             actions.pre_farm_check(task_table[State.step])
         elseif task_table[State.step].type == "COMBINE_CONTAINER" then
@@ -153,13 +156,13 @@ local function run_epic(class, choice)
         elseif task_table[State.step].type == "NPC_SEARCH" then
             actions.npc_search(task_table[State.step])
         elseif task_table[State.step].type == "LOC_TRAVEL" then
-            actions.loc_travel(task_table[State.step])
+            actions.loc_travel(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "OPEN_DOOR" then
             actions.open_door(task_table[State.step])
         elseif task_table[State.step].type == "FACE_HEADING" then
             actions.face_heading(task_table[State.step])
         elseif task_table[State.step].type == "NO_NAV_TRAVEL" then
-            actions.no_nav_travel(task_table[State.step])
+            actions.no_nav_travel(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "CAST_ALT" then
             actions.cast_alt(task_table[State.step])
         elseif task_table[State.step].type == "PICK_DOOR" then
@@ -178,7 +181,7 @@ local function run_epic(class, choice)
         elseif task_table[State.step].type == "NPC_TALK_ALL" then
             actions.npc_talk_all(task_table[State.step])
         elseif task_table[State.step].type == "ZONE_CONTINUE_TRAVEL" then
-            actions.zone_continue_travel(task_table[State.step])
+            actions.zone_continue_travel(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "FACE_LOC" then
             actions.face_loc(task_table[State.step])
         else
@@ -208,7 +211,8 @@ local function displayGUI()
         mq.exit()
         return
     end
-    ImGui.SetNextWindowSize(ImVec2(365, 400), ImGuiCond.FirstUseEver)
+    --ImGui.SetNextWindowSize(ImVec2(365, 400), ImGuiCond.FirstUseEver)
+    ImGui.SetNextWindowSize(ImVec2(415, 475), ImGuiCond.Always)
     openGUI, drawGUI = ImGui.Begin("Epic Laziness##" .. myName, openGUI, window_flags)
     if drawGUI then
         ImGui.BeginTabBar("##Tabs")
@@ -311,6 +315,14 @@ local function displayGUI()
                 class_settings.settings.class[class_list[class_list_choice]], changed = ImGui.Combo('##AutomationType',
                     class_settings.settings.class[class_list[class_list_choice]], automation_list, #automation_list,
                     #automation_list)
+                invis_type = {}
+                for word in string.gmatch(class_settings.settings.class_invis[class_list[class_list_choice]], '([^|]+)') do
+                    table.insert(invis_type, word)
+                end
+                ImGui.PushItemWidth(230)
+                class_settings.settings.invis[class_list[class_list_choice]], changed = ImGui.Combo('##InvisType',
+                    class_settings.settings.invis[class_list[class_list_choice]], invis_type, #invis_type,
+                    #invis_type)
                 if changed then
                     changed = false
                     class_settings.saveSettings()

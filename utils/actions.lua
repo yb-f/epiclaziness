@@ -17,22 +17,37 @@ function Actions.got_cursor()
     return false
 end
 
-function Actions.zone_travel(item)
+function Actions.zone_travel(item, class_settings)
     if State.bind_travel == true then
         State.status = "Returning to bind point"
         manage.gateGroup(State.group_choice)
         mq.delay("10s")
     end
+    if class_settings.general.invisForTravel == true then
+        if item.invis == 1 then
+            manage.invis(State.group_choice, class_settings)
+        end
+    end
     State.status = "Traveling to " .. item.zone
     manage.zoneGroup(State.group_choice, item.zone)
 end
 
-function Actions.zone_continue_travel(item)
+function Actions.zone_continue_travel(item, class_settings)
+    if class_settings.general.invisForTravel == true then
+        if item.invis == 1 then
+            manage.invis(State.group_choice, class_settings)
+        end
+    end
     State.status = "Traveling to " .. item.zone
     manage.zoneGroup(State.group_choice, item.zone)
 end
 
-function Actions.npc_travel(item)
+function Actions.npc_travel(item, class_settings)
+    if class_settings.general.invisForTravel == true then
+        if item.invis == 1 then
+            manage.invis(State.group_choice, class_settings)
+        end
+    end
     if item.what == nil then
         State.Status = "Waiting for NPC " .. item.npc
         while mq.TLO.Spawn("npc " .. item.npc).ID() == 0 do
@@ -179,7 +194,12 @@ function Actions.npc_give_click(item)
     mq.delay("1s")
 end
 
-function Actions.npc_follow(item)
+function Actions.npc_follow(item, class_settings)
+    if class_settings.general.invisForTravel == true then
+        if item.invis == 1 then
+            manage.invis(State.group_choice, class_settings)
+        end
+    end
     State.status = "Following " .. item.npc
     if item.whereX == nil then
         manage.followGroup(State.group_choice, item.npc)
@@ -354,7 +374,12 @@ function Actions.npc_search(item)
     mq.delay(500)
 end
 
-function Actions.loc_travel(item)
+function Actions.loc_travel(item, class_settings)
+    if class_settings.general.invisForTravel == true then
+        if item.invis == 1 then
+            manage.invis(State.group_choice, class_settings)
+        end
+    end
     State.status = "Traveling to  " .. item.whereX .. ", " .. item.whereY .. ", " .. item.whereZ
     manage.locTravelGroup(State.group_choice, item.whereX, item.whereY, item.whereZ)
     while mq.TLO.Nav.Active() do
@@ -374,7 +399,12 @@ function Actions.face_loc(item)
     mq.delay(250)
 end
 
-function Actions.no_nav_travel(item)
+function Actions.no_nav_travel(item, class_settings)
+    if class_settings.general.invisForTravel == true then
+        if item.invis == 1 then
+            manage.invis(State.group_choice, class_settings)
+        end
+    end
     State.status = "Traveling forward to  " .. item.whereX .. ", " .. item.whereY .. ", " .. item.whereZ
     manage.noNavTravel(State.group_choice, item.whereX, item.whereY, item.whereZ)
 end

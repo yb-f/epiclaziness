@@ -4,6 +4,61 @@ local dist = require 'utils/distance'
 local manage = {}
 local elheader = "\ay[\agEpic Laziness\ay]"
 
+function manage.invis(group_set, class_settings)
+    local invis_type = {}
+    for word in string.gmatch(class_settings.class_invis[mq.TLO.Me.Class()], '([^|]+)') do
+        table.insert(invis_type, word)
+    end
+    if invis_type[class_settings.invis[mq.TLO.Me.Class()]] == 'Potion' then
+        mq.cmd('/useitem "Cloudy Potion"')
+    elseif invis_type[class_settings.invis[mq.TLO.Me.Class()]] == 'Hide/Sneak' then
+        mq.cmd("/doability hide")
+        mq.delay(250)
+        mq.cmd("/doability sneak")
+    else
+        mq.cmdf("/casting %s", invis_type[class_settings.invis[mq.TLO.Me.Class()]])
+    end
+    if group_set == 1 then
+        return
+    elseif group_set == 2 then
+        for i = 0, mq.TLO.Group.GroupSize() - 1 do
+            if mq.TLO.Group.Member(i).DisplayName() ~= mq.TLO.Me.DisplayName() then
+                local invis_type = {}
+                for word in string.gmatch(class_settings.class_invis[mq.TLO.Group.Member(i).Class()], '([^|]+)') do
+                    table.insert(invis_type, word)
+                end
+                if invis_type[class_settings.invis[mq.TLO.Group.Member(i).Class()]] == 'Potion' then
+                    mq.cmdf('/dex %s /useitem "Cloudy Potion"', mq.TLO.Group.Member(i).DisplayName())
+                elseif invis_type[class_settings.invis[mq.TLO.Group.Member(i).Class()]] == 'Hide/Sneak' then
+                    mq.cmdf("/dex %s /doability hide", mq.TLO.Group.Member(i).DisplayName())
+                    mq.delay(250)
+                    mq.cmdf("/dex %s /doability sneak", mq.TLO.Group.Member(i).DisplayName())
+                else
+                    mq.cmdf("/dex %s /casting %s", mq.TLO.Group.Member(i).DisplayName(),
+                        invis_type[class_settings.invis[mq.TLO.Group.Member(i).Class()]])
+                end
+            end
+        end
+    else
+        local invis_type = {}
+        mq.cmdf("/face loc %s,%s,%s", y, x, z)
+        for word in string.gmatch(class_settings.class_invis[mq.TLO.Group.Member(State.group_combo[State.group_choice]).Class()], '([^|]+)') do
+            table.insert(invis_type, word)
+        end
+        if invis_type[class_settings.invis[mq.TLO.Group.Member(State.group_combo[State.group_choice]).Class()]] == 'Potion' then
+            mq.cmdf('/dex %s /useitem "Cloudy Potion"',
+                mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName())
+        elseif invis_type[class_settings.invis[mq.TLO.Group.Member(State.group_combo[State.group_choice]).Class()]] == 'Hide/Sneak' then
+            mq.cmdf("/dex %s /doability hide", mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName())
+            mq.delay(250)
+            mq.cmdf("/dex %s /doability sneak", mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName())
+        else
+            mq.cmdf("/dex %s /casting %s", mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName(),
+                invis_type[class_settings.invis[mq.TLO.Group.Member(State.group_combo[State.group_choice]).Class()]])
+        end
+    end
+end
+
 function manage.picklockGroup(group_set)
     if group_set == 1 then
         if mq.TLO.Me.Class.ShortName() == 'BRD' or mq.TLO.Me.Class.ShortName() == 'ROG' then
