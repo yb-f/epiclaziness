@@ -81,6 +81,7 @@ function class_settings.createSettings()
 end
 
 function class_settings.saveSettings()
+    printf("%s \aoSettings saved.", elheader)
     mq.pickle(class_settings.configPath, class_settings.settings)
 end
 

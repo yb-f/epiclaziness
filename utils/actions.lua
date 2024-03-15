@@ -18,10 +18,10 @@ function Actions.got_cursor()
 end
 
 function Actions.zone_travel(item, class_settings)
-    if State.bind_travel == true then
+    if class_settings.general.returnToBind == true then
         State.status = "Returning to bind point"
         manage.gateGroup(State.group_choice)
-        mq.delay("10s")
+        mq.delay("15s")
     end
     if class_settings.general.invisForTravel == true then
         if item.invis == 1 then

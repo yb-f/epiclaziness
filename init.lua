@@ -255,7 +255,6 @@ local function displayGUI()
                 end
             end
             if task_run == true then
-                ImGui.SameLine()
                 if pause == false then
                     if ImGui.SmallButton(ICONS.MD_PAUSE) then
                         pause = true

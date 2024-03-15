@@ -41,10 +41,9 @@ function manage.invis(group_set, class_settings)
         mq.delay(250)
         mq.cmd("/doability sneak")
     else
-        mq.cmdf("/casting %s", invis_type[class_settings.invis[mq.TLO.Me.Class()]])
+        mq.cmdf('/casting "%s"', invis_type[class_settings.invis[mq.TLO.Me.Class()]])
     end
     if group_set == 1 then
-        return
     elseif group_set == 2 then
         for i = 0, mq.TLO.Group.GroupSize() - 1 do
             if mq.TLO.Group.Member(i).DisplayName() ~= mq.TLO.Me.DisplayName() then
@@ -59,7 +58,7 @@ function manage.invis(group_set, class_settings)
                     mq.delay(250)
                     mq.cmdf("/dex %s /doability sneak", mq.TLO.Group.Member(i).DisplayName())
                 else
-                    mq.cmdf("/dex %s /casting %s", mq.TLO.Group.Member(i).DisplayName(),
+                    mq.cmdf('/dex %s /casting "%s"', mq.TLO.Group.Member(i).DisplayName(),
                         invis_type[class_settings.invis[mq.TLO.Group.Member(i).Class()]])
                 end
             end
@@ -78,10 +77,11 @@ function manage.invis(group_set, class_settings)
             mq.delay(250)
             mq.cmdf("/dex %s /doability sneak", mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName())
         else
-            mq.cmdf("/dex %s /casting %s", mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName(),
+            mq.cmdf('/dex %s /casting "%s"', mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName(),
                 invis_type[class_settings.invis[mq.TLO.Group.Member(State.group_combo[State.group_choice]).Class()]])
         end
     end
+    mq.delay("4s")
 end
 
 function manage.picklockGroup(group_set)
