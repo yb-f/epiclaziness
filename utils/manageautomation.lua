@@ -4,7 +4,32 @@ local dist = require 'utils/distance'
 local manage = {}
 local elheader = "\ay[\agEpic Laziness\ay]"
 
+function manage.removeLev(group_set)
+    State.status = "Removing levitate"
+    if group_set == 1 then
+        mq.cmd("/removelev")
+    elseif group_set == 2 then
+        mq.cmd("/dgga /removelev")
+    else
+        mq.cmdf("/removelev")
+        mq.cmdf("/dex %s /removelev", State.group_combo[State.group_choice])
+    end
+end
+
+function manage.removeInvis(group_set)
+    State.status = "Removing invis"
+    if group_set == 1 then
+        mq.cmd("/makemevis")
+    elseif group_set == 2 then
+        mq.cmd("/dgga /makemevis")
+    else
+        mq.cmdf("/makemevis")
+        mq.cmdf("/dex %s /makemevis", State.group_combo[State.group_choice])
+    end
+end
+
 function manage.invis(group_set, class_settings)
+    State.status = "Using invis"
     local invis_type = {}
     for word in string.gmatch(class_settings.class_invis[mq.TLO.Me.Class()], '([^|]+)') do
         table.insert(invis_type, word)

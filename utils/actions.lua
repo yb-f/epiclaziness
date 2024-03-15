@@ -77,6 +77,7 @@ function Actions.npc_travel(item, class_settings)
 end
 
 function Actions.npc_kill(item, class_settings, loot)
+    manage.removeInvis(State.group_choice)
     State.status = "Killing " .. item.npc
     manage.unpauseGroup(State.group_choice, class_settings)
     if item.what == nil then
@@ -140,6 +141,7 @@ function Actions.npc_wait(item)
 end
 
 function Actions.npc_talk(item)
+    manage.removeInvis(State.group_choice)
     State.status = "Talking to " .. item.npc .. " (" .. item.what .. ")"
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
         mq.cmdf('/target id %s', mq.TLO.Spawn(item.npc).ID())
@@ -150,11 +152,13 @@ function Actions.npc_talk(item)
 end
 
 function Actions.npc_talk_all(item)
+    manage.removeInvis(State.group_choice)
     State.status = "Talking to " .. item.npc .. " (" .. item.what .. ")"
     manage.groupTalk(State.group_choice, item.npc, item.what)
 end
 
 function Actions.npc_give(item)
+    manage.removeInvis(State.group_choice)
     State.status = "Giving " .. item.what .. " to " .. item.npc
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
         mq.cmdf('/target id %s', mq.TLO.Spawn(item.npc).ID())
@@ -173,6 +177,7 @@ function Actions.npc_give(item)
 end
 
 function Actions.npc_give_add(item)
+    manage.removeInvis(State.group_choice)
     State.status = "Giving " .. item.what .. " to " .. item.npc
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
         mq.cmdf('/target id %s', mq.TLO.Spawn(item.npc).ID())
@@ -185,6 +190,7 @@ function Actions.npc_give_add(item)
 end
 
 function Actions.npc_give_click(item)
+    manage.removeInvis(State.group_choice)
     State.status = "Giving items"
     mq.cmd('/notify GiveWnd GVW_Give_Button leftmouseup')
     mq.delay(100)
@@ -214,6 +220,7 @@ function Actions.npc_stop_follow(item)
 end
 
 function Actions.npc_hail(item)
+    manage.removeInvis(State.group_choice)
     State.status = "Hailing " .. item.npc
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
         mq.cmdf('/target id %s', mq.TLO.Spawn(item.npc).ID())
@@ -295,6 +302,7 @@ function Actions.combine_do(item)
 end
 
 function Actions.farm(item, class_settings)
+    manage.removeInvis(State.group_choice)
     State.status = "Farming for " .. item.what
     State.farming = true
     manage.unpauseGroup(State.group_choice, class_settings)
@@ -339,6 +347,7 @@ function Actions.farm(item, class_settings)
 end
 
 function Actions.farm_radius(item, class_settings)
+    manage.removeInvis(State.group_choice)
     State.status = "Farming for " .. item.what
     manage.locTravelGroup(State.group_choice, item.whereX, item.whereY, item.whereZ)
     manage.campGroup(State.group_choice, item.radius, class_settings)
@@ -426,6 +435,7 @@ function Actions.picklock_door(item)
 end
 
 function Actions.cast_alt(item)
+    manage.removeInvis(State.group_choice)
     State.status = "Casting " .. item.what
     mq.cmdf('/casting "%s"', item.what)
     mq.delay(200)

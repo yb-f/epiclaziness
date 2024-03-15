@@ -188,6 +188,9 @@ local function run_epic(class, choice)
             printf("%s \aoUnknown Type: \ar%s!", elheader, task_table[State.step])
             mq.exit()
         end
+        if task_table[State.step].belev == nil then
+            manage.removeLev(State.group_choice)
+        end
         if task_table[State.step].SaveStep == 1 then
             printf("%s \aosaving step: \ar%s", elheader, State.step)
             loadsave.prepSave(State.step)
