@@ -144,7 +144,7 @@ function manage.groupTalk(group_set, npc, phrase)
     elseif group_set == 2 then
         for i = 0, mq.TLO.Group.GroupSize() - 1 do
             if mq.TLO.Group.Member(i).DisplayName() ~= mq.TLO.Me.DisplayName() then
-                mq.cmdf("/dex %s /target id %s", mq.TLO.Group.Member(i).DisplayName(), npc)
+                mq.cmdf("/dex %s /target id %s", mq.TLO.Group.Member(i).DisplayName(), mq.TLO.Spawn(npc).ID())
                 mq.delay(300)
                 mq.cmdf("/dex %s /say %s", mq.TLO.Group.Member(i).DisplayName(), phrase)
             end
@@ -162,7 +162,7 @@ function manage.groupTalk(group_set, npc, phrase)
         mq.cmdf("/say %s", phrase)
         mq.delay(750)
     else
-        mq.cmdf("/dex %s /target id %s", State.group_combo[State.group_choice], npc)
+        mq.cmdf("/dex %s /target id %s", State.group_combo[State.group_choice], mq.TLO.Spawn(npc).ID())
         mq.delay(300)
         mq.cmdf("/dex %s /say %s", State.group_combo[State.group_choice], phrase)
         math.randomseed(os.time())
@@ -229,6 +229,17 @@ function manage.faceLoc(group_set, x, y, z)
     else
         mq.cmdf("/face loc %s,%s,%s", y, x, z)
         mq.cmdf("/dex %s /face loc %s,%s,%s", State.group_combo[State.group_choice], y, x, z)
+    end
+end
+
+function manage.faceHeading(group_set, heading)
+    if group_set == 1 then
+        mq.cmdf("/face heading %s", heading)
+    elseif group_set == 2 then
+        mq.cmdf("/dgga /face heading %s", heading)
+    else
+        mq.cmdf("/face heading %s", heading)
+        mq.cmdf("/dex %s /face heading %s", State.group_combo[State.group_choice], heading)
     end
 end
 

@@ -147,10 +147,12 @@ local function run_epic(class, choice)
             actions.combine_item(task_table[State.step])
         elseif task_table[State.step].type == "COMBINE_DO" then
             actions.combine_do(task_table[State.step])
+        elseif task_table[State.step].type == "COMBINE_DONE" then
+            actions.combine_done(task_table[State.step])
         elseif task_table[State.step].type == "FARM" then
             actions.farm(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "GROUND_SPAWN" then
-            actions.ground_spawn(task_table[State.step])
+            actions.ground_spawn(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "LOOT" then
             actions.loot(task_table[State.step])
         elseif task_table[State.step].type == "NPC_SEARCH" then
@@ -186,6 +188,8 @@ local function run_epic(class, choice)
             actions.zone_continue_travel(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "FACE_LOC" then
             actions.face_loc(task_table[State.step])
+        elseif task_table[State.step].type == "NPC_BUY" then
+            actions.npc_buy(task_table[State.step])
         else
             printf("%s \aoUnknown Type: \ar%s!", elheader, task_table[State.step])
             mq.exit()
@@ -216,8 +220,7 @@ local function displayGUI()
         mq.exit()
         return
     end
-    --ImGui.SetNextWindowSize(ImVec2(365, 400), ImGuiCond.FirstUseEver)
-    ImGui.SetNextWindowSize(ImVec2(415, 475), ImGuiCond.Always)
+    ImGui.SetNextWindowSize(ImVec2(415, 475), ImGuiCond.FirstUseEver)
     openGUI, drawGUI = ImGui.Begin("Epic Laziness##" .. myName, openGUI, window_flags)
     if drawGUI then
         ImGui.BeginTabBar("##Tabs")

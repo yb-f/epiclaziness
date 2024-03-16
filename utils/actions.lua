@@ -10,6 +10,14 @@ function Actions.give_window()
     return mq.TLO.Window('GiveWnd').Open()
 end
 
+function Actions.merchant_window()
+    return mq.TLO.Window('MerchantWnd').Open()
+end
+
+function Actions.inventory_window()
+    return mq.TLO.Window('InventoryWindow').Open()
+end
+
 function Actions.got_cursor()
     if mq.TLO.Cursor() ~= nil then
         return true
@@ -20,8 +28,10 @@ end
 function Actions.zone_travel(item, class_settings)
     if class_settings.general.returnToBind == true then
         State.status = "Returning to bind point"
-        manage.gateGroup(State.group_choice)
-        mq.delay("15s")
+        while mq.TLO.Zone.ShortName() ~= mq.TLO.Me.BoundLocation('0')() do
+            manage.gateGroup(State.group_choice)
+            mq.delay("15s")
+        end
     end
     if class_settings.general.invisForTravel == true then
         if item.invis == 1 then
@@ -118,7 +128,6 @@ function Actions.npc_kill(item, class_settings, loot)
             end
         end
     end
-
     manage.pauseGroup(State.group_choice, class_settings)
     mq.delay("2s")
     if mq.TLO.AdvLoot.SCount() > 0 then
@@ -157,6 +166,20 @@ function Actions.npc_talk_all(item)
     manage.groupTalk(State.group_choice, item.npc, item.what)
 end
 
+function Actions.npc_buy(item)
+    manage.removeInvis(State.group_choice)
+    State.status = "Buying " .. item.what .. " from " .. item.npc
+    if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
+        mq.cmdf('/target id %s', mq.TLO.Spawn(item.npc).ID())
+        mq.delay(300)
+    end
+    mq.cmd('/usetarget')
+    mq.delay("5s", Actions.merchant_window)
+    mq.TLO.Merchant.SelectItem("=" .. item.what)
+    mq.delay(100)
+    mq.TLO.Merchant.Buy(1)
+end
+
 function Actions.npc_give_money(item)
     manage.removeInvis(State.group_choice)
     State.status = "Giving " .. item.what .. "pp to " .. item.npc
@@ -164,10 +187,10 @@ function Actions.npc_give_money(item)
         mq.cmdf('/target id %s', mq.TLO.Spawn(item.npc).ID())
         mq.delay(300)
     end
-    if mq.TLO.Window('InventoryWindow').Open == false then
+    if mq.TLO.Window('InventoryWindow').Open() == false then
         mq.cmd('/keypress INVENTORY')
     end
-    mq.delay(200)
+    mq.delay("5s", Actions.inventory_window)
     mq.cmd('/notify InventoryWindow IW_Money0 leftmouseup')
     mq.delay(200)
     mq.cmd('/notify QuantityWnd QTYW_slider newvalue 1000')
@@ -292,6 +315,13 @@ function Actions.loot(item)
             end
         end
     end
+    if mq.TLO.AdvLoot.PCount() > 0 then
+        for i = 1, mq.TLO.AdvLoot.PCount() do
+            if mq.TLO.AdvLoot.PList(i).Name() == item.what then
+                mq.cmdf('/advloot personal %s loot', i, mq.TLO.Me.DisplayName())
+            end
+        end
+    end
     if mq.TLO.FindItem("=" .. item.what) then
         return
     else
@@ -303,8 +333,8 @@ function Actions.combine_container(item)
     State.status = "Preparing combine container"
     if mq.TLO.InvSlot('pack10').Item.Container() then
         inv.empty_bag(10)
-        inv.move_bag(10)
-        State.bagslot1, State.bagslot2 = inv.move_combine_container(10, item.what)
+        State.bagslot1, State.bagslot2 = inv.move_bag(10)
+        inv.move_combine_container(10, item.what)
     end
 end
 
@@ -320,12 +350,17 @@ function Actions.combine_do(item)
         mq.delay(100)
     end
     mq.cmd("/autoinv")
-    --[[State.status = "Moving container back to slot 10"
+end
+
+function Actions.combine_Done(item)
+    State.status = "Moving container back to slot 10"
     mq.cmdf("/nomodkey /shiftkey /itemnotify in pack%s %s leftmouseup", State.bagslot1, State.bagslot2)
     while mq.TLO.Cursor() == nil do
         mq.delay(100)
     end
-    mq.cmd("/nomodkey /shiftkey /itemnotify pack10 leftmouseup")--]]
+    mq.cmd("/nomodkey /shiftkey /itemnotify pack10 leftmouseup")
+    mq.delay(200)
+    mq.cmd("/autoinv")
 end
 
 function Actions.farm(item, class_settings)
@@ -359,10 +394,17 @@ function Actions.farm(item, class_settings)
                 mq.delay(200)
             end
             mq.delay(1000)
-            if mq.TLO.AdvLoot.LootInProgress() then
+            if mq.TLO.AdvLoot.SCount > 0 then
                 for i = 1, mq.TLO.AdvLoot.SCount() do
                     if mq.TLO.AdvLoot.SList(i).Name() == item.what then
                         mq.cmdf('/advloot shared %s giveto %s', i, mq.TLO.Me.DisplayName())
+                    end
+                end
+            end
+            if mq.TLO.AdvLoot.PCount() > 0 then
+                for i = 1, mq.TLO.AdvLoot.PCount() do
+                    if mq.TLO.AdvLoot.PList(i).Name() == item.what then
+                        mq.cmdf('/advloot personal %s loot', i, mq.TLO.Me.DisplayName())
                     end
                 end
             end
@@ -379,12 +421,50 @@ function Actions.farm_radius(item, class_settings)
     manage.locTravelGroup(State.group_choice, item.whereX, item.whereY, item.whereZ)
     manage.campGroup(State.group_choice, item.radius, class_settings)
     manage.unpauseGroup(State.group_choice, class_settings)
+    local item_list = {}
+    local item_status = ''
+    local looping = true
+    local loop_check = true
+    for word in string.gmatch(item.what, '([^|]+)') do
+        table.insert(item_list, word)
+    end
     if item.count == nil then
-        while mq.TLO.FindItem("=" .. item.what)() == nil do
-            if mq.TLO.AdvLoot.LootInProgress() then
+        while looping do
+            item_status = ''
+            loop_check = true
+            local item_remove = 0
+            for i, name in pairs(item_list) do
+                if mq.TLO.FindItem("=" .. name)() == nil then
+                    loop_check = false
+                    item_status = item_status .. "|" .. name
+                else
+                    item_remove = i
+                end
+            end
+            if item_remove > 0 then
+                table.remove(item_list, item_remove)
+            end
+            State.status = "Farming for " .. item_status
+            if loop_check then
+                looping = false
+            end
+            if mq.TLO.AdvLoot.SCount() > 0 then
                 for i = 1, mq.TLO.AdvLoot.SCount() do
-                    if mq.TLO.AdvLoot.SList(i).Name() == item.what then
-                        mq.cmdf('/advloot shared %s giveto %s', i, mq.TLO.Me.DisplayName())
+                    for _, name in pairs(item_list) do
+                        if mq.TLO.AdvLoot.SList(i).Name() == name then
+                            mq.cmdf('/advloot shared %s giveto %s', i, mq.TLO.Me.DisplayName())
+                            printf('%s \aoLooting: %s', elheader, name)
+                        end
+                    end
+                end
+            end
+            if mq.TLO.AdvLoot.PCount() > 0 then
+                for i = 1, mq.TLO.AdvLoot.PCount() do
+                    for _, name in pairs(item_list) do
+                        if mq.TLO.AdvLoot.SList(i).Name() == name then
+                            mq.cmdf('/advloot personal %s loot', i)
+                            printf('%s \aoLooting: %s', elheader, name)
+                        end
                     end
                 end
             end
@@ -392,10 +472,21 @@ function Actions.farm_radius(item, class_settings)
         end
     else
         while mq.TLO.FindItemCount("=" .. item.what)() < item.count do
-            if mq.TLO.AdvLoot.LootInProgress() then
+            if mq.TLO.AdvLoot.SCount > 0 then
                 for i = 1, mq.TLO.AdvLoot.SCount() do
                     if mq.TLO.AdvLoot.SList(i).Name() == item.what then
                         mq.cmdf('/advloot shared %s giveto %s', i, mq.TLO.Me.DisplayName())
+                        printf('%s \aoLooting: %s', elheader, name)
+                    end
+                end
+            end
+            if mq.TLO.AdvLoot.PCount() > 0 then
+                for i = 1, mq.TLO.AdvLoot.PCount() do
+                    for _, name in pairs(item_list) do
+                        if mq.TLO.AdvLoot.SList(i).Name() == name then
+                            mq.cmdf('/advloot personal %s loot', i)
+                            printf('%s \aoLooting: %s', elheader, name)
+                        end
                     end
                 end
             end
@@ -406,9 +497,9 @@ function Actions.farm_radius(item, class_settings)
     manage.pauseGroup(State.group_choice, class_settings)
 end
 
-function Actions.ground_spawn(item)
+function Actions.ground_spawn(item, class_settings)
     State.status = "Picking up ground spawn " .. item.what
-    Actions.loc_travel(item)
+    Actions.loc_travel(item, class_settings)
     mq.cmd("/itemtarget")
     mq.delay(200)
     mq.cmd("/click left itemtarget")
@@ -444,7 +535,8 @@ end
 
 function Actions.face_heading(item)
     State.status = "Facing " .. item.what
-    mq.cmdf("/face heading %s", item.what)
+    manage.faceHeading(State.group_choice, item.what)
+    --mq.cmdf("/face heading %s", item.what)
     mq.delay(250)
 end
 
