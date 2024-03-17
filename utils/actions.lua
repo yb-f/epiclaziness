@@ -166,6 +166,13 @@ function Actions.npc_talk_all(item)
     manage.groupTalk(State.group_choice, item.npc, item.what)
 end
 
+function Actions.npc_wait_despawn(item)
+    State.status = "Waiting for " .. item.npc .. " to despawn (" .. item.waittime .. ")"
+    while mq.TLO.Spawn("npc " .. item.npc).ID() ~= 0 do
+        mq.delay(200)
+    end
+end
+
 function Actions.npc_buy(item)
     manage.removeInvis(State.group_choice)
     State.status = "Buying " .. item.what .. " from " .. item.npc
@@ -293,15 +300,51 @@ function Actions.pre_farm_check(item)
     State.status = "Checking for pre-farmable items"
     local check_list = {}
     local not_found = false
-    for word in string.gmatch(item.what, '([^|]+)') do
-        table.insert(check_list, word)
-        for check in pairs(check_list) do
-            if mq.TLO.FindItem("=" .. check)() == nil then not_found = true end
+    if item.count ~= nil then
+        for word in string.gmatch(item.what, '([^|]+)') do
+            table.insert(check_list, word)
+            for check in pairs(check_list) do
+                if mq.TLO.FindItem("=" .. check)() == nil then
+                    not_found = true
+                end
+            end
         end
-        --if one or more of the items are not present this will be true, so on false advance to the desired step
-        if not_found == false then
-            State.step = item.gotostep - 1
+    else
+        for word in string.gmatch(item.what, '([^|]+)') do
+            table.insert(check_list, word)
+            for check in pairs(check_list) do
+                if mq.TLO.FindItem("=" .. check)() == nil then
+                    not_found = true
+                else
+                    if mq.TLO.FindItemCount("=" .. check) < item.count then
+                        not_found = true
+                    end
+                end
+            end
+            --if one or more of the items are not present this will be true, so on false advance to the desired step
+            if not_found == false then
+                State.step = item.gotostep - 1
+            end
         end
+    end
+end
+
+function Actions.farm_check(item)
+    State.status = "Checking if we have " .. item.count .. " of " .. item.what
+    local not_found = false
+    if mq.TLO.FindItem("=" .. item.what)() == nil then
+        not_found = true
+    else
+        if mq.TLO.FindItemCount("=" .. item.what) < item.count then
+            not_found = true
+        end
+    end
+    --if one or more of the items are not present this will be true, so on false advance to the desired step
+    if not_found == false then
+        State.step = item.gotostep - 1
+    else
+        --using item.zone as a filler slot for split goto for this function
+        State.step = item.zone - 1
     end
 end
 
@@ -326,6 +369,9 @@ function Actions.loot(item)
         return
     else
         printf("Did not loot %s", item.what)
+    end
+    if item.gotostep ~= nil then
+        State.step = item.gotostep - 1
     end
 end
 
@@ -361,6 +407,28 @@ function Actions.combine_Done(item)
     mq.cmd("/nomodkey /shiftkey /itemnotify pack10 leftmouseup")
     mq.delay(200)
     mq.cmd("/autoinv")
+end
+
+function Actions.npc_kill_all(item, class_settings)
+    manage.removeInvis(State.group_choice)
+    State.status = "Killing All " .. item.npc
+    manage.unpauseGroup(State.group_choice, class_settings)
+    while true do
+        local ID = mq.TLO.NearestSpawn('npc' .. item.npc).ID()
+        mq.cmdf('/nav id %s', ID)
+        while mq.TLO.Nav.Active() do
+            mq.delay(200)
+        end
+        mq.cmdf('/tar id %s', ID)
+        mq.delay(200)
+        mq.cmd('/keypress AUTOPRIM')
+        while mq.TLO.Spawn(ID).Type() == 'NPC' do
+            mq.delay(200)
+        end
+        if mq.TLO.FindItem("=" .. item.what) == nil then
+            Actions.loot(item)
+        end
+    end
 end
 
 function Actions.farm(item, class_settings)
@@ -472,7 +540,7 @@ function Actions.farm_radius(item, class_settings)
         end
     else
         while mq.TLO.FindItemCount("=" .. item.what)() < item.count do
-            if mq.TLO.AdvLoot.SCount > 0 then
+            if mq.TLO.AdvLoot.SCount() > 0 then
                 for i = 1, mq.TLO.AdvLoot.SCount() do
                     if mq.TLO.AdvLoot.SList(i).Name() == item.what then
                         mq.cmdf('/advloot shared %s giveto %s', i, mq.TLO.Me.DisplayName())
@@ -520,6 +588,16 @@ function Actions.npc_search(item)
     mq.delay(500)
 end
 
+function Actions.ph_search(item)
+    State.status = 'Searching for PH for ' .. item.npc
+    local spawn_search = "npc loc " ..
+        item.whereX .. " " .. item.whereY .. " " .. item.whereZ .. " radius " .. item.radius
+    if mq.TLO.Spawn(spawn_search).ID() ~= 0 then
+        State.step = item.gotostep - 1
+    end
+    mq.delay(500)
+end
+
 function Actions.loc_travel(item, class_settings)
     if class_settings.general.invisForTravel == true then
         if item.invis == 1 then
@@ -556,6 +634,16 @@ function Actions.no_nav_travel(item, class_settings)
     manage.noNavTravel(State.group_choice, item.whereX, item.whereY, item.whereZ)
 end
 
+function Actions.forward_zone(item, class_settings)
+    if class_settings.general.invisForTravel == true then
+        if item.invis == 1 then
+            manage.invis(State.group_choice, class_settings)
+        end
+    end
+    State.status = "Traveling forward to zone: " .. item.zone
+    manage.forwardZone(State.group_choice, item.zone)
+end
+
 function Actions.open_door(item)
     State.status = "Opening door"
     mq.delay(200)
@@ -579,6 +667,22 @@ function Actions.cast_alt(item)
     mq.delay(200)
     while mq.TLO.Me.Casting() ~= nil do
         mq.delay(100)
+    end
+end
+
+function Actions.ignore_mob(item, class_settings)
+    if class_settings.class[mq.TLO.Me.Class()] == 1 then
+        mq.cmdf('/%s ignore "%s"', mq.TLO.Me.Class.ShortName(), item.npc)
+    elseif class_settings.class[mq.TLO.Me.Class()] == 2 then
+        mq.cmdf('/rgl pulldeny "%s"', item.npc)
+    elseif class_settings.class[mq.TLO.Me.Class()] == 3 then
+        mq.cmdf("/target %s", item.npc)
+        mq.delay(200)
+        mq.cmd('/addignore')
+    elseif class_settings.class[mq.TLO.Me.Class()] == 4 then
+        mq.cmdf('/addignore "%s"', item.npc)
+    elseif class_settings.class[mq.TLO.Me.Class()] == 5 then
+        mq.cmdf('/addignore "%s"', item.npc)
     end
 end
 

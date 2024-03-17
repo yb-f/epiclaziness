@@ -48,6 +48,7 @@ State.epic_choice = 1
 State.farming = false
 State.nextmob = false
 State.epicstring = ''
+State.X, State.Y, State.Z = 0, 0, 0
 
 class_settings.loadSettings()
 
@@ -127,6 +128,8 @@ local function run_epic(class, choice)
             actions.npc_travel(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "NPC_KILL" then
             actions.npc_kill(task_table[State.step], class_settings.settings, task_table[State.step + 1].type)
+        elseif task_table[State.step].type == "NPC_KILL_ALL" then
+            actions.npc_kill_all(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "NPC_WAIT" then
             actions.npc_wait(task_table[State.step])
         elseif task_table[State.step].type == "NPC_TALK" then
@@ -141,6 +144,8 @@ local function run_epic(class, choice)
             actions.npc_follow(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "PRE_FARM_CHECK" then
             actions.pre_farm_check(task_table[State.step])
+        elseif task_table[State.step].type == "FARM_CHECK" then
+            actions.farm_check(task_table[State.step])
         elseif task_table[State.step].type == "COMBINE_CONTAINER" then
             actions.combine_container(task_table[State.step])
         elseif task_table[State.step].type == "COMBINE_ITEM" then
@@ -157,6 +162,8 @@ local function run_epic(class, choice)
             actions.loot(task_table[State.step])
         elseif task_table[State.step].type == "NPC_SEARCH" then
             actions.npc_search(task_table[State.step])
+        elseif task_table[State.step].type == "PH_SEARCH" then
+            actions.ph_search(task_table[State.step])
         elseif task_table[State.step].type == "LOC_TRAVEL" then
             actions.loc_travel(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "OPEN_DOOR" then
@@ -190,8 +197,16 @@ local function run_epic(class, choice)
             actions.face_loc(task_table[State.step])
         elseif task_table[State.step].type == "NPC_BUY" then
             actions.npc_buy(task_table[State.step])
+        elseif task_table[State.step].type == "NPC_WAIT_DESPAWN" then
+            actions.npc_wait_despawn(task_table[State.step])
+        elseif task_table[State.step].type == "FORWARD_ZONE" then
+            actions.forward_zone(task_table[State.step], class_settings.settings)
+        elseif task_table[State.step].type == "NPC_WAIT_DESPAWN" then
+            actions.npc_wait_despawn(task_table[State.step])
+        elseif task_table[State.step].type == "IGNORE_MOB" then
+            actions.ignore_mob(task_table[State.step], class_settings.settings)
         else
-            printf("%s \aoUnknown Type: \ar%s!", elheader, task_table[State.step])
+            printf("%s \aoUnknown Type: \ar%s!", elheader, task_table[State.step].type)
             mq.exit()
         end
         if task_table[State.step].belev == nil then

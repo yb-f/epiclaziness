@@ -4,7 +4,7 @@ local loadsave = {}
 loadsave.SaveState = {}
 local myName = mq.TLO.Me.DisplayName()
 loadsave.configPath = mq.configDir ..
-'/epiclaziness/epiclaziness_' .. mq.TLO.EverQuest.Server() .. "_" .. myName .. '.lua'
+    '/epiclaziness/epiclaziness_' .. mq.TLO.EverQuest.Server() .. "_" .. myName .. '.lua'
 local class = mq.TLO.Me.Class.Name()
 local elheader = "\ay[\agEpic Laziness\ay]"
 
@@ -20,6 +20,13 @@ function loadsave.createConfig()
     loadsave.saveState()
 end
 
+function loadsave.addConfig()
+    loadsave.SaveState[class][State.epic_choice] = {
+        ['Step'] = 0
+    }
+    loadsave.saveState()
+end
+
 function loadsave.loadState()
     local configData, err = loadfile(loadsave.configPath)
     if err then
@@ -30,7 +37,11 @@ function loadsave.loadState()
             if loadsave.SaveState[class][State.epic_choice] ~= nil then
                 State.step = loadsave.SaveState[class][State.epic_choice].Step
                 printf("%s \aoStarting on step %s", elheader, State.step)
+            else
+                loadsave.addConfig()
             end
+        else
+            loadsave.addConfig()
         end
     end
 end

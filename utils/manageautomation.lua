@@ -255,7 +255,8 @@ function manage.locTravelGroup(group_set, x, y, z)
     end
     mq.delay(200)
     while mq.TLO.Nav.Active() do
-        if loopCount == 20 then
+        mq.delay(200)
+        if loopCount == 10 then
             mq.cmd('/squelch /doortarget')
             mq.delay(200)
             if mq.TLO.Switch.Distance() ~= nil then
@@ -265,7 +266,14 @@ function manage.locTravelGroup(group_set, x, y, z)
             end
             loopCount = 0
         end
-        loopCount = loopCount + 1
+        if dist.GetDistance3D(mq.TLO.Me.X(), mq.TLO.Me.Y(), mq.TLO.Me.Z(), State.X, State.Y, State.Z) < 20 then
+            loopCount = loopCount + 1
+        else
+            State.X = mq.TLO.Me.X()
+            State.Y = mq.TLO.Me.Y()
+            State.Z = mq.TLO.Me.Z()
+            loopCount = 0
+        end
     end
 end
 
@@ -347,7 +355,8 @@ function manage.navGroup(group_set, npc)
     end
     mq.delay(200)
     while mq.TLO.Nav.Active() do
-        if loopCount == 20 then
+        mq.delay(200)
+        if loopCount == 10 then
             mq.cmd('/squelch /doortarget')
             mq.delay(200)
             if mq.TLO.Switch.Distance() ~= nil then
@@ -357,12 +366,22 @@ function manage.navGroup(group_set, npc)
             end
             loopCount = 0
         end
-        loopCount = loopCount + 1
+        if dist.GetDistance3D(mq.TLO.Me.X(), mq.TLO.Me.Y(), mq.TLO.Me.Z(), State.X, State.Y, State.Z) < 20 then
+            loopCount = loopCount + 1
+        else
+            State.X = mq.TLO.Me.X()
+            State.Y = mq.TLO.Me.Y()
+            State.Z = mq.TLO.Me.Z()
+            loopCount = 0
+        end
     end
 end
 
 function manage.navGroupLoc(group_set, npc, x, y, z)
     local loopCount = 0
+    State.X = mq.TLO.Me.X()
+    State.Y = mq.TLO.Me.Y()
+    State.Z = mq.TLO.Me.Z()
     local searchstring = "loc " .. x .. " " .. y .. " " .. z .. " radius 50 npc " .. npc
     if group_set == 1 then
         mq.cmdf("/squelch /nav id %s", mq.TLO.Spawn(searchstring).ID())
@@ -374,7 +393,8 @@ function manage.navGroupLoc(group_set, npc, x, y, z)
     end
     mq.delay(200)
     while mq.TLO.Nav.Active() do
-        if loopCount == 20 then
+        mq.delay(200)
+        if loopCount == 10 then
             mq.cmd('/squelch /doortarget')
             mq.delay(200)
             if mq.TLO.Switch.Distance() ~= nil then
@@ -384,7 +404,14 @@ function manage.navGroupLoc(group_set, npc, x, y, z)
             end
             loopCount = 0
         end
-        loopCount = loopCount + 1
+        if dist.GetDistance3D(mq.TLO.Me.X(), mq.TLO.Me.Y(), mq.TLO.Me.Z(), State.X, State.Y, State.Z) < 20 then
+            loopCount = loopCount + 1
+        else
+            State.X = mq.TLO.Me.X()
+            State.Y = mq.TLO.Me.Y()
+            State.Z = mq.TLO.Me.Z()
+            loopCount = 0
+        end
     end
 end
 
@@ -417,6 +444,36 @@ function manage.noNavTravel(group_set, x, y, z)
         end
         mq.cmdf("/dex %s /keypress forward", State.group_combo[State.group_choice])
         mq.cmd("/keypress forward")
+    end
+end
+
+function manage.forwardZone(group_set, zone)
+    if group_set == 1 then
+        mq.cmd("/keypress forward hold")
+        while mq.TLO.Zone.ShortName() ~= zone do
+            mq.delay(500)
+        end
+        mq.delay("1s")
+    elseif group_set == 2 then
+        mq.cmd("/dgge /keypress forward hold")
+        mq.cmd("/keypress forward hold")
+        while mq.TLO.Zone.ShortName() ~= zone do
+            mq.delay(500)
+        end
+        while mq.TLO.Group.AnyoneMissing() do
+            mq.delay(500)
+        end
+        mq.delay("5s")
+    else
+        mq.cmdf("/dex %s /keypress forward hold", State.group_combo[State.group_choice])
+        mq.cmd("/keypress forward hold")
+        while mq.TLO.Zone.ShortName() ~= zone do
+            mq.delay(500)
+        end
+        while mq.TLO.Group.Member(State.group_combo[State.group_choice]).OtherZone() do
+            mq.delay(500)
+        end
+        mq.delay("5s")
     end
 end
 
