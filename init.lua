@@ -49,6 +49,7 @@ State.farming = false
 State.nextmob = false
 State.epicstring = ''
 State.X, State.Y, State.Z = 0, 0, 0
+State.skip = false
 
 class_settings.loadSettings()
 
@@ -121,6 +122,7 @@ local function run_epic(class, choice)
         while pause == true do
             mq.delay(500)
         end
+        State.skip = false
         State.step = State.step + 1
         if task_table[State.step].type == "ZONE_TRAVEL" then
             actions.zone_travel(task_table[State.step], class_settings.settings)
@@ -205,6 +207,12 @@ local function run_epic(class, choice)
             actions.npc_wait_despawn(task_table[State.step])
         elseif task_table[State.step].type == "IGNORE_MOB" then
             actions.ignore_mob(task_table[State.step], class_settings.settings)
+        elseif task_table[State.step].type == "EXECUTE_COMMAND" then
+            mq.cmdf("%s", task_table[State.step].what)
+        elseif task_table[State.step].type == "SEND_YES" then
+            actions.send_yes(task_table[State.step])
+        elseif task_table[State.step].type == "PORTAL_SET" then
+            actions.portal_set(task_table[State.step])
         else
             printf("%s \aoUnknown Type: \ar%s!", elheader, task_table[State.step].type)
             mq.exit()
@@ -257,20 +265,15 @@ local function displayGUI()
                     populate_group_combo()
                 end
             end
-            if ImGui.IsItemHovered() then
-                local gate_num = gate_needed(mq.TLO.Me.Class.ShortName(), State.epic_choice)
-                local tooltip = "'/relocate gate' before traveling between zones.\nThis may require up to " ..
-                    gate_num .. " gate potions."
-                ImGui.SetTooltip(tooltip)
-            end
             if task_run == false then
                 if ImGui.Button("Begin") then
                     start_run = true
                 end
                 if ImGui.IsItemHovered() then
                     local invis_num = invis_needed(mq.TLO.Me.Class.ShortName(), State.epic_choice)
+                    local gate_num = gate_needed(mq.TLO.Me.Class.ShortName(), State.epic_choice)
                     local tooltip = "Begin/resume epic quest\nThis may require up to " ..
-                        invis_num .. " invis potions."
+                        invis_num .. " invis potions.\nThis may require up to " .. gate_num .. " gate potions."
                     ImGui.SetTooltip(tooltip)
                 end
             end
@@ -290,11 +293,13 @@ local function displayGUI()
                         ImGui.SetTooltip("Resume")
                     end
                 end
-                if State.farming == true then
-                    ImGui.SameLine()
-                    if ImGui.SmallButton(ICONS.MD_FAST_FORWARD) then
-                        State.nextmob = true
-                    end
+                ImGui.SameLine()
+                if ImGui.SmallButton(ICONS.MD_FAST_FORWARD) then
+                    State.skip = true
+                    State.step = State.step + 1
+                end
+                if ImGui.IsItemHovered() then
+                    ImGui.SetTooltip("Next Step")
                 end
                 if ImGui.Button("Stop @ Next Save") then
                     printf("%s \aoStopping at next save point.", elheader)

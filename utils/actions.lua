@@ -59,8 +59,11 @@ function Actions.npc_travel(item, class_settings)
         end
     end
     if item.what == nil then
-        State.Status = "Waiting for NPC " .. item.npc
+        State.status = "Waiting for NPC " .. item.npc
         while mq.TLO.Spawn("npc " .. item.npc).ID() == 0 do
+            if State.skip == true then
+                return
+            end
             mq.delay(200)
         end
         State.status = "Navigating to " .. item.npc
@@ -94,6 +97,7 @@ function Actions.npc_kill(item, class_settings, loot)
         mq.delay(200)
         local ID = mq.TLO.Spawn("npc " .. item.npc).ID()
         mq.cmdf("/target id %s", ID)
+        mq.cmd("/stick")
         mq.delay(100)
         mq.cmd("/keypress AUTOPRIM")
         while mq.TLO.Spawn(ID).Type() == 'NPC' do
@@ -109,6 +113,8 @@ function Actions.npc_kill(item, class_settings, loot)
         if mq.TLO.Spawn("npc " .. item.npc).ID() ~= 0 then
             local ID = mq.TLO.Spawn("npc " .. item.npc).ID()
             mq.cmdf("/target id %s", ID)
+            mq.cmd("/stick")
+            mq.delay(100)
             mq.cmd("/keypress AUTOPRIM")
             while mq.TLO.Spawn(ID).Type() == 'NPC' do
                 if mq.TLO.Target.ID ~= ID then
@@ -122,6 +128,8 @@ function Actions.npc_kill(item, class_settings, loot)
         else
             local ID = mq.TLO.Spawn("npc " .. item.what).ID()
             mq.cmdf("/target id %s", ID)
+            mq.cmd("/stick")
+            mq.delay(100)
             mq.cmd("/keypress AUTOPRIM")
             while mq.TLO.Spawn(ID).Type() == 'NPC' do
                 mq.delay(200)
@@ -182,9 +190,11 @@ function Actions.npc_buy(item)
     end
     mq.cmd('/usetarget')
     mq.delay("5s", Actions.merchant_window)
+    mq.delay("1s")
     mq.TLO.Merchant.SelectItem("=" .. item.what)
-    mq.delay(100)
+    mq.delay("1s")
     mq.TLO.Merchant.Buy(1)
+    mq.delay("1s")
 end
 
 function Actions.npc_give_money(item)
@@ -335,7 +345,7 @@ function Actions.farm_check(item)
     if mq.TLO.FindItem("=" .. item.what)() == nil then
         not_found = true
     else
-        if mq.TLO.FindItemCount("=" .. item.what) < item.count then
+        if mq.TLO.FindItemCount("=" .. item.what)() < item.count then
             not_found = true
         end
     end
@@ -365,7 +375,7 @@ function Actions.loot(item)
             end
         end
     end
-    if mq.TLO.FindItem("=" .. item.what) then
+    if mq.TLO.FindItem("=" .. item.what)() ~= nil then
         return
     else
         printf("Did not loot %s", item.what)
@@ -380,8 +390,8 @@ function Actions.combine_container(item)
     if mq.TLO.InvSlot('pack10').Item.Container() then
         inv.empty_bag(10)
         State.bagslot1, State.bagslot2 = inv.move_bag(10)
-        inv.move_combine_container(10, item.what)
     end
+    inv.move_combine_container(10, item.what)
 end
 
 function Actions.combine_item(item)
@@ -398,7 +408,7 @@ function Actions.combine_do(item)
     mq.cmd("/autoinv")
 end
 
-function Actions.combine_Done(item)
+function Actions.combine_done(item)
     State.status = "Moving container back to slot 10"
     mq.cmdf("/nomodkey /shiftkey /itemnotify in pack%s %s leftmouseup", State.bagslot1, State.bagslot2)
     while mq.TLO.Cursor() == nil do
@@ -414,25 +424,55 @@ function Actions.npc_kill_all(item, class_settings)
     State.status = "Killing All " .. item.npc
     manage.unpauseGroup(State.group_choice, class_settings)
     while true do
-        local ID = mq.TLO.NearestSpawn('npc' .. item.npc).ID()
+        if mq.TLO.Spawn('npc ' .. item.npc).ID() == 0 then
+            break
+        end
+        local ID = mq.TLO.NearestSpawn('npc ' .. item.npc).ID()
         mq.cmdf('/nav id %s', ID)
         while mq.TLO.Nav.Active() do
             mq.delay(200)
         end
         mq.cmdf('/tar id %s', ID)
-        mq.delay(200)
+        mq.cmd("/stick")
+        mq.delay(100)
         mq.cmd('/keypress AUTOPRIM')
+        while mq.TLO.Me.Casting() do
+            mq.delay(100)
+        end
+        if item.zone ~= nil then
+            mq.cmdf('/casting "%s"', item.zone)
+            mq.delay("1s")
+        end
+        local loopCount = 0
         while mq.TLO.Spawn(ID).Type() == 'NPC' do
             mq.delay(200)
+            mq.cmdf('/tar id %s', ID)
+            loopCount = loopCount + 1
+            if loopCount == 20 then
+                loopCount = 0
+                if item.zone ~= nil then
+                    mq.cmdf('/casting "%s"', item.zone)
+                    mq.delay("1s")
+                end
+                if mq.TLO.Me.Combat() == false then
+                    mq.cmd('/keypress AUTOPRIM')
+                end
+            end
         end
-        if mq.TLO.FindItem("=" .. item.what) == nil then
+        if mq.TLO.FindItem("=" .. item.what)() == nil then
             Actions.loot(item)
+            State.status = "Killing All " .. item.npc
         end
     end
 end
 
 function Actions.farm(item, class_settings)
     manage.removeInvis(State.group_choice)
+    if item.count ~= nil then
+        State.status = "Farming for " .. item.what .. " (" .. item.count .. ")"
+    else
+        State.status = "Farming for " .. item.what
+    end
     State.status = "Farming for " .. item.what
     State.farming = true
     manage.unpauseGroup(State.group_choice, class_settings)
@@ -485,7 +525,11 @@ end
 
 function Actions.farm_radius(item, class_settings)
     manage.removeInvis(State.group_choice)
-    State.status = "Farming for " .. item.what
+    if item.count ~= nil then
+        State.status = "Farming for " .. item.what .. " (" .. item.count .. ")"
+    else
+        State.status = "Farming for " .. item.what
+    end
     manage.locTravelGroup(State.group_choice, item.whereX, item.whereY, item.whereZ)
     manage.campGroup(State.group_choice, item.radius, class_settings)
     manage.unpauseGroup(State.group_choice, class_settings)
@@ -565,6 +609,10 @@ function Actions.farm_radius(item, class_settings)
     manage.pauseGroup(State.group_choice, class_settings)
 end
 
+function Actions.send_yes(item)
+    manage.sendYes(State.group_choice)
+end
+
 function Actions.ground_spawn(item, class_settings)
     State.status = "Picking up ground spawn " .. item.what
     Actions.loc_travel(item, class_settings)
@@ -642,6 +690,11 @@ function Actions.forward_zone(item, class_settings)
     end
     State.status = "Traveling forward to zone: " .. item.zone
     manage.forwardZone(State.group_choice, item.zone)
+end
+
+function Actions.portal_set(item)
+    mq.cmdf("/portalset %s", item.zone)
+    mq.delay("10s")
 end
 
 function Actions.open_door(item)

@@ -4,6 +4,18 @@ local dist = require 'utils/distance'
 local manage = {}
 local elheader = "\ay[\agEpic Laziness\ay]"
 
+function manage.sendYes(group_set)
+    State.status = "Removing levitate"
+    if group_set == 1 then
+        mq.cmd("/yes")
+    elseif group_set == 2 then
+        mq.cmd("/dgga /yes")
+    else
+        mq.cmdf("/yes")
+        mq.cmdf("/dex %s /yes", State.group_combo[State.group_choice])
+    end
+end
+
 function manage.removeLev(group_set)
     State.status = "Removing levitate"
     if group_set == 1 then
@@ -453,7 +465,7 @@ function manage.forwardZone(group_set, zone)
         while mq.TLO.Zone.ShortName() ~= zone do
             mq.delay(500)
         end
-        mq.delay("1s")
+        mq.delay("5s")
     elseif group_set == 2 then
         mq.cmd("/dgge /keypress forward hold")
         mq.cmd("/keypress forward hold")

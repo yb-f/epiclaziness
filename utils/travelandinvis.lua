@@ -10,8 +10,8 @@ local travel = {
         ['invis'] = 23
     },
     ['shm_15'] = {
-        ['gate'] = 19,
-        ['invis'] = 23
+        ['gate'] = 23,
+        ['invis'] = 31
     },
     ['shm_20'] = {
         ['gate'] = 19,

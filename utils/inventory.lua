@@ -40,7 +40,7 @@ function inventory.move_combine_container(slot, container)
     end
     mq.cmdf("/nomodkey /shiftkey /itemnotify %s leftmouseup", slot + 22)
     mq.delay(250)
-    mq.cmdf("/nomodkey /itemnotify %s rightmouseup", slot + 22)
+    mq.cmdf("/nomodkey /ctrl /itemnotify %s rightmouseup", slot + 22)
 end
 
 function inventory.move_bag(slot)
