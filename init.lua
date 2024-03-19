@@ -19,7 +19,6 @@ local task_table = {}
 local running = true
 local start_run = false
 local pause = false
-local task_run = false
 local elheader = "\ay[\agEpic Laziness\ay]"
 local stop_at_save = false
 local class_list_choice = 1
@@ -35,6 +34,7 @@ local invis_type = {}
 State = {}
 
 State.bind_travel = false
+State.task_run = false
 State.step = 0
 State.status = ''
 State.bagslot1 = 0
@@ -96,7 +96,7 @@ end
 
 local function run_epic(class, choice)
     loadsave.loadState()
-    task_run = true
+    State.task_run = true
     manage.startGroup(State.group_choice, class_settings.settings)
     mq.delay("5s")
     manage.pauseGroup(State.group_choice, class_settings.settings)
@@ -213,6 +213,8 @@ local function run_epic(class, choice)
             actions.send_yes(task_table[State.step])
         elseif task_table[State.step].type == "PORTAL_SET" then
             actions.portal_set(task_table[State.step])
+        elseif task_table[State.step].type == "FARM_CHECK_PAUSE" then
+            actions.farm_check_pause(task_table[State.step])
         else
             printf("%s \aoUnknown Type: \ar%s!", elheader, task_table[State.step].type)
             mq.exit()
@@ -226,14 +228,17 @@ local function run_epic(class, choice)
             if stop_at_save then
                 printf("%s \aoStopping.", elheader)
                 State.epicstring = ''
-                task_run = false
+                State.task_run = false
                 stop_at_save = false
                 return
             end
         end
+        if State.task_run == false then
+            return
+        end
     end
     State.epicstring = ''
-    task_run = false
+    State.task_run = false
     printf("%s \aoCompleted!", elheader)
 end
 
@@ -249,7 +254,7 @@ local function displayGUI()
         ImGui.BeginTabBar("##Tabs")
         if ImGui.BeginTabItem("General") then
             ImGui.Text("Class: " .. mq.TLO.Me.Class() .. " " .. State.epicstring)
-            if task_run == false then
+            if State.task_run == false then
                 State.epic_choice = ImGui.Combo('##Combo', State.epic_choice, epic_list)
                 if ImGui.IsItemHovered() then
                     ImGui.SetTooltip('Which Epic to run')
@@ -265,7 +270,7 @@ local function displayGUI()
                     populate_group_combo()
                 end
             end
-            if task_run == false then
+            if State.task_run == false then
                 if ImGui.Button("Begin") then
                     start_run = true
                 end
@@ -277,7 +282,7 @@ local function displayGUI()
                     ImGui.SetTooltip(tooltip)
                 end
             end
-            if task_run == true then
+            if State.task_run == true then
                 if pause == false then
                     if ImGui.SmallButton(ICONS.MD_PAUSE) then
                         pause = true

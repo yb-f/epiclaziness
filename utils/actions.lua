@@ -339,6 +339,14 @@ function Actions.pre_farm_check(item)
     end
 end
 
+function Actions.farm_check_pause(item)
+    State.status = "Checking for " .. item.what
+    if mq.TLO.FindItem("=" .. item.what)() == nil then
+        State.status = item.npc
+        State.task_run = false
+    end
+end
+
 function Actions.farm_check(item)
     State.status = "Checking if we have " .. item.count .. " of " .. item.what
     local not_found = false
