@@ -5,6 +5,8 @@ local manage = require 'utils/manageautomation'
 
 local Actions = {}
 local elheader = "\ay[\agEpic Laziness\ay]"
+local waiting = false
+
 
 function Actions.give_window()
     return mq.TLO.Window('GiveWnd').Open()
@@ -744,6 +746,20 @@ function Actions.ignore_mob(item, class_settings)
         mq.cmdf('/addignore "%s"', item.npc)
     elseif class_settings.class[mq.TLO.Me.Class()] == 5 then
         mq.cmdf('/addignore "%s"', item.npc)
+    end
+end
+
+local function event_wait(line)
+    waiting = false
+    mq.unevent('wait_event')
+end
+
+function Actions.wait_event(item)
+    mq.event('wait_event', item.what, event_wait)
+    waiting = true
+    while waiting do
+        mq.delay(200)
+        mq.doevents()
     end
 end
 
