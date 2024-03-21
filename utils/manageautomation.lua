@@ -494,6 +494,9 @@ function manage.zoneGroup(group_set, zone)
         mq.cmdf("/squelch /travelto %s", zone)
         while mq.TLO.Zone.ShortName() ~= zone do
             mq.delay(500)
+            if not mq.TLO.Nav.Active() then
+                mq.cmdf("/squelch /travelto %s", zone)
+            end
         end
         mq.delay("1s")
     elseif group_set == 2 then
@@ -503,6 +506,9 @@ function manage.zoneGroup(group_set, zone)
         end
         while mq.TLO.Group.AnyoneMissing() do
             mq.delay(500)
+            if not mq.TLO.Nav.Active() then
+                mq.cmdf("/dgga /squelch /travelto %s", zone)
+            end
         end
         mq.delay("5s")
     else
@@ -512,6 +518,10 @@ function manage.zoneGroup(group_set, zone)
             mq.delay(500)
         end
         while mq.TLO.Group.Member(State.group_combo[State.group_choice]).OtherZone() do
+            if not mq.TLO.Nav.Active() then
+                mq.cmdf("/squelch /travelto %s", zone)
+                mq.cmdf('/dex %s /squelch /travelto %s', State.group_combo[State.group_choice], zone)
+            end
             mq.delay(500)
         end
         mq.delay("5s")
