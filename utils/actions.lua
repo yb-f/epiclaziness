@@ -583,9 +583,8 @@ function Actions.farm_radius(item, class_settings)
             if mq.TLO.AdvLoot.PCount() > 0 then
                 for i = 1, mq.TLO.AdvLoot.PCount() do
                     for _, name in pairs(item_list) do
-                        if mq.TLO.AdvLoot.SList(i).Name() == name then
+                        if mq.TLO.AdvLoot.PList(i).Name() == name then
                             mq.cmdf('/advloot personal %s loot', i)
-                            printf('%s \aoLooting: %s', elheader, name)
                         end
                     end
                 end
@@ -605,7 +604,7 @@ function Actions.farm_radius(item, class_settings)
             if mq.TLO.AdvLoot.PCount() > 0 then
                 for i = 1, mq.TLO.AdvLoot.PCount() do
                     for _, name in pairs(item_list) do
-                        if mq.TLO.AdvLoot.SList(i).Name() == name then
+                        if mq.TLO.AdvLoot.PList(i).Name() == name then
                             mq.cmdf('/advloot personal %s loot', i)
                             printf('%s \aoLooting: %s', elheader, name)
                         end
