@@ -116,7 +116,7 @@ function manage.doAutomation(character, class, script, action)
         if character == mq.TLO.Me.DisplayName() then
             if script == 1 then
                 mq.cmdf('/%s resetcamp', class)
-                mq.cmdf('/%s mode 5', class)
+                mq.cmdf('/%s mode PullerTank', class)
                 mq.cmdf('/%s pause off', class)
             elseif script == 2 then
                 mq.cmd("/rgl campon")
@@ -759,10 +759,15 @@ end
 function manage.zoneGroup(group_set, zone)
     if group_set == 1 then
         mq.cmdf("/travelto %s", zone)
+        local loopCount = 0
         while mq.TLO.Zone.ShortName() ~= zone do
             mq.delay(500)
             if not mq.TLO.Navigation.Active() then
-                mq.cmdf("/travelto %s", zone)
+                if loopCount == 60 then
+                    mq.cmdf("/travelto %s", zone)
+                    loopCount = 0
+                end
+                loopCount = loopCount + 1
             end
         end
         mq.delay("1s")
