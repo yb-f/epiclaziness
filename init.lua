@@ -180,7 +180,7 @@ local function run_epic(class, choice)
         elseif task_table[State.step].type == "PICK_DOOR" then
             actions.picklock_door(task_table[State.step])
         elseif task_table[State.step].type == "WAIT" then
-            State.status = "Pausing for " .. task_table[State.step].what
+            State.status = "Pausing for " .. task_table[State.step].what / 1000 .. " seconds"
             mq.delay(tonumber(task_table[State.step].what))
         elseif task_table[State.step].type == "NPC_GIVE_ADD" then
             actions.npc_give_add(task_table[State.step])
