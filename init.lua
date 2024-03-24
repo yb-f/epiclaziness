@@ -50,6 +50,9 @@ State.nextmob = false
 State.epicstring = ''
 State.X, State.Y, State.Z = 0, 0, 0
 State.skip = false
+State.bad_IDs = {}
+State.cannot_count = 0
+State.traveling = false
 
 class_settings.loadSettings()
 
@@ -156,8 +159,6 @@ local function run_epic(class, choice)
             actions.combine_do(task_table[State.step])
         elseif task_table[State.step].type == "COMBINE_DONE" then
             actions.combine_done(task_table[State.step])
-        elseif task_table[State.step].type == "FARM" then
-            actions.farm(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "GROUND_SPAWN" then
             actions.ground_spawn(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "LOOT" then

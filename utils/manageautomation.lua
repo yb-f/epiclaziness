@@ -258,22 +258,22 @@ end
 function manage.locTravelGroup(group_set, x, y, z)
     local loopCount = 0
     if group_set == 1 then
-        mq.cmdf("/squelch /nav locxyz %s %s %s", x, y, z)
+        mq.cmdf("/nav locxyz %s %s %s", x, y, z)
     elseif group_set == 2 then
-        mq.cmdf("/dgga /squelch /nav locxyz %s %s %s", x, y, z)
+        mq.cmdf("/dgga /nav locxyz %s %s %s", x, y, z)
     else
-        mq.cmdf("/squelch /nav locxyz %s %s %s", x, y, z)
-        mq.cmdf("/dex %s /squelch /nav locxyz %s %s %s", State.group_combo[State.group_choice], x, y, z)
+        mq.cmdf("/nav locxyz %s %s %s", x, y, z)
+        mq.cmdf("/dex %s /nav locxyz %s %s %s", State.group_combo[State.group_choice], x, y, z)
     end
     mq.delay(200)
-    while mq.TLO.Nav.Active() do
+    while mq.TLO.Navigation.Active() do
         mq.delay(200)
         if loopCount == 10 then
-            mq.cmd('/squelch /doortarget')
+            mq.cmd('/doortarget')
             mq.delay(200)
             if mq.TLO.Switch.Distance() ~= nil then
                 if mq.TLO.Switch.Distance() < 20 then
-                    mq.cmd('/squelch /click left door')
+                    mq.cmd('/click left door')
                 end
             end
             loopCount = 0
@@ -291,12 +291,12 @@ end
 
 function manage.stopfollowGroup(group_set)
     if group_set == 1 then
-        mq.cmd('/squelch /afollow off')
+        mq.cmd('/afollow off')
     elseif group_set == 2 then
-        mq.cmd('/dgga /squelch /afollow off')
+        mq.cmd('/dgga /afollow off')
     else
-        mq.cmd('/squelch /afollow off')
-        mq.cmdf('/dex %s /squelch /afollow off', State.group_combo[State.group_choice])
+        mq.cmd('/afollow off')
+        mq.cmdf('/dex %s /afollow off', State.group_combo[State.group_choice])
     end
 end
 
@@ -304,17 +304,17 @@ function manage.followGroup(group_set, npc)
     if group_set == 1 then
         mq.cmdf('/target id %s', mq.TLO.Spawn("npc " .. npc).ID())
         mq.delay(300)
-        mq.cmd('/squelch /afollow')
+        mq.cmd('/afollow')
     elseif group_set == 2 then
         mq.cmdf('/dgga /target id %s', mq.TLO.Spawn("npc " .. npc).ID())
         mq.delay(300)
-        mq.cmd('/dgga /squelch /afollow')
+        mq.cmd('/dgga /afollow')
     else
         mq.cmdf('/target id %s', mq.TLO.Spawn("npc " .. npc).ID())
         mq.cmdf('/dex %s /nav id %s', State.group_combo[State.group_choice], mq.TLO.Spawn("npc " .. npc).ID())
         mq.delay(300)
-        mq.cmd('/squelch /afollow')
-        mq.cmdf('/dex %s /squelch /afollow', State.group_combo[State.group_choice])
+        mq.cmd('/afollow')
+        mq.cmdf('/dex %s /afollow', State.group_combo[State.group_choice])
     end
 end
 
@@ -322,52 +322,56 @@ function manage.followGroupLoc(group_set, npc, x, y)
     if group_set == 1 then
         mq.cmdf('/target id %s', mq.TLO.Spawn("npc " .. npc).ID())
         mq.delay(300)
-        mq.cmd('/squelch /afollow')
+        mq.cmd('/afollow')
         local distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
         while distance > 50 do
             mq.delay(200)
             distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
         end
-        mq.cmd('/squelch /afollow off')
+        mq.cmd('/afollow off')
     elseif group_set == 2 then
         mq.cmdf('/dgga /target id %s', mq.TLO.Spawn("npc " .. npc).ID())
         mq.delay(300)
-        mq.cmd('/dgga /squelch /afollow')
+        mq.cmd('/dgga /afollow')
         local distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
         while distance > 50 do
             mq.delay(200)
             distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
         end
-        mq.cmd('/dgga /squelch /afollow off')
+        mq.cmd('/dgga /afollow off')
     else
         mq.cmdf('/target id %s', mq.TLO.Spawn("npc " .. npc).ID())
-        mq.cmdf('/dex %s /squelch /nav id %s', State.group_combo[State.group_choice], mq.TLO.Spawn("npc " .. npc).ID())
+        mq.cmdf('/dex %s /nav id %s', State.group_combo[State.group_choice], mq.TLO.Spawn("npc " .. npc).ID())
         mq.delay(300)
-        mq.cmd('/squelch /afollow')
-        mq.cmdf('/dex %s /squelch /afollow', State.group_combo[State.group_choice])
+        mq.cmd('/afollow')
+        mq.cmdf('/dex %s /afollow', State.group_combo[State.group_choice])
         local distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
         while distance > 50 do
             mq.delay(200)
             distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
         end
-        mq.cmd('/squelch /afollow off')
-        mq.cmdf('/dex %s /squelch /afollow off', State.group_combo[State.group_choice])
+        mq.cmd('/afollow off')
+        mq.cmdf('/dex %s /afollow off', State.group_combo[State.group_choice])
     end
 end
 
-function manage.navGroup(group_set, npc)
+function manage.navGroup(group_set, npc, ID)
     local loopCount = 0
+    if ID == 0 then
+        ID = mq.TLO.Spawn("npc " .. npc).ID()
+    end
     if group_set == 1 then
-        mq.cmdf("/squelch /nav id %s", mq.TLO.Spawn("npc " .. npc).ID())
+        mq.cmdf("/nav id %s", ID)
     elseif group_set == 2 then
-        mq.cmdf("/dgga /squelch /nav id %s", mq.TLO.Spawn("npc " .. npc).ID())
+        mq.cmdf("/dgga /nav id %s", ID)
     else
-        mq.cmdf("/squelch /nav id %s", mq.TLO.Spawn("npc " .. npc).ID())
-        mq.cmdf('/dex %s /squelch /nav id %s', State.group_combo[State.group_choice], mq.TLO.Spawn("npc " .. npc).ID())
+        mq.cmdf("/nav id %s", ID)
+        mq.cmdf('/dex %s /nav id %s', State.group_combo[State.group_choice], ID)
     end
     mq.delay(200)
-    while mq.TLO.Nav.Active() do
+    while mq.TLO.Navigation.Active() do
         mq.delay(200)
+        mq.doevents()
         if loopCount == 10 then
             mq.cmd('/squelch /doortarget')
             mq.delay(200)
@@ -396,22 +400,22 @@ function manage.navGroupLoc(group_set, npc, x, y, z)
     State.Z = mq.TLO.Me.Z()
     local searchstring = "loc " .. x .. " " .. y .. " " .. z .. " radius 50 npc " .. npc
     if group_set == 1 then
-        mq.cmdf("/squelch /nav id %s", mq.TLO.Spawn(searchstring).ID())
+        mq.cmdf("/nav id %s", mq.TLO.Spawn(searchstring).ID())
     elseif group_set == 2 then
-        mq.cmdf("/dgga /squelch /nav id %s", mq.TLO.Spawn(searchstring).ID())
+        mq.cmdf("/dgga /nav id %s", mq.TLO.Spawn(searchstring).ID())
     else
-        mq.cmdf("/squelch /nav id %s", mq.TLO.Spawn(searchstring).ID())
-        mq.cmdf('/dex %s /squelch /nav id %s', State.group_combo[State.group_choice], mq.TLO.Spawn(searchstring).ID())
+        mq.cmdf("/nav id %s", mq.TLO.Spawn(searchstring).ID())
+        mq.cmdf('/dex %s /nav id %s', State.group_combo[State.group_choice], mq.TLO.Spawn(searchstring).ID())
     end
     mq.delay(200)
-    while mq.TLO.Nav.Active() do
+    while mq.TLO.Navigation.Active() do
         mq.delay(200)
         if loopCount == 10 then
             mq.cmd('/squelch /doortarget')
             mq.delay(200)
             if mq.TLO.Switch.Distance() ~= nil then
                 if mq.TLO.Switch.Distance() < 20 then
-                    mq.cmd('/squelch /click left door')
+                    mq.cmd('/click left door')
                 end
             end
             loopCount = 0
@@ -491,36 +495,36 @@ end
 
 function manage.zoneGroup(group_set, zone)
     if group_set == 1 then
-        mq.cmdf("/squelch /travelto %s", zone)
+        mq.cmdf("/travelto %s", zone)
         while mq.TLO.Zone.ShortName() ~= zone do
             mq.delay(500)
-            if not mq.TLO.Nav.Active() then
-                mq.cmdf("/squelch /travelto %s", zone)
+            if not mq.TLO.Navigation.Active() then
+                mq.cmdf("/travelto %s", zone)
             end
         end
         mq.delay("1s")
     elseif group_set == 2 then
-        mq.cmdf("/dgga /squelch /travelto %s", zone)
+        mq.cmdf("/dgga /travelto %s", zone)
         while mq.TLO.Zone.ShortName() ~= zone do
             mq.delay(500)
         end
         while mq.TLO.Group.AnyoneMissing() do
             mq.delay(500)
-            if not mq.TLO.Nav.Active() then
-                mq.cmdf("/dgga /squelch /travelto %s", zone)
+            if not mq.TLO.Navigation.Active() then
+                mq.cmdf("/dgga /travelto %s", zone)
             end
         end
         mq.delay("5s")
     else
-        mq.cmdf("/squelch /travelto %s", zone)
-        mq.cmdf('/dex %s /squelch /travelto %s', State.group_combo[State.group_choice], zone)
+        mq.cmdf("/travelto %s", zone)
+        mq.cmdf('/dex %s /travelto %s', State.group_combo[State.group_choice], zone)
         while mq.TLO.Zone.ShortName() ~= zone do
             mq.delay(500)
         end
         while mq.TLO.Group.Member(State.group_combo[State.group_choice]).OtherZone() do
-            if not mq.TLO.Nav.Active() then
-                mq.cmdf("/squelch /travelto %s", zone)
-                mq.cmdf('/dex %s /squelch /travelto %s', State.group_combo[State.group_choice], zone)
+            if not mq.TLO.Navigation.Active() then
+                mq.cmdf("/travelto %s", zone)
+                mq.cmdf('/dex %s /travelto %s', State.group_combo[State.group_choice], zone)
             end
             mq.delay(500)
         end

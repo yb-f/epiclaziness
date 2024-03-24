@@ -32,7 +32,23 @@ local travel = {
     ['shd_20'] = {
         ['gate'] = 19,
         ['invis'] = 23
-    }
+    },
+    ['brd_pre15'] = {
+        ['gate'] = 5,
+        ['invis'] = 11
+    },
+    ['brd_10'] = {
+        ['gate'] = 5,
+        ['invis'] = 11
+    },
+    ['brd_15'] = {
+        ['gate'] = 5,
+        ['invis'] = 11
+    },
+    ['brd_20'] = {
+        ['gate'] = 5,
+        ['invis'] = 11
+    },
 }
 
 return travel
