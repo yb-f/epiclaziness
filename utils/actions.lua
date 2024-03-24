@@ -715,7 +715,7 @@ function Actions.open_door(item)
     mq.cmd("/doortarget")
     mq.delay(200)
     mq.cmd("/click left door")
-    mq.delay(200)
+    mq.delay(1000)
 end
 
 function Actions.picklock_door(item)
@@ -738,7 +738,7 @@ function Actions.pre_farm_check(item)
     local check_list = {}
     local not_found = false
     if item.count ~= nil then
-        if mq.TLO.FindItemCount("=" .. item.what) < item.count then
+        if mq.TLO.FindItemCount("=" .. item.what)() < item.count then
             not_found = true
         end
     else
