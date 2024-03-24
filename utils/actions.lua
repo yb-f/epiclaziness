@@ -261,6 +261,11 @@ function Actions.loc_travel(item, class_settings)
         end
     end
     State.status = "Traveling to  " .. item.whereX .. ", " .. item.whereY .. ", " .. item.whereZ
+    if mq.TLO.Navigation.PathExists('locxyz ' .. item.whereX .. ' ' .. item.whereY .. ' ' .. item.whereZ) == false then
+        State.status = "No path exists to loc X: " .. item.whereX .. " Y: " .. item.whereY .. " Z: " .. item.whereZ
+        State.task_run = false
+        return
+    end
     State.traveling = true
     manage.locTravelGroup(State.group_choice, item.whereX, item.whereY, item.whereZ)
     State.traveling = false
@@ -587,6 +592,9 @@ function Actions.npc_travel(item, class_settings)
     if item.what == nil then
         State.status = "Waiting for NPC " .. item.npc
         local ID = mq.TLO.NearestSpawn(1, "npc " .. item.npc).ID()
+        if mq.TLO.Navigation.PathExists('id ' .. ID)() == false then
+            table.insert(State.bad_IDs, ID)
+        end
         local mob_loop = true
         local loop_count = 1
         while mob_loop do
@@ -598,6 +606,9 @@ function Actions.npc_travel(item, class_settings)
             end
             if State.nextmob == true then
                 ID = mq.TLO.NearestSpawn(loop_count + 1, "npc " .. item.npc).ID()
+                if mq.TLO.Navigation.PathExists('id ' .. ID)() == false then
+                    table.insert(State.bad_IDs, ID)
+                end
                 State.nextmob = false
                 loop_count = loop_count + 1
             else
