@@ -218,6 +218,8 @@ local function run_epic(class, choice)
             actions.farm_check_pause(task_table[State.step])
         elseif task_table[State.step].type == "WAIT_EVENT" then
             actions.wait_event(task_table[State.step])
+        elseif task_table[State.step].type == "FORAGE_FARM" then
+            actions.forage_farm(task_table[State.step])
         else
             printf("%s \aoUnknown Type: \ar%s!", elheader, task_table[State.step].type)
             mq.exit()

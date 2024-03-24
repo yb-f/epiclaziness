@@ -213,6 +213,57 @@ function Actions.farm_radius(item, class_settings)
     manage.pauseGroup(State.group_choice, class_settings)
 end
 
+function Actions.forage_farm(item)
+    if item.count ~= nil then
+        State.status = "Foraging for " .. item.what .. " (" .. item.count .. ")"
+    else
+        State.status = "Foraging for " .. item.what
+    end
+    if item.count == nil then
+        local item_list = {}
+        local item_status = ''
+        local looping = true
+        local loop_check = true
+        for word in string.gmatch(item.what, '([^|]+)') do
+            table.insert(item_list, word)
+        end
+        while looping do
+            mq.delay(200)
+            item_status = ''
+            loop_check = true
+            local item_remove = 0
+            for i, name in pairs(item_list) do
+                if mq.TLO.FindItem("=" .. name)() == nil then
+                    loop_check = false
+                    item_status = item_status .. "|" .. name
+                else
+                    item_remove = i
+                end
+            end
+            if item_remove > 0 then
+                table.remove(item_list, item_remove)
+            end
+            State.status = "Foraging for " .. item_status
+            if loop_check then
+                looping = false
+            end
+            if mq.TLO.Me.AbilityReady('Forage')() then
+                mq.cmd('/doability Forage')
+                for i, name in pairs(item_list) do
+                    if mq.TLO.Cursor.Name() == name then
+                        mq.cmd('/autoinv')
+                        mq.delay(200)
+                    else
+                        mq.cmd('/destroy')
+                    end
+                end
+            end
+        end
+    else
+
+    end
+end
+
 function Actions.forward_zone(item, class_settings)
     if class_settings.general.invisForTravel == true then
         if item.invis == 1 then
