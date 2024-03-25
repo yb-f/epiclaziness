@@ -54,6 +54,41 @@ function Actions.cast_alt(item)
     end
 end
 
+function Actions.clear_xtarget(class_settings)
+    local max_xtargs = mq.TLO.Me.XTargetSlots()
+    if mq.TLO.Me.XTarget() > 0 then
+        for i = 1, max_xtargs do
+            if mq.TLO.Me.XTarget(i)() ~= '' then
+                if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' then
+                    mq.TLO.Me.XTarget(i).DoTarget()
+                    ID = mq.TLO.Me.XTarget(i).ID()
+                    State.status = "Clearing XTarget " .. i .. ": " .. mq.TLO.Me.XTarget(i)()
+                    manage.unpauseGroup(State.group_choice, class_settings)
+                    mq.cmd("/stick")
+                    mq.delay(100)
+                    mq.cmd("/attack on")
+                    while mq.TLO.Spawn(ID).Type() == 'NPC' do
+                        local breakout = true
+                        for j = 1, max_xtargs do
+                            if mq.TLO.Me.XTarget(j).ID() == ID then
+                                breakout = false
+                            end
+                        end
+                        if breakout == true then break end
+                        if mq.TLO.Target.ID ~= ID then
+                            mq.TLO.Spawn(ID).DoTarget()
+                        end
+                        if mq.TLO.Me.Combat() == false then
+                            mq.cmd("/attack on")
+                        end
+                        mq.delay(200)
+                    end
+                end
+            end
+        end
+    end
+end
+
 function Actions.combine_container(item)
     State.status = "Preparing combine container"
     if mq.TLO.InvSlot('pack10').Item.Container() then

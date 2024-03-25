@@ -127,6 +127,9 @@ local function run_epic(class, choice)
         while pause == true do
             mq.delay(500)
         end
+        if mq.TLO.Me.XTarget() > 0 then
+            actions.clear_xtarget(class_settings.settings)
+        end
         State.skip = false
         State.step = State.step + 1
         if task_table[State.step].type == "ZONE_TRAVEL" then
