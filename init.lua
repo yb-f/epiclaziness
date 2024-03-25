@@ -220,6 +220,8 @@ local function run_epic(class, choice)
             actions.wait_event(task_table[State.step])
         elseif task_table[State.step].type == "FORAGE_FARM" then
             actions.forage_farm(task_table[State.step])
+        elseif task_table[State.step].type == "NPC_DAMAGE_UNTIL" then
+            actions.npc_damage_until(task_table[State.step])
         else
             printf("%s \aoUnknown Type: \ar%s!", elheader, task_table[State.step].type)
             mq.exit()
