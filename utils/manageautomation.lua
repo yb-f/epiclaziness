@@ -627,6 +627,17 @@ function manage.picklockGroup(group_set)
     end
 end
 
+function manage.Relocate(group_set, relocate)
+    if group_set == 1 then
+        mq.cmdf('/relocate %s', relocate)
+    elseif group_set == 2 then
+        mq.cmdf('/dgga /relocate %s', relocate)
+    else
+        mq.cmdf('/relocate %s', relocate)
+        mq.cmdf('/dex %s /relocate %s', State.group_combo[State.group_choice], relocate)
+    end
+end
+
 function manage.removeInvis(group_set)
     State.status = "Removing invis"
     if group_set == 1 then

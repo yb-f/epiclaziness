@@ -794,6 +794,11 @@ function Actions.pre_farm_check(item)
     end
 end
 
+function Actions.relocate(item)
+    State.status = "Relocating to " .. item.what
+    manage.relocateGroup(State.group_choice, item.what)
+end
+
 function Actions.send_yes(item)
     manage.sendYes(State.group_choice)
 end

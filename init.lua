@@ -222,6 +222,8 @@ local function run_epic(class, choice)
             actions.forage_farm(task_table[State.step])
         elseif task_table[State.step].type == "NPC_DAMAGE_UNTIL" then
             actions.npc_damage_until(task_table[State.step])
+        elseif task_table[State.step].type == "RELOCATE" then
+            actions.relocate(task_table[State.step])
         else
             printf("%s \aoUnknown Type: \ar%s!", elheader, task_table[State.step].type)
             mq.exit()
