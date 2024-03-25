@@ -627,7 +627,7 @@ function manage.picklockGroup(group_set)
     end
 end
 
-function manage.Relocate(group_set, relocate)
+function manage.relocateGroup(group_set, relocate)
     if group_set == 1 then
         mq.cmdf('/relocate %s', relocate)
     elseif group_set == 2 then
