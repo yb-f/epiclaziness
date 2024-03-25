@@ -121,7 +121,20 @@ end
 
 function Actions.farm_check_pause(item)
     State.status = "Checking for " .. item.what
-    if mq.TLO.FindItem("=" .. item.what)() == nil then
+    local check_list = {}
+    local not_found = false
+    for word in string.gmatch(item.what, '([^|]+)') do
+        table.insert(check_list, word)
+        for check in pairs(check_list) do
+            if mq.TLO.FindItem("=" .. check)() == nil then
+                not_found = true
+            end
+        end
+    end
+    --if one or more of the items are not present this will be true, so on false advance to the desired step
+    if not_found == false then
+
+    else
         State.status = item.npc
         State.task_run = false
     end
@@ -249,12 +262,14 @@ function Actions.forage_farm(item)
             end
             if mq.TLO.Me.AbilityReady('Forage')() then
                 mq.cmd('/doability Forage')
+                mq.delay(500)
                 for i, name in pairs(item_list) do
                     if mq.TLO.Cursor.Name() == name then
                         mq.cmd('/autoinv')
                         mq.delay(200)
                     else
                         mq.cmd('/destroy')
+                        mq.delay(200)
                     end
                 end
             end
@@ -344,7 +359,7 @@ function Actions.loot(item)
     if mq.TLO.FindItem("=" .. item.what)() ~= nil then
         return
     else
-        printf("%s \aoDid not loot \ar%s", elheader, item.what)
+
     end
     if item.gotostep ~= nil then
         State.step = item.gotostep - 1
@@ -368,12 +383,26 @@ function Actions.npc_buy(item)
         mq.TLO.Spawn(item.npc).DoTarget()
         mq.delay(300)
     end
+    mq.TLO.Target.RightClick()
     mq.delay("5s", Actions.merchant_window)
-    mq.delay("1s")
+    mq.delay("3s")
     mq.TLO.Merchant.SelectItem("=" .. item.what)
     mq.delay("1s")
     mq.TLO.Merchant.Buy(1)
     mq.delay("1s")
+    mq.TLO.Window('MerchantWnd').DoClose()
+end
+
+function Actions.npc_damage_until(item)
+    State.status = "Damaging " .. item.npc .. " to below " .. item.what .. "% health"
+    mq.TLO.Spawn('npc ' .. item.npc).DoTarget()
+    mq.cmd("/stick")
+    mq.delay(100)
+    mq.cmd("/attack on")
+    while mq.TLO.Spawn('npc ' .. item.npc).PctHPs() >= 80 do
+        mq.delay(50)
+    end
+    mq.cmd("/attack off")
 end
 
 function Actions.npc_follow(item, class_settings)
@@ -594,16 +623,6 @@ function Actions.npc_kill_all(item, class_settings)
     end
 end
 
-function Actions.ph_search(item)
-    State.status = 'Searching for PH for ' .. item.npc
-    local spawn_search = "npc loc " ..
-        item.whereX .. " " .. item.whereY .. " " .. item.whereZ .. " radius " .. item.radius
-    if mq.TLO.Spawn(spawn_search).ID() ~= 0 then
-        State.step = item.gotostep - 1
-    end
-    mq.delay(500)
-end
-
 function Actions.npc_search(item)
     State.status = "Searching for " .. item.npc
     if mq.TLO.Spawn("npc " .. item.npc).ID() ~= 0 then
@@ -643,6 +662,10 @@ function Actions.npc_travel(item, class_settings)
     if item.what == nil then
         State.status = "Waiting for NPC " .. item.npc
         local ID = mq.TLO.NearestSpawn(1, "npc " .. item.npc).ID()
+        while ID == nil do
+            mq.delay(500)
+            ID = mq.TLO.NearestSpawn(1, "npc " .. item.npc).ID()
+        end
         if mq.TLO.Navigation.PathExists('id ' .. ID)() == false then
             table.insert(State.bad_IDs, ID)
         end
@@ -657,6 +680,10 @@ function Actions.npc_travel(item, class_settings)
             end
             if State.nextmob == true then
                 ID = mq.TLO.NearestSpawn(loop_count + 1, "npc " .. item.npc).ID()
+                while ID == nil do
+                    mq.delay(500)
+                    ID = mq.TLO.NearestSpawn(loop_count + 1, "npc " .. item.npc).ID()
+                end
                 if mq.TLO.Navigation.PathExists('id ' .. ID)() == false then
                     table.insert(State.bad_IDs, ID)
                 end
@@ -716,6 +743,16 @@ function Actions.open_door(item)
     mq.delay(200)
     mq.cmd("/click left door")
     mq.delay(1000)
+end
+
+function Actions.ph_search(item)
+    State.status = 'Searching for PH for ' .. item.npc
+    local spawn_search = "npc loc " ..
+        item.whereX .. " " .. item.whereY .. " " .. item.whereZ .. " radius " .. item.radius
+    if mq.TLO.Spawn(spawn_search).ID() ~= 0 then
+        State.step = item.gotostep - 1
+    end
+    mq.delay(500)
 end
 
 function Actions.picklock_door(item)
