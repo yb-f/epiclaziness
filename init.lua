@@ -23,6 +23,8 @@ local elheader = "\ay[\agEpic Laziness\ay]"
 local stop_at_save = false
 local class_list_choice = 1
 local changed = false
+local myClass = mq.TLO.Me.Class()
+
 
 local class_list = { 'Bard', 'Beastlord', 'Berserker', 'Cleric', 'Druid', 'Enchanter', 'Magician', 'Monk', 'Necromancer',
     'Paladin', 'Ranger', 'Rogue', 'Shadow Knight', 'Shaman', 'Warrior', 'Wizard' }
@@ -262,7 +264,7 @@ local function displayGUI()
     if drawGUI then
         ImGui.BeginTabBar("##Tabs")
         if ImGui.BeginTabItem("General") then
-            ImGui.Text("Class: " .. mq.TLO.Me.Class() .. " " .. State.epicstring)
+            ImGui.Text("Class: " .. myClass .. " " .. State.epicstring)
             if State.task_run == false then
                 State.epic_choice = ImGui.Combo('##Combo', State.epic_choice, epic_list)
                 if ImGui.IsItemHovered() then
