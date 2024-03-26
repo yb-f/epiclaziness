@@ -49,6 +49,22 @@ local travel = {
         ['gate'] = 5,
         ['invis'] = 11
     },
+    ['rog_10'] = {
+        ['gate'] = 5,
+        ['invis'] = 11
+    },
+    ['rog_15'] = {
+        ['gate'] = 5,
+        ['invis'] = 11
+    },
+    ['rog_20'] = {
+        ['gate'] = 5,
+        ['invis'] = 11
+    },
+    ['rog_pre15'] = {
+        ['gate'] = 5,
+        ['invis'] = 11
+    },
 }
 
 return travel
