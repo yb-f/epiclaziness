@@ -651,7 +651,7 @@ function manage.removeInvis(group_set)
 end
 
 function manage.removeLev(group_set)
-    State.status = "Removing levitate"
+    --State.status = "Removing levitate"
     if group_set == 1 then
         mq.cmd("/removelev")
     elseif group_set == 2 then
