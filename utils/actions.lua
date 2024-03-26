@@ -6,9 +6,16 @@ local manage = require 'utils/manageautomation'
 local Actions = {}
 local elheader = "\ay[\agEpic Laziness\ay]"
 local waiting = false
+local gamble_done = false
 
 local function target_invalid_switch()
     State.cannot_count = State.cannot_count + 1
+end
+
+local function gamble_event(line, arg1)
+    if arg1 == '1900' then
+        gamble_done = true
+    end
 end
 
 function Actions.give_window()
@@ -42,6 +49,15 @@ function Actions.auto_inv(item)
         mq.cmd('/autoinv')
         mq.delay(200)
     end
+    mq.delay("1s")
+end
+
+function Actions.backstab(item)
+    mq.TLO.NearestSpawn("npc " .. item.npc).DoTarget()
+    mq.cmd('/stick behind')
+    mq.delay("2s")
+    mq.cmd('/doability backstab')
+    mq.delay(500)
 end
 
 function Actions.cast_alt(item)
@@ -57,7 +73,10 @@ end
 function Actions.clear_xtarget(class_settings)
     local max_xtargs = mq.TLO.Me.XTargetSlots()
     if mq.TLO.Me.XTarget() > 0 then
-        for i = 1, max_xtargs do
+        local looping = true
+        local i = 0
+        while looping do
+            i = i + 1
             if mq.TLO.Me.XTarget(i)() ~= '' then
                 if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' then
                     mq.TLO.Me.XTarget(i).DoTarget()
@@ -83,6 +102,7 @@ function Actions.clear_xtarget(class_settings)
                         end
                         mq.delay(200)
                     end
+                    i = 1
                 end
             end
         end
@@ -108,14 +128,18 @@ function Actions.combine_do(item)
 end
 
 function Actions.combine_done(item)
-    State.status = "Moving container back to slot 10"
-    mq.cmdf("/nomodkey /shiftkey /itemnotify in pack%s %s leftmouseup", State.bagslot1, State.bagslot2)
-    while mq.TLO.Cursor() == nil do
-        mq.delay(100)
+    if State.bagslot1 ~= 0 and State.bagslot2 ~= 0 then
+        State.status = "Moving container back to slot 10"
+        mq.cmdf("/nomodkey /shiftkey /itemnotify in pack%s %s leftmouseup", State.bagslot1, State.bagslot2)
+        while mq.TLO.Cursor() == nil do
+            mq.delay(100)
+        end
+        mq.cmd("/nomodkey /shiftkey /itemnotify pack10 leftmouseup")
+        mq.delay(200)
+        mq.cmd("/autoinv")
+        State.bagslot1 = 0
+        State.bagslot2 = 0
     end
-    mq.cmd("/nomodkey /shiftkey /itemnotify pack10 leftmouseup")
-    mq.delay(200)
-    mq.cmd("/autoinv")
 end
 
 function Actions.combine_item(item)
@@ -158,18 +182,22 @@ function Actions.farm_check_pause(item)
     State.status = "Checking for " .. item.what
     local check_list = {}
     local not_found = false
-    for word in string.gmatch(item.what, '([^|]+)') do
-        table.insert(check_list, word)
-        for check in pairs(check_list) do
-            if mq.TLO.FindItem("=" .. check)() == nil then
-                not_found = true
+    if item.count ~= nil then
+        if mq.TLO.FindItemCount("=" .. item.what)() < item.count then
+            not_found = true
+        end
+    else
+        for word in string.gmatch(item.what, '([^|]+)') do
+            table.insert(check_list, word)
+            for _, check in pairs(check_list) do
+                if mq.TLO.FindItem("=" .. check)() == nil then
+                    not_found = true
+                end
             end
         end
     end
     --if one or more of the items are not present this will be true, so on false advance to the desired step
-    if not_found == false then
-
-    else
+    if not_found == true then
         State.status = item.npc
         State.task_run = false
     end
@@ -430,11 +458,19 @@ end
 
 function Actions.npc_damage_until(item)
     State.status = "Damaging " .. item.npc .. " to below " .. item.what .. "% health"
-    mq.TLO.Spawn('npc ' .. item.npc).DoTarget()
+    ID = mq.TLO.Spawn('npc ' .. item.npc).ID()
+    mq.TLO.Spawn(ID).DoTarget()
     mq.cmd("/stick")
     mq.delay(100)
     mq.cmd("/attack on")
-    while mq.TLO.Spawn('npc ' .. item.npc).PctHPs() >= 80 do
+    local looping = true
+    while looping do
+        if mq.TLO.Spawn(ID)() == nil then
+            looping = false
+        end
+        if mq.TLO.Spawn(ID).PctHPs() < 80 then
+            looping = false
+        end
         mq.delay(50)
     end
     mq.cmd("/attack off")
@@ -483,7 +519,15 @@ function Actions.npc_give_add(item)
     mq.cmdf('/itemnotify "%s" leftmouseup', item.what)
     mq.delay("2s", Actions.got_cursor)
     mq.TLO.Target.LeftClick()
-    mq.delay("1s")
+    mq.delay("5s", Actions.give_window)
+    local looping = true
+    while looping do
+        for i = 0, 3 do
+            if string.lower(mq.TLO.Window('GiveWnd').Child('GVW_MyItemSlot' .. i).Tooltip()) == string.lower(item.what) then
+                looping = false
+            end
+        end
+    end
 end
 
 function Actions.npc_give_click(item)
@@ -797,6 +841,25 @@ function Actions.picklock_door(item)
     mq.delay(100)
 end
 
+function Actions.pickpocket(item)
+    mq.TLO.NearestSpawn("npc " .. item.npc).DoTarget()
+    local looping = true
+    while looping do
+        if mq.TLO.Me.AbilityReady('Pick Pockets')() then
+            mq.cmd('/doability Pick Pockets')
+            mq.delay(500)
+            if mq.TLO.Cursor.Name() == item.what then
+                mq.cmd('/autoinv')
+                mq.delay(200)
+                looping = false
+            else
+                mq.cmd('/destroy')
+                mq.delay(200)
+            end
+        end
+    end
+end
+
 function Actions.portal_set(item)
     mq.cmdf("/portalset %s", item.zone)
     mq.delay(500)
@@ -816,7 +879,7 @@ function Actions.pre_farm_check(item)
     else
         for word in string.gmatch(item.what, '([^|]+)') do
             table.insert(check_list, word)
-            for check in pairs(check_list) do
+            for _, check in pairs(check_list) do
                 if mq.TLO.FindItem("=" .. check)() == nil then
                     not_found = true
                 end
@@ -832,6 +895,16 @@ end
 function Actions.relocate(item)
     State.status = "Relocating to " .. item.what
     manage.relocateGroup(State.group_choice, item.what)
+end
+
+function Actions.rog_gamble(item)
+    mq.event('chips', "#*#You now have #1# chips#*#", gamble_event)
+    while gamble_done == false do
+        Actions.npc_talk(item)
+        mq.delay("5s")
+        mq.doevents()
+    end
+    gamble_done = false
 end
 
 function Actions.send_yes(item)
