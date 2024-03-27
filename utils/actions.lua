@@ -79,7 +79,7 @@ function Actions.clear_xtarget(class_settings)
             i = i + 1
             if mq.TLO.Me.XTarget(i)() ~= '' then
                 if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' then
-                    if mq.TLO.Me.XTarget(i).Distance() < 300 then
+                    if mq.TLO.Me.XTarget(i).Distance() < 300 and mq.TLO.Me.XTarget(i).LineOfSight() == true then
                         mq.TLO.Me.XTarget(i).DoTarget()
                         ID = mq.TLO.Me.XTarget(i).ID()
                         State.status = "Clearing XTarget " .. i .. ": " .. mq.TLO.Me.XTarget(i)()
@@ -103,6 +103,8 @@ function Actions.clear_xtarget(class_settings)
                             end
                             mq.delay(200)
                         end
+                        i = 0
+                    elseif i > mq.TLO.Me.XTarget(i)() then
                         i = 0
                     end
                 end
@@ -167,6 +169,7 @@ end
 
 function Actions.farm_check(item)
     State.status = "Checking if we have " .. item.count .. " of " .. item.what
+    mq.delay(1500)
     local not_found = false
     if mq.TLO.FindItem("=" .. item.what)() == nil then
         not_found = true
