@@ -79,33 +79,39 @@ function Actions.clear_xtarget(class_settings)
             i = i + 1
             if mq.TLO.Me.XTarget(i)() ~= '' then
                 if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' then
-                    mq.TLO.Me.XTarget(i).DoTarget()
-                    ID = mq.TLO.Me.XTarget(i).ID()
-                    State.status = "Clearing XTarget " .. i .. ": " .. mq.TLO.Me.XTarget(i)()
-                    manage.unpauseGroup(State.group_choice, class_settings)
-                    mq.cmd("/stick")
-                    mq.delay(100)
-                    mq.cmd("/attack on")
-                    while mq.TLO.Spawn(ID).Type() == 'NPC' do
-                        local breakout = true
-                        for j = 1, max_xtargs do
-                            if mq.TLO.Me.XTarget(j).ID() == ID then
-                                breakout = false
+                    if mq.TLO.Me.XTarget(i).Distance() < 300 then
+                        mq.TLO.Me.XTarget(i).DoTarget()
+                        ID = mq.TLO.Me.XTarget(i).ID()
+                        State.status = "Clearing XTarget " .. i .. ": " .. mq.TLO.Me.XTarget(i)()
+                        manage.unpauseGroup(State.group_choice, class_settings)
+                        mq.cmd("/stick")
+                        mq.delay(100)
+                        mq.cmd("/attack on")
+                        while mq.TLO.Spawn(ID).Type() == 'NPC' do
+                            local breakout = true
+                            for j = 1, max_xtargs do
+                                if mq.TLO.Me.XTarget(j).ID() == ID then
+                                    breakout = false
+                                end
                             end
+                            if breakout == true then break end
+                            if mq.TLO.Target.ID ~= ID then
+                                mq.TLO.Spawn(ID).DoTarget()
+                            end
+                            if mq.TLO.Me.Combat() == false then
+                                mq.cmd("/attack on")
+                            end
+                            mq.delay(200)
                         end
-                        if breakout == true then break end
-                        if mq.TLO.Target.ID ~= ID then
-                            mq.TLO.Spawn(ID).DoTarget()
-                        end
-                        if mq.TLO.Me.Combat() == false then
-                            mq.cmd("/attack on")
-                        end
-                        mq.delay(200)
+                        i = 0
                     end
-                    i = 1
                 end
             end
+            if mq.TLO.Me.XTarget() == 0 then
+                looping = false
+            end
         end
+        manage.pauseGroup(State.group_choice, class_settings)
     end
 end
 
@@ -704,8 +710,25 @@ end
 
 function Actions.npc_search(item)
     State.status = "Searching for " .. item.npc
-    if mq.TLO.Spawn("npc " .. item.npc).ID() ~= 0 then
-        State.step = item.gotostep - 1
+    local looping = true
+    local i = 1
+    while looping do
+        local ID = mq.TLO.NearestSpawn(i, "npc " .. item.npc).ID()
+        if ID ~= nil then
+            local not_bad = true
+            for _, bad_id in pairs(State.bad_IDs) do
+                if ID == bad_id then
+                    not_bad = false
+                end
+            end
+            if not_bad == true then
+                State.step = item.gotostep - 1
+                return
+            end
+        else
+            return
+        end
+        i = i + 1
     end
     mq.delay(500)
 end
