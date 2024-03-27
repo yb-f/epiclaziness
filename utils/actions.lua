@@ -768,6 +768,7 @@ function Actions.npc_travel(item, class_settings)
             mq.delay(500)
             ID = mq.TLO.NearestSpawn(1, "npc " .. item.npc).ID()
         end
+        State.status = "Looking for path to NPC " .. item.npc
         if mq.TLO.Navigation.PathExists('id ' .. ID)() == false then
             table.insert(State.bad_IDs, ID)
         end
@@ -884,8 +885,10 @@ function Actions.pickpocket(item)
 end
 
 function Actions.portal_set(item)
+    State.status = "Setting portal to " .. item.zone
+    mq.delay("1s")
     mq.cmdf("/portalset %s", item.zone)
-    mq.delay(500)
+    mq.delay("1s")
     while mq.TLO.PortalSetter.InProgress() == true do
         mq.delay(200)
     end
