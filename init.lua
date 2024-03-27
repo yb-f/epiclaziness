@@ -23,7 +23,8 @@ local stop_at_save = false
 local class_list_choice = 1
 local changed = false
 local myClass = mq.TLO.Me.Class()
-
+local exclude_list = {}
+local exclude_name = ''
 
 local class_list = { 'Bard', 'Beastlord', 'Berserker', 'Cleric', 'Druid', 'Enchanter', 'Magician', 'Monk', 'Necromancer',
     'Paladin', 'Ranger', 'Rogue', 'Shadow Knight', 'Shaman', 'Warrior', 'Wizard' }
@@ -57,6 +58,19 @@ State.cannot_count = 0
 State.traveling = false
 
 class_settings.loadSettings()
+
+local function matchFilters(spawn)
+    if string.find(string.lower(spawn.Name()), string.lower(exclude_name)) then return true end
+    return false
+end
+
+local function create_spawn_list()
+    exclude_list = mq.getFilteredSpawns(matchFilters)
+    for _, spawn in pairs(exclude_list) do
+        print(spawn.Name())
+        table.insert(State.bad_IDs, spawn.ID())
+    end
+end
 
 local function invis_needed(class, choice)
     local class_epic = ''
@@ -130,6 +144,7 @@ local function run_epic(class, choice)
         State.skip = false
         State.step = State.step + 1
         if task_table[State.step].type == "ZONE_TRAVEL" then
+            State.bad_IDs = {}
             if mq.TLO.Me.XTarget() > 0 then
                 actions.clear_xtarget(class_settings.settings)
             end
@@ -168,6 +183,9 @@ local function run_epic(class, choice)
                 actions.clear_xtarget(class_settings.settings)
             end
             actions.npc_hail(task_table[State.step])
+        elseif task_table[State.step].type == "EXCLUDE_NPC" then
+            exclude_name = task_table[State.step].npc
+            create_spawn_list()
         elseif task_table[State.step].type == "NPC_FOLLOW" then
             if mq.TLO.Me.XTarget() > 0 then
                 actions.clear_xtarget(class_settings.settings)
