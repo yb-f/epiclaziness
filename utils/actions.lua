@@ -74,9 +74,11 @@ function Actions.clear_xtarget(class_settings)
     local max_xtargs = mq.TLO.Me.XTargetSlots()
     if mq.TLO.Me.XTarget() > 0 then
         local looping = true
+        local loopCount = 0
         local i = 0
         while looping do
             i = i + 1
+            loopCount = loopCount + 1
             if mq.TLO.Me.XTarget(i)() ~= '' then
                 if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' then
                     if mq.TLO.Me.XTarget(i).Distance() < 300 and mq.TLO.Me.XTarget(i).LineOfSight() == true then
@@ -104,10 +106,15 @@ function Actions.clear_xtarget(class_settings)
                             mq.delay(200)
                         end
                         i = 0
+                        loopCount = 0
                     elseif i > mq.TLO.Me.XTarget() then
                         i = 0
                     end
                 end
+            end
+            if loopCount == 20 then
+                i = 0
+                loopCount = 0
             end
             if mq.TLO.Me.XTarget() == 0 then
                 looping = false
