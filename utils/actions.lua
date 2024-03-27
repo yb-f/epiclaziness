@@ -104,7 +104,7 @@ function Actions.clear_xtarget(class_settings)
                             mq.delay(200)
                         end
                         i = 0
-                    elseif i > mq.TLO.Me.XTarget(i)() then
+                    elseif i > mq.TLO.Me.XTarget() then
                         i = 0
                     end
                 end
