@@ -30,6 +30,10 @@ function Actions.inventory_window()
     return mq.TLO.Window('InventoryWindow').Open()
 end
 
+function Actions.tradeskill_window()
+    return mq.TLO.Window('TradeskillWnd').Open()
+end
+
 function Actions.got_cursor()
     if mq.TLO.Cursor() ~= nil then
         return true
@@ -140,6 +144,9 @@ function Actions.combine_do(item)
         mq.delay(100)
     end
     mq.cmd("/autoinv")
+    while mq.TLO.Cursor() ~= nil do
+        mq.delay(100)
+    end
 end
 
 function Actions.combine_done(item)
@@ -160,6 +167,39 @@ end
 function Actions.combine_item(item)
     State.status = "Moving " .. item.what .. " to combine container"
     inv.move_item_to_combine(item.what, 10)
+end
+
+function Actions.enviro_combine_container(item)
+    State.status = "Moving to " .. item.what
+    mq.cmdf("/itemtarget %s", item.what)
+    mq.delay(500)
+    mq.cmd("/nav item")
+    while mq.TLO.Navigation.Active() do
+        mq.delay(500)
+    end
+    State.status = "Opening " .. item.what .. " window"
+    mq.cmdf("/itemtarget %s", item.what)
+    mq.delay("5s", Actions.tradeskill_window)
+    mq.TLO.Window("TradeskillWnd/COMBW_ExperimentButton").LeftMouseUp()
+    mq.delay("1s")
+end
+
+function Actions.enviro_combine_item(item)
+    State.status = "Moving " .. item.what .. " to combine container slot " .. item.npc
+    mq.cmd("/keypress OPEN_INV_BAGS")
+    inv.move_item_to_enviro_combine(item.what, item.npc)
+end
+
+function Actions.enviro_combine_do(item)
+    State.status = "Combining"
+    mq.TLO.Window("ContainerWindow/Container_Combine").LeftMouseUp()
+    while mq.TLO.Cursor() == nil do
+        mq.delay(100)
+    end
+    mq.cmd("/autoinv")
+    while mq.TLO.Cursor() ~= nil do
+        mq.delay(100)
+    end
 end
 
 function Actions.face_heading(item)
