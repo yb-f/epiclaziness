@@ -164,14 +164,8 @@ local function run_epic(class, choice)
             end
             actions.npc_wait(task_table[State.step])
         elseif task_table[State.step].type == "NPC_TALK" then
-            if mq.TLO.Me.XTarget() > 0 then
-                actions.clear_xtarget(class_settings.settings)
-            end
             actions.npc_talk(task_table[State.step])
         elseif task_table[State.step].type == "NPC_GIVE" then
-            if mq.TLO.Me.XTarget() > 0 then
-                actions.clear_xtarget(class_settings.settings)
-            end
             actions.npc_give(task_table[State.step])
         elseif task_table[State.step].type == "AUTO_INV" then
             if mq.TLO.Me.XTarget() > 0 then
@@ -179,9 +173,6 @@ local function run_epic(class, choice)
             end
             actions.auto_inv(task_table[State.step])
         elseif task_table[State.step].type == "NPC_HAIL" then
-            if mq.TLO.Me.XTarget() > 0 then
-                actions.clear_xtarget(class_settings.settings)
-            end
             actions.npc_hail(task_table[State.step])
         elseif task_table[State.step].type == "EXCLUDE_NPC" then
             exclude_name = task_table[State.step].npc
@@ -309,9 +300,6 @@ local function run_epic(class, choice)
             end
             actions.face_loc(task_table[State.step])
         elseif task_table[State.step].type == "NPC_BUY" then
-            if mq.TLO.Me.XTarget() > 0 then
-                actions.clear_xtarget(class_settings.settings)
-            end
             actions.npc_buy(task_table[State.step])
         elseif task_table[State.step].type == "NPC_WAIT_DESPAWN" then
             if mq.TLO.Me.XTarget() > 0 then
