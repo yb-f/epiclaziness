@@ -32,6 +32,17 @@ function inventory.move_item_to_combine(name, slot)
     mq.delay("1s")
 end
 
+function inventory.move_item_to_enviro_combine(name, slot)
+    local itemslot  = mq.TLO.FindItem("=" .. name).ItemSlot() - 22
+    local itemslot2 = mq.TLO.FindItem("=" .. name).ItemSlot2() + 1
+    mq.cmdf("/nomodkey /ctrl /itemnotify in pack%s %s leftmouseup", itemslot, itemslot2)
+    while mq.TLO.Cursor() == nil do
+        mq.delay(100)
+    end
+    mq.cmdf("/itemnotify enviro%s leftmouseup", slot)
+    mq.delay("1s")
+end
+
 function inventory.move_combine_container(slot, container)
     local itemslot = mq.TLO.FindItem("=" .. container).ItemSlot() - 22
     local itemslot2 = mq.TLO.FindItem("=" .. container).ItemSlot2() + 1
