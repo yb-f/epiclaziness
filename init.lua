@@ -320,6 +320,7 @@ local function run_epic(class, choice)
                 actions.clear_xtarget(class_settings.settings)
             end
             mq.cmdf("%s", task_table[State.step].what)
+            mq.delay(500)
         elseif task_table[State.step].type == "SEND_YES" then
             actions.send_yes(task_table[State.step])
         elseif task_table[State.step].type == "PORTAL_SET" then
