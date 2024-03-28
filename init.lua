@@ -344,6 +344,12 @@ local function run_epic(class, choice)
                 actions.clear_xtarget(class_settings.settings)
             end
             actions.relocate(task_table[State.step])
+        elseif task_table[State.step].type == "ENVIRO_COMBINE_CONTAINER" then
+            actions.enviro_combine_container(task_table[State.step])
+        elseif task_table[State.step].type == "ENVIRO_COMBINE_ITEM" then
+            actions.enviro_combine_item(task_table[State.step])
+        elseif task_table[State.step].type == "ENVIRO_COMBINE_DO" then
+            actions.enviro_combine_do(task_table[State.step])
         else
             printf("%s \aoUnknown Type: \ar%s!", elheader, task_table[State.step].type)
             mq.exit()
