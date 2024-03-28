@@ -931,6 +931,9 @@ end
 function Actions.relocate(item)
     State.status = "Relocating to " .. item.what
     manage.relocateGroup(State.group_choice, item.what)
+    while mq.TLO.Me.Casting() ~= nil do
+        mq.delay(500)
+    end
 end
 
 function Actions.rog_gamble(item)
