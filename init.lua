@@ -114,6 +114,7 @@ local function populate_group_combo()
 end
 
 local function run_epic(class, choice)
+    task_table = {}
     loadsave.loadState()
     State.task_run = true
     manage.startGroup(State.group_choice, class_settings.settings)
