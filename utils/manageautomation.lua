@@ -116,7 +116,7 @@ function manage.doAutomation(character, class, script, action)
         if character == mq.TLO.Me.DisplayName() then
             if script == 1 then
                 mq.cmdf('/%s resetcamp', class)
-                mq.cmdf('/%s mode PullerTank', class)
+                mq.cmdf('/%s mode HunterTank', class)
                 mq.cmdf('/%s pause off', class)
             elseif script == 2 then
                 mq.cmd("/rgl campon")
