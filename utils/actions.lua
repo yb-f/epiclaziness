@@ -178,7 +178,7 @@ function Actions.enviro_combine_container(item)
         mq.delay(500)
     end
     State.status = "Opening " .. item.what .. " window"
-    mq.cmdf("/itemtarget %s", item.what)
+    mq.cmd("/click left item")
     mq.delay("5s", Actions.tradeskill_window)
     mq.TLO.Window("TradeskillWnd/COMBW_ExperimentButton").LeftMouseUp()
     mq.delay("1s")
@@ -215,14 +215,23 @@ function Actions.face_loc(item)
 end
 
 function Actions.farm_check(item)
-    State.status = "Checking if we have " .. item.count .. " of " .. item.what
-    mq.delay(1500)
+    mq.delay("2s")
+    local check_list = {}
     local not_found = false
-    if mq.TLO.FindItem("=" .. item.what)() == nil then
-        not_found = true
-    else
+    if item.count ~= nil then
+        State.status = "Checking if we have " .. item.count .. " of " .. item.what
         if mq.TLO.FindItemCount("=" .. item.what)() < item.count then
             not_found = true
+        end
+    else
+        State.status = "Checking if we have " .. item.what
+        for word in string.gmatch(item.what, '([^|]+)') do
+            table.insert(check_list, word)
+            for _, check in pairs(check_list) do
+                if mq.TLO.FindItem("=" .. check)() == nil then
+                    not_found = true
+                end
+            end
         end
     end
     --if one or more of the items are not present this will be true, so on false advance to the desired step
@@ -457,7 +466,7 @@ function Actions.loc_travel(item, class_settings)
 end
 
 function Actions.loot(item)
-    State.status = "Looting " .. item.what .. " from " .. item.npc
+    State.status = "Looting " .. item.what
     mq.delay("2s")
     if mq.TLO.AdvLoot.SCount() > 0 then
         for i = 1, mq.TLO.AdvLoot.SCount() do
@@ -971,6 +980,9 @@ end
 function Actions.relocate(item)
     State.status = "Relocating to " .. item.what
     manage.relocateGroup(State.group_choice, item.what)
+    while mq.TLO.Me.Casting() == nil do
+        mq.delay(10)
+    end
     while mq.TLO.Me.Casting() ~= nil do
         mq.delay(500)
     end
