@@ -1003,6 +1003,7 @@ end
 
 function Actions.pre_farm_check(item)
     State.status = "Checking for pre-farmable items"
+    mq.delay("1s")
     local check_list = {}
     local not_found = false
     if item.count ~= nil then
