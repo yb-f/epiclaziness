@@ -242,7 +242,7 @@ local function run_epic(class, choice)
             if mq.TLO.Me.XTarget() > 0 then
                 actions.clear_xtarget(class_settings.settings)
             end
-            actions.npc_search(task_table[State.step])
+            actions.general_search(task_table[State.step])
         elseif task_table[State.step].type == "PH_SEARCH" then
             if mq.TLO.Me.XTarget() > 0 then
                 actions.clear_xtarget(class_settings.settings)
