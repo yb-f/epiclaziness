@@ -431,6 +431,9 @@ function Actions.general_search(item)
             State.step = item.gotostep - 1
             return
         else
+            if item.zone ~= nil then
+                State.step = item.zone - 1
+            end
             return
         end
         i = i + 1
@@ -822,6 +825,9 @@ function Actions.npc_search(item)
                 return
             end
         else
+            if item.zone ~= nil then
+                State.step = item.zone - 1
+            end
             return
         end
         i = i + 1
