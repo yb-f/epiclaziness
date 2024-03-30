@@ -556,6 +556,31 @@ function manage.noNavTravel(group_set, x, y, z)
     end
 end
 
+function manage.openDoorAll(group_set)
+    if group_set == 1 then
+        mq.delay(200)
+        mq.cmd("/doortarget")
+        mq.delay(200)
+        mq.cmd("/click left door")
+        mq.delay(1000)
+    elseif group_set == 2 then
+        mq.delay(200)
+        mq.cmd("/dgga /doortarget")
+        mq.delay(200)
+        mq.cmd("/dgga /click left door")
+        mq.delay(1000)
+    else
+        local name = State.group_combo[State.group_choice]
+        mq.delay(200)
+        mq.cmd("/doortarget")
+        mq.cmdf("/dex %s /doortarget", name)
+        mq.delay(200)
+        mq.cmdf("/dex %s /click left door", name)
+        mq.cmd("/click left door")
+        mq.delay(100)
+    end
+end
+
 function manage.pauseGroup(group_set, class_settings)
     manage.doAutomation(mq.TLO.Me.DisplayName(), mq.TLO.Me.Class.ShortName(),
         class_settings.class[mq.TLO.Me.Class.Name()],
@@ -692,7 +717,7 @@ function manage.startGroup(group_set, class_settings)
     if mq.TLO.Me.Grouped() == true and mq.TLO.Group.Leader() == mq.TLO.Me.DisplayName() then
         mq.cmdf("/grouprole set %s 1", mq.TLO.Me.DisplayName())
         mq.cmdf("/grouprole set %s 2", mq.TLO.Me.DisplayName())
-        mq.cmdf("/grouprole set %s 3", mq.TLO.Me.DisplayName())
+        --mq.cmdf("/grouprole set %s 3", mq.TLO.Me.DisplayName())
     end
     manage.doAutomation(mq.TLO.Me.DisplayName(), mq.TLO.Me.Class.ShortName(),
         class_settings.class[mq.TLO.Me.Class.Name()],
@@ -756,7 +781,7 @@ function manage.unpauseGroup(group_set, class_settings)
         for i = 0, mq.TLO.Group.GroupSize() - 1 do
             if mq.TLO.Group.Member(i).DisplayName() ~= mq.TLO.Me.DisplayName() then
                 manage.doAutomation(mq.TLO.Group.Member(i).DisplayName(), mq.TLO.Group.Member(i).Class.ShortName(),
-                    class_settings.clas[mq.TLO.Group.Member(i).Class.Name()],
+                    class_settings.class[mq.TLO.Group.Member(i).Class.Name()],
                     'unpause')
             end
         end

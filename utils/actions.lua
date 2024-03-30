@@ -907,6 +907,11 @@ function Actions.open_door(item)
     mq.delay(1000)
 end
 
+function Actions.open_door_all(item)
+    State.status = "Opening door"
+    manage.openDoorAll(State.group_choice)
+end
+
 function Actions.ph_search(item)
     State.status = 'Searching for PH for ' .. item.npc
     local spawn_search = "npc loc " ..
