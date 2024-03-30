@@ -27,6 +27,82 @@ function manage.campGroup(group_set, radius, class_settings)
     end
 end
 
+function manage.clearXtarget(group_set, npc)
+    npc = npc or "thiswontmatchanything"
+    local max_xtargs = mq.TLO.Me.XTargetSlots()
+    if mq.TLO.Me.XTarget() > 0 then
+        local looping = true
+        local loopCount = 0
+        local i = 0
+        local idList = {}
+        while looping do
+            i = i + 1
+            loopCount = loopCount + 1
+            if mq.TLO.Me.XTarget(i)() ~= '' then
+                if string.find(string.lower(mq.TLO.Me.XTarget(i).CleanName()), string.lower(npc)) then
+                    local ID = mq.TLO.Me.XTarget(i).ID()
+                    local notFound = true
+                    for _, ids in pairs(idList) do
+                        if ID == ids then
+                            notFound = false
+                        end
+                    end
+                    if notFound then
+                        table.insert(idList, ID)
+                    end
+                    if #idList == mq.TLO.Me.XTarget() then
+                        break
+                    end
+                else
+                    if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' then
+                        if mq.TLO.Me.XTarget(i).Distance() ~= nil then
+                            if mq.TLO.Me.XTarget(i).Distance() < 300 and mq.TLO.Me.XTarget(i).LineOfSight() == true then
+                                mq.TLO.Me.XTarget(i).DoTarget()
+                                ID = mq.TLO.Me.XTarget(i).ID()
+                                State.status = "Clearing XTarget " .. i .. ": " .. mq.TLO.Me.XTarget(i)()
+                                manage.unpauseGroup(State.group_choice, group_set)
+                                mq.cmd("/stick")
+                                mq.delay(100)
+                                mq.cmd("/attack on")
+                                while mq.TLO.Spawn(ID).Type() == 'NPC' do
+                                    local breakout = true
+                                    for j = 1, max_xtargs do
+                                        if mq.TLO.Me.XTarget(j).ID() == ID then
+                                            breakout = false
+                                        end
+                                    end
+                                    if breakout == true then break end
+                                    if mq.TLO.Target.ID() ~= ID then
+                                        mq.TLO.Spawn(ID).DoTarget()
+                                    end
+                                    if mq.TLO.Me.Combat() == false then
+                                        mq.cmd("/attack on")
+                                    end
+                                    mq.delay(200)
+                                end
+                                i = 0
+                                loopCount = 0
+                            elseif i > mq.TLO.Me.XTarget() then
+                                i = 0
+                            end
+                        else
+                            i = 0
+                        end
+                    end
+                end
+            end
+            if loopCount == 20 then
+                i = 0
+                loopCount = 0
+            end
+            if mq.TLO.Me.XTarget() == 0 then
+                looping = false
+            end
+        end
+        manage.pauseGroup(State.group_choice, group_set)
+    end
+end
+
 function manage.doAutomation(character, class, script, action)
     if action == 'start' then
         if character == mq.TLO.Me.DisplayName() then
@@ -427,6 +503,9 @@ function manage.locTravelGroup(group_set, x, y, z)
     mq.delay(200)
     while mq.TLO.Navigation.Active() do
         mq.delay(200)
+        if mq.TLO.Me.XTarget() > 0 then
+            manage.clearXtarget(group_set)
+        end
         if loopCount == 10 then
             mq.cmd('/doortarget')
             mq.delay(200)
@@ -465,6 +544,9 @@ function manage.navGroup(group_set, npc, ID)
     while mq.TLO.Navigation.Active() do
         mq.delay(200)
         mq.doevents()
+        if mq.TLO.Me.XTarget() > 0 then
+            manage.clearXtarget(group_set, npc)
+        end
         if loopCount == 10 then
             mq.cmd('/squelch /doortarget')
             mq.delay(200)
@@ -502,6 +584,9 @@ function manage.navGroupGeneral(group_set, npc, ID)
     mq.delay(200)
     while mq.TLO.Navigation.Active() do
         mq.delay(200)
+        if mq.TLO.Me.XTarget() > 0 then
+            manage.clearXtarget(group_set)
+        end
         if loopCount == 10 then
             mq.cmd('/squelch /doortarget')
             mq.delay(200)
@@ -540,6 +625,9 @@ function manage.navGroupLoc(group_set, npc, x, y, z)
     mq.delay(200)
     while mq.TLO.Navigation.Active() do
         mq.delay(200)
+        if mq.TLO.Me.XTarget() > 0 then
+            manage.clearXtarget(group_set, npc)
+        end
         if loopCount == 10 then
             mq.cmd('/squelch /doortarget')
             mq.delay(200)
@@ -835,6 +923,9 @@ function manage.zoneGroup(group_set, zone)
         local loopCount = 0
         while mq.TLO.Zone.ShortName() ~= zone do
             mq.delay(500)
+            if mq.TLO.Me.XTarget() > 0 then
+                manage.clearXtarget(group_set)
+            end
             if not mq.TLO.Navigation.Active() then
                 if loopCount == 60 then
                     mq.cmdf("/travelto %s", zone)

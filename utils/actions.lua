@@ -46,7 +46,7 @@ local function event_wait(line)
     mq.unevent('wait_event')
 end
 
-function Actions.auto_inv(item)
+function Actions.auto_inv(item, class_settings)
     State.status = "Moving items to inventory"
     mq.delay(200)
     while mq.TLO.Cursor() ~= nil do
@@ -56,7 +56,7 @@ function Actions.auto_inv(item)
     mq.delay("1s")
 end
 
-function Actions.backstab(item)
+function Actions.backstab(item, class_settings)
     mq.TLO.NearestSpawn("npc " .. item.npc).DoTarget()
     mq.cmd('/stick behind')
     mq.delay("2s")
@@ -64,7 +64,7 @@ function Actions.backstab(item)
     mq.delay(500)
 end
 
-function Actions.cast_alt(item)
+function Actions.cast_alt(item, class_settings)
     manage.removeInvis(State.group_choice)
     State.status = "Casting " .. item.what
     mq.cmdf('/casting "%s"', item.what)
@@ -132,7 +132,7 @@ function Actions.clear_xtarget(class_settings)
     end
 end
 
-function Actions.combine_container(item)
+function Actions.combine_container(item, class_settings)
     State.status = "Preparing combine container"
     if mq.TLO.InvSlot('pack10').Item.Container() then
         inv.empty_bag(10)
@@ -141,7 +141,7 @@ function Actions.combine_container(item)
     inv.move_combine_container(10, item.what)
 end
 
-function Actions.combine_do(item)
+function Actions.combine_do(item, class_settings)
     State.status = "Combining"
     mq.cmdf("/combine pack10")
     while mq.TLO.Cursor() == nil do
@@ -153,7 +153,7 @@ function Actions.combine_do(item)
     end
 end
 
-function Actions.combine_done(item)
+function Actions.combine_done(item, class_settings)
     if State.bagslot1 ~= 0 and State.bagslot2 ~= 0 then
         State.status = "Moving container back to slot 10"
         mq.cmdf("/nomodkey /shiftkey /itemnotify in pack%s %s leftmouseup", State.bagslot1, State.bagslot2)
@@ -168,12 +168,12 @@ function Actions.combine_done(item)
     end
 end
 
-function Actions.combine_item(item)
+function Actions.combine_item(item, class_settings)
     State.status = "Moving " .. item.what .. " to combine container"
     inv.move_item_to_combine(item.what, 10)
 end
 
-function Actions.enviro_combine_container(item)
+function Actions.enviro_combine_container(item, class_settings)
     State.status = "Moving to " .. item.what
     mq.cmdf("/itemtarget %s", item.what)
     mq.delay(500)
@@ -188,13 +188,13 @@ function Actions.enviro_combine_container(item)
     mq.delay("1s")
 end
 
-function Actions.enviro_combine_item(item)
+function Actions.enviro_combine_item(item, class_settings)
     State.status = "Moving " .. item.what .. " to combine container slot " .. item.npc
     mq.cmd("/keypress OPEN_INV_BAGS")
     inv.move_item_to_enviro_combine(item.what, item.npc)
 end
 
-function Actions.enviro_combine_do(item)
+function Actions.enviro_combine_do(item, class_settings)
     State.status = "Combining"
     mq.TLO.Window("ContainerWindow/Container_Combine").LeftMouseUp()
     while mq.TLO.Cursor() == nil do
@@ -206,19 +206,19 @@ function Actions.enviro_combine_do(item)
     end
 end
 
-function Actions.face_heading(item)
+function Actions.face_heading(item, class_settings)
     State.status = "Facing heading " .. item.what
     manage.faceHeading(State.group_choice, item.what)
     mq.delay(250)
 end
 
-function Actions.face_loc(item)
+function Actions.face_loc(item, class_settings)
     State.status = "Facing " .. item.whereX .. ", " .. item.whereY .. ", " .. item.whereZ
     manage.faceLoc(State.group_choice, item.whereX, item.whereY, item.whereZ)
     mq.delay(250)
 end
 
-function Actions.farm_check(item)
+function Actions.farm_check(item, class_settings)
     mq.delay("2s")
     local check_list = {}
     local not_found = false
@@ -247,7 +247,7 @@ function Actions.farm_check(item)
     end
 end
 
-function Actions.farm_check_pause(item)
+function Actions.farm_check_pause(item, class_settings)
     State.status = "Checking for " .. item.what
     local check_list = {}
     local not_found = false
@@ -358,7 +358,7 @@ function Actions.farm_radius(item, class_settings)
     manage.pauseGroup(State.group_choice, class_settings)
 end
 
-function Actions.forage_farm(item)
+function Actions.forage_farm(item, class_settings)
     if item.count ~= nil then
         State.status = "Foraging for " .. item.what .. " (" .. item.count .. ")"
     else
@@ -421,7 +421,7 @@ function Actions.forward_zone(item, class_settings)
     manage.forwardZone(State.group_choice, item.zone)
 end
 
-function Actions.general_search(item)
+function Actions.general_search(item, class_settings)
     State.status = "Searching for " .. item.npc
     local looping = true
     local i = 1
@@ -505,7 +505,7 @@ function Actions.loc_travel(item, class_settings)
     State.traveling = false
 end
 
-function Actions.loot(item)
+function Actions.loot(item, class_settings)
     State.status = "Looting " .. item.what
     mq.delay("2s")
     if mq.TLO.AdvLoot.SCount() > 0 then
@@ -544,7 +544,7 @@ function Actions.no_nav_travel(item, class_settings)
     manage.noNavTravel(State.group_choice, item.whereX, item.whereY, item.whereZ)
 end
 
-function Actions.npc_buy(item)
+function Actions.npc_buy(item, class_settings)
     manage.removeInvis(State.group_choice)
     State.status = "Buying " .. item.what .. " from " .. item.npc
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
@@ -561,7 +561,7 @@ function Actions.npc_buy(item)
     mq.TLO.Window('MerchantWnd').DoClose()
 end
 
-function Actions.npc_damage_until(item)
+function Actions.npc_damage_until(item, class_settings)
     State.status = "Damaging " .. item.npc .. " to below " .. item.what .. "% health"
     ID = mq.TLO.Spawn('npc ' .. item.npc).ID()
     mq.TLO.Spawn(ID).DoTarget()
@@ -595,7 +595,7 @@ function Actions.npc_follow(item, class_settings)
     end
 end
 
-function Actions.npc_give(item)
+function Actions.npc_give(item, class_settings)
     manage.removeInvis(State.group_choice)
     State.status = "Giving " .. item.what .. " to " .. item.npc
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
@@ -614,7 +614,7 @@ function Actions.npc_give(item)
     mq.delay("1s")
 end
 
-function Actions.npc_give_add(item)
+function Actions.npc_give_add(item, class_settings)
     manage.removeInvis(State.group_choice)
     State.status = "Giving " .. item.what .. " to " .. item.npc
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
@@ -635,7 +635,7 @@ function Actions.npc_give_add(item)
     end
 end
 
-function Actions.npc_give_click(item)
+function Actions.npc_give_click(item, class_settings)
     manage.removeInvis(State.group_choice)
     State.status = "Giving items"
     mq.TLO.Window('GiveWnd').Child('GVW_Give_Button').LeftMouseUp()
@@ -646,7 +646,7 @@ function Actions.npc_give_click(item)
     mq.delay("1s")
 end
 
-function Actions.npc_give_money(item)
+function Actions.npc_give_money(item, class_settings)
     manage.removeInvis(State.group_choice)
     State.status = "Giving " .. item.what .. "pp to " .. item.npc
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
@@ -674,7 +674,7 @@ function Actions.npc_give_money(item)
     mq.delay("1s")
 end
 
-function Actions.npc_hail(item)
+function Actions.npc_hail(item, class_settings)
     manage.removeInvis(State.group_choice)
     State.status = "Hailing " .. item.npc
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
@@ -807,7 +807,7 @@ function Actions.npc_kill_all(item, class_settings)
     end
 end
 
-function Actions.npc_search(item)
+function Actions.npc_search(item, class_settings)
     State.status = "Searching for " .. item.npc
     local looping = true
     local i = 1
@@ -835,12 +835,12 @@ function Actions.npc_search(item)
     mq.delay(500)
 end
 
-function Actions.npc_stop_follow(item)
+function Actions.npc_stop_follow(item, class_settings)
     State.status = "Stopping autofollow"
     manage.stopfollowGroup(State.group_choice)
 end
 
-function Actions.npc_talk(item)
+function Actions.npc_talk(item, class_settings)
     manage.removeInvis(State.group_choice)
     State.status = "Talking to " .. item.npc .. " (" .. item.what .. ")"
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
@@ -851,7 +851,7 @@ function Actions.npc_talk(item)
     mq.delay(750)
 end
 
-function Actions.npc_talk_all(item)
+function Actions.npc_talk_all(item, class_settings)
     manage.removeInvis(State.group_choice)
     State.status = "Talking to " .. item.npc .. " (" .. item.what .. ")"
     manage.groupTalk(State.group_choice, item.npc, item.what)
@@ -927,21 +927,24 @@ function Actions.npc_travel(item, class_settings)
     end
 end
 
-function Actions.npc_wait(item)
+function Actions.npc_wait(item, class_settings)
     State.status = "Waiting for " .. item.npc .. " (" .. item.waittime .. ")"
     while mq.TLO.Spawn("npc " .. item.npc).ID() == 0 do
+        if mq.TLO.Me.XTarget() > 0 then
+            manage.clearXtarget(group_set)
+        end
         mq.delay(200)
     end
 end
 
-function Actions.npc_wait_despawn(item)
+function Actions.npc_wait_despawn(item, class_settings)
     State.status = "Waiting for " .. item.npc .. " to despawn (" .. item.waittime .. ")"
     while mq.TLO.Spawn("npc " .. item.npc).ID() ~= 0 do
         mq.delay(200)
     end
 end
 
-function Actions.open_door(item)
+function Actions.open_door(item, class_settings)
     State.status = "Opening door"
     mq.delay(200)
     mq.cmd("/doortarget")
@@ -950,12 +953,12 @@ function Actions.open_door(item)
     mq.delay(1000)
 end
 
-function Actions.open_door_all(item)
+function Actions.open_door_all(item, class_settings)
     State.status = "Opening door"
     manage.openDoorAll(State.group_choice)
 end
 
-function Actions.ph_search(item)
+function Actions.ph_search(item, class_settings)
     State.status = 'Searching for PH for ' .. item.npc
     local spawn_search = "npc loc " ..
         item.whereX .. " " .. item.whereY .. " " .. item.whereZ .. " radius " .. item.radius
@@ -965,14 +968,14 @@ function Actions.ph_search(item)
     mq.delay(500)
 end
 
-function Actions.picklock_door(item)
+function Actions.picklock_door(item, class_settings)
     State.status = "Lockpicking door"
     mq.delay(1500)
     manage.picklockGroup(State.group_choice)
     mq.delay(100)
 end
 
-function Actions.pickpocket(item)
+function Actions.pickpocket(item, class_settings)
     mq.TLO.NearestSpawn("npc " .. item.npc).DoTarget()
     local looping = true
     while looping do
@@ -991,7 +994,7 @@ function Actions.pickpocket(item)
     end
 end
 
-function Actions.portal_set(item)
+function Actions.portal_set(item, class_settings)
     State.status = "Setting portal to " .. item.zone
     mq.delay("1s")
     mq.cmdf("/portalset %s", item.zone)
@@ -1001,7 +1004,7 @@ function Actions.portal_set(item)
     end
 end
 
-function Actions.pre_farm_check(item)
+function Actions.pre_farm_check(item, class_settings)
     State.status = "Checking for pre-farmable items"
     mq.delay("1s")
     local check_list = {}
@@ -1026,7 +1029,7 @@ function Actions.pre_farm_check(item)
     end
 end
 
-function Actions.relocate(item)
+function Actions.relocate(item, class_settings)
     State.status = "Relocating to " .. item.what
     manage.relocateGroup(State.group_choice, item.what)
     while mq.TLO.Me.Casting() == nil do
@@ -1037,7 +1040,7 @@ function Actions.relocate(item)
     end
 end
 
-function Actions.rog_gamble(item)
+function Actions.rog_gamble(item, class_settings)
     mq.event('chips', "#*#You now have #1# chips#*#", gamble_event)
     while gamble_done == false do
         Actions.npc_talk(item)
@@ -1047,11 +1050,11 @@ function Actions.rog_gamble(item)
     gamble_done = false
 end
 
-function Actions.send_yes(item)
+function Actions.send_yes(item, class_settings)
     manage.sendYes(State.group_choice)
 end
 
-function Actions.wait_event(item)
+function Actions.wait_event(item, class_settings)
     mq.event('wait_event', item.what, event_wait)
     waiting = true
     while waiting do
