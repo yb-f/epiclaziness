@@ -14,7 +14,8 @@ function loadsave.createConfig()
         [class] = {
             [State.epic_choice] = {
                 ['Step'] = 0
-            }
+            },
+            ['Last_Ran'] = 1
         }
     }
     loadsave.saveState()
@@ -35,6 +36,9 @@ function loadsave.loadState()
         loadsave.SaveState = configData()
         if loadsave.SaveState[class] ~= nil then
             if loadsave.SaveState[class][State.epic_choice] ~= nil then
+                if State.task_run == false then
+                    State.epic_choice = loadsave.SaveState[class]['Last_Ran']
+                end
                 State.step = loadsave.SaveState[class][State.epic_choice].Step
                 printf("%s \aoStarting on step %s", elheader, State.step)
             else
@@ -48,6 +52,7 @@ end
 
 function loadsave.prepSave(step)
     loadsave.SaveState[class][State.epic_choice].Step = step
+    loadsave.SaveState[class]['Last_Ran'] = State.epic_choice
     loadsave.saveState()
 end
 
