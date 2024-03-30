@@ -504,7 +504,9 @@ function manage.locTravelGroup(group_set, x, y, z)
     while mq.TLO.Navigation.Active() do
         mq.delay(200)
         if mq.TLO.Me.XTarget() > 0 then
+            mq.cmd('/nav pause')
             manage.clearXtarget(group_set)
+            mq.cmd('/nav pause')
         end
         if loopCount == 10 then
             mq.cmd('/doortarget')
@@ -545,7 +547,9 @@ function manage.navGroup(group_set, npc, ID)
         mq.delay(200)
         mq.doevents()
         if mq.TLO.Me.XTarget() > 0 then
+            mq.cmd('/nav pause')
             manage.clearXtarget(group_set, npc)
+            mq.cmd('/nav pause')
         end
         if loopCount == 10 then
             mq.cmd('/squelch /doortarget')
@@ -585,7 +589,9 @@ function manage.navGroupGeneral(group_set, npc, ID)
     while mq.TLO.Navigation.Active() do
         mq.delay(200)
         if mq.TLO.Me.XTarget() > 0 then
+            mq.cmd('/nav pause')
             manage.clearXtarget(group_set)
+            mq.cmd('/nav pause')
         end
         if loopCount == 10 then
             mq.cmd('/squelch /doortarget')
@@ -626,7 +632,9 @@ function manage.navGroupLoc(group_set, npc, x, y, z)
     while mq.TLO.Navigation.Active() do
         mq.delay(200)
         if mq.TLO.Me.XTarget() > 0 then
+            mq.cmd('/nav pause')
             manage.clearXtarget(group_set, npc)
+            mq.cmd('/nav pause')
         end
         if loopCount == 10 then
             mq.cmd('/squelch /doortarget')
@@ -924,7 +932,9 @@ function manage.zoneGroup(group_set, zone)
         while mq.TLO.Zone.ShortName() ~= zone do
             mq.delay(500)
             if mq.TLO.Me.XTarget() > 0 then
+                mq.cmd('/nav pause')
                 manage.clearXtarget(group_set)
+                mq.cmd('/nav pause')
             end
             if not mq.TLO.Navigation.Active() then
                 if loopCount == 60 then

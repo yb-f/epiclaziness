@@ -145,36 +145,18 @@ local function run_epic(class, choice)
         State.skip = false
         State.step = State.step + 1
         if task_table[State.step].type == "AUTO_INV" then
-            if mq.TLO.Me.XTarget() > 0 then
-                actions.clear_xtarget(class_settings.settings)
-            end
             actions.auto_inv(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "BACKSTAB" then
             actions.backstab(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "CAST_ALT" then
-            if mq.TLO.Me.XTarget() > 0 then
-                actions.clear_xtarget(class_settings.settings)
-            end
             actions.cast_alt(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "COMBINE_CONTAINER" then
-            if mq.TLO.Me.XTarget() > 0 then
-                actions.clear_xtarget(class_settings.settings)
-            end
             actions.combine_container(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "COMBINE_DO" then
-            if mq.TLO.Me.XTarget() > 0 then
-                actions.clear_xtarget(class_settings.settings)
-            end
             actions.combine_do(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "COMBINE_DONE" then
-            if mq.TLO.Me.XTarget() > 0 then
-                actions.clear_xtarget(class_settings.settings)
-            end
             actions.combine_done(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "COMBINE_ITEM" then
-            if mq.TLO.Me.XTarget() > 0 then
-                actions.clear_xtarget(class_settings.settings)
-            end
             actions.combine_item(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "ENVIRO_COMBINE_CONTAINER" then
             actions.enviro_combine_container(task_table[State.step], class_settings.settings)
@@ -187,47 +169,29 @@ local function run_epic(class, choice)
             create_spawn_list()
         elseif task_table[State.step].type == "EXECUTE_COMMAND" then
             if mq.TLO.Me.XTarget() > 0 then
-                actions.clear_xtarget(class_settings.settings)
+                manage.clearXtarget(class_settings.settings)
             end
             mq.cmdf("%s", task_table[State.step].what)
             mq.delay(500)
         elseif task_table[State.step].type == "FACE_HEADING" then
-            if mq.TLO.Me.XTarget() > 0 then
-                actions.clear_xtarget(class_settings.settings)
-            end
             actions.face_heading(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "FACE_LOC" then
-            if mq.TLO.Me.XTarget() > 0 then
-                actions.clear_xtarget(class_settings.settings)
-            end
             actions.face_loc(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "FARM_CHECK" then
-            if mq.TLO.Me.XTarget() > 0 then
-                actions.clear_xtarget(class_settings.settings)
-            end
             actions.farm_check(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "FARM_CHECK_PAUSE" then
             actions.farm_check_pause(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "FARM_RADIUS" then
             actions.farm_radius(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "FORAGE_FARM" then
-            if mq.TLO.Me.XTarget() > 0 then
-                actions.clear_xtarget(class_settings.settings)
-            end
             actions.forage_farm(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "FORWARD_ZONE" then
             actions.forward_zone(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "GENERAL_SEARCH" then
-            if mq.TLO.Me.XTarget() > 0 then
-                actions.clear_xtarget(class_settings.settings)
-            end
             actions.general_search(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "GENERAL_TRAVEL" then
             actions.general_travel(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "GROUND_SPAWN" then
-            if mq.TLO.Me.XTarget() > 0 then
-                actions.clear_xtarget(class_settings.settings)
-            end
             actions.ground_spawn(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "IGNORE_MOB" then
             actions.ignore_mob(task_table[State.step], class_settings.settings)
@@ -245,9 +209,6 @@ local function run_epic(class, choice)
         elseif task_table[State.step].type == "NPC_DAMAGE_UNTIL" then
             actions.npc_damage_until(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "NPC_FOLLOW" then
-            if mq.TLO.Me.XTarget() > 0 then
-                actions.clear_xtarget(class_settings.settings)
-            end
             actions.npc_follow(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "NPC_GIVE" then
             actions.npc_give(task_table[State.step], class_settings.settings)
@@ -264,9 +225,6 @@ local function run_epic(class, choice)
         elseif task_table[State.step].type == "NPC_KILL_ALL" then
             actions.npc_kill_all(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "NPC_SEARCH" then
-            if mq.TLO.Me.XTarget() > 0 then
-                actions.clear_xtarget(class_settings.settings)
-            end
             actions.npc_search(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "NPC_STOP_FOLLOW" then
             actions.npc_stop_follow(task_table[State.step], class_settings.settings)
@@ -278,62 +236,38 @@ local function run_epic(class, choice)
             end
             actions.npc_talk_all(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "NPC_TRAVEL" then
-            actions.npc_travel(task_table[State.step], class_settings.settings)       
+            actions.npc_travel(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "NPC_WAIT" then
-            if mq.TLO.Me.XTarget() > 0 then
-                actions.clear_xtarget(class_settings.settings)
-            end
             actions.npc_wait(task_table[State.step])
         elseif task_table[State.step].type == "NPC_WAIT_DESPAWN" then
-            if mq.TLO.Me.XTarget() > 0 then
-                actions.clear_xtarget(class_settings.settings)
-            end
             actions.npc_wait_despawn(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "OPEN_DOOR" then
             actions.open_door(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "OPEN_DOOR_ALL" then
             actions.open_door_all(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "PH_SEARCH" then
-            if mq.TLO.Me.XTarget() > 0 then
-                actions.clear_xtarget(class_settings.settings)
-            end
             actions.ph_search(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "PICK_DOOR" then
-            if mq.TLO.Me.XTarget() > 0 then
-                actions.clear_xtarget(class_settings.settings)
-            end
             actions.picklock_door(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "PICK_POCKET" then
             actions.pickpocket(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "PORTAL_SET" then
             actions.portal_set(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "PRE_FARM_CHECK" then
-            if mq.TLO.Me.XTarget() > 0 then
-                actions.clear_xtarget(class_settings.settings)
-            end
             actions.pre_farm_check(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "RELOCATE" then
-            if mq.TLO.Me.XTarget() > 0 then
-                actions.clear_xtarget(class_settings.settings)
-            end
             actions.relocate(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "ROG_GAMBLE" then
-            if mq.TLO.Me.XTarget() > 0 then
-                actions.clear_xtarget(class_settings.settings)
-            end
             actions.rog_gamble(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "SEND_YES" then
             actions.send_yes(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "WAIT" then
             if mq.TLO.Me.XTarget() > 0 then
-                actions.clear_xtarget(class_settings.settings)
+                manage.clearXtarget(class_settings.settings)
             end
             State.status = "Pausing for " .. task_table[State.step].what / 1000 .. " seconds"
             mq.delay(tonumber(task_table[State.step].what))
         elseif task_table[State.step].type == "WAIT_EVENT" then
-            if mq.TLO.Me.XTarget() > 0 then
-                actions.clear_xtarget(class_settings.settings)
-            end
             actions.wait_event(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "ZONE_CONTINUE_TRAVEL" then
             actions.zone_continue_travel(task_table[State.step], class_settings.settings)
