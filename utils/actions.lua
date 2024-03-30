@@ -85,33 +85,37 @@ function Actions.clear_xtarget(class_settings)
             loopCount = loopCount + 1
             if mq.TLO.Me.XTarget(i)() ~= '' then
                 if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' then
-                    if mq.TLO.Me.XTarget(i).Distance() < 300 and mq.TLO.Me.XTarget(i).LineOfSight() == true then
-                        mq.TLO.Me.XTarget(i).DoTarget()
-                        ID = mq.TLO.Me.XTarget(i).ID()
-                        State.status = "Clearing XTarget " .. i .. ": " .. mq.TLO.Me.XTarget(i)()
-                        manage.unpauseGroup(State.group_choice, class_settings)
-                        mq.cmd("/stick")
-                        mq.delay(100)
-                        mq.cmd("/attack on")
-                        while mq.TLO.Spawn(ID).Type() == 'NPC' do
-                            local breakout = true
-                            for j = 1, max_xtargs do
-                                if mq.TLO.Me.XTarget(j).ID() == ID then
-                                    breakout = false
+                    if mq.TLO.Me.XTarget(i).Distance() ~= nil then
+                        if mq.TLO.Me.XTarget(i).Distance() < 300 and mq.TLO.Me.XTarget(i).LineOfSight() == true then
+                            mq.TLO.Me.XTarget(i).DoTarget()
+                            ID = mq.TLO.Me.XTarget(i).ID()
+                            State.status = "Clearing XTarget " .. i .. ": " .. mq.TLO.Me.XTarget(i)()
+                            manage.unpauseGroup(State.group_choice, class_settings)
+                            mq.cmd("/stick")
+                            mq.delay(100)
+                            mq.cmd("/attack on")
+                            while mq.TLO.Spawn(ID).Type() == 'NPC' do
+                                local breakout = true
+                                for j = 1, max_xtargs do
+                                    if mq.TLO.Me.XTarget(j).ID() == ID then
+                                        breakout = false
+                                    end
                                 end
+                                if breakout == true then break end
+                                if mq.TLO.Target.ID ~= ID then
+                                    mq.TLO.Spawn(ID).DoTarget()
+                                end
+                                if mq.TLO.Me.Combat() == false then
+                                    mq.cmd("/attack on")
+                                end
+                                mq.delay(200)
                             end
-                            if breakout == true then break end
-                            if mq.TLO.Target.ID ~= ID then
-                                mq.TLO.Spawn(ID).DoTarget()
-                            end
-                            if mq.TLO.Me.Combat() == false then
-                                mq.cmd("/attack on")
-                            end
-                            mq.delay(200)
+                            i = 0
+                            loopCount = 0
+                        elseif i > mq.TLO.Me.XTarget() then
+                            i = 0
                         end
-                        i = 0
-                        loopCount = 0
-                    elseif i > mq.TLO.Me.XTarget() then
+                    else
                         i = 0
                     end
                 end
@@ -415,6 +419,39 @@ function Actions.forward_zone(item, class_settings)
     end
     State.status = "Traveling forward to zone: " .. item.zone
     manage.forwardZone(State.group_choice, item.zone)
+end
+
+function Actions.general_search(item)
+    State.status = "Searching for " .. item.npc
+    local looping = true
+    local i = 1
+    while looping do
+        local ID = mq.TLO.NearestSpawn(i, item.npc).ID()
+        if ID ~= nil then
+            State.step = item.gotostep - 1
+            return
+        else
+            return
+        end
+        i = i + 1
+    end
+    mq.delay(500)
+end
+
+function Actions.general_travel(item, class_settings)
+    if class_settings.general.invisForTravel == true then
+        if item.invis == 1 then
+            manage.invis(State.group_choice, class_settings)
+        end
+    end
+    State.status = "Waiting for NPC " .. item.npc
+    local ID = mq.TLO.NearestSpawn(1, item.npc).ID()
+    while ID == nil do
+        mq.delay(500)
+        ID = mq.TLO.NearestSpawn(1, item.npc).ID()
+    end
+    State.status = "Navigating to " .. item.npc
+    manage.navGroupGeneral(State.group_choice, item.npc, ID)
 end
 
 function Actions.ground_spawn(item, class_settings)

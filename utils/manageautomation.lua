@@ -486,6 +486,43 @@ function manage.navGroup(group_set, npc, ID)
     end
 end
 
+function manage.navGroupGeneral(group_set, npc, ID)
+    local loopCount = 0
+    if ID == 0 then
+        ID = mq.TLO.Spawn(npc).ID()
+    end
+    if group_set == 1 then
+        mq.cmdf("/nav id %s", ID)
+    elseif group_set == 2 then
+        mq.cmdf("/dgga /nav id %s", ID)
+    else
+        mq.cmdf("/nav id %s", ID)
+        mq.cmdf('/dex %s /nav id %s', State.group_combo[State.group_choice], ID)
+    end
+    mq.delay(200)
+    while mq.TLO.Navigation.Active() do
+        mq.delay(200)
+        if loopCount == 10 then
+            mq.cmd('/squelch /doortarget')
+            mq.delay(200)
+            if mq.TLO.Switch.Distance() ~= nil then
+                if mq.TLO.Switch.Distance() < 20 then
+                    mq.cmd('/click left door')
+                end
+            end
+            loopCount = 0
+        end
+        if dist.GetDistance3D(mq.TLO.Me.X(), mq.TLO.Me.Y(), mq.TLO.Me.Z(), State.X, State.Y, State.Z) < 20 then
+            loopCount = loopCount + 1
+        else
+            State.X = mq.TLO.Me.X()
+            State.Y = mq.TLO.Me.Y()
+            State.Z = mq.TLO.Me.Z()
+            loopCount = 0
+        end
+    end
+end
+
 function manage.navGroupLoc(group_set, npc, x, y, z)
     local loopCount = 0
     State.X = mq.TLO.Me.X()

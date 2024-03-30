@@ -155,6 +155,11 @@ local function run_epic(class, choice)
                 actions.clear_xtarget(class_settings.settings)
             end
             actions.npc_travel(task_table[State.step], class_settings.settings)
+        elseif task_table[State.step].type == "GENERAL_TRAVEL" then
+            if mq.TLO.Me.XTarget() > 0 then
+                actions.clear_xtarget(class_settings.settings)
+            end
+            actions.general_travel(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "NPC_KILL" then
             actions.npc_kill(task_table[State.step], class_settings.settings, task_table[State.step + 1].type)
         elseif task_table[State.step].type == "NPC_KILL_ALL" then
@@ -229,6 +234,11 @@ local function run_epic(class, choice)
             end
             actions.rog_gamble(task_table[State.step])
         elseif task_table[State.step].type == "NPC_SEARCH" then
+            if mq.TLO.Me.XTarget() > 0 then
+                actions.clear_xtarget(class_settings.settings)
+            end
+            actions.npc_search(task_table[State.step])
+        elseif task_table[State.step].type == "GENERAL_SEARCH" then
             if mq.TLO.Me.XTarget() > 0 then
                 actions.clear_xtarget(class_settings.settings)
             end
