@@ -115,8 +115,8 @@ end
 
 local function run_epic(class, choice)
     task_table = {}
-    loadsave.loadState()
     State.task_run = true
+    loadsave.loadState()
     manage.startGroup(State.group_choice, class_settings.settings)
     mq.delay("5s")
     manage.pauseGroup(State.group_choice, class_settings.settings)
@@ -244,10 +244,9 @@ local function run_epic(class, choice)
             end
             actions.loc_travel(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "OPEN_DOOR" then
-            if mq.TLO.Me.XTarget() > 0 then
-                actions.clear_xtarget(class_settings.settings)
-            end
             actions.open_door(task_table[State.step])
+        elseif task_table[State.step].type == "OPEN_DOOR_ALL" then
+            actions.open_door_all(task_table[State.step])
         elseif task_table[State.step].type == "FACE_HEADING" then
             if mq.TLO.Me.XTarget() > 0 then
                 actions.clear_xtarget(class_settings.settings)
@@ -505,6 +504,7 @@ local function displayGUI()
 end
 
 populate_group_combo()
+loadsave.loadState()
 mq.imgui.init('displayGUI', displayGUI)
 
 local function main()
