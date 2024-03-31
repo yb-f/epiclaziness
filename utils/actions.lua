@@ -420,7 +420,11 @@ function Actions.general_travel(item, class_settings)
         ID = mq.TLO.NearestSpawn(1, item.npc).ID()
     end
     State.status = "Navigating to " .. item.npc
-    manage.navGroupGeneral(State.group_choice, item.npc, ID)
+    if item.invis ~= nil then
+        manage.navGroupGeneral(State.group_choice, item.npc, ID, class_settings, item.invis)
+    else
+        manage.navGroupGeneral(State.group_choice, item.npc, ID, class_settings)
+    end
 end
 
 function Actions.ground_spawn(item, class_settings)
@@ -467,7 +471,11 @@ function Actions.loc_travel(item, class_settings)
         return
     end
     State.traveling = true
-    manage.locTravelGroup(State.group_choice, item.whereX, item.whereY, item.whereZ)
+    if item.invis ~= nil then
+        manage.locTravelGroup(State.group_choice, item.whereX, item.whereY, item.whereZ, class_settings, item.invis)
+    else
+        manage.locTravelGroup(State.group_choice, item.whereX, item.whereY, item.whereZ, class_settings)
+    end
     State.traveling = false
 end
 
@@ -838,7 +846,25 @@ function Actions.npc_travel(item, class_settings)
             manage.invis(State.group_choice, class_settings)
         end
     end
-    if item.what == nil then
+    if item.whereX ~= nil then
+        State.status = "Looking for path to NPC @ " .. item.whereX .. " " .. item.whereY .. " " .. item.whereZ
+        local search_string = "locxyz " .. item.whereX .. " " .. " " .. item.whereY .. " " .. item.whereZ
+        if mq.TLO.Navigation.PathExists(search_string)() == false then
+            if mq.TLO.Me.XTarget() > 0 then
+                manage.clearXtarget(State.group_choice)
+                State.status = "No path found to " .. item.whereX .. " " .. item.whereY .. " " .. item.whereZ
+                mq.cmd('/foreground')
+                State.task_run = false
+                return
+            end
+        end
+        if item.invis ~= nil then
+            manage.navGroupLoc(State.group_choice, item.npc, item.whereX, item.whereY, item.whereZ, class_settings,
+                item.invis)
+        else
+            manage.navGroupLoc(State.group_choice, item.npc, item.whereX, item.whereY, item.whereZ, class_settings)
+        end
+    else
         State.status = "Waiting for NPC " .. item.npc
         local ID = mq.TLO.NearestSpawn(1, "npc " .. item.npc).ID()
         while ID == nil do
@@ -850,7 +876,7 @@ function Actions.npc_travel(item, class_settings)
             table.insert(State.bad_IDs, ID)
         end
         local mob_loop = true
-        local loop_count = 1
+        local loop_count = 2
         while mob_loop do
             mq.delay(200)
             for _, bad_id in pairs(State.bad_IDs) do
@@ -859,10 +885,10 @@ function Actions.npc_travel(item, class_settings)
                 end
             end
             if State.nextmob == true then
-                ID = mq.TLO.NearestSpawn(loop_count + 1, "npc " .. item.npc).ID()
+                ID = mq.TLO.NearestSpawn(loop_count, "npc " .. item.npc).ID()
                 while ID == nil do
                     mq.delay(500)
-                    ID = mq.TLO.NearestSpawn(loop_count + 1, "npc " .. item.npc).ID()
+                    ID = mq.TLO.NearestSpawn(loop_count, "npc " .. item.npc).ID()
                 end
                 if mq.TLO.Navigation.PathExists('id ' .. ID)() == false then
                     table.insert(State.bad_IDs, ID)
@@ -880,24 +906,10 @@ function Actions.npc_travel(item, class_settings)
             mq.delay(200)
         end
         State.status = "Navigating to " .. item.npc
-        if item.whereX == nil then
-            manage.navGroup(State.group_choice, item.npc, ID)
+        if item.invis ~= nil then
+            manage.navGroup(State.group_choice, item.npc, ID, class_settings, item.invis)
         else
-            manage.navGroupLoc(State.group_choice, item.npc, item.whereX, item.whereY, item.whereZ)
-        end
-    else
-        if mq.TLO.Spawn("npc " .. item.npc).ID() ~= 0 then
-            if item.whereX == nil then
-                manage.navGroup(State.group_choice, item.npc, 0)
-            else
-                manage.navGroupLoc(State.group_choice, item.npc, item.whereX, item.whereY, item.whereZ)
-            end
-        else
-            if item.whereX == nil then
-                manage.navGroup(State.group_choice, item.what, 0)
-            else
-                manage.navGroupLoc(State.group_choice, item.what, item.whereX, item.whereY, item.whereZ)
-            end
+            manage.navGroup(State.group_choice, item.npc, ID, class_settings)
         end
     end
 end
@@ -1079,7 +1091,11 @@ function Actions.zone_travel(item, class_settings)
     end
     State.status = "Traveling to " .. item.zone
     State.traveling = true
-    manage.zoneGroup(State.group_choice, item.zone)
+    if item.invis ~= nil then
+        manage.zoneGroup(State.group_choice, item.zone, class_settings, item.invis)
+    else
+        manage.zoneGroup(State.group_choice, item.zone, class_settings)
+    end
     State.traveling = false
 end
 
