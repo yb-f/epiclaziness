@@ -38,7 +38,7 @@ local travel = {
     --Not accurate
     ['brd_pre15'] = {
         ['gate'] = 5,
-        ['invis'] = 11
+        ['invis'] = 8
     },
     ['brd_10'] = {
         ['gate'] = 5,
@@ -73,23 +73,20 @@ local travel = {
     },
     --Not accurate
     ['clr_10'] = {
-        ['gate'] = 5,
+        ['gate'] = 0,
         ['invis'] = 11
     },
-    --Not accurate
     ['clr_15'] = {
-        ['gate'] = 5,
-        ['invis'] = 11
+        ['gate'] = 0,
+        ['invis'] = 17
     },
-    --Not accurate
     ['clr_20'] = {
-        ['gate'] = 5,
-        ['invis'] = 11
+        ['gate'] = 0,
+        ['invis'] = 12
     },
-    --Not accurate
     ['clr_pre15'] = {
-        ['gate'] = 7,
-        ['invis'] = 8
+        ['gate'] = 0,
+        ['invis'] = 6
     },
 }
 
