@@ -27,7 +27,7 @@ function manage.campGroup(group_set, radius, class_settings)
     end
 end
 
-function manage.clearXtarget(group_set, npc)
+function manage.clearXtarget(group_set, class_settings, npc)
     npc = npc or "thiswontmatchanything"
     local max_xtargs = mq.TLO.Me.XTargetSlots()
     if mq.TLO.Me.XTarget() > 0 then
@@ -39,54 +39,56 @@ function manage.clearXtarget(group_set, npc)
             i = i + 1
             loopCount = loopCount + 1
             if mq.TLO.Me.XTarget(i)() ~= '' then
-                if string.find(string.lower(mq.TLO.Me.XTarget(i).CleanName()), string.lower(npc)) then
-                    local ID = mq.TLO.Me.XTarget(i).ID()
-                    local notFound = true
-                    for _, ids in pairs(idList) do
-                        if ID == ids then
-                            notFound = false
+                if mq.TLO.Me.XTarget(i).CleanName() ~= nil then
+                    if string.find(string.lower(mq.TLO.Me.XTarget(i).CleanName()), string.lower(npc)) then
+                        local ID = mq.TLO.Me.XTarget(i).ID()
+                        local notFound = true
+                        for _, ids in pairs(idList) do
+                            if ID == ids then
+                                notFound = false
+                            end
                         end
-                    end
-                    if notFound then
-                        table.insert(idList, ID)
-                    end
-                    if #idList == mq.TLO.Me.XTarget() then
-                        break
-                    end
-                else
-                    if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' then
-                        if mq.TLO.Me.XTarget(i).Distance() ~= nil then
-                            if mq.TLO.Me.XTarget(i).Distance() < 300 and mq.TLO.Me.XTarget(i).LineOfSight() == true then
-                                mq.TLO.Me.XTarget(i).DoTarget()
-                                ID = mq.TLO.Me.XTarget(i).ID()
-                                State.status = "Clearing XTarget " .. i .. ": " .. mq.TLO.Me.XTarget(i)()
-                                manage.unpauseGroup(State.group_choice, group_set)
-                                mq.cmd("/stick")
-                                mq.delay(100)
-                                mq.cmd("/attack on")
-                                while mq.TLO.Spawn(ID).Type() == 'NPC' do
-                                    local breakout = true
-                                    for j = 1, max_xtargs do
-                                        if mq.TLO.Me.XTarget(j).ID() == ID then
-                                            breakout = false
+                        if notFound then
+                            table.insert(idList, ID)
+                        end
+                        if #idList == mq.TLO.Me.XTarget() then
+                            break
+                        end
+                    else
+                        if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' then
+                            if mq.TLO.Me.XTarget(i).Distance() ~= nil then
+                                if mq.TLO.Me.XTarget(i).Distance() < 300 and mq.TLO.Me.XTarget(i).LineOfSight() == true then
+                                    mq.TLO.Me.XTarget(i).DoTarget()
+                                    ID = mq.TLO.Me.XTarget(i).ID()
+                                    State.status = "Clearing XTarget " .. i .. ": " .. mq.TLO.Me.XTarget(i)()
+                                    manage.unpauseGroup(group_set, class_settings)
+                                    mq.cmd("/stick")
+                                    mq.delay(100)
+                                    mq.cmd("/attack on")
+                                    while mq.TLO.Spawn(ID).Type() == 'NPC' do
+                                        local breakout = true
+                                        for j = 1, max_xtargs do
+                                            if mq.TLO.Me.XTarget(j).ID() == ID then
+                                                breakout = false
+                                            end
                                         end
+                                        if breakout == true then break end
+                                        if mq.TLO.Target.ID() ~= ID then
+                                            mq.TLO.Spawn(ID).DoTarget()
+                                        end
+                                        if mq.TLO.Me.Combat() == false then
+                                            mq.cmd("/attack on")
+                                        end
+                                        mq.delay(200)
                                     end
-                                    if breakout == true then break end
-                                    if mq.TLO.Target.ID() ~= ID then
-                                        mq.TLO.Spawn(ID).DoTarget()
-                                    end
-                                    if mq.TLO.Me.Combat() == false then
-                                        mq.cmd("/attack on")
-                                    end
-                                    mq.delay(200)
+                                    i = 0
+                                    loopCount = 0
+                                elseif i > mq.TLO.Me.XTarget() then
+                                    i = 0
                                 end
-                                i = 0
-                                loopCount = 0
-                            elseif i > mq.TLO.Me.XTarget() then
+                            else
                                 i = 0
                             end
-                        else
-                            i = 0
                         end
                     end
                 end
@@ -99,7 +101,7 @@ function manage.clearXtarget(group_set, npc)
                 looping = false
             end
         end
-        manage.pauseGroup(State.group_choice, group_set)
+        manage.pauseGroup(group_set, class_settings)
     end
 end
 
@@ -507,7 +509,7 @@ function manage.locTravelGroup(group_set, x, y, z, class_settings, invis)
         if mq.TLO.Me.XTarget() > 0 then
             local temp = State.status
             manage.navPause(group_set)
-            manage.clearXtarget(group_set)
+            manage.clearXtarget(group_set, class_settings)
             manage.navUnpause(group_set)
             State.status = temp
         end
@@ -564,7 +566,7 @@ function manage.navGroup(group_set, npc, ID, class_settings, invis)
         if mq.TLO.Me.XTarget() > 0 then
             local temp = State.status
             manage.navPause(group_set)
-            manage.clearXtarget(group_set)
+            manage.clearXtarget(group_set, class_settings)
             manage.navUnpause(group_set)
             State.status = temp
         end
@@ -620,7 +622,7 @@ function manage.navGroupGeneral(group_set, npc, ID, class_settings, invis)
         if mq.TLO.Me.XTarget() > 0 then
             local temp = State.status
             manage.navPause(group_set)
-            manage.clearXtarget(group_set)
+            manage.clearXtarget(group_set, class_settings)
             manage.navUnpause(group_set)
             State.status = temp
         end
@@ -677,7 +679,7 @@ function manage.navGroupLoc(group_set, npc, x, y, z, class_settings, invis)
         if mq.TLO.Me.XTarget() > 0 then
             local temp = State.status
             manage.navPause(group_set)
-            manage.clearXtarget(group_set)
+            manage.clearXtarget(group_set, class_settings)
             manage.navUnpause(group_set)
             State.status = temp
         end
@@ -1021,7 +1023,7 @@ function manage.zoneGroup(group_set, zone, class_settings, invis)
         if mq.TLO.Me.XTarget() > 0 then
             local temp = State.status
             manage.navPause(group_set)
-            manage.clearXtarget(group_set)
+            manage.clearXtarget(group_set, class_settings)
             manage.navUnpause(group_set)
             State.status = temp
         end

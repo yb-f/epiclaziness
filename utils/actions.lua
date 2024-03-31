@@ -76,7 +76,7 @@ end
 
 function Actions.combine_container(item, class_settings)
     if mq.TLO.Me.XTarget() > 0 then
-        manage.clearXtarget(class_settings)
+        manage.clearXtarget(State.group_choice, class_settings)
     end
     State.status = "Preparing combine container"
     if mq.TLO.InvSlot('pack10').Item.Container() then
@@ -88,7 +88,7 @@ end
 
 function Actions.combine_do(item, class_settings)
     if mq.TLO.Me.XTarget() > 0 then
-        manage.clearXtarget(class_settings)
+        manage.clearXtarget(State.group_choice, class_settings)
     end
     State.status = "Combining"
     mq.cmdf("/combine pack10")
@@ -103,7 +103,7 @@ end
 
 function Actions.combine_done(item, class_settings)
     if mq.TLO.Me.XTarget() > 0 then
-        manage.clearXtarget(class_settings)
+        manage.clearXtarget(State.group_choice, class_settings)
     end
     if State.bagslot1 ~= 0 and State.bagslot2 ~= 0 then
         State.status = "Moving container back to slot 10"
@@ -121,7 +121,7 @@ end
 
 function Actions.combine_item(item, class_settings)
     if mq.TLO.Me.XTarget() > 0 then
-        manage.clearXtarget(class_settings)
+        manage.clearXtarget(State.group_choice, class_settings)
     end
     State.status = "Moving " .. item.what .. " to combine container"
     inv.move_item_to_combine(item.what, 10)
@@ -174,7 +174,7 @@ end
 
 function Actions.farm_check(item, class_settings)
     if mq.TLO.Me.XTarget() > 0 then
-        manage.clearXtarget(class_settings)
+        manage.clearXtarget(State.group_choice, class_settings)
     end
     mq.delay("2s")
     local check_list = {}
@@ -206,7 +206,7 @@ end
 
 function Actions.farm_check_pause(item, class_settings)
     if mq.TLO.Me.XTarget() > 0 then
-        manage.clearXtarget(class_settings)
+        manage.clearXtarget(State.group_choice, class_settings)
     end
     State.status = "Checking for " .. item.what
     local check_list = {}
@@ -335,7 +335,7 @@ function Actions.forage_farm(item, class_settings)
         while looping do
             mq.delay(200)
             if mq.TLO.Me.XTarget() > 0 then
-                manage.clearXtarget(class_settings)
+                manage.clearXtarget(State.group_choice, class_settings)
             end
             item_status = ''
             loop_check = true
@@ -388,7 +388,7 @@ end
 
 function Actions.general_search(item, class_settings)
     if mq.TLO.Me.XTarget() > 0 then
-        manage.clearXtarget(class_settings)
+        manage.clearXtarget(State.group_choice, class_settings)
     end
     State.status = "Searching for " .. item.npc
     local looping = true
@@ -487,7 +487,7 @@ end
 
 function Actions.loot(item, class_settings)
     if mq.TLO.Me.XTarget() > 0 then
-        manage.clearXtarget(class_settings)
+        manage.clearXtarget(State.group_choice, class_settings)
     end
     State.status = "Looting " .. item.what
     mq.delay("2s")
@@ -568,7 +568,7 @@ end
 
 function Actions.npc_follow(item, class_settings)
     if mq.TLO.Me.XTarget() > 0 then
-        manage.clearXtarget(class_settings)
+        manage.clearXtarget(State.group_choice, class_settings)
     end
     if mq.TLO.Me.Invis() == false then
         if class_settings.general.invisForTravel == true then
@@ -799,7 +799,7 @@ end
 
 function Actions.npc_search(item, class_settings)
     if mq.TLO.Me.XTarget() > 0 then
-        manage.clearXtarget(class_settings)
+        manage.clearXtarget(State.group_choice, class_settings)
     end
     State.status = "Searching for " .. item.npc
     local looping = true
@@ -863,13 +863,14 @@ function Actions.npc_travel(item, class_settings)
         local search_string = "locxyz " .. item.whereX .. " " .. " " .. item.whereY .. " " .. item.whereZ
         if mq.TLO.Navigation.PathExists(search_string)() == false then
             if mq.TLO.Me.XTarget() > 0 then
-                manage.clearXtarget(State.group_choice)
+                manage.clearXtarget(State.group_choice, class_settings)
                 State.status = "No path found to " .. item.whereX .. " " .. item.whereY .. " " .. item.whereZ
                 mq.cmd('/foreground')
                 State.task_run = false
                 return
             end
         end
+        State.status = "Navigating to " .. item.npc .. " @ " .. item.whereX .. " " .. item.whereY .. " " .. item.whereZ
         if item.invis ~= nil then
             manage.navGroupLoc(State.group_choice, item.npc, item.whereX, item.whereY, item.whereZ, class_settings,
                 item.invis)
@@ -930,7 +931,7 @@ function Actions.npc_wait(item, class_settings)
     State.status = "Waiting for " .. item.npc .. " (" .. item.waittime .. ")"
     while mq.TLO.Spawn("npc " .. item.npc).ID() == 0 do
         if mq.TLO.Me.XTarget() > 0 then
-            manage.clearXtarget(class_settings)
+            manage.clearXtarget(State.group_choice, class_settings)
             State.status = "Waiting for " .. item.npc .. " (" .. item.waittime .. ")"
         end
         mq.delay(200)
@@ -941,7 +942,7 @@ function Actions.npc_wait_despawn(item, class_settings)
     State.status = "Waiting for " .. item.npc .. " to despawn (" .. item.waittime .. ")"
     while mq.TLO.Spawn("npc " .. item.npc).ID() ~= 0 do
         if mq.TLO.Me.XTarget() > 0 then
-            manage.clearXtarget(class_settings)
+            manage.clearXtarget(State.group_choice, class_settings)
             State.status = "Waiting for " .. item.npc .. " to despawn (" .. item.waittime .. ")"
         end
         mq.delay(200)
@@ -964,7 +965,7 @@ end
 
 function Actions.ph_search(item, class_settings)
     if mq.TLO.Me.XTarget() > 0 then
-        manage.clearXtarget(class_settings)
+        manage.clearXtarget(State.group_choice, class_settings)
     end
     State.status = 'Searching for PH for ' .. item.npc
     local spawn_search = "npc loc " ..
@@ -1013,7 +1014,7 @@ end
 
 function Actions.pre_farm_check(item, class_settings)
     if mq.TLO.Me.XTarget() > 0 then
-        manage.clearXtarget(class_settings)
+        manage.clearXtarget(State.group_choice, class_settings)
     end
     State.status = "Checking for pre-farmable items (" .. item.what .. ")"
     mq.delay("1s")
@@ -1041,7 +1042,7 @@ end
 
 function Actions.relocate(item, class_settings)
     if mq.TLO.Me.XTarget() > 0 then
-        manage.clearXtarget(class_settings)
+        manage.clearXtarget(State.group_choice, class_settings)
     end
     State.status = "Relocating to " .. item.what
     manage.relocateGroup(State.group_choice, item.what)
