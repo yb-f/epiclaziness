@@ -169,7 +169,7 @@ local function run_epic(class, choice)
             create_spawn_list()
         elseif task_table[State.step].type == "EXECUTE_COMMAND" then
             if mq.TLO.Me.XTarget() > 0 then
-                manage.clearXtarget(class_settings.settings)
+                manage.clearXtarget(State.group_choice, class_settings.settings)
             end
             mq.cmdf("%s", task_table[State.step].what)
             mq.delay(500)
@@ -199,7 +199,7 @@ local function run_epic(class, choice)
             actions.loc_travel(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "LOOT" then
             if mq.TLO.Me.XTarget() > 0 then
-                actions.clear_xtarget(class_settings.settings)
+                manage.clearXtarget(State.group_choice, class_settings.settings)
             end
             actions.loot(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "NO_NAV_TRAVEL" then
@@ -232,7 +232,7 @@ local function run_epic(class, choice)
             actions.npc_talk(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "NPC_TALK_ALL" then
             if mq.TLO.Me.XTarget() > 0 then
-                actions.clear_xtarget(class_settings.settings)
+                manage.clearXtarget(State.group_choice, class_settings.settings)
             end
             actions.npc_talk_all(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "NPC_TRAVEL" then
