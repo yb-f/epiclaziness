@@ -239,7 +239,11 @@ function Actions.farm_radius(item, class_settings)
     else
         State.status = "Farming for " .. item.what
     end
-    manage.locTravelGroup(State.group_choice, item.whereX, item.whereY, item.whereZ)
+    if item.invis ~= nil then
+        manage.locTravelGroup(State.group_choice, item.whereX, item.whereY, item.whereZ, class_settings, item.invis)
+    else
+        manage.locTravelGroup(State.group_choice, item.whereX, item.whereY, item.whereZ, class_settings)
+    end
     manage.campGroup(State.group_choice, item.radius, class_settings)
     manage.unpauseGroup(State.group_choice, class_settings)
     local item_list = {}
