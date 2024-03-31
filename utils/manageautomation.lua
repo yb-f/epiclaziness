@@ -102,6 +102,9 @@ function manage.clearXtarget(group_set, class_settings, npc)
             end
         end
         manage.pauseGroup(group_set, class_settings)
+        if mq.TLO.Stick.Active() == true then
+            mq.cmd('/stick off')
+        end
     end
 end
 
