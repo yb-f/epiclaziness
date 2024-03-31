@@ -36,6 +36,9 @@ function loadsave.loadState()
         loadsave.SaveState = configData()
         if loadsave.SaveState[class] ~= nil then
             if loadsave.SaveState[class][State.epic_choice] ~= nil then
+                if loadsave.SaveState[class]['Last_Ran'] == nil then
+                    loadsave.SaveState[class]['Last_Ran'] = 1
+                end
                 if State.task_run == false then
                     State.epic_choice = loadsave.SaveState[class]['Last_Ran']
                 else
