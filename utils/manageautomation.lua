@@ -505,16 +505,20 @@ function manage.locTravelGroup(group_set, x, y, z, class_settings, invis)
     while mq.TLO.Navigation.Active() do
         mq.delay(200)
         if mq.TLO.Me.XTarget() > 0 then
+            local temp = State.status
             manage.navPause(group_set)
             manage.clearXtarget(group_set)
             manage.navUnpause(group_set)
+            State.status = temp
         end
         if mq.TLO.Me.Invis() == false then
             if class_settings.general.invisForTravel == true then
                 if invis == 1 then
+                    local temp = State.status
                     manage.navPause(group_set)
                     manage.invis(State.group_choice, class_settings)
                     manage.navUnpause(group_set)
+                    State.status = temp
                 end
             end
         end
@@ -558,16 +562,20 @@ function manage.navGroup(group_set, npc, ID, class_settings, invis)
         mq.delay(200)
         mq.doevents()
         if mq.TLO.Me.XTarget() > 0 then
+            local temp = State.status
             manage.navPause(group_set)
             manage.clearXtarget(group_set)
             manage.navUnpause(group_set)
+            State.status = temp
         end
         if mq.TLO.Me.Invis() == false then
             if class_settings.general.invisForTravel == true then
                 if invis == 1 then
+                    local temp = State.status
                     manage.navPause(group_set)
                     manage.invis(State.group_choice, class_settings)
                     manage.navUnpause(group_set)
+                    State.status = temp
                 end
             end
         end
@@ -610,16 +618,20 @@ function manage.navGroupGeneral(group_set, npc, ID, class_settings, invis)
     while mq.TLO.Navigation.Active() do
         mq.delay(200)
         if mq.TLO.Me.XTarget() > 0 then
+            local temp = State.status
             manage.navPause(group_set)
             manage.clearXtarget(group_set)
             manage.navUnpause(group_set)
+            State.status = temp
         end
         if mq.TLO.Me.Invis() == false then
             if class_settings.general.invisForTravel == true then
                 if invis == 1 then
+                    local temp = State.status
                     manage.navPause(group_set)
                     manage.invis(State.group_choice, class_settings)
                     manage.navUnpause(group_set)
+                    State.status = temp
                 end
             end
         end
@@ -663,16 +675,20 @@ function manage.navGroupLoc(group_set, npc, x, y, z, class_settings, invis)
     while mq.TLO.Navigation.Active() do
         mq.delay(200)
         if mq.TLO.Me.XTarget() > 0 then
+            local temp = State.status
             manage.navPause(group_set)
             manage.clearXtarget(group_set)
             manage.navUnpause(group_set)
+            State.status = temp
         end
         if mq.TLO.Me.Invis() == false then
             if class_settings.general.invisForTravel == true then
                 if invis == 1 then
+                    local temp = State.status
                     manage.navPause(group_set)
                     manage.invis(State.group_choice, class_settings)
                     manage.navUnpause(group_set)
+                    State.status = temp
                 end
             end
         end
@@ -1003,16 +1019,20 @@ function manage.zoneGroup(group_set, zone, class_settings, invis)
     while mq.TLO.Zone.ShortName() ~= zone do
         mq.delay(500)
         if mq.TLO.Me.XTarget() > 0 then
+            local temp = State.status
             manage.navPause(group_set)
             manage.clearXtarget(group_set)
             manage.navUnpause(group_set)
+            State.status = temp
         end
         if mq.TLO.Me.Invis() == false then
             if class_settings.general.invisForTravel == true then
                 if invis == 1 then
+                    local temp = State.status
                     manage.navPause(group_set)
                     manage.invis(State.group_choice, class_settings)
                     manage.navUnpause(group_set)
+                    State.status = temp
                 end
             end
         end
