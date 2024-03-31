@@ -375,9 +375,11 @@ function Actions.forage_farm(item, class_settings)
 end
 
 function Actions.forward_zone(item, class_settings)
-    if class_settings.general.invisForTravel == true then
-        if item.invis == 1 then
-            manage.invis(State.group_choice, class_settings)
+    if mq.TLO.Me.Invis() == false then
+        if class_settings.general.invisForTravel == true then
+            if item.invis == 1 then
+                manage.invis(State.group_choice, class_settings)
+            end
         end
     end
     State.status = "Traveling forward to zone: " .. item.zone
@@ -408,9 +410,11 @@ function Actions.general_search(item, class_settings)
 end
 
 function Actions.general_travel(item, class_settings)
-    if class_settings.general.invisForTravel == true then
-        if item.invis == 1 then
-            manage.invis(State.group_choice, class_settings)
+    if mq.TLO.Me.Invis() == false then
+        if class_settings.general.invisForTravel == true then
+            if item.invis == 1 then
+                manage.invis(State.group_choice, class_settings)
+            end
         end
     end
     State.status = "Waiting for NPC " .. item.npc
@@ -459,9 +463,11 @@ function Actions.ignore_mob(item, class_settings)
 end
 
 function Actions.loc_travel(item, class_settings)
-    if class_settings.general.invisForTravel == true then
-        if item.invis == 1 then
-            manage.invis(State.group_choice, class_settings)
+    if mq.TLO.Me.Invis() == false then
+        if class_settings.general.invisForTravel == true then
+            if item.invis == 1 then
+                manage.invis(State.group_choice, class_settings)
+            end
         end
     end
     State.status = "Traveling to  " .. item.whereX .. ", " .. item.whereY .. ", " .. item.whereZ
@@ -512,9 +518,11 @@ function Actions.loot(item, class_settings)
 end
 
 function Actions.no_nav_travel(item, class_settings)
-    if class_settings.general.invisForTravel == true then
-        if item.invis == 1 then
-            manage.invis(State.group_choice, class_settings)
+    if mq.TLO.Me.Invis() == false then
+        if class_settings.general.invisForTravel == true then
+            if item.invis == 1 then
+                manage.invis(State.group_choice, class_settings)
+            end
         end
     end
     State.status = "Traveling forward to  " .. item.whereX .. ", " .. item.whereY .. ", " .. item.whereZ
@@ -562,9 +570,11 @@ function Actions.npc_follow(item, class_settings)
     if mq.TLO.Me.XTarget() > 0 then
         manage.clearXtarget(class_settings)
     end
-    if class_settings.general.invisForTravel == true then
-        if item.invis == 1 then
-            manage.invis(State.group_choice, class_settings)
+    if mq.TLO.Me.Invis() == false then
+        if class_settings.general.invisForTravel == true then
+            if item.invis == 1 then
+                manage.invis(State.group_choice, class_settings)
+            end
         end
     end
     State.status = "Following " .. item.npc
@@ -841,9 +851,11 @@ function Actions.npc_talk_all(item, class_settings)
 end
 
 function Actions.npc_travel(item, class_settings)
-    if class_settings.general.invisForTravel == true then
-        if item.invis == 1 then
-            manage.invis(State.group_choice, class_settings)
+    if mq.TLO.Me.Invis() == false then
+        if class_settings.general.invisForTravel == true then
+            if item.invis == 1 then
+                manage.invis(State.group_choice, class_settings)
+            end
         end
     end
     if item.whereX ~= nil then
@@ -1065,9 +1077,11 @@ function Actions.wait_event(item, class_settings)
 end
 
 function Actions.zone_continue_travel(item, class_settings)
-    if class_settings.general.invisForTravel == true then
-        if item.invis == 1 then
-            manage.invis(State.group_choice, class_settings)
+    if mq.TLO.Me.Invis() == false then
+        if class_settings.general.invisForTravel == true then
+            if item.invis == 1 then
+                manage.invis(State.group_choice, class_settings)
+            end
         end
     end
     State.status = "Traveling to " .. item.zone
@@ -1084,9 +1098,11 @@ function Actions.zone_travel(item, class_settings)
             mq.delay("15s")
         end
     end
-    if class_settings.general.invisForTravel == true then
-        if item.invis == 1 then
-            manage.invis(State.group_choice, class_settings)
+    if mq.TLO.Me.Invis() == false then
+        if class_settings.general.invisForTravel == true then
+            if item.invis == 1 then
+                manage.invis(State.group_choice, class_settings)
+            end
         end
     end
     State.status = "Traveling to " .. item.zone
