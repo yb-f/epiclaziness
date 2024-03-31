@@ -336,8 +336,8 @@ local function displayGUI()
                 if ImGui.IsItemHovered() then
                     local invis_num = invis_needed(mq.TLO.Me.Class.ShortName(), State.epic_choice)
                     local gate_num = gate_needed(mq.TLO.Me.Class.ShortName(), State.epic_choice)
-                    local tooltip = "Begin/resume epic quest\nThis may require up to " ..
-                        invis_num .. " invis potions.\nThis may require up to " .. gate_num .. " gate potions."
+                    local tooltip = "Begin/resume epic quest\nThis may require at least " ..
+                        invis_num .. " invis potions.\nThis may require at least " .. gate_num .. " gate potions."
                     ImGui.SetTooltip(tooltip)
                 end
             end
