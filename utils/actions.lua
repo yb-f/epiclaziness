@@ -74,65 +74,10 @@ function Actions.cast_alt(item, class_settings)
     end
 end
 
-function Actions.clear_xtarget(class_settings)
-    local max_xtargs = mq.TLO.Me.XTargetSlots()
-    if mq.TLO.Me.XTarget() > 0 then
-        local looping = true
-        local loopCount = 0
-        local i = 0
-        while looping do
-            i = i + 1
-            loopCount = loopCount + 1
-            if mq.TLO.Me.XTarget(i)() ~= '' then
-                if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' then
-                    if mq.TLO.Me.XTarget(i).Distance() ~= nil then
-                        if mq.TLO.Me.XTarget(i).Distance() < 300 and mq.TLO.Me.XTarget(i).LineOfSight() == true then
-                            mq.TLO.Me.XTarget(i).DoTarget()
-                            ID = mq.TLO.Me.XTarget(i).ID()
-                            State.status = "Clearing XTarget " .. i .. ": " .. mq.TLO.Me.XTarget(i)()
-                            manage.unpauseGroup(State.group_choice, class_settings)
-                            mq.cmd("/stick")
-                            mq.delay(100)
-                            mq.cmd("/attack on")
-                            while mq.TLO.Spawn(ID).Type() == 'NPC' do
-                                local breakout = true
-                                for j = 1, max_xtargs do
-                                    if mq.TLO.Me.XTarget(j).ID() == ID then
-                                        breakout = false
-                                    end
-                                end
-                                if breakout == true then break end
-                                if mq.TLO.Target.ID ~= ID then
-                                    mq.TLO.Spawn(ID).DoTarget()
-                                end
-                                if mq.TLO.Me.Combat() == false then
-                                    mq.cmd("/attack on")
-                                end
-                                mq.delay(200)
-                            end
-                            i = 0
-                            loopCount = 0
-                        elseif i > mq.TLO.Me.XTarget() then
-                            i = 0
-                        end
-                    else
-                        i = 0
-                    end
-                end
-            end
-            if loopCount == 20 then
-                i = 0
-                loopCount = 0
-            end
-            if mq.TLO.Me.XTarget() == 0 then
-                looping = false
-            end
-        end
-        manage.pauseGroup(State.group_choice, class_settings)
-    end
-end
-
 function Actions.combine_container(item, class_settings)
+    if mq.TLO.Me.XTarget() > 0 then
+        manage.clearXtarget(class_settings)
+    end
     State.status = "Preparing combine container"
     if mq.TLO.InvSlot('pack10').Item.Container() then
         inv.empty_bag(10)
@@ -142,6 +87,9 @@ function Actions.combine_container(item, class_settings)
 end
 
 function Actions.combine_do(item, class_settings)
+    if mq.TLO.Me.XTarget() > 0 then
+        manage.clearXtarget(class_settings)
+    end
     State.status = "Combining"
     mq.cmdf("/combine pack10")
     while mq.TLO.Cursor() == nil do
@@ -154,6 +102,9 @@ function Actions.combine_do(item, class_settings)
 end
 
 function Actions.combine_done(item, class_settings)
+    if mq.TLO.Me.XTarget() > 0 then
+        manage.clearXtarget(class_settings)
+    end
     if State.bagslot1 ~= 0 and State.bagslot2 ~= 0 then
         State.status = "Moving container back to slot 10"
         mq.cmdf("/nomodkey /shiftkey /itemnotify in pack%s %s leftmouseup", State.bagslot1, State.bagslot2)
@@ -169,6 +120,9 @@ function Actions.combine_done(item, class_settings)
 end
 
 function Actions.combine_item(item, class_settings)
+    if mq.TLO.Me.XTarget() > 0 then
+        manage.clearXtarget(class_settings)
+    end
     State.status = "Moving " .. item.what .. " to combine container"
     inv.move_item_to_combine(item.what, 10)
 end
@@ -219,6 +173,9 @@ function Actions.face_loc(item, class_settings)
 end
 
 function Actions.farm_check(item, class_settings)
+    if mq.TLO.Me.XTarget() > 0 then
+        manage.clearXtarget(class_settings)
+    end
     mq.delay("2s")
     local check_list = {}
     local not_found = false
@@ -248,6 +205,9 @@ function Actions.farm_check(item, class_settings)
 end
 
 function Actions.farm_check_pause(item, class_settings)
+    if mq.TLO.Me.XTarget() > 0 then
+        manage.clearXtarget(class_settings)
+    end
     State.status = "Checking for " .. item.what
     local check_list = {}
     local not_found = false
@@ -374,6 +334,9 @@ function Actions.forage_farm(item, class_settings)
         end
         while looping do
             mq.delay(200)
+            if mq.TLO.Me.XTarget() > 0 then
+                manage.clearXtarget(class_settings)
+            end
             item_status = ''
             loop_check = true
             local item_remove = 0
@@ -412,9 +375,11 @@ function Actions.forage_farm(item, class_settings)
 end
 
 function Actions.forward_zone(item, class_settings)
-    if class_settings.general.invisForTravel == true then
-        if item.invis == 1 then
-            manage.invis(State.group_choice, class_settings)
+    if mq.TLO.Me.Invis() == false then
+        if class_settings.general.invisForTravel == true then
+            if item.invis == 1 then
+                manage.invis(State.group_choice, class_settings)
+            end
         end
     end
     State.status = "Traveling forward to zone: " .. item.zone
@@ -422,6 +387,9 @@ function Actions.forward_zone(item, class_settings)
 end
 
 function Actions.general_search(item, class_settings)
+    if mq.TLO.Me.XTarget() > 0 then
+        manage.clearXtarget(class_settings)
+    end
     State.status = "Searching for " .. item.npc
     local looping = true
     local i = 1
@@ -442,9 +410,11 @@ function Actions.general_search(item, class_settings)
 end
 
 function Actions.general_travel(item, class_settings)
-    if class_settings.general.invisForTravel == true then
-        if item.invis == 1 then
-            manage.invis(State.group_choice, class_settings)
+    if mq.TLO.Me.Invis() == false then
+        if class_settings.general.invisForTravel == true then
+            if item.invis == 1 then
+                manage.invis(State.group_choice, class_settings)
+            end
         end
     end
     State.status = "Waiting for NPC " .. item.npc
@@ -454,7 +424,11 @@ function Actions.general_travel(item, class_settings)
         ID = mq.TLO.NearestSpawn(1, item.npc).ID()
     end
     State.status = "Navigating to " .. item.npc
-    manage.navGroupGeneral(State.group_choice, item.npc, ID)
+    if item.invis ~= nil then
+        manage.navGroupGeneral(State.group_choice, item.npc, ID, class_settings, item.invis)
+    else
+        manage.navGroupGeneral(State.group_choice, item.npc, ID, class_settings)
+    end
 end
 
 function Actions.ground_spawn(item, class_settings)
@@ -489,9 +463,11 @@ function Actions.ignore_mob(item, class_settings)
 end
 
 function Actions.loc_travel(item, class_settings)
-    if class_settings.general.invisForTravel == true then
-        if item.invis == 1 then
-            manage.invis(State.group_choice, class_settings)
+    if mq.TLO.Me.Invis() == false then
+        if class_settings.general.invisForTravel == true then
+            if item.invis == 1 then
+                manage.invis(State.group_choice, class_settings)
+            end
         end
     end
     State.status = "Traveling to  " .. item.whereX .. ", " .. item.whereY .. ", " .. item.whereZ
@@ -501,11 +477,18 @@ function Actions.loc_travel(item, class_settings)
         return
     end
     State.traveling = true
-    manage.locTravelGroup(State.group_choice, item.whereX, item.whereY, item.whereZ)
+    if item.invis ~= nil then
+        manage.locTravelGroup(State.group_choice, item.whereX, item.whereY, item.whereZ, class_settings, item.invis)
+    else
+        manage.locTravelGroup(State.group_choice, item.whereX, item.whereY, item.whereZ, class_settings)
+    end
     State.traveling = false
 end
 
 function Actions.loot(item, class_settings)
+    if mq.TLO.Me.XTarget() > 0 then
+        manage.clearXtarget(class_settings)
+    end
     State.status = "Looting " .. item.what
     mq.delay("2s")
     if mq.TLO.AdvLoot.SCount() > 0 then
@@ -535,9 +518,11 @@ function Actions.loot(item, class_settings)
 end
 
 function Actions.no_nav_travel(item, class_settings)
-    if class_settings.general.invisForTravel == true then
-        if item.invis == 1 then
-            manage.invis(State.group_choice, class_settings)
+    if mq.TLO.Me.Invis() == false then
+        if class_settings.general.invisForTravel == true then
+            if item.invis == 1 then
+                manage.invis(State.group_choice, class_settings)
+            end
         end
     end
     State.status = "Traveling forward to  " .. item.whereX .. ", " .. item.whereY .. ", " .. item.whereZ
@@ -582,9 +567,14 @@ function Actions.npc_damage_until(item, class_settings)
 end
 
 function Actions.npc_follow(item, class_settings)
-    if class_settings.general.invisForTravel == true then
-        if item.invis == 1 then
-            manage.invis(State.group_choice, class_settings)
+    if mq.TLO.Me.XTarget() > 0 then
+        manage.clearXtarget(class_settings)
+    end
+    if mq.TLO.Me.Invis() == false then
+        if class_settings.general.invisForTravel == true then
+            if item.invis == 1 then
+                manage.invis(State.group_choice, class_settings)
+            end
         end
     end
     State.status = "Following " .. item.npc
@@ -808,6 +798,9 @@ function Actions.npc_kill_all(item, class_settings)
 end
 
 function Actions.npc_search(item, class_settings)
+    if mq.TLO.Me.XTarget() > 0 then
+        manage.clearXtarget(class_settings)
+    end
     State.status = "Searching for " .. item.npc
     local looping = true
     local i = 1
@@ -858,12 +851,32 @@ function Actions.npc_talk_all(item, class_settings)
 end
 
 function Actions.npc_travel(item, class_settings)
-    if class_settings.general.invisForTravel == true then
-        if item.invis == 1 then
-            manage.invis(State.group_choice, class_settings)
+    if mq.TLO.Me.Invis() == false then
+        if class_settings.general.invisForTravel == true then
+            if item.invis == 1 then
+                manage.invis(State.group_choice, class_settings)
+            end
         end
     end
-    if item.what == nil then
+    if item.whereX ~= nil then
+        State.status = "Looking for path to NPC @ " .. item.whereX .. " " .. item.whereY .. " " .. item.whereZ
+        local search_string = "locxyz " .. item.whereX .. " " .. " " .. item.whereY .. " " .. item.whereZ
+        if mq.TLO.Navigation.PathExists(search_string)() == false then
+            if mq.TLO.Me.XTarget() > 0 then
+                manage.clearXtarget(State.group_choice)
+                State.status = "No path found to " .. item.whereX .. " " .. item.whereY .. " " .. item.whereZ
+                mq.cmd('/foreground')
+                State.task_run = false
+                return
+            end
+        end
+        if item.invis ~= nil then
+            manage.navGroupLoc(State.group_choice, item.npc, item.whereX, item.whereY, item.whereZ, class_settings,
+                item.invis)
+        else
+            manage.navGroupLoc(State.group_choice, item.npc, item.whereX, item.whereY, item.whereZ, class_settings)
+        end
+    else
         State.status = "Waiting for NPC " .. item.npc
         local ID = mq.TLO.NearestSpawn(1, "npc " .. item.npc).ID()
         while ID == nil do
@@ -875,7 +888,7 @@ function Actions.npc_travel(item, class_settings)
             table.insert(State.bad_IDs, ID)
         end
         local mob_loop = true
-        local loop_count = 1
+        local loop_count = 2
         while mob_loop do
             mq.delay(200)
             for _, bad_id in pairs(State.bad_IDs) do
@@ -884,10 +897,10 @@ function Actions.npc_travel(item, class_settings)
                 end
             end
             if State.nextmob == true then
-                ID = mq.TLO.NearestSpawn(loop_count + 1, "npc " .. item.npc).ID()
+                ID = mq.TLO.NearestSpawn(loop_count, "npc " .. item.npc).ID()
                 while ID == nil do
                     mq.delay(500)
-                    ID = mq.TLO.NearestSpawn(loop_count + 1, "npc " .. item.npc).ID()
+                    ID = mq.TLO.NearestSpawn(loop_count, "npc " .. item.npc).ID()
                 end
                 if mq.TLO.Navigation.PathExists('id ' .. ID)() == false then
                     table.insert(State.bad_IDs, ID)
@@ -905,24 +918,10 @@ function Actions.npc_travel(item, class_settings)
             mq.delay(200)
         end
         State.status = "Navigating to " .. item.npc
-        if item.whereX == nil then
-            manage.navGroup(State.group_choice, item.npc, ID)
+        if item.invis ~= nil then
+            manage.navGroup(State.group_choice, item.npc, ID, class_settings, item.invis)
         else
-            manage.navGroupLoc(State.group_choice, item.npc, item.whereX, item.whereY, item.whereZ)
-        end
-    else
-        if mq.TLO.Spawn("npc " .. item.npc).ID() ~= 0 then
-            if item.whereX == nil then
-                manage.navGroup(State.group_choice, item.npc, 0)
-            else
-                manage.navGroupLoc(State.group_choice, item.npc, item.whereX, item.whereY, item.whereZ)
-            end
-        else
-            if item.whereX == nil then
-                manage.navGroup(State.group_choice, item.what, 0)
-            else
-                manage.navGroupLoc(State.group_choice, item.what, item.whereX, item.whereY, item.whereZ)
-            end
+            manage.navGroup(State.group_choice, item.npc, ID, class_settings)
         end
     end
 end
@@ -931,7 +930,8 @@ function Actions.npc_wait(item, class_settings)
     State.status = "Waiting for " .. item.npc .. " (" .. item.waittime .. ")"
     while mq.TLO.Spawn("npc " .. item.npc).ID() == 0 do
         if mq.TLO.Me.XTarget() > 0 then
-            manage.clearXtarget(group_set)
+            manage.clearXtarget(class_settings)
+            State.status = "Waiting for " .. item.npc .. " (" .. item.waittime .. ")"
         end
         mq.delay(200)
     end
@@ -940,6 +940,10 @@ end
 function Actions.npc_wait_despawn(item, class_settings)
     State.status = "Waiting for " .. item.npc .. " to despawn (" .. item.waittime .. ")"
     while mq.TLO.Spawn("npc " .. item.npc).ID() ~= 0 do
+        if mq.TLO.Me.XTarget() > 0 then
+            manage.clearXtarget(class_settings)
+            State.status = "Waiting for " .. item.npc .. " to despawn (" .. item.waittime .. ")"
+        end
         mq.delay(200)
     end
 end
@@ -959,6 +963,9 @@ function Actions.open_door_all(item, class_settings)
 end
 
 function Actions.ph_search(item, class_settings)
+    if mq.TLO.Me.XTarget() > 0 then
+        manage.clearXtarget(class_settings)
+    end
     State.status = 'Searching for PH for ' .. item.npc
     local spawn_search = "npc loc " ..
         item.whereX .. " " .. item.whereY .. " " .. item.whereZ .. " radius " .. item.radius
@@ -1005,7 +1012,10 @@ function Actions.portal_set(item, class_settings)
 end
 
 function Actions.pre_farm_check(item, class_settings)
-    State.status = "Checking for pre-farmable items"
+    if mq.TLO.Me.XTarget() > 0 then
+        manage.clearXtarget(class_settings)
+    end
+    State.status = "Checking for pre-farmable items (" .. item.what .. ")"
     mq.delay("1s")
     local check_list = {}
     local not_found = false
@@ -1030,6 +1040,9 @@ function Actions.pre_farm_check(item, class_settings)
 end
 
 function Actions.relocate(item, class_settings)
+    if mq.TLO.Me.XTarget() > 0 then
+        manage.clearXtarget(class_settings)
+    end
     State.status = "Relocating to " .. item.what
     manage.relocateGroup(State.group_choice, item.what)
     while mq.TLO.Me.Casting() == nil do
@@ -1064,9 +1077,11 @@ function Actions.wait_event(item, class_settings)
 end
 
 function Actions.zone_continue_travel(item, class_settings)
-    if class_settings.general.invisForTravel == true then
-        if item.invis == 1 then
-            manage.invis(State.group_choice, class_settings)
+    if mq.TLO.Me.Invis() == false then
+        if class_settings.general.invisForTravel == true then
+            if item.invis == 1 then
+                manage.invis(State.group_choice, class_settings)
+            end
         end
     end
     State.status = "Traveling to " .. item.zone
@@ -1083,14 +1098,20 @@ function Actions.zone_travel(item, class_settings)
             mq.delay("15s")
         end
     end
-    if class_settings.general.invisForTravel == true then
-        if item.invis == 1 then
-            manage.invis(State.group_choice, class_settings)
+    if mq.TLO.Me.Invis() == false then
+        if class_settings.general.invisForTravel == true then
+            if item.invis == 1 then
+                manage.invis(State.group_choice, class_settings)
+            end
         end
     end
     State.status = "Traveling to " .. item.zone
     State.traveling = true
-    manage.zoneGroup(State.group_choice, item.zone)
+    if item.invis ~= nil then
+        manage.zoneGroup(State.group_choice, item.zone, class_settings, item.invis)
+    else
+        manage.zoneGroup(State.group_choice, item.zone, class_settings)
+    end
     State.traveling = false
 end
 

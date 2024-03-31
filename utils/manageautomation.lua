@@ -490,7 +490,8 @@ function manage.invis(group_set, class_settings)
     mq.delay("4s")
 end
 
-function manage.locTravelGroup(group_set, x, y, z)
+function manage.locTravelGroup(group_set, x, y, z, class_settings, invis)
+    invis = invis or 0
     local loopCount = 0
     if group_set == 1 then
         mq.cmdf("/nav locxyz %s %s %s", x, y, z)
@@ -504,7 +505,22 @@ function manage.locTravelGroup(group_set, x, y, z)
     while mq.TLO.Navigation.Active() do
         mq.delay(200)
         if mq.TLO.Me.XTarget() > 0 then
+            local temp = State.status
+            manage.navPause(group_set)
             manage.clearXtarget(group_set)
+            manage.navUnpause(group_set)
+            State.status = temp
+        end
+        if mq.TLO.Me.Invis() == false then
+            if class_settings.general.invisForTravel == true then
+                if invis == 1 then
+                    local temp = State.status
+                    manage.navPause(group_set)
+                    manage.invis(State.group_choice, class_settings)
+                    manage.navUnpause(group_set)
+                    State.status = temp
+                end
+            end
         end
         if loopCount == 10 then
             mq.cmd('/doortarget')
@@ -527,7 +543,8 @@ function manage.locTravelGroup(group_set, x, y, z)
     end
 end
 
-function manage.navGroup(group_set, npc, ID)
+function manage.navGroup(group_set, npc, ID, class_settings, invis)
+    invis = invis or 0
     local loopCount = 0
     if ID == 0 then
         ID = mq.TLO.Spawn("npc " .. npc).ID()
@@ -545,7 +562,22 @@ function manage.navGroup(group_set, npc, ID)
         mq.delay(200)
         mq.doevents()
         if mq.TLO.Me.XTarget() > 0 then
-            manage.clearXtarget(group_set, npc)
+            local temp = State.status
+            manage.navPause(group_set)
+            manage.clearXtarget(group_set)
+            manage.navUnpause(group_set)
+            State.status = temp
+        end
+        if mq.TLO.Me.Invis() == false then
+            if class_settings.general.invisForTravel == true then
+                if invis == 1 then
+                    local temp = State.status
+                    manage.navPause(group_set)
+                    manage.invis(State.group_choice, class_settings)
+                    manage.navUnpause(group_set)
+                    State.status = temp
+                end
+            end
         end
         if loopCount == 10 then
             mq.cmd('/squelch /doortarget')
@@ -568,7 +600,8 @@ function manage.navGroup(group_set, npc, ID)
     end
 end
 
-function manage.navGroupGeneral(group_set, npc, ID)
+function manage.navGroupGeneral(group_set, npc, ID, class_settings, invis)
+    invis = invis or 0
     local loopCount = 0
     if ID == 0 then
         ID = mq.TLO.Spawn(npc).ID()
@@ -585,7 +618,22 @@ function manage.navGroupGeneral(group_set, npc, ID)
     while mq.TLO.Navigation.Active() do
         mq.delay(200)
         if mq.TLO.Me.XTarget() > 0 then
+            local temp = State.status
+            manage.navPause(group_set)
             manage.clearXtarget(group_set)
+            manage.navUnpause(group_set)
+            State.status = temp
+        end
+        if mq.TLO.Me.Invis() == false then
+            if class_settings.general.invisForTravel == true then
+                if invis == 1 then
+                    local temp = State.status
+                    manage.navPause(group_set)
+                    manage.invis(State.group_choice, class_settings)
+                    manage.navUnpause(group_set)
+                    State.status = temp
+                end
+            end
         end
         if loopCount == 10 then
             mq.cmd('/squelch /doortarget')
@@ -608,7 +656,8 @@ function manage.navGroupGeneral(group_set, npc, ID)
     end
 end
 
-function manage.navGroupLoc(group_set, npc, x, y, z)
+function manage.navGroupLoc(group_set, npc, x, y, z, class_settings, invis)
+    invis = invis or 0
     local loopCount = 0
     State.X = mq.TLO.Me.X()
     State.Y = mq.TLO.Me.Y()
@@ -626,7 +675,22 @@ function manage.navGroupLoc(group_set, npc, x, y, z)
     while mq.TLO.Navigation.Active() do
         mq.delay(200)
         if mq.TLO.Me.XTarget() > 0 then
-            manage.clearXtarget(group_set, npc)
+            local temp = State.status
+            manage.navPause(group_set)
+            manage.clearXtarget(group_set)
+            manage.navUnpause(group_set)
+            State.status = temp
+        end
+        if mq.TLO.Me.Invis() == false then
+            if class_settings.general.invisForTravel == true then
+                if invis == 1 then
+                    local temp = State.status
+                    manage.navPause(group_set)
+                    manage.invis(State.group_choice, class_settings)
+                    manage.navUnpause(group_set)
+                    State.status = temp
+                end
+            end
         end
         if loopCount == 10 then
             mq.cmd('/squelch /doortarget')
@@ -679,6 +743,30 @@ function manage.noNavTravel(group_set, x, y, z)
         mq.cmdf("/dex %s /keypress forward", State.group_combo[State.group_choice])
         mq.cmd("/keypress forward")
     end
+end
+
+function manage.navPause(group_set)
+    if group_set == 1 then
+        mq.cmd('/nav pause')
+    elseif group_set == 2 then
+        mq.cmd('/dgga /nav pause')
+    else
+        mq.cmd('/nav pause')
+        mq.cmdf('/dex %s /nav id %s', State.group_combo[State.group_choice])
+    end
+    mq.delay(500)
+end
+
+function manage.navUnpause(group_set, travelData)
+    if group_set == 1 then
+        mq.cmd('/nav pause')
+    elseif group_set == 2 then
+        mq.cmd('/dgga /nav pause')
+    else
+        mq.cmd('/nav pause')
+        mq.cmdf('/dex %s /nav id %s', State.group_combo[State.group_choice])
+    end
+    mq.delay(500)
 end
 
 function manage.openDoorAll(group_set)
@@ -917,51 +1005,69 @@ function manage.unpauseGroup(group_set, class_settings)
     end
 end
 
-function manage.zoneGroup(group_set, zone)
+function manage.zoneGroup(group_set, zone, class_settings, invis)
+    invis = invis or 0
     if group_set == 1 then
         mq.cmdf("/travelto %s", zone)
-        local loopCount = 0
-        while mq.TLO.Zone.ShortName() ~= zone do
-            mq.delay(500)
-            if mq.TLO.Me.XTarget() > 0 then
-                manage.clearXtarget(group_set)
-            end
-            if not mq.TLO.Navigation.Active() then
-                if loopCount == 60 then
-                    mq.cmdf("/travelto %s", zone)
-                    loopCount = 0
-                end
-                loopCount = loopCount + 1
-            end
-        end
-        mq.delay("1s")
     elseif group_set == 2 then
         mq.cmdf("/dgga /travelto %s", zone)
-        while mq.TLO.Zone.ShortName() ~= zone do
-            mq.delay(500)
-        end
-        while mq.TLO.Group.AnyoneMissing() do
-            mq.delay(500)
-            if not mq.TLO.Navigation.Active() then
-                mq.cmdf("/dgga /travelto %s", zone)
-            end
-        end
-        mq.delay("5s")
     else
         mq.cmdf("/travelto %s", zone)
         mq.cmdf('/dex %s /travelto %s', State.group_combo[State.group_choice], zone)
-        while mq.TLO.Zone.ShortName() ~= zone do
-            mq.delay(500)
-        end
-        while mq.TLO.Group.Member(State.group_combo[State.group_choice]).OtherZone() do
-            if not mq.TLO.Navigation.Active() then
-                mq.cmdf("/travelto %s", zone)
-                mq.cmdf('/dex %s /travelto %s', State.group_combo[State.group_choice], zone)
-            end
-            mq.delay(500)
-        end
-        mq.delay("5s")
     end
+    local loopCount = 0
+    while mq.TLO.Zone.ShortName() ~= zone do
+        mq.delay(500)
+        if mq.TLO.Me.XTarget() > 0 then
+            local temp = State.status
+            manage.navPause(group_set)
+            manage.clearXtarget(group_set)
+            manage.navUnpause(group_set)
+            State.status = temp
+        end
+        if mq.TLO.Me.Invis() == false then
+            if class_settings.general.invisForTravel == true then
+                if invis == 1 then
+                    local temp = State.status
+                    manage.navPause(group_set)
+                    manage.invis(State.group_choice, class_settings)
+                    manage.navUnpause(group_set)
+                    State.status = temp
+                end
+            end
+        end
+        if not mq.TLO.Navigation.Active() then
+            if loopCount == 60 then
+                if mq.TLO.Cursor() ~= nil then
+                    if mq.TLO.Cursor() == "Spire Stone" then
+                        mq.cmd('/autoinv')
+                    end
+                end
+                if mq.TLO.FindItem('=Spire Stone')() == nil then
+                    if group_set == 1 then
+                        mq.cmdf("/travelto %s", zone)
+                    elseif group_set == 2 then
+                        mq.cmdf("/dgga /travelto %s", zone)
+                    else
+                        mq.cmdf("/travelto %s", zone)
+                        mq.cmdf('/dex %s /travelto %s', State.group_combo[State.group_choice], zone)
+                    end
+                end
+            end
+            loopCount = loopCount + 1
+        end
+    end
+    if group_set == 2 then
+        while mq.TLO.Group.AnyoneMissing() do
+            mq.delay(500)
+        end
+    end
+    if group_set > 2 then
+        while mq.TLO.Group.Member(State.group_combo[State.group_choice]).OtherZone() do
+            mq.delay(500)
+        end
+    end
+    mq.delay("5s")
 end
 
 return manage
