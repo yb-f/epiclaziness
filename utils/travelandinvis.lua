@@ -88,6 +88,26 @@ local travel = {
         ['gate'] = 0,
         ['invis'] = 6
     },
+    --Not accurate
+    ['bst_10'] = {
+        ['gate'] = 5,
+        ['invis'] = 11
+    },
+    --Not accurate
+    ['bst_15'] = {
+        ['gate'] = 5,
+        ['invis'] = 11
+    },
+    --Not accurate
+    ['bst_20'] = {
+        ['gate'] = 5,
+        ['invis'] = 11
+    },
+    --Not accurate
+    ['bst_pre15'] = {
+        ['gate'] = 7,
+        ['invis'] = 8
+    },
 }
 
 return travel
