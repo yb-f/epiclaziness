@@ -150,6 +150,7 @@ end
 
 function Actions.enviro_combine_do(item, class_settings)
     State.status = "Combining"
+    mq.delay("1s")
     mq.TLO.Window("ContainerWindow/Container_Combine").LeftMouseUp()
     while mq.TLO.Cursor() == nil do
         mq.delay(100)
@@ -545,7 +546,11 @@ function Actions.npc_buy(item, class_settings)
     mq.delay("3s")
     mq.TLO.Merchant.SelectItem("=" .. item.what)
     mq.delay("1s")
-    mq.TLO.Merchant.Buy(1)
+    if item.count == nil then
+        mq.TLO.Merchant.Buy(1)
+    else
+        mq.TLO.Merchant.Buy(item.count)
+    end
     mq.delay("1s")
     mq.TLO.Window('MerchantWnd').DoClose()
 end
@@ -1056,6 +1061,10 @@ function Actions.relocate(item, class_settings)
     while mq.TLO.Me.Casting() ~= nil do
         mq.delay(500)
     end
+end
+
+function Actions.remove_invis(item, class_settings)
+    manage.removeInvis(State.group_choice)
 end
 
 function Actions.rog_gamble(item, class_settings)
