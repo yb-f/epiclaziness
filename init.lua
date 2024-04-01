@@ -251,19 +251,23 @@ local function run_epic(class, choice)
             actions.picklock_door(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "PICK_POCKET" then
             actions.pickpocket(task_table[State.step], class_settings.settings)
+        elseif task_table[State.step].type == "PICKUP_KEY" then
+            mq.cmdf("/itemnotify \"%s\" leftmouseup", task_table[State.step].what)
         elseif task_table[State.step].type == "PORTAL_SET" then
             actions.portal_set(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "PRE_FARM_CHECK" then
             actions.pre_farm_check(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "RELOCATE" then
             actions.relocate(task_table[State.step], class_settings.settings)
+        elseif task_table[State.step].type == "REMOVE_INVIS" then
+            actions.remove_invis(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "ROG_GAMBLE" then
             actions.rog_gamble(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "SEND_YES" then
             actions.send_yes(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "WAIT" then
             if mq.TLO.Me.XTarget() > 0 then
-                manage.clearXtarget(class_settings.settings)
+                manage.clearXtarget(State.group_choice, class_settings.settings)
             end
             State.status = "Pausing for " .. task_table[State.step].what / 1000 .. " seconds"
             mq.delay(tonumber(task_table[State.step].what))
