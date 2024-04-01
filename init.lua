@@ -323,13 +323,13 @@ local function displayGUI()
             if State.task_run == false then
                 State.epic_choice = ImGui.Combo('##Combo', State.epic_choice, epic_list)
                 if ImGui.IsItemHovered() then
-                    ImGui.SetTooltip('Which Epic to run')
+                    ImGui.SetTooltip('Which epic to run.')
                 end
             end
             if mq.TLO.Me.Grouped() == true then
                 State.group_choice = ImGui.Combo('##Group_Combo', State.group_choice, State.group_combo)
                 if ImGui.IsItemHovered() then
-                    ImGui.SetTooltip('Who should come with you (None, Group, Individual group member)')
+                    ImGui.SetTooltip('Who should come with you (None. Full group. Individual group member.)')
                 end
                 ImGui.SameLine()
                 if ImGui.SmallButton(ICONS.MD_REFRESH) then
@@ -354,14 +354,14 @@ local function displayGUI()
                         State.pause = true
                     end
                     if ImGui.IsItemHovered() then
-                        ImGui.SetTooltip("Pause before begining next step.")
+                        ImGui.SetTooltip("Pause script.")
                     end
                 else
                     if ImGui.SmallButton(ICONS.FA_PLAY) then
                         State.pause = false
                     end
                     if ImGui.IsItemHovered() then
-                        ImGui.SetTooltip("Resume")
+                        ImGui.SetTooltip("Resume script.")
                     end
                 end
                 ImGui.SameLine()
@@ -370,7 +370,7 @@ local function displayGUI()
                     State.step = State.step + 1
                 end
                 if ImGui.IsItemHovered() then
-                    ImGui.SetTooltip("Next Step")
+                    ImGui.SetTooltip("Skip to next step.")
                 end
                 if ImGui.Button("Stop @ Next Save") then
                     printf("%s \aoStopping at next save point.", elheader)
