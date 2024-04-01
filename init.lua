@@ -294,6 +294,7 @@ local function run_epic(class, choice)
                 State.epicstring = ''
                 State.task_run = false
                 stop_at_save = false
+                State.status = "Stopped at step " .. State.step
                 return
             end
         end
