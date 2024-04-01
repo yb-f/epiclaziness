@@ -140,6 +140,7 @@ local function run_epic(class, choice)
     end
     while State.step < #task_table do
         while State.pause == true do
+            State.status = "Paused"
             mq.delay(500)
         end
         State.skip = false
@@ -300,6 +301,7 @@ local function run_epic(class, choice)
             return
         end
     end
+    State.status = "Completed " .. mq.TLO.Me.Class() .. ": " .. State.epicstring
     State.epicstring = ''
     State.task_run = false
     printf("%s \aoCompleted!", elheader)

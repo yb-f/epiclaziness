@@ -559,6 +559,8 @@ function manage.locTravelGroup(group_set, x, y, z, class_settings, invis)
         mq.cmdf("/dex %s /nav locxyz %s %s %s", State.group_combo[State.group_choice], x, y, z)
     end
     mq.delay(200)
+    local unpause_automation = false
+    local temp = State.status
     while mq.TLO.Navigation.Active() do
         mq.delay(200)
         if mq.TLO.Me.XTarget() > 0 then
@@ -567,6 +569,19 @@ function manage.locTravelGroup(group_set, x, y, z, class_settings, invis)
             manage.clearXtarget(group_set, class_settings)
             manage.navUnpause(group_set)
             State.status = temp
+        end
+        if State.pause == true then
+            manage.navPause(group_set)
+            unpause_automation = true
+            State.status = "Paused"
+        end
+        while State.pause == true do
+            mq.delay(200)
+        end
+        if unpause_automation == true then
+            State.status = temp
+            manage.navUnpause(group_set)
+            unpause_automation = false
         end
         if mq.TLO.Me.Invis() == false then
             if class_settings.general.invisForTravel == true then
@@ -615,6 +630,8 @@ function manage.navGroup(group_set, npc, ID, class_settings, invis)
         mq.cmdf('/dex %s /nav id %s', State.group_combo[State.group_choice], ID)
     end
     mq.delay(200)
+    local temp = State.status
+    local unpause_automation = false
     while mq.TLO.Navigation.Active() do
         mq.delay(200)
         mq.doevents()
@@ -624,6 +641,19 @@ function manage.navGroup(group_set, npc, ID, class_settings, invis)
             manage.clearXtarget(group_set, class_settings)
             manage.navUnpause(group_set)
             State.status = temp
+        end
+        if State.pause == true then
+            manage.navPause(group_set)
+            unpause_automation = true
+            State.status = "Paused"
+        end
+        while State.pause == true do
+            mq.delay(200)
+        end
+        if unpause_automation == true then
+            State.status = temp
+            manage.navUnpause(group_set)
+            unpause_automation = false
         end
         if mq.TLO.Me.Invis() == false then
             if class_settings.general.invisForTravel == true then
@@ -672,6 +702,8 @@ function manage.navGroupGeneral(group_set, npc, ID, class_settings, invis)
         mq.cmdf('/dex %s /nav id %s', State.group_combo[State.group_choice], ID)
     end
     mq.delay(200)
+    local temp = State.status
+    local unpause_automation = false
     while mq.TLO.Navigation.Active() do
         mq.delay(200)
         if mq.TLO.Me.XTarget() > 0 then
@@ -680,6 +712,19 @@ function manage.navGroupGeneral(group_set, npc, ID, class_settings, invis)
             manage.clearXtarget(group_set, class_settings)
             manage.navUnpause(group_set)
             State.status = temp
+        end
+        if State.pause == true then
+            manage.navPause(group_set)
+            unpause_automation = true
+            State.status = "Paused"
+        end
+        while State.pause == true do
+            mq.delay(200)
+        end
+        if unpause_automation == true then
+            State.status = temp
+            manage.navUnpause(group_set)
+            unpause_automation = false
         end
         if mq.TLO.Me.Invis() == false then
             if class_settings.general.invisForTravel == true then
@@ -729,6 +774,8 @@ function manage.navGroupLoc(group_set, npc, x, y, z, class_settings, invis)
         mq.cmdf('/dex %s /nav id %s', State.group_combo[State.group_choice], mq.TLO.Spawn(searchstring).ID())
     end
     mq.delay(200)
+    local temp = State.status
+    local unpause_automation = false
     while mq.TLO.Navigation.Active() do
         mq.delay(200)
         if mq.TLO.Me.XTarget() > 0 then
@@ -737,6 +784,19 @@ function manage.navGroupLoc(group_set, npc, x, y, z, class_settings, invis)
             manage.clearXtarget(group_set, class_settings)
             manage.navUnpause(group_set)
             State.status = temp
+        end
+        if State.pause == true then
+            manage.navPause(group_set)
+            unpause_automation = true
+            State.status = "Paused"
+        end
+        while State.pause == true do
+            mq.delay(200)
+        end
+        if unpause_automation == true then
+            State.status = temp
+            manage.navUnpause(group_set)
+            unpause_automation = false
         end
         if mq.TLO.Me.Invis() == false then
             if class_settings.general.invisForTravel == true then
@@ -1072,6 +1132,8 @@ function manage.zoneGroup(group_set, zone, class_settings, invis)
         mq.cmdf("/travelto %s", zone)
         mq.cmdf('/dex %s /travelto %s', State.group_combo[State.group_choice], zone)
     end
+    local temp = State.status
+    local unpause_automation = false
     local loopCount = 0
     while mq.TLO.Zone.ShortName() ~= zone do
         mq.delay(500)
@@ -1081,6 +1143,19 @@ function manage.zoneGroup(group_set, zone, class_settings, invis)
             manage.clearXtarget(group_set, class_settings)
             manage.navUnpause(group_set)
             State.status = temp
+        end
+        if State.pause == true then
+            manage.navPause(group_set)
+            unpause_automation = true
+            State.status = "Paused"
+        end
+        while State.pause == true do
+            mq.delay(200)
+        end
+        if unpause_automation == true then
+            State.status = temp
+            manage.navUnpause(group_set)
+            unpause_automation = false
         end
         if mq.TLO.Me.Invis() == false then
             if class_settings.general.invisForTravel == true then

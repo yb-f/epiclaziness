@@ -251,11 +251,25 @@ function Actions.farm_radius(item, class_settings)
     local item_status = ''
     local looping = true
     local loop_check = true
+    local unpause_automation = false
     for word in string.gmatch(item.what, '([^|]+)') do
         table.insert(item_list, word)
     end
     if item.count == nil then
         while looping do
+            if State.pause == true then
+                manage.pauseGroup(State.group_choice, class_settings)
+                unpause_automation = true
+                State.status = "Paused"
+            end
+            while State.pause == true do
+                mq.delay(200)
+            end
+            if unpause_automation == true then
+                State.status = "Farming for " .. item_status
+                manage.unpauseGroup(State.group_choice, class_settings)
+                unpause_automation = false
+            end
             item_status = ''
             loop_check = true
             local item_remove = 0
@@ -284,6 +298,7 @@ function Actions.farm_radius(item, class_settings)
                     end
                 end
             end
+            mq.delay(250)
             if mq.TLO.AdvLoot.PCount() > 0 then
                 for i = 1, mq.TLO.AdvLoot.PCount() do
                     for _, name in pairs(item_list) do
@@ -298,6 +313,19 @@ function Actions.farm_radius(item, class_settings)
         end
     else
         while mq.TLO.FindItemCount("=" .. item.what)() < item.count do
+            if State.pause == true then
+                manage.pauseGroup(State.group_choice, class_settings)
+                unpause_automation = true
+                State.status = "Paused"
+            end
+            while State.pause == true do
+                mq.delay(200)
+            end
+            if unpause_automation == true then
+                State.status = "Farming for " .. item.what .. " (" .. item.count .. ")"
+                manage.unpauseGroup(State.group_choice, class_settings)
+                unpause_automation = false
+            end
             if mq.TLO.AdvLoot.SCount() > 0 then
                 for i = 1, mq.TLO.AdvLoot.SCount() do
                     if mq.TLO.AdvLoot.SList(i).Name() == item.what then
@@ -334,11 +362,23 @@ function Actions.forage_farm(item, class_settings)
         local item_status = ''
         local looping = true
         local loop_check = true
+        local unpause_automation = false
         for word in string.gmatch(item.what, '([^|]+)') do
             table.insert(item_list, word)
         end
         while looping do
             mq.delay(200)
+            if State.pause == true then
+                unpause_automation = true
+                State.status = "Paused"
+            end
+            while State.pause == true do
+                mq.delay(200)
+            end
+            if unpause_automation == true then
+                State.status = "Foraging for " .. item_status
+                unpause_automation = false
+            end
             if mq.TLO.Me.XTarget() > 0 then
                 manage.clearXtarget(State.group_choice, class_settings)
             end
@@ -422,10 +462,22 @@ function Actions.general_travel(item, class_settings)
             end
         end
     end
-    State.status = "Waiting for NPC " .. item.npc
+    State.status = "Waiting for " .. item.npc
     local ID = mq.TLO.NearestSpawn(1, item.npc).ID()
+    local unpause_automation = false
     while ID == nil do
         mq.delay(500)
+        if State.pause == true then
+            unpause_automation = true
+            State.status = "Paused"
+        end
+        while State.pause == true do
+            mq.delay(200)
+        end
+        if unpause_automation == true then
+            State.status = "Waiting for " .. item.npc
+            unpause_automation = false
+        end
         ID = mq.TLO.NearestSpawn(1, item.npc).ID()
     end
     State.status = "Navigating to " .. item.npc
@@ -763,13 +815,39 @@ function Actions.npc_kill_all(item, class_settings)
     manage.removeInvis(State.group_choice)
     State.status = "Killing All " .. item.npc
     manage.unpauseGroup(State.group_choice, class_settings)
+    local unpause_automation = false
     while true do
         if mq.TLO.Spawn('npc ' .. item.npc).ID() == 0 then
             break
         end
+        mq.delay(500)
+        if State.pause == true then
+            unpause_automation = true
+            State.status = "Paused"
+        end
+        while State.pause == true do
+            mq.delay(200)
+        end
+        if unpause_automation == true then
+            State.status = "Killing All " .. item.npc
+            unpause_automation = false
+        end
         local ID = mq.TLO.NearestSpawn('npc ' .. item.npc).ID()
         mq.cmdf('/nav id %s', ID)
         while mq.TLO.Navigation.Active() do
+            if State.pause == true then
+                unpause_automation = true
+                State.status = "Paused"
+                mq.cmd('/nav pause')
+            end
+            while State.pause == true do
+                mq.delay(200)
+            end
+            if unpause_automation == true then
+                State.status = "Killing All " .. item.npc
+                unpause_automation = false
+                mq.cmd('/nav pause')
+            end
             mq.delay(200)
         end
         mq.TLO.Spawn(ID).DoTarget()
@@ -889,7 +967,19 @@ function Actions.npc_travel(item, class_settings)
     else
         State.status = "Waiting for NPC " .. item.npc
         local ID = mq.TLO.NearestSpawn(1, "npc " .. item.npc).ID()
+        local unpause_automation = false
         while ID == nil do
+            if State.pause == true then
+                unpause_automation = true
+                State.status = "Paused"
+            end
+            while State.pause == true do
+                mq.delay(200)
+            end
+            if unpause_automation == true then
+                State.status = "Waiting for NPC " .. item.npc
+                unpause_automation = false
+            end
             mq.delay(500)
             ID = mq.TLO.NearestSpawn(1, "npc " .. item.npc).ID()
         end
@@ -910,6 +1000,17 @@ function Actions.npc_travel(item, class_settings)
                 ID = mq.TLO.NearestSpawn(loop_count, "npc " .. item.npc).ID()
                 while ID == nil do
                     mq.delay(500)
+                    if State.pause == true then
+                        unpause_automation = true
+                        State.status = "Paused"
+                    end
+                    while State.pause == true do
+                        mq.delay(200)
+                    end
+                    if unpause_automation == true then
+                        State.status = "Looking for path to NPC " .. item.npc
+                        unpause_automation = false
+                    end
                     ID = mq.TLO.NearestSpawn(loop_count, "npc " .. item.npc).ID()
                 end
                 if mq.TLO.Navigation.PathExists('id ' .. ID)() == false then
@@ -921,13 +1022,7 @@ function Actions.npc_travel(item, class_settings)
                 break
             end
         end
-        while mq.TLO.Spawn("npc " .. item.npc).ID() == 0 do
-            if State.skip == true then
-                return
-            end
-            mq.delay(200)
-        end
-        State.status = "Navigating to " .. item.npc
+        State.status = "Navigating to " .. item.npc .. " (" .. ID .. ")"
         if item.invis ~= nil then
             manage.navGroup(State.group_choice, item.npc, ID, class_settings, item.invis)
         else
@@ -938,10 +1033,22 @@ end
 
 function Actions.npc_wait(item, class_settings)
     State.status = "Waiting for " .. item.npc .. " (" .. item.waittime .. ")"
+    local unpause_automation = false
     while mq.TLO.Spawn("npc " .. item.npc).ID() == 0 do
         if mq.TLO.Me.XTarget() > 0 then
             manage.clearXtarget(State.group_choice, class_settings)
             State.status = "Waiting for " .. item.npc .. " (" .. item.waittime .. ")"
+        end
+        if State.pause == true then
+            unpause_automation = true
+            State.status = "Paused"
+        end
+        while State.pause == true do
+            mq.delay(200)
+        end
+        if unpause_automation == true then
+            State.status = "Waiting for " .. item.npc .. " (" .. item.waittime .. ")"
+            unpause_automation = false
         end
         mq.delay(200)
     end
@@ -949,10 +1056,22 @@ end
 
 function Actions.npc_wait_despawn(item, class_settings)
     State.status = "Waiting for " .. item.npc .. " to despawn (" .. item.waittime .. ")"
+    local unpause_automation = false
     while mq.TLO.Spawn("npc " .. item.npc).ID() ~= 0 do
         if mq.TLO.Me.XTarget() > 0 then
             manage.clearXtarget(State.group_choice, class_settings)
             State.status = "Waiting for " .. item.npc .. " to despawn (" .. item.waittime .. ")"
+        end
+        if State.pause == true then
+            unpause_automation = true
+            State.status = "Paused"
+        end
+        while State.pause == true do
+            mq.delay(200)
+        end
+        if unpause_automation == true then
+            State.status = "Waiting for " .. item.npc .. " to despawn (" .. item.waittime .. ")"
+            unpause_automation = false
         end
         mq.delay(200)
     end
