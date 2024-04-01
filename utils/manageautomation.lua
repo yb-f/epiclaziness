@@ -443,6 +443,54 @@ end
 function manage.invis(group_set, class_settings)
     State.status = "Using invis"
     local invis_type = {}
+    if mq.TLO.Me.Combat() == true then
+        mq.cmd('/keypress AUTOPRIM')
+    end
+    if mq.TLO.Spawn('npc magus').Distance() ~= nil then
+        if mq.TLO.Spawn('npc magus').Distance() < 30 then
+            return
+        end
+    end
+    if mq.TLO.Spawn('npc translocator').Distance() ~= nil then
+        if mq.TLO.Spawn('npc translocator').Distance() < 30 then
+            return
+        end
+    end
+    if mq.TLO.Spawn('npc priest of discord').Distance() ~= nil then
+        if mq.TLO.Spawn('npc priest of discord').Distance() < 30 then
+            return
+        end
+    end
+    if mq.TLO.Spawn('npc nexus scion').Distance() ~= nil then
+        if mq.TLO.Spawn('npc nexus scion').Distance() < 30 then
+            return
+        end
+    end
+    if mq.TLO.Spawn('npc deaen greyforge').Distance() ~= nil then
+        if mq.TLO.Spawn('npc deaen greyforge').Distance() < 30 then
+            return
+        end
+    end
+    if mq.TLO.Spawn('npc ambassador cogswald').Distance() ~= nil then
+        if mq.TLO.Spawn('npc ambassador cogswald').Distance() < 30 then
+            return
+        end
+    end
+    if mq.TLO.Spawn('npc madronoa').Distance() ~= nil then
+        if mq.TLO.Spawn('npc madronoa').Distance() < 30 then
+            return
+        end
+    end
+    if mq.TLO.Spawn('npc belinda').Distance() ~= nil then
+        if mq.TLO.Spawn('npc belinda').Distance() < 30 then
+            return
+        end
+    end
+    if mq.TLO.Spawn('npc herald of druzzil ro').Distance() ~= nil then
+        if mq.TLO.Spawn('npc herald of druzzil ro').Distance() < 30 then
+            return
+        end
+    end
     for word in string.gmatch(class_settings.class_invis[mq.TLO.Me.Class()], '([^|]+)') do
         table.insert(invis_type, word)
     end
@@ -454,6 +502,10 @@ function manage.invis(group_set, class_settings)
         mq.cmd("/doability sneak")
     else
         mq.cmdf('/casting "%s"', invis_type[class_settings.invis[mq.TLO.Me.Class()]])
+        mq.delay(500)
+        while mq.TLO.Me.Casting() == true do
+            mq.delay(200)
+        end
     end
     if group_set == 1 then
     elseif group_set == 2 then
