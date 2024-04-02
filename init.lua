@@ -135,6 +135,16 @@ local function run_epic(class, choice)
         tablename = class .. "_20"
         State.epicstring = "2.0"
     end
+    local table_found = false
+    for row in dbn:nrows("SELECT name FROM sqlite_master WHERE type='table' AND name='" .. tablename .. "';") do
+        table_found = true
+    end
+    if table_found == false then
+        printf("%s \aoThis quest has not yet been implemented.", elheader)
+        State.status = "This quest has not yet been implemented."
+        State.task_run = false
+        return
+    end
     local sql = "SELECT * FROM " .. tablename
     for a in dbn:nrows(sql) do
         table.insert(task_table, a)
