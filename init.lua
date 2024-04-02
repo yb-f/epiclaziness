@@ -10,6 +10,9 @@ local manage = require 'utils/manageautomation'
 local class_settings = require 'utils/class_settings'
 local invis_travel = require 'utils/travelandinvis'
 
+local PackageMan = require('mq/PackageMan')
+PackageMan.Require('lsqlite3')
+
 local window_flags = bit32.bor(ImGuiWindowFlags.None)
 local openGUI, drawGUI = true, true
 local myName = mq.TLO.Me.DisplayName()
