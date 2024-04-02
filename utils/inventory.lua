@@ -16,7 +16,7 @@ function inventory.equip_item(item)
         mq.delay(100)
     end
     mq.cmdf('/itemnotify %s leftmouseup', inventory.slot)
-    while mq.TLO.Me.Inventory(inventory.slot) ~= item.what do
+    while mq.TLO.Me.Inventory(inventory.slot)() ~= item.what do
         mq.delay(100)
     end
     mq.cmd('/autoinv')
@@ -33,7 +33,7 @@ function inventory.restore_item()
         mq.delay(100)
     end
     mq.cmdf('/itemnotify %s leftmouseup', inventory.slot)
-    while mq.TLO.Me.Inventory(inventory.slot) ~= inventory.stored_item do
+    while mq.TLO.Me.Inventory(inventory.slot)() ~= inventory.stored_item do
         mq.delay(100)
     end
     mq.cmd('/autoinv')
