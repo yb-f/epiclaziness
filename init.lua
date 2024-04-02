@@ -240,6 +240,8 @@ local function run_epic(class, choice)
             actions.npc_talk_all(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "NPC_TRAVEL" then
             actions.npc_travel(task_table[State.step], class_settings.settings)
+        elseif task_table[State.step].type == "NPC_TRAVEL_NO_PATH_CHECK" then
+            actions.npc_travel(task_table[State.step], class_settings.settings, true)
         elseif task_table[State.step].type == "NPC_WAIT" then
             actions.npc_wait(task_table[State.step])
         elseif task_table[State.step].type == "NPC_WAIT_DESPAWN" then
@@ -265,7 +267,7 @@ local function run_epic(class, choice)
         elseif task_table[State.step].type == "REMOVE_INVIS" then
             actions.remove_invis(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "RESTORE_ITEM" then
-            inv.restore_item(task_table[State.step], class_settings.settings)
+            inv.restore_item()
         elseif task_table[State.step].type == "ROG_GAMBLE" then
             actions.rog_gamble(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "SEND_YES" then
