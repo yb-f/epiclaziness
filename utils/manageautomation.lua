@@ -580,7 +580,7 @@ function manage.locTravelGroup(group_set, x, y, z, class_settings, invis)
                 if invis == 1 then
                     local temp = State.status
                     local transCheck = manage.invisTranslocatorCheck()
-                    if transCheck == true then
+                    if transCheck == false then
                         manage.navPause(group_set)
                         manage.invis(State.group_choice, class_settings)
                         manage.navUnpause(group_set)
@@ -660,7 +660,7 @@ function manage.navGroup(group_set, npc, ID, class_settings, invis)
                 if invis == 1 then
                     local temp = State.status
                     local transCheck = manage.invisTranslocatorCheck()
-                    if transCheck == true then
+                    if transCheck == false then
                         manage.navPause(group_set)
                         manage.invis(State.group_choice, class_settings)
                         manage.navUnpause(group_set)
@@ -739,7 +739,7 @@ function manage.navGroupGeneral(group_set, npc, ID, class_settings, invis)
                 if invis == 1 then
                     local temp = State.status
                     local transCheck = manage.invisTranslocatorCheck()
-                    if transCheck == true then
+                    if transCheck == false then
                         manage.navPause(group_set)
                         manage.invis(State.group_choice, class_settings)
                         manage.navUnpause(group_set)
@@ -819,7 +819,7 @@ function manage.navGroupLoc(group_set, npc, x, y, z, class_settings, invis)
                 if invis == 1 then
                     local temp = State.status
                     local transCheck = manage.invisTranslocatorCheck()
-                    if transCheck == true then
+                    if transCheck == false then
                         manage.navPause(group_set)
                         manage.invis(State.group_choice, class_settings)
                         manage.navUnpause(group_set)
@@ -1186,7 +1186,7 @@ function manage.zoneGroup(group_set, zone, class_settings, invis)
                 if invis == 1 then
                     local temp = State.status
                     local transCheck = manage.invisTranslocatorCheck()
-                    if transCheck == true then
+                    if transCheck == false then
                         manage.navPause(group_set)
                         manage.invis(State.group_choice, class_settings)
                         manage.navUnpause(group_set)
