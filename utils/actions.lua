@@ -693,6 +693,10 @@ function Actions.npc_give(item, class_settings)
     mq.delay(100)
     while mq.TLO.Window('GiveWnd').Open() do
         mq.delay(100)
+        if State.skip == true then
+            State.skip = false
+            return
+        end
     end
     mq.delay("1s")
 end
@@ -715,6 +719,10 @@ function Actions.npc_give_add(item, class_settings)
                 looping = false
             end
         end
+        if State.skip == true then
+            State.skip = false
+            return
+        end
     end
 end
 
@@ -725,6 +733,10 @@ function Actions.npc_give_click(item, class_settings)
     mq.delay(100)
     while mq.TLO.Window('GiveWnd').Open() do
         mq.delay(100)
+        if State.skip == true then
+            State.skip = false
+            return
+        end
     end
     mq.delay("1s")
 end
@@ -752,6 +764,10 @@ function Actions.npc_give_money(item, class_settings)
     mq.delay(100)
     while mq.TLO.Window('GiveWnd').Open() do
         mq.delay(100)
+        if State.skip == true then
+            State.skip = false
+            return
+        end
     end
     mq.TLO.Window('InventoryWindow').DoClose()
     mq.delay("1s")

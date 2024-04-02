@@ -856,6 +856,10 @@ function manage.noNavTravel(group_set, x, y, z)
         while distance > 5 do
             mq.delay(10)
             distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
+            if State.skip == true then
+                State.skip = false
+                return
+            end
         end
         mq.cmd("/squelch /keypress forward")
     elseif group_set == 2 then
@@ -865,6 +869,10 @@ function manage.noNavTravel(group_set, x, y, z)
         while distance > 5 do
             mq.delay(10)
             distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
+            if State.skip == true then
+                State.skip = false
+                return
+            end
         end
         mq.cmd("/dgge /squelch /keypress forward")
         mq.cmd("/squelch /keypress forward")
@@ -875,6 +883,10 @@ function manage.noNavTravel(group_set, x, y, z)
         while distance > 5 do
             mq.delay(10)
             distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
+            if State.skip == true then
+                State.skip = false
+                return
+            end
         end
         mq.cmdf("/dex %s /squelch /keypress forward", State.group_combo[State.group_choice])
         mq.cmd("/squelch /keypress forward")
@@ -1218,11 +1230,19 @@ function manage.zoneGroup(group_set, zone, class_settings, invis)
     if group_set == 2 then
         while mq.TLO.Group.AnyoneMissing() do
             mq.delay(500)
+            if State.skip == true then
+                State.skip = false
+                return
+            end
         end
     end
     if group_set > 2 then
         while mq.TLO.Group.Member(State.group_combo[State.group_choice]).OtherZone() do
             mq.delay(500)
+            if State.skip == true then
+                State.skip = false
+                return
+            end
         end
     end
     mq.delay("5s")
