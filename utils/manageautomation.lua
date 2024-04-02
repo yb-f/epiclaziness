@@ -322,6 +322,11 @@ function manage.followGroupLoc(group_set, npc, x, y)
         mq.cmd('/afollow')
         local distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
         while distance > 50 do
+            if State.skip == true then
+                mq.cmd('/afollow off')
+                State.skip = false
+                return
+            end
             mq.delay(200)
             distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
         end
@@ -332,6 +337,11 @@ function manage.followGroupLoc(group_set, npc, x, y)
         mq.cmd('/dgga /afollow')
         local distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
         while distance > 50 do
+            if State.skip == true then
+                mq.cmd('/dgga /afollow off')
+                State.skip = false
+                return
+            end
             mq.delay(200)
             distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
         end
@@ -344,6 +354,12 @@ function manage.followGroupLoc(group_set, npc, x, y)
         mq.cmdf('/dex %s /afollow', State.group_combo[State.group_choice])
         local distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
         while distance > 50 do
+            if State.skip == true then
+                mq.cmd('/afollow off')
+                mq.cmdf('/dex %s /afollow off', State.group_combo[State.group_choice])
+                State.skip = false
+                return
+            end
             mq.delay(200)
             distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
         end
@@ -562,6 +578,11 @@ function manage.locTravelGroup(group_set, x, y, z, class_settings, invis)
     local unpause_automation = false
     local temp = State.status
     while mq.TLO.Navigation.Active() do
+        if State.skip == true then
+            manage.navPause(group_set)
+            State.skip = false
+            return
+        end
         mq.delay(200)
         if mq.TLO.Me.XTarget() > 0 then
             local temp = State.status
@@ -633,6 +654,11 @@ function manage.navGroup(group_set, npc, ID, class_settings, invis)
     local temp = State.status
     local unpause_automation = false
     while mq.TLO.Navigation.Active() do
+        if State.skip == true then
+            manage.navPause(group_set)
+            State.skip = false
+            return
+        end
         mq.delay(200)
         mq.doevents()
         if mq.TLO.Me.XTarget() > 0 then
@@ -705,6 +731,11 @@ function manage.navGroupGeneral(group_set, npc, ID, class_settings, invis)
     local temp = State.status
     local unpause_automation = false
     while mq.TLO.Navigation.Active() do
+        if State.skip == true then
+            manage.navPause(group_set)
+            State.skip = false
+            return
+        end
         mq.delay(200)
         if mq.TLO.Me.XTarget() > 0 then
             local temp = State.status
@@ -777,6 +808,11 @@ function manage.navGroupLoc(group_set, npc, x, y, z, class_settings, invis)
     local temp = State.status
     local unpause_automation = false
     while mq.TLO.Navigation.Active() do
+        if State.skip == true then
+            manage.navPause(group_set)
+            State.skip = false
+            return
+        end
         mq.delay(200)
         if mq.TLO.Me.XTarget() > 0 then
             local temp = State.status
@@ -1136,6 +1172,11 @@ function manage.zoneGroup(group_set, zone, class_settings, invis)
     local unpause_automation = false
     local loopCount = 0
     while mq.TLO.Zone.ShortName() ~= zone do
+        if State.skip == true then
+            manage.navPause(group_set)
+            State.skip = false
+            return
+        end
         mq.delay(500)
         if mq.TLO.Me.XTarget() > 0 then
             local temp = State.status

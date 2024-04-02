@@ -368,6 +368,7 @@ local function displayGUI()
                 if ImGui.SmallButton(ICONS.MD_FAST_FORWARD) then
                     State.skip = true
                     State.step = State.step + 1
+                    printf("%s \aoSkipping to step %s", elheader, State.step)
                 end
                 if ImGui.IsItemHovered() then
                     ImGui.SetTooltip("Skip to next step.")

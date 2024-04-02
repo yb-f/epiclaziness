@@ -257,6 +257,12 @@ function Actions.farm_radius(item, class_settings)
     end
     if item.count == nil then
         while looping do
+            if State.skip == true then
+                manage.uncampGroup(State.group_choice, class_settings)
+                manage.pauseGroup(State.group_choice, class_settings)
+                State.skip = false
+                return
+            end
             if State.pause == true then
                 manage.pauseGroup(State.group_choice, class_settings)
                 unpause_automation = true
@@ -313,6 +319,12 @@ function Actions.farm_radius(item, class_settings)
         end
     else
         while mq.TLO.FindItemCount("=" .. item.what)() < item.count do
+            if State.skip == true then
+                manage.uncampGroup(State.group_choice, class_settings)
+                manage.pauseGroup(State.group_choice, class_settings)
+                State.skip = false
+                return
+            end
             if State.pause == true then
                 manage.pauseGroup(State.group_choice, class_settings)
                 unpause_automation = true
@@ -368,6 +380,10 @@ function Actions.forage_farm(item, class_settings)
         end
         while looping do
             mq.delay(200)
+            if State.skip == true then
+                State.skip = false
+                return
+            end
             if State.pause == true then
                 unpause_automation = true
                 State.status = "Paused"
@@ -439,6 +455,10 @@ function Actions.general_search(item, class_settings)
     local looping = true
     local i = 1
     while looping do
+        if State.skip == true then
+            State.skip = false
+            return
+        end
         local ID = mq.TLO.NearestSpawn(i, item.npc).ID()
         if ID ~= nil then
             State.step = item.gotostep - 1
@@ -467,6 +487,10 @@ function Actions.general_travel(item, class_settings)
     local unpause_automation = false
     while ID == nil do
         mq.delay(500)
+        if State.skip == true then
+            State.skip = false
+            return
+        end
         if State.pause == true then
             unpause_automation = true
             State.status = "Paused"
@@ -495,6 +519,10 @@ function Actions.ground_spawn(item, class_settings)
     mq.delay(200)
     mq.cmd("/click left itemtarget")
     while mq.TLO.Cursor.Name() ~= item.what do
+        if State.skip == true then
+            State.skip = false
+            return
+        end
         mq.delay(200)
         mq.cmd("/itemtarget")
         mq.delay(200)
@@ -616,6 +644,10 @@ function Actions.npc_damage_until(item, class_settings)
     mq.cmd("/attack on")
     local looping = true
     while looping do
+        if State.skip == true then
+            State.skip = false
+            return
+        end
         if mq.TLO.Spawn(ID)() == nil then
             looping = false
         end
@@ -751,6 +783,10 @@ function Actions.npc_kill(item, class_settings, loot)
         mq.event("cannot_cast", "You cannot cast#*#on#*#", target_invalid_switch)
         while mq.TLO.Spawn(ID).Type() == 'NPC' do
             mq.doevents()
+            if State.skip == true then
+                State.skip = false
+                return
+            end
             if State.cannot_count > 9 then
                 State.cannot_count = 0
                 table.insert(State.bad_IDs, ID)
@@ -777,6 +813,10 @@ function Actions.npc_kill(item, class_settings, loot)
             mq.delay(100)
             mq.cmd("/attack on")
             while mq.TLO.Spawn(ID).Type() == 'NPC' do
+                if State.skip == true then
+                    State.skip = false
+                    return
+                end
                 if mq.TLO.Target.ID ~= ID then
                     mq.TLO.Spawn(ID).DoTarget()
                 end
@@ -792,6 +832,10 @@ function Actions.npc_kill(item, class_settings, loot)
             mq.delay(100)
             mq.cmd("/attack on")
             while mq.TLO.Spawn(ID).Type() == 'NPC' do
+                if State.skip == true then
+                    State.skip = false
+                    return
+                end
                 mq.delay(200)
             end
         end
@@ -817,6 +861,10 @@ function Actions.npc_kill_all(item, class_settings)
     manage.unpauseGroup(State.group_choice, class_settings)
     local unpause_automation = false
     while true do
+        if State.skip == true then
+            State.skip = false
+            return
+        end
         if mq.TLO.Spawn('npc ' .. item.npc).ID() == 0 then
             break
         end
@@ -835,6 +883,10 @@ function Actions.npc_kill_all(item, class_settings)
         local ID = mq.TLO.NearestSpawn('npc ' .. item.npc).ID()
         mq.cmdf('/nav id %s', ID)
         while mq.TLO.Navigation.Active() do
+            if State.skip == true then
+                State.skip = false
+                return
+            end
             if State.pause == true then
                 unpause_automation = true
                 State.status = "Paused"
@@ -863,6 +915,10 @@ function Actions.npc_kill_all(item, class_settings)
         end
         local loopCount = 0
         while mq.TLO.Spawn(ID).Type() == 'NPC' do
+            if State.skip == true then
+                State.skip = false
+                return
+            end
             mq.delay(200)
             mq.TLO.Spawn(ID).DoTarget()
             loopCount = loopCount + 1
@@ -892,6 +948,10 @@ function Actions.npc_search(item, class_settings)
     local looping = true
     local i = 1
     while looping do
+        if State.skip == true then
+            State.skip = false
+            return
+        end
         local ID = mq.TLO.NearestSpawn(i, "npc " .. item.npc).ID()
         if ID ~= nil then
             local not_bad = true
@@ -969,6 +1029,10 @@ function Actions.npc_travel(item, class_settings)
         local ID = mq.TLO.NearestSpawn(1, "npc " .. item.npc).ID()
         local unpause_automation = false
         while ID == nil do
+            if State.skip == true then
+                State.skip = false
+                return
+            end
             if State.pause == true then
                 unpause_automation = true
                 State.status = "Paused"
@@ -990,6 +1054,10 @@ function Actions.npc_travel(item, class_settings)
         local mob_loop = true
         local loop_count = 2
         while mob_loop do
+            if State.skip == true then
+                State.skip = false
+                return
+            end
             mq.delay(200)
             for _, bad_id in pairs(State.bad_IDs) do
                 if ID == bad_id then
@@ -999,6 +1067,10 @@ function Actions.npc_travel(item, class_settings)
             if State.nextmob == true then
                 ID = mq.TLO.NearestSpawn(loop_count, "npc " .. item.npc).ID()
                 while ID == nil do
+                    if State.skip == true then
+                        State.skip = false
+                        return
+                    end
                     mq.delay(500)
                     if State.pause == true then
                         unpause_automation = true
@@ -1039,6 +1111,10 @@ function Actions.npc_wait(item, class_settings)
             manage.clearXtarget(State.group_choice, class_settings)
             State.status = "Waiting for " .. item.npc .. " (" .. item.waittime .. ")"
         end
+        if State.skip == true then
+            State.skip = false
+            return
+        end
         if State.pause == true then
             unpause_automation = true
             State.status = "Paused"
@@ -1061,6 +1137,10 @@ function Actions.npc_wait_despawn(item, class_settings)
         if mq.TLO.Me.XTarget() > 0 then
             manage.clearXtarget(State.group_choice, class_settings)
             State.status = "Waiting for " .. item.npc .. " to despawn (" .. item.waittime .. ")"
+        end
+        if State.skip == true then
+            State.skip = false
+            return
         end
         if State.pause == true then
             unpause_automation = true
@@ -1115,6 +1195,10 @@ function Actions.pickpocket(item, class_settings)
     mq.TLO.NearestSpawn("npc " .. item.npc).DoTarget()
     local looping = true
     while looping do
+        if State.skip == true then
+            State.skip = false
+            return
+        end
         if mq.TLO.Me.AbilityReady('Pick Pockets')() then
             mq.cmd('/doability Pick Pockets')
             mq.delay(500)
@@ -1189,6 +1273,10 @@ end
 function Actions.rog_gamble(item, class_settings)
     mq.event('chips', "#*#You now have #1# chips#*#", gamble_event)
     while gamble_done == false do
+        if State.skip == true then
+            State.skip = false
+            return
+        end
         Actions.npc_talk(item)
         mq.delay("5s")
         mq.doevents()
@@ -1204,6 +1292,11 @@ function Actions.wait_event(item, class_settings)
     mq.event('wait_event', item.what, event_wait)
     waiting = true
     while waiting do
+        if State.skip == true then
+            mq.unevent('wait_event')
+            State.skip = false
+            return
+        end
         mq.delay(200)
         mq.doevents()
     end
