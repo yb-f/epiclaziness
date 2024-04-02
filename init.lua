@@ -1,6 +1,5 @@
 local mq = require('mq')
 local ImGui = require 'ImGui'
-local sqlite3 = require('lsqlite3')
 local dist = require 'utils/distance'
 local inv = require 'utils/inventory'
 local ICONS = require('mq.Icons')
@@ -11,7 +10,7 @@ local class_settings = require 'utils/class_settings'
 local invis_travel = require 'utils/travelandinvis'
 
 local PackageMan = require('mq/PackageMan')
-PackageMan.Require('lsqlite3')
+local sqlite3 = PackageMan.Require('lsqlite3')
 
 local window_flags = bit32.bor(ImGuiWindowFlags.None)
 local openGUI, drawGUI = true, true
