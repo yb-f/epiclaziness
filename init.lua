@@ -165,6 +165,8 @@ local function run_epic(class, choice)
             actions.enviro_combine_do(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "ENVIRO_COMBINE_ITEM" then
             actions.enviro_combine_item(task_table[State.step], class_settings.settings)
+        elseif task_table[State.step].type == "EQUIP_ITEM" then
+            inv.equip_item(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "EXCLUDE_NPC" then
             exclude_name = task_table[State.step].npc
             create_spawn_list()
@@ -262,6 +264,8 @@ local function run_epic(class, choice)
             actions.relocate(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "REMOVE_INVIS" then
             actions.remove_invis(task_table[State.step], class_settings.settings)
+        elseif task_table[State.step].type == "RESTORE_ITEM" then
+            inv.restore_item(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "ROG_GAMBLE" then
             actions.rog_gamble(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "SEND_YES" then

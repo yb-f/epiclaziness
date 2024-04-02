@@ -3,6 +3,46 @@ local mq = require('mq')
 
 local inventory = {}
 
+inventory.slot = 0
+inventory.stored_item = ''
+
+function inventory.equip_item(item)
+    State.status = "Equiping " .. item.what
+    mq.delay("1s")
+    inventory.slot = mq.TLO.FindItem('=' .. item.what).WornSlot(1)()
+    inventory.stored_item = mq.TLO.Me.Inventory(inventory.slot)()
+    mq.cmdf("/itemnotify \"%s\" leftmouseup", item.what)
+    while mq.TLO.Cursor() == nil do
+        mq.delay(100)
+    end
+    mq.cmdf('/itemnotify %s leftmouseup', inventory.slot)
+    while mq.TLO.Me.Inventory(inventory.slot) ~= item.what do
+        mq.delay(100)
+    end
+    mq.cmd('/autoinv')
+    while mq.TLO.Cursor() ~= nil do
+        mq.delay(100)
+        mq.cmd('/autoinv')
+    end
+end
+
+function inventory.restore_item()
+    mq.delay("1s")
+    mq.cmdf("/itemnotify \"%s\" leftmouseup", inventory.stored_item)
+    while mq.TLO.Cursor() == nil do
+        mq.delay(100)
+    end
+    mq.cmdf('/itemnotify %s leftmouseup', inventory.slot)
+    while mq.TLO.Me.Inventory(inventory.slot) ~= inventory.stored_item do
+        mq.delay(100)
+    end
+    mq.cmd('/autoinv')
+    while mq.TLO.Cursor() ~= nil do
+        mq.delay(100)
+        mq.cmd('/autoinv')
+    end
+end
+
 function inventory.find_free_slot(exclude_bag)
     for i = 10, 1, -1 do
         if i ~= exclude_bag then
