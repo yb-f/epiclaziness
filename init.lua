@@ -368,6 +368,7 @@ local function displayGUI()
                 if ImGui.IsItemHovered() then
                     ImGui.SetTooltip("Move to previous step.")
                 end
+                ImGui.SameLine()
                 if State.pause == false then
                     if ImGui.SmallButton(ICONS.MD_PAUSE) then
                         State.pause = true
