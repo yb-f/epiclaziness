@@ -406,8 +406,8 @@ local function displayGUI()
         end
         if ImGui.BeginTabItem("Settings") then
             if ImGui.CollapsingHeader('General Settings') then
-                class_settings.settings.general.useAOC = ImGui.Checkbox("Use Agent of Change",
-                    class_settings.settings.general.useAOC)
+                --class_settings.settings.general.useAOC = ImGui.Checkbox("Use Agent of Change",
+                --  class_settings.settings.general.useAOC)
                 class_settings.settings.general.returnToBind = ImGui.Checkbox("Return to Bind Between Travel",
                     class_settings.settings.general.returnToBind)
                 class_settings.settings.general.invisForTravel = ImGui.Checkbox("Invis When Travelling",

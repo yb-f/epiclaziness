@@ -1122,8 +1122,7 @@ end
 
 function manage.unpauseGroup(group_set, class_settings)
     manage.doAutomation(mq.TLO.Me.DisplayName(), mq.TLO.Me.Class.ShortName(),
-        class_settings.class[mq.TLO.Me.Class.Name()],
-        'unpause')
+        class_settings.class[mq.TLO.Me.Class.Name()], 'unpause')
     if group_set == 1 then
         return
     elseif group_set == 2 then
