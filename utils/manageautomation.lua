@@ -463,47 +463,47 @@ function manage.invis(group_set, class_settings)
         mq.cmd('/keypress AUTOPRIM')
     end
     if mq.TLO.Spawn('npc magus').Distance() ~= nil then
-        if mq.TLO.Spawn('npc magus').Distance() < 30 then
+        if mq.TLO.Spawn('npc magus').Distance() < 50 then
             return
         end
     end
     if mq.TLO.Spawn('npc translocator').Distance() ~= nil then
-        if mq.TLO.Spawn('npc translocator').Distance() < 30 then
+        if mq.TLO.Spawn('npc translocator').Distance() < 50 then
             return
         end
     end
     if mq.TLO.Spawn('npc priest of discord').Distance() ~= nil then
-        if mq.TLO.Spawn('npc priest of discord').Distance() < 30 then
+        if mq.TLO.Spawn('npc priest of discord').Distance() < 50 then
             return
         end
     end
     if mq.TLO.Spawn('npc nexus scion').Distance() ~= nil then
-        if mq.TLO.Spawn('npc nexus scion').Distance() < 30 then
+        if mq.TLO.Spawn('npc nexus scion').Distance() < 50 then
             return
         end
     end
     if mq.TLO.Spawn('npc deaen greyforge').Distance() ~= nil then
-        if mq.TLO.Spawn('npc deaen greyforge').Distance() < 30 then
+        if mq.TLO.Spawn('npc deaen greyforge').Distance() < 50 then
             return
         end
     end
     if mq.TLO.Spawn('npc ambassador cogswald').Distance() ~= nil then
-        if mq.TLO.Spawn('npc ambassador cogswald').Distance() < 30 then
+        if mq.TLO.Spawn('npc ambassador cogswald').Distance() < 50 then
             return
         end
     end
     if mq.TLO.Spawn('npc madronoa').Distance() ~= nil then
-        if mq.TLO.Spawn('npc madronoa').Distance() < 30 then
+        if mq.TLO.Spawn('npc madronoa').Distance() < 50 then
             return
         end
     end
     if mq.TLO.Spawn('npc belinda').Distance() ~= nil then
-        if mq.TLO.Spawn('npc belinda').Distance() < 30 then
+        if mq.TLO.Spawn('npc belinda').Distance() < 50 then
             return
         end
     end
     if mq.TLO.Spawn('npc herald of druzzil ro').Distance() ~= nil then
-        if mq.TLO.Spawn('npc herald of druzzil ro').Distance() < 30 then
+        if mq.TLO.Spawn('npc herald of druzzil ro').Distance() < 50 then
             return
         end
     end
@@ -1171,7 +1171,7 @@ function manage.zoneGroup(group_set, zone, class_settings, invis)
     local temp = State.status
     local unpause_automation = false
     local loopCount = 0
-    while mq.TLO.Zone.ShortName() ~= zone do
+    while mq.TLO.Zone.ShortName() ~= zone and mq.TLO.Zone.Name() ~= zone do
         if State.skip == true then
             manage.navPause(group_set)
             State.skip = false
