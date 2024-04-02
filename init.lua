@@ -53,6 +53,7 @@ State.nextmob = false
 State.epicstring = ''
 State.X, State.Y, State.Z = 0, 0, 0
 State.skip = false
+State.rewound = false
 State.bad_IDs = {}
 State.cannot_count = 0
 State.traveling = false
@@ -144,7 +145,11 @@ local function run_epic(class, choice)
             mq.delay(500)
         end
         State.skip = false
-        State.step = State.step + 1
+        if State.rewound == false then
+            State.step = State.step + 1
+        else
+            State.rewound = false
+        end
         if task_table[State.step].type == "AUTO_INV" then
             actions.auto_inv(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "BACKSTAB" then
@@ -355,6 +360,14 @@ local function displayGUI()
                 end
             end
             if State.task_run == true then
+                if ImGui.SmallButton(ICONS.MD_FAST_REWIND) then
+                    State.skip = true
+                    State.rewound = true
+                    printf("%s \aoMoving to previous step \ar%s", elheader, State.step)
+                end
+                if ImGui.IsItemHovered() then
+                    ImGui.SetTooltip("Move to previous step.")
+                end
                 if State.pause == false then
                     if ImGui.SmallButton(ICONS.MD_PAUSE) then
                         State.pause = true
@@ -374,7 +387,7 @@ local function displayGUI()
                 if ImGui.SmallButton(ICONS.MD_FAST_FORWARD) then
                     State.skip = true
                     State.step = State.step + 1
-                    printf("%s \aoSkipping to step %s", elheader, State.step)
+                    printf("%s \aoSkipping to step \ar%s", elheader, State.step)
                 end
                 if ImGui.IsItemHovered() then
                     ImGui.SetTooltip("Skip to next step.")
