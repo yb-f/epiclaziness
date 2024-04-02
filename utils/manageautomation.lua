@@ -3,6 +3,7 @@ local dist = require 'utils/distance'
 
 local manage = {}
 local elheader = "\ay[\agEpic Laziness\ay]"
+local translocators = { "Magus", "Translocator", "Priest of Discord", "Nexus Scion", "Deaen Greyforge", "Ambassador Cogswald", "Madronoa", "Belinda", "Herald of Druzzil Ro" }
 
 function manage.campGroup(group_set, radius, class_settings)
     manage.doAutomation(mq.TLO.Me.DisplayName(), mq.TLO.Me.Class.ShortName(),
@@ -462,51 +463,6 @@ function manage.invis(group_set, class_settings)
     if mq.TLO.Me.Combat() == true then
         mq.cmd('/keypress AUTOPRIM')
     end
-    if mq.TLO.Spawn('npc magus').Distance() ~= nil then
-        if mq.TLO.Spawn('npc magus').Distance() < 50 then
-            return
-        end
-    end
-    if mq.TLO.Spawn('npc translocator').Distance() ~= nil then
-        if mq.TLO.Spawn('npc translocator').Distance() < 50 then
-            return
-        end
-    end
-    if mq.TLO.Spawn('npc priest of discord').Distance() ~= nil then
-        if mq.TLO.Spawn('npc priest of discord').Distance() < 50 then
-            return
-        end
-    end
-    if mq.TLO.Spawn('npc nexus scion').Distance() ~= nil then
-        if mq.TLO.Spawn('npc nexus scion').Distance() < 50 then
-            return
-        end
-    end
-    if mq.TLO.Spawn('npc deaen greyforge').Distance() ~= nil then
-        if mq.TLO.Spawn('npc deaen greyforge').Distance() < 50 then
-            return
-        end
-    end
-    if mq.TLO.Spawn('npc ambassador cogswald').Distance() ~= nil then
-        if mq.TLO.Spawn('npc ambassador cogswald').Distance() < 50 then
-            return
-        end
-    end
-    if mq.TLO.Spawn('npc madronoa').Distance() ~= nil then
-        if mq.TLO.Spawn('npc madronoa').Distance() < 50 then
-            return
-        end
-    end
-    if mq.TLO.Spawn('npc belinda').Distance() ~= nil then
-        if mq.TLO.Spawn('npc belinda').Distance() < 50 then
-            return
-        end
-    end
-    if mq.TLO.Spawn('npc herald of druzzil ro').Distance() ~= nil then
-        if mq.TLO.Spawn('npc herald of druzzil ro').Distance() < 50 then
-            return
-        end
-    end
     for word in string.gmatch(class_settings.class_invis[mq.TLO.Me.Class()], '([^|]+)') do
         table.insert(invis_type, word)
     end
@@ -563,6 +519,17 @@ function manage.invis(group_set, class_settings)
     mq.delay("4s")
 end
 
+function manage.invisTranslocatorCheck()
+    for _, name in pairs(translocators) do
+        if mq.TLO.Spawn('npc ' .. name).Distance() ~= nil then
+            if mq.TLO.Spawn('npc ' .. name).Distance() < 50 then
+                return true
+            end
+        end
+    end
+    return false
+end
+
 function manage.locTravelGroup(group_set, x, y, z, class_settings, invis)
     invis = invis or 0
     local loopCount = 0
@@ -608,10 +575,13 @@ function manage.locTravelGroup(group_set, x, y, z, class_settings, invis)
             if class_settings.general.invisForTravel == true then
                 if invis == 1 then
                     local temp = State.status
-                    manage.navPause(group_set)
-                    manage.invis(State.group_choice, class_settings)
-                    manage.navUnpause(group_set)
-                    State.status = temp
+                    local transCheck = manage.invisTranslocatorCheck()
+                    if transCheck == true then
+                        manage.navPause(group_set)
+                        manage.invis(State.group_choice, class_settings)
+                        manage.navUnpause(group_set)
+                        State.status = temp
+                    end
                 end
             end
         end
@@ -685,10 +655,13 @@ function manage.navGroup(group_set, npc, ID, class_settings, invis)
             if class_settings.general.invisForTravel == true then
                 if invis == 1 then
                     local temp = State.status
-                    manage.navPause(group_set)
-                    manage.invis(State.group_choice, class_settings)
-                    manage.navUnpause(group_set)
-                    State.status = temp
+                    local transCheck = manage.invisTranslocatorCheck()
+                    if transCheck == true then
+                        manage.navPause(group_set)
+                        manage.invis(State.group_choice, class_settings)
+                        manage.navUnpause(group_set)
+                        State.status = temp
+                    end
                 end
             end
         end
@@ -761,10 +734,13 @@ function manage.navGroupGeneral(group_set, npc, ID, class_settings, invis)
             if class_settings.general.invisForTravel == true then
                 if invis == 1 then
                     local temp = State.status
-                    manage.navPause(group_set)
-                    manage.invis(State.group_choice, class_settings)
-                    manage.navUnpause(group_set)
-                    State.status = temp
+                    local transCheck = manage.invisTranslocatorCheck()
+                    if transCheck == true then
+                        manage.navPause(group_set)
+                        manage.invis(State.group_choice, class_settings)
+                        manage.navUnpause(group_set)
+                        State.status = temp
+                    end
                 end
             end
         end
@@ -838,10 +814,13 @@ function manage.navGroupLoc(group_set, npc, x, y, z, class_settings, invis)
             if class_settings.general.invisForTravel == true then
                 if invis == 1 then
                     local temp = State.status
-                    manage.navPause(group_set)
-                    manage.invis(State.group_choice, class_settings)
-                    manage.navUnpause(group_set)
-                    State.status = temp
+                    local transCheck = manage.invisTranslocatorCheck()
+                    if transCheck == true then
+                        manage.navPause(group_set)
+                        manage.invis(State.group_choice, class_settings)
+                        manage.navUnpause(group_set)
+                        State.status = temp
+                    end
                 end
             end
         end
@@ -1202,10 +1181,13 @@ function manage.zoneGroup(group_set, zone, class_settings, invis)
             if class_settings.general.invisForTravel == true then
                 if invis == 1 then
                     local temp = State.status
-                    manage.navPause(group_set)
-                    manage.invis(State.group_choice, class_settings)
-                    manage.navUnpause(group_set)
-                    State.status = temp
+                    local transCheck = manage.invisTranslocatorCheck()
+                    if transCheck == true then
+                        manage.navPause(group_set)
+                        manage.invis(State.group_choice, class_settings)
+                        manage.navUnpause(group_set)
+                        State.status = temp
+                    end
                 end
             end
         end
