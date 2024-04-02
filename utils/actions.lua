@@ -79,11 +79,11 @@ function Actions.combine_container(item, class_settings)
         manage.clearXtarget(State.group_choice, class_settings)
     end
     State.status = "Preparing combine container"
-    if mq.TLO.InvSlot('pack10').Item.Container() then
-        inv.empty_bag(10)
-        State.bagslot1, State.bagslot2 = inv.move_bag(10)
+    if mq.TLO.InvSlot('pack8').Item.Container() then
+        inv.empty_bag(8)
+        State.bagslot1, State.bagslot2 = inv.move_bag(8)
     end
-    inv.move_combine_container(10, item.what)
+    inv.move_combine_container(8, item.what)
 end
 
 function Actions.combine_do(item, class_settings)
@@ -91,7 +91,7 @@ function Actions.combine_do(item, class_settings)
         manage.clearXtarget(State.group_choice, class_settings)
     end
     State.status = "Combining"
-    mq.cmdf("/combine pack10")
+    mq.cmdf("/combine pack8")
     while mq.TLO.Cursor() == nil do
         mq.delay(100)
     end
@@ -106,12 +106,12 @@ function Actions.combine_done(item, class_settings)
         manage.clearXtarget(State.group_choice, class_settings)
     end
     if State.bagslot1 ~= 0 and State.bagslot2 ~= 0 then
-        State.status = "Moving container back to slot 10"
+        State.status = "Moving container back to slot 8"
         mq.cmdf("/nomodkey /shiftkey /itemnotify in pack%s %s leftmouseup", State.bagslot1, State.bagslot2)
         while mq.TLO.Cursor() == nil do
             mq.delay(100)
         end
-        mq.cmd("/nomodkey /shiftkey /itemnotify pack10 leftmouseup")
+        mq.cmd("/nomodkey /shiftkey /itemnotify pack8 leftmouseup")
         mq.delay(200)
         mq.cmd("/autoinv")
         State.bagslot1 = 0
@@ -124,7 +124,7 @@ function Actions.combine_item(item, class_settings)
         manage.clearXtarget(State.group_choice, class_settings)
     end
     State.status = "Moving " .. item.what .. " to combine container"
-    inv.move_item_to_combine(item.what, 10)
+    inv.move_item_to_combine(item.what, 8)
 end
 
 function Actions.enviro_combine_container(item, class_settings)
@@ -997,7 +997,8 @@ function Actions.npc_talk_all(item, class_settings)
     manage.groupTalk(State.group_choice, item.npc, item.what)
 end
 
-function Actions.npc_travel(item, class_settings)
+function Actions.npc_travel(item, class_settings, ignore_path_check)
+    ignore_path_check = ignore_path_check or false
     if mq.TLO.Me.Invis() == false then
         if class_settings.general.invisForTravel == true then
             if item.invis == 1 then
@@ -1048,8 +1049,10 @@ function Actions.npc_travel(item, class_settings)
             ID = mq.TLO.NearestSpawn(1, "npc " .. item.npc).ID()
         end
         State.status = "Looking for path to NPC " .. item.npc
-        if mq.TLO.Navigation.PathExists('id ' .. ID)() == false then
-            table.insert(State.bad_IDs, ID)
+        if ignore_path_check == false then
+            if mq.TLO.Navigation.PathExists('id ' .. ID)() == false then
+                table.insert(State.bad_IDs, ID)
+            end
         end
         local mob_loop = true
         local loop_count = 2
