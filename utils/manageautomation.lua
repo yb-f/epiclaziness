@@ -3,7 +3,8 @@ local dist = require 'utils/distance'
 
 local manage = {}
 local elheader = "\ay[\agEpic Laziness\ay]"
-local translocators = { "Magus", "Translocator", "Priest of Discord", "Nexus Scion", "Deaen Greyforge", "Ambassador Cogswald", "Madronoa", "Belinda", "Herald of Druzzil Ro" }
+local translocators = { "Magus", "Translocator", "Priest of Discord", "Nexus Scion", "Deaen Greyforge",
+    "Ambassador Cogswald", "Madronoa", "Belinda", "Herald of Druzzil Ro" }
 
 function manage.campGroup(group_set, radius, class_settings)
     manage.doAutomation(mq.TLO.Me.DisplayName(), mq.TLO.Me.Class.ShortName(),
@@ -63,9 +64,9 @@ function manage.clearXtarget(group_set, class_settings, npc)
                                     ID = mq.TLO.Me.XTarget(i).ID()
                                     State.status = "Clearing XTarget " .. i .. ": " .. mq.TLO.Me.XTarget(i)()
                                     manage.unpauseGroup(group_set, class_settings)
-                                    mq.cmd("/stick")
+                                    mq.cmd("/squelch /stick")
                                     mq.delay(100)
-                                    mq.cmd("/attack on")
+                                    mq.cmd("/squelch /attack on")
                                     while mq.TLO.Spawn(ID).Type() == 'NPC' do
                                         local breakout = true
                                         for j = 1, max_xtargs do
@@ -78,7 +79,7 @@ function manage.clearXtarget(group_set, class_settings, npc)
                                             mq.TLO.Spawn(ID).DoTarget()
                                         end
                                         if mq.TLO.Me.Combat() == false then
-                                            mq.cmd("/attack on")
+                                            mq.cmd("/squelch /attack on")
                                         end
                                         mq.delay(200)
                                     end
@@ -278,23 +279,23 @@ end
 
 function manage.faceHeading(group_set, heading)
     if group_set == 1 then
-        mq.cmdf("/face heading %s", heading)
+        mq.cmdf("/squelch /face heading %s", heading)
     elseif group_set == 2 then
-        mq.cmdf("/dgga /face heading %s", heading)
+        mq.cmdf("/dgga /squelch /face heading %s", heading)
     else
-        mq.cmdf("/face heading %s", heading)
-        mq.cmdf("/dex %s /face heading %s", State.group_combo[State.group_choice], heading)
+        mq.cmdf("/squelch /face heading %s", heading)
+        mq.cmdf("/dex %s /squelch /face heading %s", State.group_combo[State.group_choice], heading)
     end
 end
 
 function manage.faceLoc(group_set, x, y, z)
     if group_set == 1 then
-        mq.cmdf("/face loc %s,%s,%s", y, x, z)
+        mq.cmdf("/squelch /face loc %s,%s,%s", y, x, z)
     elseif group_set == 2 then
-        mq.cmdf("/dgga /face loc %s,%s,%s", y, x, z)
+        mq.cmdf("/dgga /squelch /face loc %s,%s,%s", y, x, z)
     else
-        mq.cmdf("/face loc %s,%s,%s", y, x, z)
-        mq.cmdf("/dex %s /face loc %s,%s,%s", State.group_combo[State.group_choice], y, x, z)
+        mq.cmdf("/squelch /face loc %s,%s,%s", y, x, z)
+        mq.cmdf("/dex %s /squelch /face loc %s,%s,%s", State.group_combo[State.group_choice], y, x, z)
     end
 end
 
@@ -320,11 +321,11 @@ function manage.followGroupLoc(group_set, npc, x, y)
     if group_set == 1 then
         mq.TLO.Spawn("npc " .. npc).DoTarget()
         mq.delay(300)
-        mq.cmd('√/afollow')
+        mq.cmd('/squelch /afollow')
         local distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
         while distance > 50 do
             if State.skip == true then
-                mq.cmd('/afollow off')
+                mq.cmd('/squelch /afollow off')
                 State.skip = false
                 return
             end
@@ -389,7 +390,7 @@ function manage.forwardZone(group_set, zone)
         mq.delay("5s")
     else
         mq.cmdf("/dex %s /keypress forward hold", State.group_combo[State.group_choice])
-        mq.cmd("/keypress forward hold")
+        mq.cmd("/squelch /keypress forward hold")
         while mq.TLO.Zone.ShortName() ~= zone do
             mq.delay(500)
         end
@@ -402,13 +403,13 @@ end
 
 function manage.gateGroup(group_set)
     if group_set == 1 then
-        mq.cmd("/relocate gate")
+        mq.cmd("/squelch /relocate gate")
         mq.delay(500)
     elseif group_set == 2 then
-        mq.cmd("/dgga /relocate gate")
+        mq.cmd("/dgga /squelch/relocate gate")
         mq.delay(500)
     else
-        mq.cmd("/relocate gate")
+        mq.cmd("/squelch /relocate gate")
         mq.cmdf('/dex %s /squelch /relocate gate', State.group_combo[State.group_choice])
     end
 end
@@ -424,7 +425,7 @@ function manage.groupTalk(group_set, npc, phrase)
     elseif group_set == 2 then
         for i = 0, mq.TLO.Group.GroupSize() - 1 do
             if mq.TLO.Group.Member(i).DisplayName() ~= mq.TLO.Me.DisplayName() then
-                mq.cmdf("/dex %s /target id %s", mq.TLO.Group.Member(i).DisplayName(), mq.TLO.Spawn(npc).ID())
+                mq.cmdf("/dex %s /squelch /target id %s", mq.TLO.Group.Member(i).DisplayName(), mq.TLO.Spawn(npc).ID())
                 mq.delay(300)
                 mq.cmdf("/dex %s /say %s", mq.TLO.Group.Member(i).DisplayName(), phrase)
             end
@@ -442,7 +443,7 @@ function manage.groupTalk(group_set, npc, phrase)
         mq.cmdf("/say %s", phrase)
         mq.delay(750)
     else
-        mq.cmdf("/dex %s /target id %s", State.group_combo[State.group_choice], mq.TLO.Spawn(npc).ID())
+        mq.cmdf("/dex %s /squelch /target id %s", State.group_combo[State.group_choice], mq.TLO.Spawn(npc).ID())
         mq.delay(300)
         mq.cmdf("/dex %s /say %s", State.group_combo[State.group_choice], phrase)
         math.randomseed(os.time())
@@ -461,7 +462,7 @@ function manage.invis(group_set, class_settings)
     State.status = "Using invis"
     local invis_type = {}
     if mq.TLO.Me.Combat() == true then
-        mq.cmd('/squelch /keypress AUTOPRIM')
+        mq.cmd('/squelch /attack off')
     end
     for word in string.gmatch(class_settings.class_invis[mq.TLO.Me.Class()], '([^|]+)') do
         table.insert(invis_type, word)
@@ -508,11 +509,14 @@ function manage.invis(group_set, class_settings)
             mq.cmdf('/dex %s /squelch /useitem "Cloudy Potion"',
                 mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName())
         elseif invis_type[class_settings.invis[mq.TLO.Group.Member(State.group_combo[State.group_choice]).Class()]] == 'Hide/Sneak' then
-            mq.cmdf("/dex %s /squelch /doability hide", mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName())
+            mq.cmdf("/dex %s /squelch /doability hide",
+                mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName())
             mq.delay(250)
-            mq.cmdf("/dex %s /squelch /doability sneak", mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName())
+            mq.cmdf("/dex %s /squelch /doability sneak",
+                mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName())
         else
-            mq.cmdf('/dex %s /squelch /casting "%s"', mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName(),
+            mq.cmdf('/dex %s /squelch /casting "%s"',
+                mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName(),
                 invis_type[class_settings.invis[mq.TLO.Group.Member(State.group_combo[State.group_choice]).Class()]])
         end
     end
@@ -534,12 +538,12 @@ function manage.locTravelGroup(group_set, x, y, z, class_settings, invis)
     invis = invis or 0
     local loopCount = 0
     if group_set == 1 then
-        mq.cmdf("/nav locxyz %s %s %s", x, y, z)
+        mq.cmdf("/squelch /nav locxyz %s %s %s", x, y, z)
     elseif group_set == 2 then
-        mq.cmdf("/dgga /nav locxyz %s %s %s", x, y, z)
+        mq.cmdf("/dgga /squelch /nav locxyz %s %s %s", x, y, z)
     else
-        mq.cmdf("/nav locxyz %s %s %s", x, y, z)
-        mq.cmdf("/dex %s /nav locxyz %s %s %s", State.group_combo[State.group_choice], x, y, z)
+        mq.cmdf("/squelch /nav locxyz %s %s %s", x, y, z)
+        mq.cmdf("/dex %s /squelch /nav locxyz %s %s %s", State.group_combo[State.group_choice], x, y, z)
     end
     mq.delay(200)
     local unpause_automation = false
@@ -590,7 +594,7 @@ function manage.locTravelGroup(group_set, x, y, z, class_settings, invis)
             mq.delay(200)
             if mq.TLO.Switch.Distance() ~= nil then
                 if mq.TLO.Switch.Distance() < 20 then
-                    mq.cmd('/click left door')
+                    mq.cmd('/squelch /click left door')
                 end
             end
             loopCount = 0
@@ -613,12 +617,12 @@ function manage.navGroup(group_set, npc, ID, class_settings, invis)
         ID = mq.TLO.Spawn("npc " .. npc).ID()
     end
     if group_set == 1 then
-        mq.cmdf("/nav id %s", ID)
+        mq.cmdf("/squelch /nav id %s", ID)
     elseif group_set == 2 then
-        mq.cmdf("/dgga /nav id %s", ID)
+        mq.cmdf("/dgga /squelch /nav id %s", ID)
     else
-        mq.cmdf("/nav id %s", ID)
-        mq.cmdf('/dex %s /nav id %s', State.group_combo[State.group_choice], ID)
+        mq.cmdf("/squelch /nav id %s", ID)
+        mq.cmdf('/dex %s /squelch /nav id %s', State.group_combo[State.group_choice], ID)
     end
     mq.delay(200)
     local temp = State.status
@@ -670,7 +674,7 @@ function manage.navGroup(group_set, npc, ID, class_settings, invis)
             mq.delay(200)
             if mq.TLO.Switch.Distance() ~= nil then
                 if mq.TLO.Switch.Distance() < 20 then
-                    mq.cmd('/click left door')
+                    mq.cmd('/squelch /click left door')
                 end
             end
             loopCount = 0
@@ -693,12 +697,12 @@ function manage.navGroupGeneral(group_set, npc, ID, class_settings, invis)
         ID = mq.TLO.Spawn(npc).ID()
     end
     if group_set == 1 then
-        mq.cmdf("/nav id %s", ID)
+        mq.cmdf("/squelch /nav id %s", ID)
     elseif group_set == 2 then
-        mq.cmdf("/dgga /nav id %s", ID)
+        mq.cmdf("/dgga /squelch /nav id %s", ID)
     else
-        mq.cmdf("/nav id %s", ID)
-        mq.cmdf('/dex %s /nav id %s', State.group_combo[State.group_choice], ID)
+        mq.cmdf("/squelch /nav id %s", ID)
+        mq.cmdf('/dex %s /squelch /nav id %s', State.group_combo[State.group_choice], ID)
     end
     mq.delay(200)
     local temp = State.status
@@ -749,7 +753,7 @@ function manage.navGroupGeneral(group_set, npc, ID, class_settings, invis)
             mq.delay(200)
             if mq.TLO.Switch.Distance() ~= nil then
                 if mq.TLO.Switch.Distance() < 20 then
-                    mq.cmd('/click left door')
+                    mq.cmd('/squelch /click left door')
                 end
             end
             loopCount = 0
@@ -773,12 +777,12 @@ function manage.navGroupLoc(group_set, npc, x, y, z, class_settings, invis)
     State.Z = mq.TLO.Me.Z()
     local searchstring = "loc " .. x .. " " .. y .. " " .. z .. " radius 50 npc " .. npc
     if group_set == 1 then
-        mq.cmdf("/nav id %s", mq.TLO.Spawn(searchstring).ID())
+        mq.cmdf("/squelch /nav id %s", mq.TLO.Spawn(searchstring).ID())
     elseif group_set == 2 then
-        mq.cmdf("/dgga /nav id %s", mq.TLO.Spawn(searchstring).ID())
+        mq.cmdf("/dgga /squelch /nav id %s", mq.TLO.Spawn(searchstring).ID())
     else
-        mq.cmdf("/nav id %s", mq.TLO.Spawn(searchstring).ID())
-        mq.cmdf('/dex %s /nav id %s', State.group_combo[State.group_choice], mq.TLO.Spawn(searchstring).ID())
+        mq.cmdf("/squelch /nav id %s", mq.TLO.Spawn(searchstring).ID())
+        mq.cmdf('/dex %s /squelch /nav id %s', State.group_combo[State.group_choice], mq.TLO.Spawn(searchstring).ID())
     end
     mq.delay(200)
     local temp = State.status
@@ -829,7 +833,7 @@ function manage.navGroupLoc(group_set, npc, x, y, z, class_settings, invis)
             mq.delay(200)
             if mq.TLO.Switch.Distance() ~= nil then
                 if mq.TLO.Switch.Distance() < 20 then
-                    mq.cmd('/click left door')
+                    mq.cmd('/squelch /click left door')
                 end
             end
             loopCount = 0
@@ -847,56 +851,56 @@ end
 
 function manage.noNavTravel(group_set, x, y, z)
     if group_set == 1 then
-        mq.cmd("/keypress forward hold")
+        mq.cmd("/squelch /keypress forward hold")
         local distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
         while distance > 5 do
             mq.delay(10)
             distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
         end
-        mq.cmd("/keypress forward")
+        mq.cmd("/squelch /keypress forward")
     elseif group_set == 2 then
-        mq.cmd("/dgge /keypress forward hold")
-        mq.cmd("/keypress forward hold")
+        mq.cmd("/dgge /squelch /keypress forward hold")
+        mq.cmd("/squelch /keypress forward hold")
         local distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
         while distance > 5 do
             mq.delay(10)
             distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
         end
-        mq.cmd("/dgge /keypress forward")
-        mq.cmd("/keypress forward")
+        mq.cmd("/dgge /squelch /keypress forward")
+        mq.cmd("/squelch /keypress forward")
     else
-        mq.cmdf("/dex %s /keypress forward hold", State.group_combo[State.group_choice])
-        mq.cmd("/keypress forward hold")
+        mq.cmdf("/dex %s /squelch /keypress forward hold", State.group_combo[State.group_choice])
+        mq.cmd("/squelch /keypress forward hold")
         local distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
         while distance > 5 do
             mq.delay(10)
             distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
         end
-        mq.cmdf("/dex %s /keypress forward", State.group_combo[State.group_choice])
-        mq.cmd("/keypress forward")
+        mq.cmdf("/dex %s /squelch /keypress forward", State.group_combo[State.group_choice])
+        mq.cmd("/squelch /keypress forward")
     end
 end
 
 function manage.navPause(group_set)
     if group_set == 1 then
-        mq.cmd('/nav pause')
+        mq.cmd('/squelch /nav pause')
     elseif group_set == 2 then
-        mq.cmd('/dgga /nav pause')
+        mq.cmd('/dgga /squelch /nav pause')
     else
-        mq.cmd('/nav pause')
-        mq.cmdf('/dex %s /nav id %s', State.group_combo[State.group_choice])
+        mq.cmd('/squelch /nav pause')
+        mq.cmdf('/dex %s /squelch /nav id %s', State.group_combo[State.group_choice])
     end
     mq.delay(500)
 end
 
 function manage.navUnpause(group_set, travelData)
     if group_set == 1 then
-        mq.cmd('/nav pause')
+        mq.cmd('/squelch /nav pause')
     elseif group_set == 2 then
-        mq.cmd('/dgga /nav pause')
+        mq.cmd('/dgga /squelch /nav pause')
     else
-        mq.cmd('/nav pause')
-        mq.cmdf('/dex %s /nav id %s', State.group_combo[State.group_choice])
+        mq.cmd('/squelch /nav pause')
+        mq.cmdf('/dex %s /squelch /nav id %s', State.group_combo[State.group_choice])
     end
     mq.delay(500)
 end
@@ -904,24 +908,24 @@ end
 function manage.openDoorAll(group_set)
     if group_set == 1 then
         mq.delay(200)
-        mq.cmd("/doortarget")
+        mq.cmd("/squelch /doortarget")
         mq.delay(200)
-        mq.cmd("/click left door")
+        mq.cmd("/squelch /click left door")
         mq.delay(1000)
     elseif group_set == 2 then
         mq.delay(200)
-        mq.cmd("/dgga /doortarget")
+        mq.cmd("/dgga /squelch /doortarget")
         mq.delay(200)
-        mq.cmd("/dgga /click left door")
+        mq.cmd("/dgga /squelch /click left door")
         mq.delay(1000)
     else
         local name = State.group_combo[State.group_choice]
         mq.delay(200)
-        mq.cmd("/doortarget")
-        mq.cmdf("/dex %s /doortarget", name)
+        mq.cmd("/squelch /doortarget")
+        mq.cmdf("/dex %s /squelch /doortarget", name)
         mq.delay(200)
-        mq.cmdf("/dex %s /click left door", name)
-        mq.cmd("/click left door")
+        mq.cmdf("/dex %s /squelch /click left door", name)
+        mq.cmd("/squelch /click left door")
         mq.delay(100)
     end
 end
@@ -950,47 +954,47 @@ end
 function manage.picklockGroup(group_set)
     if group_set == 1 then
         if mq.TLO.Me.Class.ShortName() == 'BRD' or mq.TLO.Me.Class.ShortName() == 'ROG' then
-            mq.cmd("/itemnotify lockpicks leftmouseup")
+            mq.cmd("/squelch /itemnotify lockpicks leftmouseup")
             mq.delay(200)
-            mq.cmd("/doortarget")
+            mq.cmd("/squelch /doortarget")
             mq.delay(200)
-            mq.cmd("/click left door")
+            mq.cmd("/squelch /click left door")
             mq.delay(200)
-            mq.cmd("/autoinv")
+            mq.cmd("/squelch /autoinv")
         else
             printf("%s \aoI am not a class that is able to pick locks.", elheader)
         end
     elseif group_set == 2 then
         for i = 0, mq.TLO.Group.GroupSize() - 1 do
             if mq.TLO.Group.Member(i).Class.ShortName() == 'BRD' or mq.TLO.Group.Member(i).Class.ShortName() == 'ROG' then
-                mq.cmdf("/dex %s /itemnotify lockpicks leftmouseup", mq.TLO.Group.Member(i).DisplayName())
+                mq.cmdf("/dex %s /squelch /itemnotify lockpicks leftmouseup", mq.TLO.Group.Member(i).DisplayName())
                 mq.delay(200)
-                mq.cmdf("/dex %s /doortarget", mq.TLO.Group.Member(i).DisplayName())
+                mq.cmdf("/dex %s /squelch /doortarget", mq.TLO.Group.Member(i).DisplayName())
                 mq.delay(200)
-                mq.cmdf("/dex %s /click left door", mq.TLO.Group.Member(i).DisplayName())
+                mq.cmdf("/dex %s /squelch /click left door", mq.TLO.Group.Member(i).DisplayName())
                 mq.delay(200)
-                mq.cmdf("/dex %s /autoinv", mq.TLO.Group.Member(i).DisplayName())
+                mq.cmdf("/dex %s /squelch /autoinv", mq.TLO.Group.Member(i).DisplayName())
                 break
             end
         end
     else
         local name = State.group_combo[State.group_choice]
         if mq.TLO.Group.Member(name).Class.ShortName() == 'BRD' or mq.TLO.Group.Member(name).Class.ShortName() == 'ROG' then
-            mq.cmdf("/dex %s /itemnotify lockpicks leftmouseup", name)
+            mq.cmdf("/dex %s /squelch /itemnotify lockpicks leftmouseup", name)
             mq.delay(200)
-            mq.cmdf("/dex %s /doortarget", name)
+            mq.cmdf("/dex %s /squelch /doortarget", name)
             mq.delay(200)
-            mq.cmdf("/dex %s /click left door", name)
+            mq.cmdf("/dex %s /squelch /click left door", name)
             mq.delay(200)
-            mq.cmdf("/dex %s /autoinv", name)
+            mq.cmdf("/dex %s /squelch /autoinv", name)
         elseif mq.TLO.Me.Class.ShortName() == 'BRD' or mq.TLO.Me.Class.ShortName() == 'ROG' then
-            mq.cmd("/itemnotify lockpicks leftmouseup")
+            mq.cmd("/squelch /itemnotify lockpicks leftmouseup")
             mq.delay(200)
-            mq.cmd("/doortarget")
+            mq.cmd("/squelch /doortarget")
             mq.delay(200)
-            mq.cmd("/click left door")
+            mq.cmd("/squelch /click left door")
             mq.delay(200)
-            mq.cmd("/autoinv")
+            mq.cmd("/squelch /autoinv")
         else
             printf("%s \aoI require a class that is able to pick locks.", elheader)
         end
@@ -999,48 +1003,48 @@ end
 
 function manage.relocateGroup(group_set, relocate)
     if group_set == 1 then
-        mq.cmdf('/relocate %s', relocate)
+        mq.cmdf('/squelch /relocate %s', relocate)
     elseif group_set == 2 then
-        mq.cmdf('/dgga /relocate %s', relocate)
+        mq.cmdf('/dgga /squelch /relocate %s', relocate)
     else
-        mq.cmdf('/relocate %s', relocate)
-        mq.cmdf('/dex %s /relocate %s', State.group_combo[State.group_choice], relocate)
+        mq.cmdf('/squelch /relocate %s', relocate)
+        mq.cmdf('/dex %s /squelch /relocate %s', State.group_combo[State.group_choice], relocate)
     end
 end
 
 function manage.removeInvis(group_set)
     State.status = "Removing invis"
     if group_set == 1 then
-        mq.cmd("/makemevis")
+        mq.cmd("/squelch /makemevis")
     elseif group_set == 2 then
-        mq.cmd("/dgga /makemevis")
+        mq.cmd("/dgga /squelch /makemevis")
     else
-        mq.cmdf("/makemevis")
-        mq.cmdf("/dex %s /makemevis", State.group_combo[State.group_choice])
+        mq.cmdf("/squelch /makemevis")
+        mq.cmdf("/dex %s /squelch /makemevis", State.group_combo[State.group_choice])
     end
 end
 
 function manage.removeLev(group_set)
     --State.status = "Removing levitate"
     if group_set == 1 then
-        mq.cmd("/removelev")
+        mq.cmd("/squelch /removelev")
     elseif group_set == 2 then
-        mq.cmd("/dgga /removelev")
+        mq.cmd("/dgga /squelch /removelev")
     else
-        mq.cmdf("/removelev")
-        mq.cmdf("/dex %s /removelev", State.group_combo[State.group_choice])
+        mq.cmdf("/squelch /removelev")
+        mq.cmdf("/dex %s /squelch /removelev", State.group_combo[State.group_choice])
     end
 end
 
 function manage.sendYes(group_set)
     State.status = "Removing levitate"
     if group_set == 1 then
-        mq.cmd("/yes")
+        mq.cmd("/squelch /yes")
     elseif group_set == 2 then
-        mq.cmd("/dgga /yes")
+        mq.cmd("/dgga /squelch /yes")
     else
-        mq.cmdf("/yes")
-        mq.cmdf("/dex %s /yes", State.group_combo[State.group_choice])
+        mq.cmdf("/squelch /yes")
+        mq.cmdf("/dex %s /squelch /yes", State.group_combo[State.group_choice])
     end
 end
 
@@ -1060,8 +1064,8 @@ end
 
 function manage.startGroup(group_set, class_settings)
     if mq.TLO.Me.Grouped() == true and mq.TLO.Group.Leader() == mq.TLO.Me.DisplayName() then
-        mq.cmdf("/grouprole set %s 1", mq.TLO.Me.DisplayName())
-        mq.cmdf("/grouprole set %s 2", mq.TLO.Me.DisplayName())
+        mq.cmdf("/squelch /grouprole set %s 1", mq.TLO.Me.DisplayName())
+        mq.cmdf("/squelch /grouprole set %s 2", mq.TLO.Me.DisplayName())
         --mq.cmdf("/grouprole set %s 3", mq.TLO.Me.DisplayName())
     end
     manage.doAutomation(mq.TLO.Me.DisplayName(), mq.TLO.Me.Class.ShortName(),
@@ -1195,7 +1199,7 @@ function manage.zoneGroup(group_set, zone, class_settings, invis)
             if loopCount == 60 then
                 if mq.TLO.Cursor() ~= nil then
                     if mq.TLO.Cursor() == "Spire Stone" then
-                        mq.cmd('/autoinv')
+                        mq.cmd('/squelch /autoinv')
                     end
                 end
                 if mq.TLO.FindItem('=Spire Stone')() == nil then

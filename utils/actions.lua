@@ -50,7 +50,7 @@ function Actions.auto_inv(item, class_settings)
     State.status = "Moving items to inventory"
     mq.delay(200)
     while mq.TLO.Cursor() ~= nil do
-        mq.cmd('/autoinv')
+        mq.cmd('/squelch /autoinv')
         mq.delay(200)
     end
     mq.delay("1s")
@@ -58,16 +58,16 @@ end
 
 function Actions.backstab(item, class_settings)
     mq.TLO.NearestSpawn("npc " .. item.npc).DoTarget()
-    mq.cmd('/stick behind')
+    mq.cmd('/squelch /stick behind')
     mq.delay("2s")
-    mq.cmd('/doability backstab')
+    mq.cmd('/squelch /doability backstab')
     mq.delay(500)
 end
 
 function Actions.cast_alt(item, class_settings)
     manage.removeInvis(State.group_choice)
     State.status = "Casting " .. item.what
-    mq.cmdf('/casting "%s"', item.what)
+    mq.cmdf('/squelch /casting "%s"', item.what)
     mq.delay(200)
     while mq.TLO.Me.Casting() ~= nil do
         mq.delay(100)
@@ -91,11 +91,11 @@ function Actions.combine_do(item, class_settings)
         manage.clearXtarget(State.group_choice, class_settings)
     end
     State.status = "Combining"
-    mq.cmdf("/combine pack8")
+    mq.cmdf("/squelch /combine pack8")
     while mq.TLO.Cursor() == nil do
         mq.delay(100)
     end
-    mq.cmd("/autoinv")
+    mq.cmd("/squelch /autoinv")
     while mq.TLO.Cursor() ~= nil do
         mq.delay(100)
     end
@@ -107,13 +107,13 @@ function Actions.combine_done(item, class_settings)
     end
     if State.bagslot1 ~= 0 and State.bagslot2 ~= 0 then
         State.status = "Moving container back to slot 8"
-        mq.cmdf("/nomodkey /shiftkey /itemnotify in pack%s %s leftmouseup", State.bagslot1, State.bagslot2)
+        mq.cmdf("/squelch /nomodkey /shiftkey /itemnotify in pack%s %s leftmouseup", State.bagslot1, State.bagslot2)
         while mq.TLO.Cursor() == nil do
             mq.delay(100)
         end
-        mq.cmd("/nomodkey /shiftkey /itemnotify pack8 leftmouseup")
+        mq.cmd("/squelch /nomodkey /shiftkey /itemnotify pack8 leftmouseup")
         mq.delay(200)
-        mq.cmd("/autoinv")
+        mq.cmd("/squelch /autoinv")
         State.bagslot1 = 0
         State.bagslot2 = 0
     end
@@ -129,14 +129,14 @@ end
 
 function Actions.enviro_combine_container(item, class_settings)
     State.status = "Moving to " .. item.what
-    mq.cmdf("/itemtarget %s", item.what)
+    mq.cmdf("/squelch /itemtarget %s", item.what)
     mq.delay(500)
-    mq.cmd("/nav item")
+    mq.cmd("/squelch /nav item")
     while mq.TLO.Navigation.Active() do
         mq.delay(500)
     end
     State.status = "Opening " .. item.what .. " window"
-    mq.cmd("/click left item")
+    mq.cmd("/squelch /click left item")
     mq.delay("5s", Actions.tradeskill_window)
     mq.TLO.Window("TradeskillWnd/COMBW_ExperimentButton").LeftMouseUp()
     mq.delay("1s")
@@ -144,7 +144,7 @@ end
 
 function Actions.enviro_combine_item(item, class_settings)
     State.status = "Moving " .. item.what .. " to combine container slot " .. item.npc
-    mq.cmd("/keypress OPEN_INV_BAGS")
+    mq.cmd("/squelch /keypress OPEN_INV_BAGS")
     inv.move_item_to_enviro_combine(item.what, item.npc)
 end
 
@@ -155,7 +155,7 @@ function Actions.enviro_combine_do(item, class_settings)
     while mq.TLO.Cursor() == nil do
         mq.delay(100)
     end
-    mq.cmd("/autoinv")
+    mq.cmd("/squelch /autoinv")
     while mq.TLO.Cursor() ~= nil do
         mq.delay(100)
     end
@@ -298,7 +298,7 @@ function Actions.farm_radius(item, class_settings)
                 for i = 1, mq.TLO.AdvLoot.SCount() do
                     for _, name in pairs(item_list) do
                         if mq.TLO.AdvLoot.SList(i).Name() == name then
-                            mq.cmdf('/advloot shared %s giveto %s', i, mq.TLO.Me.DisplayName())
+                            mq.cmdf('/squelch /advloot shared %s giveto %s', i, mq.TLO.Me.DisplayName())
                             printf('%s \aoLooting: \ar%s', elheader, name)
                         end
                     end
@@ -309,7 +309,7 @@ function Actions.farm_radius(item, class_settings)
                 for i = 1, mq.TLO.AdvLoot.PCount() do
                     for _, name in pairs(item_list) do
                         if mq.TLO.AdvLoot.PList(i).Name() == name then
-                            mq.cmdf('/advloot personal %s loot', i)
+                            mq.cmdf('/squelch /advloot personal %s loot', i)
                             printf('%s \aoLooting: \ar%s', elheader, name)
                         end
                     end
@@ -341,7 +341,7 @@ function Actions.farm_radius(item, class_settings)
             if mq.TLO.AdvLoot.SCount() > 0 then
                 for i = 1, mq.TLO.AdvLoot.SCount() do
                     if mq.TLO.AdvLoot.SList(i).Name() == item.what then
-                        mq.cmdf('/advloot shared %s giveto %s', i, mq.TLO.Me.DisplayName())
+                        mq.cmdf('/squelch /advloot shared %s giveto %s', i, mq.TLO.Me.DisplayName())
                         printf('%s \aoLooting: %s', elheader, item.what)
                     end
                 end
@@ -350,7 +350,7 @@ function Actions.farm_radius(item, class_settings)
                 for i = 1, mq.TLO.AdvLoot.PCount() do
                     for _, name in pairs(item_list) do
                         if mq.TLO.AdvLoot.PList(i).Name() == name then
-                            mq.cmdf('/advloot personal %s loot', i)
+                            mq.cmdf('/squelch /advloot personal %s loot', i)
                             printf('%s \aoLooting: %s', elheader, name)
                         end
                     end
@@ -417,14 +417,14 @@ function Actions.forage_farm(item, class_settings)
                 looping = false
             end
             if mq.TLO.Me.AbilityReady('Forage')() then
-                mq.cmd('/doability Forage')
+                mq.cmd('/squelch /doability Forage')
                 mq.delay(500)
                 for i, name in pairs(item_list) do
                     if mq.TLO.Cursor.Name() == name then
-                        mq.cmd('/autoinv')
+                        mq.cmd('/squelch /autoinv')
                         mq.delay(200)
                     else
-                        mq.cmd('/destroy')
+                        mq.cmd('/squelch /destroy')
                         mq.delay(200)
                     end
                 end
@@ -515,35 +515,35 @@ end
 function Actions.ground_spawn(item, class_settings)
     State.status = "Picking up ground spawn " .. item.what
     Actions.loc_travel(item, class_settings)
-    mq.cmd("/itemtarget")
+    mq.cmd("/squelch /itemtarget")
     mq.delay(200)
-    mq.cmd("/click left itemtarget")
+    mq.cmd("/squelch /click left itemtarget")
     while mq.TLO.Cursor.Name() ~= item.what do
         if State.skip == true then
             State.skip = false
             return
         end
         mq.delay(200)
-        mq.cmd("/itemtarget")
+        mq.cmd("/squelch /itemtarget")
         mq.delay(200)
-        mq.cmd("/click left itemtarget")
+        mq.cmd("/squelch /click left itemtarget")
     end
     Actions.auto_inv(item)
 end
 
 function Actions.ignore_mob(item, class_settings)
     if class_settings.class[mq.TLO.Me.Class()] == 1 then
-        mq.cmdf('/%s ignore "%s"', mq.TLO.Me.Class.ShortName(), item.npc)
+        mq.cmdf('/squelch /%s ignore "%s"', mq.TLO.Me.Class.ShortName(), item.npc)
     elseif class_settings.class[mq.TLO.Me.Class()] == 2 then
-        mq.cmdf('/rgl pulldeny "%s"', item.npc)
+        mq.cmdf('/squelch /rgl pulldeny "%s"', item.npc)
     elseif class_settings.class[mq.TLO.Me.Class()] == 3 then
         mq.TLO.Spawn('npc ' .. item.npc).DoTarget()
         mq.delay(200)
-        mq.cmd('/addignore')
+        mq.cmd('/squelch /addignore')
     elseif class_settings.class[mq.TLO.Me.Class()] == 4 then
-        mq.cmdf('/addignore "%s"', item.npc)
+        mq.cmdf('/squelch /addignore "%s"', item.npc)
     elseif class_settings.class[mq.TLO.Me.Class()] == 5 then
-        mq.cmdf('/addignore "%s"', item.npc)
+        mq.cmdf('/squelch /addignore "%s"', item.npc)
     end
 end
 
@@ -579,7 +579,7 @@ function Actions.loot(item, class_settings)
     if mq.TLO.AdvLoot.SCount() > 0 then
         for i = 1, mq.TLO.AdvLoot.SCount() do
             if mq.TLO.AdvLoot.SList(i).Name() == item.what then
-                mq.cmdf('/advloot shared %s giveto %s', i, mq.TLO.Me.DisplayName())
+                mq.cmdf('/squelch /advloot shared %s giveto %s', i, mq.TLO.Me.DisplayName())
                 printf('%s \aoLooting: \ar%s', elheader, item.what)
             end
         end
@@ -587,7 +587,7 @@ function Actions.loot(item, class_settings)
     if mq.TLO.AdvLoot.PCount() > 0 then
         for i = 1, mq.TLO.AdvLoot.PCount() do
             if mq.TLO.AdvLoot.PList(i).Name() == item.what then
-                mq.cmdf('/advloot personal %s loot', i, mq.TLO.Me.DisplayName())
+                mq.cmdf('/squelch /advloot personal %s loot', i, mq.TLO.Me.DisplayName())
                 printf('%s \aoLooting: \ar%s', elheader, item.what)
             end
         end
@@ -639,9 +639,9 @@ function Actions.npc_damage_until(item, class_settings)
     State.status = "Damaging " .. item.npc .. " to below " .. item.what .. "% health"
     ID = mq.TLO.Spawn('npc ' .. item.npc).ID()
     mq.TLO.Spawn(ID).DoTarget()
-    mq.cmd("/stick")
+    mq.cmd("/squelch /stick")
     mq.delay(100)
-    mq.cmd("/attack on")
+    mq.cmd("/squelch /attack on")
     local looping = true
     while looping do
         if State.skip == true then
@@ -656,7 +656,7 @@ function Actions.npc_damage_until(item, class_settings)
         end
         mq.delay(50)
     end
-    mq.cmd("/attack off")
+    mq.cmd("/squelch /attack off")
 end
 
 function Actions.npc_follow(item, class_settings)
@@ -685,7 +685,7 @@ function Actions.npc_give(item, class_settings)
         mq.TLO.Spawn(item.npc).DoTarget()
         mq.delay(300)
     end
-    mq.cmdf('/nomodkey /shift /itemnotify "%s" leftmouseup', item.what)
+    mq.cmdf('/squelch /nomodkey /shift /itemnotify "%s" leftmouseup', item.what)
     mq.delay("2s", Actions.got_cursor)
     mq.TLO.Target.LeftClick()
     mq.delay("5s", Actions.give_window)
@@ -704,7 +704,7 @@ function Actions.npc_give_add(item, class_settings)
         mq.TLO.Spawn(item.npc).DoTarget()
         mq.delay(300)
     end
-    mq.cmdf('/itemnotify "%s" leftmouseup', item.what)
+    mq.cmdf('/squelch /itemnotify "%s" leftmouseup', item.what)
     mq.delay("2s", Actions.got_cursor)
     mq.TLO.Target.LeftClick()
     mq.delay("5s", Actions.give_window)
@@ -764,7 +764,7 @@ function Actions.npc_hail(item, class_settings)
         mq.TLO.Spawn(item.npc).DoTarget()
         mq.delay(300)
     end
-    mq.cmd("/keypress HAIL")
+    mq.cmd("/squelch /keypress HAIL")
     mq.delay(300)
 end
 
@@ -776,9 +776,9 @@ function Actions.npc_kill(item, class_settings, loot)
         mq.delay(200)
         local ID = mq.TLO.NearestSpawn("npc " .. item.npc).ID()
         mq.TLO.Spawn(ID).DoTarget()
-        mq.cmd("/stick")
+        mq.cmd("/squelch /stick")
         mq.delay(100)
-        mq.cmd("/attack on")
+        mq.cmd("/squelch /attack on")
         mq.event("cannot_see", "You cannot see your target.", target_invalid_switch)
         mq.event("cannot_cast", "You cannot cast#*#on#*#", target_invalid_switch)
         while mq.TLO.Spawn(ID).Type() == 'NPC' do
@@ -799,7 +799,7 @@ function Actions.npc_kill(item, class_settings, loot)
                 mq.TLO.Spawn(ID).DoTarget()
             end
             if mq.TLO.Me.Combat() == false then
-                mq.cmd("/attack on")
+                mq.cmd("/squelch /attack on")
             end
             mq.delay(200)
         end
@@ -809,9 +809,9 @@ function Actions.npc_kill(item, class_settings, loot)
         if mq.TLO.Spawn("npc " .. item.npc).ID() ~= 0 then
             local ID = mq.TLO.Spawn("npc " .. item.npc).ID()
             mq.TLO.Spawn(ID).DoTarget()
-            mq.cmd("/stick")
+            mq.cmd("/squelch /stick")
             mq.delay(100)
-            mq.cmd("/attack on")
+            mq.cmd("/squelch /attack on")
             while mq.TLO.Spawn(ID).Type() == 'NPC' do
                 if State.skip == true then
                     State.skip = false
@@ -821,16 +821,16 @@ function Actions.npc_kill(item, class_settings, loot)
                     mq.TLO.Spawn(ID).DoTarget()
                 end
                 if mq.TLO.Me.Combat() == false then
-                    mq.cmd("/attack on")
+                    mq.cmd("/squelch /attack on")
                 end
                 mq.delay(200)
             end
         else
             local ID = mq.TLO.Spawn("npc " .. item.what).ID()
             mq.TLO.Spawn(ID).DoTarget()
-            mq.cmd("/stick")
+            mq.cmd("/squelch /stick")
             mq.delay(100)
-            mq.cmd("/attack on")
+            mq.cmd("/squelch /attack on")
             while mq.TLO.Spawn(ID).Type() == 'NPC' do
                 if State.skip == true then
                     State.skip = false
@@ -881,7 +881,7 @@ function Actions.npc_kill_all(item, class_settings)
             unpause_automation = false
         end
         local ID = mq.TLO.NearestSpawn('npc ' .. item.npc).ID()
-        mq.cmdf('/nav id %s', ID)
+        mq.cmdf('/squelch /nav id %s', ID)
         while mq.TLO.Navigation.Active() do
             if State.skip == true then
                 State.skip = false
@@ -890,7 +890,7 @@ function Actions.npc_kill_all(item, class_settings)
             if State.pause == true then
                 unpause_automation = true
                 State.status = "Paused"
-                mq.cmd('/nav pause')
+                mq.cmd('/squelch /nav pause')
             end
             while State.pause == true do
                 mq.delay(200)
@@ -898,19 +898,19 @@ function Actions.npc_kill_all(item, class_settings)
             if unpause_automation == true then
                 State.status = "Killing All " .. item.npc
                 unpause_automation = false
-                mq.cmd('/nav pause')
+                mq.cmd('/squelch /nav pause')
             end
             mq.delay(200)
         end
         mq.TLO.Spawn(ID).DoTarget()
-        mq.cmd("/stick")
+        mq.cmd("/squelch /stick")
         mq.delay(100)
-        mq.cmd('/attack on')
+        mq.cmd('/squelch /attack on')
         while mq.TLO.Me.Casting() do
             mq.delay(100)
         end
         if item.zone ~= nil then
-            mq.cmdf('/casting "%s"', item.zone)
+            mq.cmdf('/squelch /casting "%s"', item.zone)
             mq.delay("1s")
         end
         local loopCount = 0
@@ -925,11 +925,11 @@ function Actions.npc_kill_all(item, class_settings)
             if loopCount == 20 then
                 loopCount = 0
                 if item.zone ~= nil then
-                    mq.cmdf('/casting "%s"', item.zone)
+                    mq.cmdf('/squelch /casting "%s"', item.zone)
                     mq.delay("1s")
                 end
                 if mq.TLO.Me.Combat() == false then
-                    mq.cmd('/attack on')
+                    mq.cmd('/squelch /attack on')
                 end
             end
         end
@@ -1163,9 +1163,9 @@ end
 function Actions.open_door(item, class_settings)
     State.status = "Opening door"
     mq.delay(200)
-    mq.cmd("/doortarget")
+    mq.cmd("/squelch /doortarget")
     mq.delay(200)
-    mq.cmd("/click left door")
+    mq.cmd("/squelch /click left door")
     mq.delay(1000)
 end
 
@@ -1203,14 +1203,14 @@ function Actions.pickpocket(item, class_settings)
             return
         end
         if mq.TLO.Me.AbilityReady('Pick Pockets')() then
-            mq.cmd('/doability Pick Pockets')
+            mq.cmd('/squelch /doability Pick Pockets')
             mq.delay(500)
             if mq.TLO.Cursor.Name() == item.what then
                 mq.cmd('/autoinv')
                 mq.delay(200)
                 looping = false
             else
-                mq.cmd('/destroy')
+                mq.cmd('/squelch /destroy')
                 mq.delay(200)
             end
         end
@@ -1220,7 +1220,7 @@ end
 function Actions.portal_set(item, class_settings)
     State.status = "Setting portal to " .. item.zone
     mq.delay("1s")
-    mq.cmdf("/portalset %s", item.zone)
+    mq.cmdf("/squelch /portalset %s", item.zone)
     mq.delay("1s")
     while mq.TLO.PortalSetter.InProgress() == true do
         mq.delay(200)

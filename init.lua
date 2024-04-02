@@ -257,7 +257,7 @@ local function run_epic(class, choice)
         elseif task_table[State.step].type == "PICK_POCKET" then
             actions.pickpocket(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "PICKUP_KEY" then
-            mq.cmdf("/itemnotify \"%s\" leftmouseup", task_table[State.step].what)
+            mq.cmdf("/squelch /itemnotify \"%s\" leftmouseup", task_table[State.step].what)
         elseif task_table[State.step].type == "PORTAL_SET" then
             actions.portal_set(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "PRE_FARM_CHECK" then
