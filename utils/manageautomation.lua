@@ -104,7 +104,7 @@ function manage.clearXtarget(group_set, class_settings, npc)
         end
         manage.pauseGroup(group_set, class_settings)
         if mq.TLO.Stick.Active() == true then
-            mq.cmd('/stick off')
+            mq.cmd('/squelch /stick off')
         end
     end
 end
@@ -113,164 +113,164 @@ function manage.doAutomation(character, class, script, action)
     if action == 'start' then
         if character == mq.TLO.Me.DisplayName() then
             if script == 1 then
-                mq.cmdf('/%s mode 0', class)
+                mq.cmdf('/squelch /%s mode 0 nosave', class)
             elseif script == 2 then
-                mq.cmd("/lua run rgmercs")
+                mq.cmd("/squelch /lua run rgmercs")
             elseif script == 3 then
-                mq.cmd("/mac rgmercs")
+                mq.cmd("/squelch /mac rgmercs")
             elseif script == 4 then
-                mq.cmd("/mac kissassist")
+                mq.cmd("/squelch /mac kissassist")
             elseif script == 5 then
-                mq.cmd("/mac muleassist")
+                mq.cmd("/squelch /mac muleassist")
             end
         else
             if script == 1 then
-                mq.cmdf('/dex %s /%s mode 2', character, class)
+                mq.cmdf('/dex %s /squelch /%s mode 2 nosave', character, class)
             elseif script == 2 then
-                mq.cmdf("/dex %s /lua run rgmercs", character)
+                mq.cmdf("/dex %s /squelch /lua run rgmercs", character)
                 mq.delay(500)
-                mq.cmdf('/dex %s /rgl chaseon %s', character, mq.TLO.Me.DisplayName())
+                mq.cmdf('/dex %s /squelch /rgl chaseon %s', character, mq.TLO.Me.DisplayName())
             elseif script == 3 then
-                mq.cmdf("/dex %s /mac rgmercs", character)
+                mq.cmdf("/dex %s /squelch /mac rgmercs", character)
                 mq.delay(500)
-                mq.cmdf('/dex %s /rg chaseon %s', character, mq.TLO.Me.DisplayName())
+                mq.cmdf('/dex %s /squelch /rg chaseon %s', character, mq.TLO.Me.DisplayName())
             elseif script == 4 then
-                mq.cmdf("/dex %s /mac kissassist", character)
-                mq.cmdf("/dex %s /chase on %s", character, mq.TLO.Me.DisplayName())
+                mq.cmdf("/dex %s /squelch /mac kissassist", character)
+                mq.cmdf("/dex %s /squelch /chase on %s", character, mq.TLO.Me.DisplayName())
             elseif script == 5 then
-                mq.cmdf("/dex %s /mac muleassist", character)
-                mq.cmdf("/dex %s /chase on %s", character, mq.TLO.Me.DisplayName())
+                mq.cmdf("/dex %s /squelch /mac muleassist", character)
+                mq.cmdf("/dex %s /squelch /chase on %s", character, mq.TLO.Me.DisplayName())
             end
         end
     elseif action == 'pause' then
         if character == mq.TLO.Me.DisplayName() then
             if script == 1 then
-                mq.cmdf('/%s pause on', class)
+                mq.cmdf('/squelch /%s pause on nosave', class)
             elseif script == 2 then
-                mq.cmd("/rgl pause")
+                mq.cmd("/squelch /rgl pause")
             elseif script == 3 then
-                mq.cmd("/rg off")
+                mq.cmd("/squelch /rg off")
             elseif script == 4 then
-                mq.cmd("/mqp on")
+                mq.cmd("/squelch /mqp on")
             elseif script == 5 then
-                mq.cmd("/mqp on")
+                mq.cmd("/squelch /mqp on")
             end
         else
             if script == 1 then
-                mq.cmdf('/dex %s /%s pause on', character, class)
+                mq.cmdf('/dex %s /squelch /%s pause on nosave', character, class)
             elseif script == 2 then
-                mq.cmdf("/dex %s /rgl pause", character)
+                mq.cmdf("/dex %s /squelch /rgl pause", character)
             elseif script == 3 then
-                mq.cmdf("/dex %s /rg off", character)
+                mq.cmdf("/dex %s /squelch /rg off", character)
             elseif script == 4 then
-                mq.cmdf("/dex %s /mqp on", character)
+                mq.cmdf("/dex %s /squelch /mqp on", character)
             elseif script == 5 then
-                mq.cmdf("/dex %s /mqp on", character)
+                mq.cmdf("/dex %s /squelch /mqp on", character)
             end
         end
     elseif action == 'unpause' then
         if character == mq.TLO.Me.DisplayName() then
             if script == 1 then
-                mq.cmdf('/%s pause off', class)
+                mq.cmdf('/squelch /%s pause off nosave', class)
             elseif script == 2 then
-                mq.cmd("/rgl unpause")
+                mq.cmd("/squelch /rgl unpause")
             elseif script == 3 then
-                mq.cmd("/rg on")
+                mq.cmd("/squelch /rg on")
             elseif script == 4 then
-                mq.cmd("/mqp off")
+                mq.cmd("/squelch /mqp off")
             elseif script == 5 then
-                mq.cmd("/mqp off")
+                mq.cmd("/squelch /mqp off")
             end
         else
             if script == 1 then
-                mq.cmdf('/dex %s /%s pause off', character, class)
+                mq.cmdf('/dex %s /squelch /%s pause off nosave', character, class)
             elseif script == 2 then
-                mq.cmdf("/dex %s /rgl unpause", character)
+                mq.cmdf("/dex %s /squelch /rgl unpause", character)
             elseif script == 3 then
-                mq.cmdf("/dex %s /rg on", character)
+                mq.cmdf("/dex %s /squelch /rg on", character)
             elseif script == 4 then
-                mq.cmdf("/dex %s /mqp off", character)
+                mq.cmdf("/dex %s /squelch /mqp off", character)
             elseif script == 5 then
-                mq.cmdf("/dex %s /mqp off", character)
+                mq.cmdf("/dex %s /squelch /mqp off", character)
             end
         end
     elseif action == 'camp' then
         if character == mq.TLO.Me.DisplayName() then
             if script == 1 then
-                mq.cmdf('/%s resetcamp', class)
-                mq.cmdf('/%s mode HunterTank', class)
-                mq.cmdf('/%s pause off', class)
+                mq.cmdf('/squelch /%s resetcamp nosave', class)
+                mq.cmdf('/squelch /%s mode HunterTank nosave', class)
+                mq.cmdf('/squelch /%s pause off nosave', class)
             elseif script == 2 then
-                mq.cmd("/rgl campon")
-                mq.cmd("/rgl unpause")
-                mq.cmd("/rgl set dopull on")
+                mq.cmd("/squelch /rgl campon")
+                mq.cmd("/squelch /rgl unpause")
+                mq.cmd("/squelch /rgl set dopull on")
             elseif script == 3 then
-                mq.cmd("/rg camphere")
-                mq.cmd("/rg on")
+                mq.cmd("/squelch /rg camphere")
+                mq.cmd("/squelch /rg on")
             elseif script == 4 then
-                mq.cmd("/mqp off")
-                mq.cmd("/camphere on")
+                mq.cmd("/squelch /mqp off")
+                mq.cmd("/squelch /camphere on")
             elseif script == 5 then
-                mq.cmd("/mqp off")
-                mq.cmd("/camphere on")
+                mq.cmd("/squelch /mqp off")
+                mq.cmd("/squelch /camphere on")
             end
         else
             if script == 1 then
-                mq.cmdf('/dex %s /%s resetcamp', character, class)
-                mq.cmdf('/dex %s /%s mode 1', character, class)
-                mq.cmdf('/dex %s /%s pause off', character, class)
+                mq.cmdf('/dex %s /squelch /%s resetcamp nosave', character, class)
+                mq.cmdf('/dex %s /squelch /%s mode 1 nosave', character, class)
+                mq.cmdf('/dex %s /squelch /%s pause off nosave', character, class)
             elseif script == 2 then
-                mq.cmdf("/dex %s /rgl campon", character)
-                mq.cmdf("/dex %s /rgl unpause", character)
+                mq.cmdf("/dex %s /squelch /rgl campon", character)
+                mq.cmdf("/dex %s /squelch /rgl unpause", character)
             elseif script == 3 then
-                mq.cmdf("/dex %s /rg camphere", character)
-                mq.cmdf("/dex %s /rg on", character)
+                mq.cmdf("/dex %s /squelch /rg camphere", character)
+                mq.cmdf("/dex %s /squelch /rg on", character)
             elseif script == 4 then
-                mq.cmdf("/dex %s /mqp off", character)
-                mq.cmdf("/dex %s /camphere on", character)
+                mq.cmdf("/dex %s /squelch /mqp off", character)
+                mq.cmdf("/dex %s /squelch /camphere on", character)
             elseif script == 5 then
-                mq.cmdf("/dex %s /mqp off", character)
-                mq.cmdf("/dex %s /camphere on", character)
+                mq.cmdf("/dex %s /squelch /mqp off", character)
+                mq.cmdf("/dex %s /squelch /camphere on", character)
             end
         end
     elseif action == 'uncamp' then
         if character == mq.TLO.Me.DisplayName() then
             if script == 1 then
-                mq.cmdf('/%s mode 0', class)
-                mq.cmdf('/%s pause on', class)
+                mq.cmdf('/squelch /%s mode 0 nosave', class)
+                mq.cmdf('/squelch /%s pause on nosave', class)
             elseif script == 2 then
-                mq.cmd("/rgl campoff")
-                mq.cmd("/rgl pause")
+                mq.cmd("/squelch /rgl campoff")
+                mq.cmd("/squelch /rgl pause")
             elseif script == 3 then
-                mq.cmd("/rg campoff")
-                mq.cmd("/rg off")
+                mq.cmd("/squelch /rg campoff")
+                mq.cmd("/squelch /rg off")
             elseif script == 4 then
-                mq.cmd("/camphere off")
-                mq.cmd("/mqp on")
+                mq.cmd("/squelch /camphere off")
+                mq.cmd("/squelch /mqp on")
             elseif script == 5 then
-                mq.cmd("/camphere off")
-                mq.cmd("/mqp on")
+                mq.cmd("/squelch /camphere off")
+                mq.cmd("/squelch /mqp on")
             end
         else
             if script == 1 then
-                mq.cmdf('/dex %s /%s mode 2', character, class)
-                mq.cmdf('/dex %s /%s pause on', character, class)
+                mq.cmdf('/dex %s /squelch /%s mode 2 nosave', character, class)
+                mq.cmdf('/dex %s /squelch /%s pause on nosave', character, class)
             elseif script == 2 then
-                mq.cmdf("/dex %s /rgl campoff", character)
-                mq.cmdf('/dex %s /rgl chaseon %s', character, mq.TLO.Me.DisplayName())
-                mq.cmdf("/dex %s /rgl pause", character)
+                mq.cmdf("/dex %s /squelch /rgl campoff", character)
+                mq.cmdf('/dex %s /squelch /rgl chaseon %s', character, mq.TLO.Me.DisplayName())
+                mq.cmdf("/dex %s /squelch /rgl pause", character)
             elseif script == 3 then
-                mq.cmdf("/dex %s /rg camphere", character)
-                mq.cmdf('/dex %s /rg chaseon %s', character, mq.TLO.Me.DisplayName())
-                mq.cmdf("/dex %s /rg off", character)
+                mq.cmdf("/dex %s /squelch /rg camphere", character)
+                mq.cmdf('/dex %s /squelch /rg chaseon %s', character, mq.TLO.Me.DisplayName())
+                mq.cmdf("/dex %s /squelch /rg off", character)
             elseif script == 4 then
-                mq.cmdf("/dex %s /camphere off", character)
-                mq.cmdf("/dex %s /chaseon", character)
-                mq.cmdf("/dex %s /mqp on", character)
+                mq.cmdf("/dex %s /squelch /camphere off", character)
+                mq.cmdf("/dex %s /squelch /chaseon", character)
+                mq.cmdf("/dex %s /squelch /mqp on", character)
             elseif script == 5 then
-                mq.cmdf("/dex %s /camphere off", character)
-                mq.cmdf("/dex %s /chaseon", character)
-                mq.cmdf("/dex %s /mqp on", character)
+                mq.cmdf("/dex %s /squelch /camphere off", character)
+                mq.cmdf("/dex %s /squelch /chaseon", character)
+                mq.cmdf("/dex %s /squelch /mqp on", character)
             end
         end
     end
@@ -302,17 +302,17 @@ function manage.followGroup(group_set, npc)
     if group_set == 1 then
         mq.TLO.Spawn("npc " .. npc).DoTarget()
         mq.delay(300)
-        mq.cmd('/afollow')
+        mq.cmd('/squelch /afollow')
     elseif group_set == 2 then
-        mq.cmdf('/dgga /target id %s', mq.TLO.Spawn("npc " .. npc).ID())
+        mq.cmdf('/dgga /squelch /target id %s', mq.TLO.Spawn("npc " .. npc).ID())
         mq.delay(300)
-        mq.cmd('/dgga /afollow')
+        mq.cmd('/dgga /squelch /afollow')
     else
         mq.TLO.Spawn("npc " .. npc).DoTarget()
-        mq.cmdf('/dex %s /nav id %s', State.group_combo[State.group_choice], mq.TLO.Spawn("npc " .. npc).ID())
+        mq.cmdf('/dex %s /squelch /nav id %s', State.group_combo[State.group_choice], mq.TLO.Spawn("npc " .. npc).ID())
         mq.delay(300)
-        mq.cmd('/afollow')
-        mq.cmdf('/dex %s /afollow', State.group_combo[State.group_choice])
+        mq.cmd('/squelch /afollow')
+        mq.cmdf('/dex %s /squelch /afollow', State.group_combo[State.group_choice])
     end
 end
 
@@ -320,7 +320,7 @@ function manage.followGroupLoc(group_set, npc, x, y)
     if group_set == 1 then
         mq.TLO.Spawn("npc " .. npc).DoTarget()
         mq.delay(300)
-        mq.cmd('/afollow')
+        mq.cmd('√/afollow')
         local distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
         while distance > 50 do
             if State.skip == true then
@@ -331,55 +331,55 @@ function manage.followGroupLoc(group_set, npc, x, y)
             mq.delay(200)
             distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
         end
-        mq.cmd('/afollow off')
+        mq.cmd('/squelch /afollow off')
     elseif group_set == 2 then
-        mq.cmdf('/dgga /target id %s', mq.TLO.Spawn("npc " .. npc).ID())
+        mq.cmdf('/dgga /squelch /target id %s', mq.TLO.Spawn("npc " .. npc).ID())
         mq.delay(300)
-        mq.cmd('/dgga /afollow')
+        mq.cmd('/dgga /squelch /afollow')
         local distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
         while distance > 50 do
             if State.skip == true then
-                mq.cmd('/dgga /afollow off')
+                mq.cmd('/dgga /squelch /afollow off')
                 State.skip = false
                 return
             end
             mq.delay(200)
             distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
         end
-        mq.cmd('/dgga /afollow off')
+        mq.cmd('/dgga /squelch /afollow off')
     else
         mq.TLO.Spawn("npc " .. npc).DoTarget()
-        mq.cmdf('/dex %s /nav id %s', State.group_combo[State.group_choice], mq.TLO.Spawn("npc " .. npc).ID())
+        mq.cmdf('/dex %s /squelch /nav id %s', State.group_combo[State.group_choice], mq.TLO.Spawn("npc " .. npc).ID())
         mq.delay(300)
-        mq.cmd('/afollow')
-        mq.cmdf('/dex %s /afollow', State.group_combo[State.group_choice])
+        mq.cmd('/squelch /afollow')
+        mq.cmdf('/dex %s /squelch /afollow', State.group_combo[State.group_choice])
         local distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
         while distance > 50 do
             if State.skip == true then
-                mq.cmd('/afollow off')
-                mq.cmdf('/dex %s /afollow off', State.group_combo[State.group_choice])
+                mq.cmd('/squelch /afollow off')
+                mq.cmdf('/dex %s /squelch /afollow off', State.group_combo[State.group_choice])
                 State.skip = false
                 return
             end
             mq.delay(200)
             distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
         end
-        mq.cmd('/afollow off')
-        mq.cmdf('/dex %s /afollow off', State.group_combo[State.group_choice])
+        mq.cmd('/squelch /afollow off')
+        mq.cmdf('/dex %s /squelch /afollow off', State.group_combo[State.group_choice])
     end
 end
 
 --WORK ON THIS ONE
 function manage.forwardZone(group_set, zone)
     if group_set == 1 then
-        mq.cmd("/keypress forward hold")
+        mq.cmd("/squelch /keypress forward hold")
         while mq.TLO.Zone.ShortName() ~= zone do
             mq.delay(500)
         end
         mq.delay("5s")
     elseif group_set == 2 then
-        mq.cmd("/dgge /keypress forward hold")
-        mq.cmd("/keypress forward hold")
+        mq.cmd("/dgge /squelch /keypress forward hold")
+        mq.cmd("/squelch /keypress forward hold")
         while mq.TLO.Zone.ShortName() ~= zone do
             mq.delay(500)
         end
@@ -409,7 +409,7 @@ function manage.gateGroup(group_set)
         mq.delay(500)
     else
         mq.cmd("/relocate gate")
-        mq.cmdf('/dex %s /relocate gate', State.group_combo[State.group_choice])
+        mq.cmdf('/dex %s /squelch /relocate gate', State.group_combo[State.group_choice])
     end
 end
 
@@ -461,19 +461,19 @@ function manage.invis(group_set, class_settings)
     State.status = "Using invis"
     local invis_type = {}
     if mq.TLO.Me.Combat() == true then
-        mq.cmd('/keypress AUTOPRIM')
+        mq.cmd('/squelch /keypress AUTOPRIM')
     end
     for word in string.gmatch(class_settings.class_invis[mq.TLO.Me.Class()], '([^|]+)') do
         table.insert(invis_type, word)
     end
     if invis_type[class_settings.invis[mq.TLO.Me.Class()]] == 'Potion' then
-        mq.cmd('/useitem "Cloudy Potion"')
+        mq.cmd('/squelch /useitem "Cloudy Potion"')
     elseif invis_type[class_settings.invis[mq.TLO.Me.Class()]] == 'Hide/Sneak' then
-        mq.cmd("/doability hide")
+        mq.cmd("/squelch /doability hide")
         mq.delay(250)
-        mq.cmd("/doability sneak")
+        mq.cmd("/squelch /doability sneak")
     else
-        mq.cmdf('/casting "%s"', invis_type[class_settings.invis[mq.TLO.Me.Class()]])
+        mq.cmdf('/squelch /casting "%s"', invis_type[class_settings.invis[mq.TLO.Me.Class()]])
         mq.delay(500)
         while mq.TLO.Me.Casting() == true do
             mq.delay(200)
@@ -488,13 +488,13 @@ function manage.invis(group_set, class_settings)
                     table.insert(invis_type, word)
                 end
                 if invis_type[class_settings.invis[mq.TLO.Group.Member(i).Class()]] == 'Potion' then
-                    mq.cmdf('/dex %s /useitem "Cloudy Potion"', mq.TLO.Group.Member(i).DisplayName())
+                    mq.cmdf('/dex %s /squelch /useitem "Cloudy Potion"', mq.TLO.Group.Member(i).DisplayName())
                 elseif invis_type[class_settings.invis[mq.TLO.Group.Member(i).Class()]] == 'Hide/Sneak' then
-                    mq.cmdf("/dex %s /doability hide", mq.TLO.Group.Member(i).DisplayName())
+                    mq.cmdf("/dex %s /squelch /doability hide", mq.TLO.Group.Member(i).DisplayName())
                     mq.delay(250)
-                    mq.cmdf("/dex %s /doability sneak", mq.TLO.Group.Member(i).DisplayName())
+                    mq.cmdf("/dex %s /squelch /doability sneak", mq.TLO.Group.Member(i).DisplayName())
                 else
-                    mq.cmdf('/dex %s /casting "%s"', mq.TLO.Group.Member(i).DisplayName(),
+                    mq.cmdf('/dex %s /squelch /casting "%s"', mq.TLO.Group.Member(i).DisplayName(),
                         invis_type[class_settings.invis[mq.TLO.Group.Member(i).Class()]])
                 end
             end
@@ -505,14 +505,14 @@ function manage.invis(group_set, class_settings)
             table.insert(invis_type, word)
         end
         if invis_type[class_settings.invis[mq.TLO.Group.Member(State.group_combo[State.group_choice]).Class()]] == 'Potion' then
-            mq.cmdf('/dex %s /useitem "Cloudy Potion"',
+            mq.cmdf('/dex %s /squelch /useitem "Cloudy Potion"',
                 mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName())
         elseif invis_type[class_settings.invis[mq.TLO.Group.Member(State.group_combo[State.group_choice]).Class()]] == 'Hide/Sneak' then
-            mq.cmdf("/dex %s /doability hide", mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName())
+            mq.cmdf("/dex %s /squelch /doability hide", mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName())
             mq.delay(250)
-            mq.cmdf("/dex %s /doability sneak", mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName())
+            mq.cmdf("/dex %s /squelch /doability sneak", mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName())
         else
-            mq.cmdf('/dex %s /casting "%s"', mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName(),
+            mq.cmdf('/dex %s /squelch /casting "%s"', mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName(),
                 invis_type[class_settings.invis[mq.TLO.Group.Member(State.group_combo[State.group_choice]).Class()]])
         end
     end
@@ -586,7 +586,7 @@ function manage.locTravelGroup(group_set, x, y, z, class_settings, invis)
             end
         end
         if loopCount == 10 then
-            mq.cmd('/doortarget')
+            mq.cmd('/squelch /doortarget')
             mq.delay(200)
             if mq.TLO.Switch.Distance() ~= nil then
                 if mq.TLO.Switch.Distance() < 20 then
@@ -1046,15 +1046,15 @@ end
 
 function manage.setRadius(character, class, script, radius)
     if script == 1 then
-        mq.cmdf('/%s pullradius %s', class, radius)
+        mq.cmdf('/squelch /%s pullradius %s nosave', class, radius)
     elseif script == 2 then
-        mq.cmd("/rgl set pullradius %s", radius)
+        mq.cmd("/squelch /rgl set pullradius %s", radius)
     elseif script == 3 then
-        mq.cmd("/rg pullrad %s", radius)
+        mq.cmd("/squelch /rg pullrad %s", radius)
     elseif script == 4 then
-        mq.cmd("/maxradius %s", radius)
+        mq.cmd("/squelch /maxradius %s", radius)
     elseif script == 5 then
-        mq.cmd("/maxradius %s", radius)
+        mq.cmd("/squelch /maxradius %s", radius)
     end
 end
 
@@ -1086,12 +1086,12 @@ end
 
 function manage.stopfollowGroup(group_set)
     if group_set == 1 then
-        mq.cmd('/afollow off')
+        mq.cmd('/squelch /afollow off')
     elseif group_set == 2 then
-        mq.cmd('/dgga /afollow off')
+        mq.cmd('/dgga /squelch /afollow off')
     else
-        mq.cmd('/afollow off')
-        mq.cmdf('/dex %s /afollow off', State.group_combo[State.group_choice])
+        mq.cmd('/squelch /afollow off')
+        mq.cmdf('/dex %s /squelch /afollow off', State.group_combo[State.group_choice])
     end
 end
 
@@ -1140,12 +1140,12 @@ end
 function manage.zoneGroup(group_set, zone, class_settings, invis)
     invis = invis or 0
     if group_set == 1 then
-        mq.cmdf("/travelto %s", zone)
+        mq.cmdf("/squelch /travelto %s", zone)
     elseif group_set == 2 then
-        mq.cmdf("/dgga /travelto %s", zone)
+        mq.cmdf("/dgga /squelch /travelto %s", zone)
     else
-        mq.cmdf("/travelto %s", zone)
-        mq.cmdf('/dex %s /travelto %s', State.group_combo[State.group_choice], zone)
+        mq.cmdf("/squelch /travelto %s", zone)
+        mq.cmdf('/dex %s /squelch /travelto %s', State.group_combo[State.group_choice], zone)
     end
     local temp = State.status
     local unpause_automation = false
@@ -1200,12 +1200,12 @@ function manage.zoneGroup(group_set, zone, class_settings, invis)
                 end
                 if mq.TLO.FindItem('=Spire Stone')() == nil then
                     if group_set == 1 then
-                        mq.cmdf("/travelto %s", zone)
+                        mq.cmdf("/squelch /travelto %s", zone)
                     elseif group_set == 2 then
-                        mq.cmdf("/dgga /travelto %s", zone)
+                        mq.cmdf("/dgga /squelch /travelto %s", zone)
                     else
-                        mq.cmdf("/travelto %s", zone)
-                        mq.cmdf('/dex %s /travelto %s', State.group_combo[State.group_choice], zone)
+                        mq.cmdf("/squelch /travelto %s", zone)
+                        mq.cmdf('/dex %s /squelch /travelto %s', State.group_combo[State.group_choice], zone)
                     end
                 end
             end
