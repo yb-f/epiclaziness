@@ -363,6 +363,7 @@ local function displayGUI()
                 if ImGui.SmallButton(ICONS.MD_FAST_REWIND) then
                     State.skip = true
                     State.rewound = true
+                    State.step = State.step - 1
                     printf("%s \aoMoving to previous step \ar%s", elheader, State.step)
                 end
                 if ImGui.IsItemHovered() then
