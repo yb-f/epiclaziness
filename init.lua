@@ -116,12 +116,9 @@ end
 
 local function run_epic(class, choice)
     task_table = {}
+    local tablename = ''
     State.task_run = true
     loadsave.loadState()
-    manage.startGroup(State.group_choice, class_settings.settings)
-    mq.delay("5s")
-    manage.pauseGroup(State.group_choice, class_settings.settings)
-    local tablename = ''
     if choice == 1 then
         tablename = class .. "_10"
         State.epicstring = "1.0"
@@ -135,20 +132,13 @@ local function run_epic(class, choice)
         tablename = class .. "_20"
         State.epicstring = "2.0"
     end
-    local table_found = false
-    for row in dbn:nrows("SELECT name FROM sqlite_master WHERE type='table' AND name='" .. tablename .. "';") do
-        table_found = true
-    end
-    if table_found == false then
-        printf("%s \aoThis quest has not yet been implemented.", elheader)
-        State.status = "This quest has not yet been implemented."
-        State.task_run = false
-        return
-    end
     local sql = "SELECT * FROM " .. tablename
     for a in dbn:nrows(sql) do
         table.insert(task_table, a)
     end
+    manage.startGroup(State.group_choice, class_settings.settings)
+    mq.delay("5s")
+    manage.pauseGroup(State.group_choice, class_settings.settings)
     while State.step < #task_table do
         while State.pause == true do
             State.status = "Paused"
@@ -258,7 +248,7 @@ local function run_epic(class, choice)
         elseif task_table[State.step].type == "NPC_TRAVEL_NO_PATH_CHECK" then
             actions.npc_travel(task_table[State.step], class_settings.settings, true)
         elseif task_table[State.step].type == "NPC_WAIT" then
-            actions.npc_wait(task_table[State.step])
+            actions.npc_wait(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "NPC_WAIT_DESPAWN" then
             actions.npc_wait_despawn(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "OPEN_DOOR" then
