@@ -43,7 +43,7 @@ function loadsave.loadState()
                     State.epic_choice = loadsave.SaveState[class]['Last_Ran']
                 else
                     State.step = loadsave.SaveState[class][State.epic_choice].Step
-                    printf("%s \aoStarting on step %s", elheader, State.step)
+                    printf("%s \aoStarting on step: \ar%s", elheader, State.step)
                 end
             else
                 loadsave.addConfig()
