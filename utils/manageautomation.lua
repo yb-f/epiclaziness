@@ -470,13 +470,21 @@ function manage.invis(group_set, class_settings)
     if invis_type[class_settings.invis[mq.TLO.Me.Class()]] == 'Potion' then
         mq.cmd('/squelch /useitem "Cloudy Potion"')
     elseif invis_type[class_settings.invis[mq.TLO.Me.Class()]] == 'Hide/Sneak' then
+        while mq.TLO.Me.AbilityReady('Hide')() == false do
+            mq.delay(100)
+        end
         mq.cmd("/squelch /doability hide")
         while mq.TLO.Me.Invis() == false do
             mq.delay(100)
         end
-        mq.cmd("/squelch /doability sneak")
-        while mq.TLO.Me.Sneaking() == false do
-            mq.delay(100)
+        if mq.TLO.Me.Sneaking() == false then
+            while mq.TLO.Me.AbilityReady('Sneak')() == false do
+                mq.delay(100)
+            end
+            mq.cmd("/squelch /doability sneak")
+            while mq.TLO.Me.Sneaking() == false do
+                mq.delay(100)
+            end
         end
     else
         mq.cmdf('/squelch /casting "%s"', invis_type[class_settings.invis[mq.TLO.Me.Class()]])
