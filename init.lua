@@ -8,14 +8,13 @@ local loadsave = require 'utils/loadsave'
 local manage = require 'utils/manageautomation'
 local class_settings = require 'utils/class_settings'
 local invis_travel = require 'utils/travelandinvis'
-
+local quests_done = require 'utils/questsdone'
 local PackageMan = require('mq/PackageMan')
 local sqlite3 = PackageMan.Require('lsqlite3')
 
 local window_flags = bit32.bor(ImGuiWindowFlags.None)
 local openGUI, drawGUI = true, true
 local myName = mq.TLO.Me.DisplayName()
-local epic_list = { "1.0", "Pre-1.5", "1.5", "2.0" }
 local dbn = sqlite3.open(mq.luaDir .. '\\epiclaziness\\epiclaziness.db')
 local task_table = {}
 local running = true
@@ -27,6 +26,8 @@ local changed = false
 local myClass = mq.TLO.Me.Class()
 local exclude_list = {}
 local exclude_name = ''
+--local epic_list = { "1.0", "Pre-1.5", "1.5", "2.0" }
+local epic_list = quests_done[string.lower(mq.TLO.Me.Class.ShortName())]
 
 local class_list = { 'Bard', 'Beastlord', 'Berserker', 'Cleric', 'Druid', 'Enchanter', 'Magician', 'Monk', 'Necromancer',
     'Paladin', 'Ranger', 'Rogue', 'Shadow Knight', 'Shaman', 'Warrior', 'Wizard' }
@@ -59,6 +60,33 @@ State.rewound = false
 State.bad_IDs = {}
 State.cannot_count = 0
 State.traveling = false
+
+--Check if necessary plugins are loaded.
+if mq.TLO.Plugin('mq2nav')() == nil then
+    printf("%s \arMQ2Nav \aois required for this script.", elheader)
+    printf("%s \aoPlease load it with the command \ar/plugin nav \aoand rerun this script.")
+    mq.exit()
+end
+if mq.TLO.Plugin('mq2easyfind')() == nil then
+    printf("%s \arMQ2EasyFind \aois required for this script.", elheader)
+    printf("%s \aoPlease load it with the command \ar/plugin easyfind \aoand rerun this script.")
+    mq.exit()
+end
+if mq.TLO.Plugin('mq2relocate')() == nil then
+    printf("%s \arMQ2Relocate \aois required for this script.", elheader)
+    printf("%s \aoPlease load it with the command \ar/plugin relocate \aoand rerun this script.")
+    mq.exit()
+end
+if mq.TLO.Plugin('mq2portalsetter')() == nil then
+    printf("%s \arMQ2PortalSetter \aois required for this script.", elheader)
+    printf("%s \aoPlease load it with the command \ar/plugin portalsetter \aoand rerun this script.")
+    mq.exit()
+end
+if mq.TLO.Plugin('mq2cast')() == nil then
+    printf("%s \arMQ2Cast \aois required for this script.", elheader)
+    printf("%s \aoPlease load it with the command \ar/plugin cast \aoand rerun this script.")
+    mq.exit()
+end
 
 class_settings.loadSettings()
 
@@ -121,18 +149,23 @@ local function run_epic(class, choice)
     local tablename = ''
     State.task_run = true
     loadsave.loadState()
-    if choice == 1 then
+    if epic_list[choice] == "1.0" then
         tablename = class .. "_10"
         State.epicstring = "1.0"
-    elseif choice == 2 then
+    elseif epic_list[choice] == "Pre-1.5" then
         tablename = class .. "_pre15"
         State.epicstring = "Pre-1.5"
-    elseif choice == 3 then
+    elseif epic_list[choice] == "1.5" then
         tablename = class .. "_15"
         State.epicstring = "1.5"
-    elseif choice == 4 then
+    elseif epic_list[choice] == "2.0" then
         tablename = class .. "_20"
         State.epicstring = "2.0"
+    end
+    if tablename == '' then
+        printf('%s \ao This class and quest has not yet been implemented.', elheader)
+        State.task_run = false
+        return
     end
     local sql = "SELECT * FROM " .. tablename
     for a in dbn:nrows(sql) do
