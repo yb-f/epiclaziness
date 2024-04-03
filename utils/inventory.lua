@@ -44,7 +44,7 @@ function inventory.restore_item()
 end
 
 function inventory.find_free_slot(exclude_bag)
-    for i = 10, 1, -1 do
+    for i = mq.TLO.Me.NumBagSlots(), 1, -1 do
         if i ~= exclude_bag then
             for j = mq.TLO.InvSlot('pack' .. i).Item.Container(), 1, -1 do
                 if mq.TLO.InvSlot('pack' .. i).Item.Item(j)() == nil then
