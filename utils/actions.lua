@@ -689,6 +689,18 @@ function Actions.npc_give(item, class_settings)
     mq.delay("2s", Actions.got_cursor)
     mq.TLO.Target.LeftClick()
     mq.delay("5s", Actions.give_window)
+    local looping = true
+    while looping do
+        for i = 0, 3 do
+            if string.lower(mq.TLO.Window('GiveWnd').Child('GVW_MyItemSlot' .. i).Tooltip()) == string.lower(item.what) then
+                looping = false
+            end
+        end
+        if State.skip == true then
+            State.skip = false
+            return
+        end
+    end
     mq.TLO.Window('GiveWnd').Child('GVW_Give_Button').LeftMouseUp()
     mq.delay(100)
     while mq.TLO.Window('GiveWnd').Open() do
