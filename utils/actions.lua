@@ -57,6 +57,12 @@ function Actions.auto_inv(item, class_settings)
 end
 
 function Actions.backstab(item, class_settings)
+    if mq.TLO.NearestSpawn("npc " .. item.npc).Distance ~= nil then
+        if mq.TLO.NearestSpawn("npc " .. item.npc).Distance() > 100 then
+            State.step = State.step - 2
+            return
+        end
+    end
     mq.TLO.NearestSpawn("npc " .. item.npc).DoTarget()
     mq.cmd('/squelch /stick behind')
     mq.delay("2s")
@@ -76,7 +82,13 @@ end
 
 function Actions.combine_container(item, class_settings)
     if mq.TLO.Me.XTarget() > 0 then
-        manage.clearXtarget(State.group_choice, class_settings)
+        for i = 1, mq.TLO.Me.XTargetSlots() do
+            if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
+                local temp = State.status
+                manage.clearXtarget(State.group_choice, class_settings)
+                State.status = temp
+            end
+        end
     end
     State.status = "Preparing combine container"
     if mq.TLO.InvSlot('pack8').Item.Container() then
@@ -88,7 +100,13 @@ end
 
 function Actions.combine_do(item, class_settings)
     if mq.TLO.Me.XTarget() > 0 then
-        manage.clearXtarget(State.group_choice, class_settings)
+        for i = 1, mq.TLO.Me.XTargetSlots() do
+            if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
+                local temp = State.status
+                manage.clearXtarget(State.group_choice, class_settings)
+                State.status = temp
+            end
+        end
     end
     State.status = "Combining"
     mq.cmdf("/squelch /combine pack8")
@@ -103,7 +121,13 @@ end
 
 function Actions.combine_done(item, class_settings)
     if mq.TLO.Me.XTarget() > 0 then
-        manage.clearXtarget(State.group_choice, class_settings)
+        for i = 1, mq.TLO.Me.XTargetSlots() do
+            if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
+                local temp = State.status
+                manage.clearXtarget(State.group_choice, class_settings)
+                State.status = temp
+            end
+        end
     end
     if State.bagslot1 ~= 0 and State.bagslot2 ~= 0 then
         State.status = "Moving container back to slot 8"
@@ -121,7 +145,13 @@ end
 
 function Actions.combine_item(item, class_settings)
     if mq.TLO.Me.XTarget() > 0 then
-        manage.clearXtarget(State.group_choice, class_settings)
+        for i = 1, mq.TLO.Me.XTargetSlots() do
+            if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
+                local temp = State.status
+                manage.clearXtarget(State.group_choice, class_settings)
+                State.status = temp
+            end
+        end
     end
     State.status = "Moving " .. item.what .. " to combine container"
     inv.move_item_to_combine(item.what, 8)
@@ -175,7 +205,13 @@ end
 
 function Actions.farm_check(item, class_settings)
     if mq.TLO.Me.XTarget() > 0 then
-        manage.clearXtarget(State.group_choice, class_settings)
+        for i = 1, mq.TLO.Me.XTargetSlots() do
+            if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
+                local temp = State.status
+                manage.clearXtarget(State.group_choice, class_settings)
+                State.status = temp
+            end
+        end
     end
     mq.delay("2s")
     local check_list = {}
@@ -207,7 +243,13 @@ end
 
 function Actions.farm_check_pause(item, class_settings)
     if mq.TLO.Me.XTarget() > 0 then
-        manage.clearXtarget(State.group_choice, class_settings)
+        for i = 1, mq.TLO.Me.XTargetSlots() do
+            if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
+                local temp = State.status
+                manage.clearXtarget(State.group_choice, class_settings)
+                State.status = temp
+            end
+        end
     end
     State.status = "Checking for " .. item.what
     local check_list = {}
@@ -230,6 +272,7 @@ function Actions.farm_check_pause(item, class_settings)
     if not_found == true then
         State.status = item.npc
         State.task_run = false
+        mq.cmd('/foreground')
     end
 end
 
@@ -396,7 +439,13 @@ function Actions.forage_farm(item, class_settings)
                 unpause_automation = false
             end
             if mq.TLO.Me.XTarget() > 0 then
-                manage.clearXtarget(State.group_choice, class_settings)
+                for i = 1, mq.TLO.Me.XTargetSlots() do
+                    if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
+                        local temp = State.status
+                        manage.clearXtarget(State.group_choice, class_settings)
+                        State.status = temp
+                    end
+                end
             end
             item_status = ''
             loop_check = true
@@ -449,7 +498,13 @@ end
 
 function Actions.general_search(item, class_settings)
     if mq.TLO.Me.XTarget() > 0 then
-        manage.clearXtarget(State.group_choice, class_settings)
+        for i = 1, mq.TLO.Me.XTargetSlots() do
+            if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
+                local temp = State.status
+                manage.clearXtarget(State.group_choice, class_settings)
+                State.status = temp
+            end
+        end
     end
     State.status = "Searching for " .. item.npc
     local looping = true
@@ -559,6 +614,7 @@ function Actions.loc_travel(item, class_settings)
     if mq.TLO.Navigation.PathExists('locxyz ' .. item.whereX .. ' ' .. item.whereY .. ' ' .. item.whereZ) == false then
         State.status = "No path exists to loc X: " .. item.whereX .. " Y: " .. item.whereY .. " Z: " .. item.whereZ
         State.task_run = false
+        mq.cmd('/foreground')
         return
     end
     State.traveling = true
@@ -572,14 +628,22 @@ end
 
 function Actions.loot(item, class_settings)
     if mq.TLO.Me.XTarget() > 0 then
-        manage.clearXtarget(State.group_choice, class_settings)
+        for i = 1, mq.TLO.Me.XTargetSlots() do
+            if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
+                local temp = State.status
+                manage.clearXtarget(State.group_choice, class_settings)
+                State.status = temp
+            end
+        end
     end
     State.status = "Looting " .. item.what
     mq.delay("2s")
+    local looted = false
     if mq.TLO.AdvLoot.SCount() > 0 then
         for i = 1, mq.TLO.AdvLoot.SCount() do
             if mq.TLO.AdvLoot.SList(i).Name() == item.what then
                 mq.cmdf('/squelch /advloot shared %s giveto %s', i, mq.TLO.Me.DisplayName())
+                looted = true
                 printf('%s \aoLooting: \ar%s', elheader, item.what)
             end
         end
@@ -588,6 +652,7 @@ function Actions.loot(item, class_settings)
         for i = 1, mq.TLO.AdvLoot.PCount() do
             if mq.TLO.AdvLoot.PList(i).Name() == item.what then
                 mq.cmdf('/squelch /advloot personal %s loot', i, mq.TLO.Me.DisplayName())
+                looted = true
                 printf('%s \aoLooting: \ar%s', elheader, item.what)
             end
         end
@@ -595,7 +660,30 @@ function Actions.loot(item, class_settings)
     if mq.TLO.FindItem("=" .. item.what)() ~= nil then
         return
     else
-
+        if looted == true then
+            local loopCount = 0
+            while true do
+                loopCount = loopCount + 1
+                mq.delay(200)
+                if mq.TLO.FindItem("=" .. item.what)() ~= nil then
+                    return
+                end
+                if mq.TLO.AdvLoot.PCount() > 0 then
+                    for i = 1, mq.TLO.AdvLoot.PCount() do
+                        if mq.TLO.AdvLoot.PList(i).Name() == item.what then
+                            mq.cmdf('/squelch /advloot personal %s loot', i, mq.TLO.Me.DisplayName())
+                            looted = true
+                        end
+                    end
+                end
+                if loopCount == 10 then
+                    State.task_run = false
+                    State.status = "Tried to loot " .. item.what .. "at step " .. State.Step .. " but failed!"
+                    mq.cmd('/foreground')
+                    return
+                end
+            end
+        end
     end
     if item.gotostep ~= nil then
         State.step = item.gotostep - 1
@@ -618,6 +706,12 @@ function Actions.npc_buy(item, class_settings)
     manage.removeInvis(State.group_choice)
     State.status = "Buying " .. item.what .. " from " .. item.npc
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
+        if mq.TLO.Spawn(item.npc).Distance ~= nil then
+            if mq.TLO.Spawn(item.npc).Distance() > 100 then
+                State.step = State.step - 2
+                return
+            end
+        end
         mq.TLO.Spawn(item.npc).DoTarget()
         mq.delay(300)
     end
@@ -638,6 +732,12 @@ end
 function Actions.npc_damage_until(item, class_settings)
     State.status = "Damaging " .. item.npc .. " to below " .. item.what .. "% health"
     ID = mq.TLO.Spawn('npc ' .. item.npc).ID()
+    if mq.TLO.Spawn(ID).Distance ~= nil then
+        if mq.TLO.Spawn(ID).Distance() > 100 then
+            State.step = State.step - 2
+            return
+        end
+    end
     mq.TLO.Spawn(ID).DoTarget()
     mq.cmd("/squelch /stick")
     mq.delay(100)
@@ -661,7 +761,13 @@ end
 
 function Actions.npc_follow(item, class_settings)
     if mq.TLO.Me.XTarget() > 0 then
-        manage.clearXtarget(State.group_choice, class_settings)
+        for i = 1, mq.TLO.Me.XTargetSlots() do
+            if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
+                local temp = State.status
+                manage.clearXtarget(State.group_choice, class_settings)
+                State.status = temp
+            end
+        end
     end
     if mq.TLO.Me.Invis() == false then
         if class_settings.general.invisForTravel == true then
@@ -682,15 +788,30 @@ function Actions.npc_give(item, class_settings)
     manage.removeInvis(State.group_choice)
     State.status = "Giving " .. item.what .. " to " .. item.npc
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
+        if mq.TLO.Spawn(item.npc).Distance ~= nil then
+            if mq.TLO.Spawn(item.npc).Distance() > 100 then
+                State.step = State.step - 2
+                return
+            end
+        end
         mq.TLO.Spawn(item.npc).DoTarget()
         mq.delay(300)
+    end
+    if mq.TLO.FindItem('=' .. item.what) == nil then
+        State.status = item.what .. " should be handed to " .. item.npc .. "but is not found in inventory."
+        State.task_run = false
+        mq.cmd('/foreground')
+        return
     end
     mq.cmdf('/squelch /nomodkey /shift /itemnotify "%s" leftmouseup', item.what)
     mq.delay("2s", Actions.got_cursor)
     mq.TLO.Target.LeftClick()
     mq.delay("5s", Actions.give_window)
     local looping = true
+    local loopCount = 0
     while looping do
+        loopCount = loopCount + 1
+        mq.delay(200)
         for i = 0, 3 do
             if string.lower(mq.TLO.Window('GiveWnd').Child('GVW_MyItemSlot' .. i).Tooltip()) == string.lower(item.what) then
                 looping = false
@@ -698,6 +819,12 @@ function Actions.npc_give(item, class_settings)
         end
         if State.skip == true then
             State.skip = false
+            return
+        end
+        if loopCount == 10 then
+            State.status = "Failed to give " .. item.what .. " to " .. item.npc .. " on step " .. State.step
+            State.task_run = false
+            mq.cmd('/foreground')
             return
         end
     end
@@ -717,6 +844,12 @@ function Actions.npc_give_add(item, class_settings)
     manage.removeInvis(State.group_choice)
     State.status = "Giving " .. item.what .. " to " .. item.npc
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
+        if mq.TLO.Spawn(item.npc).Distance ~= nil then
+            if mq.TLO.Spawn(item.npc).Distance() > 100 then
+                State.step = State.step - 2
+                return
+            end
+        end
         mq.TLO.Spawn(item.npc).DoTarget()
         mq.delay(300)
     end
@@ -757,6 +890,12 @@ function Actions.npc_give_money(item, class_settings)
     manage.removeInvis(State.group_choice)
     State.status = "Giving " .. item.what .. "pp to " .. item.npc
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
+        if mq.TLO.Spawn(item.npc).Distance ~= nil then
+            if mq.TLO.Spawn(item.npc).Distance() > 100 then
+                State.step = State.step - 2
+                return
+            end
+        end
         mq.TLO.Spawn(item.npc).DoTarget()
         mq.delay(300)
     end
@@ -789,6 +928,12 @@ function Actions.npc_hail(item, class_settings)
     manage.removeInvis(State.group_choice)
     State.status = "Hailing " .. item.npc
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
+        if mq.TLO.Spawn(item.npc).Distance ~= nil then
+            if mq.TLO.Spawn(item.npc).Distance() > 100 then
+                State.step = State.step - 2
+                return
+            end
+        end
         mq.TLO.Spawn(item.npc).DoTarget()
         mq.delay(300)
     end
@@ -803,6 +948,12 @@ function Actions.npc_kill(item, class_settings, loot)
     if item.what == nil then
         mq.delay(200)
         local ID = mq.TLO.NearestSpawn("npc " .. item.npc).ID()
+        if mq.TLO.Spawn(ID).Distance ~= nil then
+            if mq.TLO.Spawn(ID).Distance() > 100 then
+                State.step = State.step - 2
+                return
+            end
+        end
         mq.TLO.Spawn(ID).DoTarget()
         mq.cmd("/squelch /stick")
         mq.delay(100)
@@ -836,6 +987,12 @@ function Actions.npc_kill(item, class_settings, loot)
     else
         if mq.TLO.Spawn("npc " .. item.npc).ID() ~= 0 then
             local ID = mq.TLO.Spawn("npc " .. item.npc).ID()
+            if mq.TLO.Spawn(ID).Distance ~= nil then
+                if mq.TLO.Spawn(ID).Distance() > 100 then
+                    State.step = State.step - 2
+                    return
+                end
+            end
             mq.TLO.Spawn(ID).DoTarget()
             mq.cmd("/squelch /stick")
             mq.delay(100)
@@ -855,6 +1012,12 @@ function Actions.npc_kill(item, class_settings, loot)
             end
         else
             local ID = mq.TLO.Spawn("npc " .. item.what).ID()
+            if mq.TLO.Spawn(ID).Distance ~= nil then
+                if mq.TLO.Spawn(ID).Distance() > 100 then
+                    State.step = State.step - 2
+                    return
+                end
+            end
             mq.TLO.Spawn(ID).DoTarget()
             mq.cmd("/squelch /stick")
             mq.delay(100)
@@ -930,6 +1093,12 @@ function Actions.npc_kill_all(item, class_settings)
             end
             mq.delay(200)
         end
+        if mq.TLO.Spawn(ID).Distance ~= nil then
+            if mq.TLO.Spawn(ID).Distance() > 100 then
+                State.step = State.step - 1
+                return
+            end
+        end
         mq.TLO.Spawn(ID).DoTarget()
         mq.cmd("/squelch /stick")
         mq.delay(100)
@@ -948,6 +1117,12 @@ function Actions.npc_kill_all(item, class_settings)
                 return
             end
             mq.delay(200)
+            if mq.TLO.Spawn(ID).Distance ~= nil then
+                if mq.TLO.Spawn(ID).Distance() > 100 then
+                    State.step = State.step - 1
+                    return
+                end
+            end
             mq.TLO.Spawn(ID).DoTarget()
             loopCount = loopCount + 1
             if loopCount == 20 then
@@ -970,7 +1145,13 @@ end
 
 function Actions.npc_search(item, class_settings)
     if mq.TLO.Me.XTarget() > 0 then
-        manage.clearXtarget(State.group_choice, class_settings)
+        for i = 1, mq.TLO.Me.XTargetSlots() do
+            if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
+                local temp = State.status
+                manage.clearXtarget(State.group_choice, class_settings)
+                State.status = temp
+            end
+        end
     end
     State.status = "Searching for " .. item.npc
     local looping = true
@@ -1012,6 +1193,12 @@ function Actions.npc_talk(item, class_settings)
     manage.removeInvis(State.group_choice)
     State.status = "Talking to " .. item.npc .. " (" .. item.what .. ")"
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
+        if mq.TLO.Spawn(item.npc).Distance ~= nil then
+            if mq.TLO.Spawn(item.npc).Distance() > 100 then
+                State.step = State.step - 2
+                return
+            end
+        end
         mq.TLO.Spawn(item.npc).DoTarget()
         mq.delay(300)
     end
@@ -1039,7 +1226,13 @@ function Actions.npc_travel(item, class_settings, ignore_path_check)
         local search_string = "locxyz " .. item.whereX .. " " .. " " .. item.whereY .. " " .. item.whereZ
         if mq.TLO.Navigation.PathExists(search_string)() == false then
             if mq.TLO.Me.XTarget() > 0 then
-                manage.clearXtarget(State.group_choice, class_settings)
+                for i = 1, mq.TLO.Me.XTargetSlots() do
+                    if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
+                        local temp = State.status
+                        manage.clearXtarget(State.group_choice, class_settings)
+                        State.status = temp
+                    end
+                end
                 State.status = "No path found to " .. item.whereX .. " " .. item.whereY .. " " .. item.whereZ
                 mq.cmd('/foreground')
                 State.task_run = false
@@ -1139,7 +1332,13 @@ function Actions.npc_wait(item, class_settings)
     local unpause_automation = false
     while mq.TLO.Spawn("npc " .. item.npc).ID() == 0 do
         if mq.TLO.Me.XTarget() > 0 then
-            manage.clearXtarget(State.group_choice, class_settings)
+            for i = 1, mq.TLO.Me.XTargetSlots() do
+                if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
+                    local temp = State.status
+                    manage.clearXtarget(State.group_choice, class_settings)
+                    State.status = temp
+                end
+            end
             State.status = "Waiting for " .. item.npc .. " (" .. item.waittime .. ")"
         end
         if State.skip == true then
@@ -1166,7 +1365,13 @@ function Actions.npc_wait_despawn(item, class_settings)
     local unpause_automation = false
     while mq.TLO.Spawn("npc " .. item.npc).ID() ~= 0 do
         if mq.TLO.Me.XTarget() > 0 then
-            manage.clearXtarget(State.group_choice, class_settings)
+            for i = 1, mq.TLO.Me.XTargetSlots() do
+                if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
+                    local temp = State.status
+                    manage.clearXtarget(State.group_choice, class_settings)
+                    State.status = temp
+                end
+            end
             State.status = "Waiting for " .. item.npc .. " to despawn (" .. item.waittime .. ")"
         end
         if State.skip == true then
@@ -1204,7 +1409,13 @@ end
 
 function Actions.ph_search(item, class_settings)
     if mq.TLO.Me.XTarget() > 0 then
-        manage.clearXtarget(State.group_choice, class_settings)
+        for i = 1, mq.TLO.Me.XTargetSlots() do
+            if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
+                local temp = State.status
+                manage.clearXtarget(State.group_choice, class_settings)
+                State.status = temp
+            end
+        end
     end
     State.status = 'Searching for PH for ' .. item.npc
     local spawn_search = "npc loc " ..
@@ -1223,6 +1434,12 @@ function Actions.picklock_door(item, class_settings)
 end
 
 function Actions.pickpocket(item, class_settings)
+    if mq.TLO.Spawn(item.npc).Distance ~= nil then
+        if mq.TLO.Spawn(item.npc).Distance() > 100 then
+            State.step = State.step - 2
+            return
+        end
+    end
     mq.TLO.NearestSpawn("npc " .. item.npc).DoTarget()
     local looping = true
     while looping do
@@ -1257,7 +1474,13 @@ end
 
 function Actions.pre_farm_check(item, class_settings)
     if mq.TLO.Me.XTarget() > 0 then
-        manage.clearXtarget(State.group_choice, class_settings)
+        for i = 1, mq.TLO.Me.XTargetSlots() do
+            if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
+                local temp = State.status
+                manage.clearXtarget(State.group_choice, class_settings)
+                State.status = temp
+            end
+        end
     end
     State.status = "Checking for pre-farmable items (" .. item.what .. ")"
     mq.delay("1s")
@@ -1285,7 +1508,13 @@ end
 
 function Actions.relocate(item, class_settings)
     if mq.TLO.Me.XTarget() > 0 then
-        manage.clearXtarget(State.group_choice, class_settings)
+        for i = 1, mq.TLO.Me.XTargetSlots() do
+            if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
+                local temp = State.status
+                manage.clearXtarget(State.group_choice, class_settings)
+                State.status = temp
+            end
+        end
     end
     State.status = "Relocating to " .. item.what
     manage.relocateGroup(State.group_choice, item.what)

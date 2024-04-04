@@ -57,7 +57,7 @@ function manage.clearXtarget(group_set, class_settings, npc)
                             break
                         end
                     else
-                        if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' then
+                        if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
                             if mq.TLO.Me.XTarget(i).Distance() ~= nil then
                                 if mq.TLO.Me.XTarget(i).Distance() < 300 and mq.TLO.Me.XTarget(i).LineOfSight() == true then
                                     mq.TLO.Me.XTarget(i).DoTarget()
@@ -300,6 +300,12 @@ function manage.faceLoc(group_set, x, y, z)
 end
 
 function manage.followGroup(group_set, npc)
+    if mq.TLO.Spawn("npc " .. npc).Distance ~= nil then
+        if mq.TLO.Spawn("npc " .. npc).Distance() > 100 then
+            State.step = State.step - 2
+            return
+        end
+    end
     if group_set == 1 then
         mq.TLO.Spawn("npc " .. npc).DoTarget()
         mq.delay(300)
@@ -318,6 +324,12 @@ function manage.followGroup(group_set, npc)
 end
 
 function manage.followGroupLoc(group_set, npc, x, y)
+    if mq.TLO.Spawn("npc " .. npc).Distance ~= nil then
+        if mq.TLO.Spawn("npc " .. npc).Distance() > 100 then
+            State.step = State.step - 2
+            return
+        end
+    end
     if group_set == 1 then
         mq.TLO.Spawn("npc " .. npc).DoTarget()
         mq.delay(300)
@@ -415,6 +427,12 @@ function manage.gateGroup(group_set)
 end
 
 function manage.groupTalk(group_set, npc, phrase)
+    if mq.TLO.Spawn(npc).Distance ~= nil then
+        if mq.TLO.Spawn(npc).Distance() > 100 then
+            State.step = State.step - 2
+            return
+        end
+    end
     if group_set == 1 then
         if mq.TLO.Target.ID() ~= mq.TLO.Spawn(npc).ID() then
             mq.TLO.Spawn(npc).DoTarget()
@@ -569,11 +587,15 @@ function manage.locTravelGroup(group_set, x, y, z, class_settings, invis)
         end
         mq.delay(200)
         if mq.TLO.Me.XTarget() > 0 then
-            local temp = State.status
-            manage.navPause(group_set)
-            manage.clearXtarget(group_set, class_settings)
-            manage.navUnpause(group_set)
-            State.status = temp
+            for i = 1, mq.TLO.Me.XTargetSlots() do
+                if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
+                    local temp = State.status
+                    manage.navPause(group_set)
+                    manage.clearXtarget(group_set, class_settings)
+                    manage.navUnpause(group_set)
+                    State.status = temp
+                end
+            end
         end
         if State.pause == true then
             manage.navPause(group_set)
@@ -641,6 +663,9 @@ function manage.navGroup(group_set, npc, ID, class_settings, invis)
     local temp = State.status
     local unpause_automation = false
     while mq.TLO.Navigation.Active() do
+        if mq.TLO.Navigation.Paused() == true then
+            manage.navUnPause(group_set)
+        end
         if State.skip == true then
             manage.navPause(group_set)
             State.skip = false
@@ -649,11 +674,16 @@ function manage.navGroup(group_set, npc, ID, class_settings, invis)
         mq.delay(200)
         mq.doevents()
         if mq.TLO.Me.XTarget() > 0 then
-            local temp = State.status
-            manage.navPause(group_set)
-            manage.clearXtarget(group_set, class_settings)
-            manage.navUnpause(group_set)
-            State.status = temp
+            for i = 1, mq.TLO.Me.XTargetSlots() do
+                if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
+                    print(i)
+                    local temp = State.status
+                    manage.navPause(group_set)
+                    manage.clearXtarget(group_set, class_settings)
+                    manage.navUnpause(group_set)
+                    State.status = temp
+                end
+            end
         end
         if State.pause == true then
             manage.navPause(group_set)
@@ -721,6 +751,9 @@ function manage.navGroupGeneral(group_set, npc, ID, class_settings, invis)
     local temp = State.status
     local unpause_automation = false
     while mq.TLO.Navigation.Active() do
+        if mq.TLO.Navigation.Paused() == true then
+            manage.navUnPause(group_set)
+        end
         if State.skip == true then
             manage.navPause(group_set)
             State.skip = false
@@ -728,11 +761,15 @@ function manage.navGroupGeneral(group_set, npc, ID, class_settings, invis)
         end
         mq.delay(200)
         if mq.TLO.Me.XTarget() > 0 then
-            local temp = State.status
-            manage.navPause(group_set)
-            manage.clearXtarget(group_set, class_settings)
-            manage.navUnpause(group_set)
-            State.status = temp
+            for i = 1, mq.TLO.Me.XTargetSlots() do
+                if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
+                    local temp = State.status
+                    manage.navPause(group_set)
+                    manage.clearXtarget(group_set, class_settings)
+                    manage.navUnpause(group_set)
+                    State.status = temp
+                end
+            end
         end
         if State.pause == true then
             manage.navPause(group_set)
@@ -801,6 +838,9 @@ function manage.navGroupLoc(group_set, npc, x, y, z, class_settings, invis)
     local temp = State.status
     local unpause_automation = false
     while mq.TLO.Navigation.Active() do
+        if mq.TLO.Navigation.Paused() == true then
+            manage.navUnPause(group_set)
+        end
         if State.skip == true then
             manage.navPause(group_set)
             State.skip = false
@@ -808,11 +848,15 @@ function manage.navGroupLoc(group_set, npc, x, y, z, class_settings, invis)
         end
         mq.delay(200)
         if mq.TLO.Me.XTarget() > 0 then
-            local temp = State.status
-            manage.navPause(group_set)
-            manage.clearXtarget(group_set, class_settings)
-            manage.navUnpause(group_set)
-            State.status = temp
+            for i = 1, mq.TLO.Me.XTargetSlots() do
+                if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
+                    local temp = State.status
+                    manage.navPause(group_set)
+                    manage.clearXtarget(group_set, class_settings)
+                    manage.navUnpause(group_set)
+                    State.status = temp
+                end
+            end
         end
         if State.pause == true then
             manage.navPause(group_set)
@@ -913,7 +957,7 @@ function manage.navPause(group_set)
         mq.cmd('/dgga /squelch /nav pause')
     else
         mq.cmd('/squelch /nav pause')
-        mq.cmdf('/dex %s /squelch /nav id %s', State.group_combo[State.group_choice])
+        mq.cmdf('/dex %s /nav pause', State.group_combo[State.group_choice])
     end
     mq.delay(500)
 end
@@ -1179,6 +1223,9 @@ function manage.zoneGroup(group_set, zone, class_settings, invis)
     local unpause_automation = false
     local loopCount = 0
     while mq.TLO.Zone.ShortName() ~= zone and mq.TLO.Zone.Name() ~= zone do
+        if mq.TLO.Navigation.Paused() == true then
+            manage.navUnPause(group_set)
+        end
         if State.skip == true then
             manage.navPause(group_set)
             State.skip = false
@@ -1186,11 +1233,15 @@ function manage.zoneGroup(group_set, zone, class_settings, invis)
         end
         mq.delay(500)
         if mq.TLO.Me.XTarget() > 0 then
-            local temp = State.status
-            manage.navPause(group_set)
-            manage.clearXtarget(group_set, class_settings)
-            manage.navUnpause(group_set)
-            State.status = temp
+            for i = 1, mq.TLO.Me.XTargetSlots() do
+                if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
+                    local temp = State.status
+                    manage.navPause(group_set)
+                    manage.clearXtarget(group_set, class_settings)
+                    manage.navUnpause(group_set)
+                    State.status = temp
+                end
+            end
         end
         if State.pause == true then
             manage.navPause(group_set)

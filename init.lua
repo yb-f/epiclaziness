@@ -185,6 +185,9 @@ local function run_epic(class, choice)
         else
             State.rewound = false
         end
+        if mq.TLO.Me.Combat() == true then
+            mq.cmd('/attack off')
+        end
         if task_table[State.step].type == "AUTO_INV" then
             actions.auto_inv(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "BACKSTAB" then
@@ -212,7 +215,11 @@ local function run_epic(class, choice)
             create_spawn_list()
         elseif task_table[State.step].type == "EXECUTE_COMMAND" then
             if mq.TLO.Me.XTarget() > 0 then
-                manage.clearXtarget(State.group_choice, class_settings.settings)
+                for i = 1, mq.TLO.Me.XTargetSlots() do
+                    if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
+                        manage.clearXtarget(State.group_choice, class_settings.settings)
+                    end
+                end
             end
             mq.cmdf("%s", task_table[State.step].what)
             mq.delay(500)
@@ -242,7 +249,11 @@ local function run_epic(class, choice)
             actions.loc_travel(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "LOOT" then
             if mq.TLO.Me.XTarget() > 0 then
-                manage.clearXtarget(State.group_choice, class_settings.settings)
+                for i = 1, mq.TLO.Me.XTargetSlots() do
+                    if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
+                        manage.clearXtarget(State.group_choice, class_settings.settings)
+                    end
+                end
             end
             actions.loot(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "NO_NAV_TRAVEL" then
@@ -275,7 +286,11 @@ local function run_epic(class, choice)
             actions.npc_talk(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "NPC_TALK_ALL" then
             if mq.TLO.Me.XTarget() > 0 then
-                manage.clearXtarget(State.group_choice, class_settings.settings)
+                for i = 1, mq.TLO.Me.XTargetSlots() do
+                    if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
+                        manage.clearXtarget(State.group_choice, class_settings.settings)
+                    end
+                end
             end
             actions.npc_talk_all(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "NPC_TRAVEL" then
@@ -314,7 +329,11 @@ local function run_epic(class, choice)
             actions.send_yes(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "WAIT" then
             if mq.TLO.Me.XTarget() > 0 then
-                manage.clearXtarget(State.group_choice, class_settings.settings)
+                for i = 1, mq.TLO.Me.XTargetSlots() do
+                    if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
+                        manage.clearXtarget(State.group_choice, class_settings.settings)
+                    end
+                end
             end
             State.status = "Pausing for " .. task_table[State.step].what / 1000 .. " seconds"
             mq.delay(tonumber(task_table[State.step].what))
