@@ -358,7 +358,11 @@ function Actions.farm_radius(item, class_settings)
                     end
                 end
             end
-            mq.delay(200)
+            mq.delay("1s")
+            if mq.TLO.Window('ConfirmationDialogBox').Open() then
+                mq.TLO.Window('ConfirmationDialogBox/CD_Yes_Button').LeftMouseUp()
+                mq.delay("1s")
+            end
         end
     else
         while mq.TLO.FindItemCount("=" .. item.what)() < item.count do
@@ -399,7 +403,11 @@ function Actions.farm_radius(item, class_settings)
                     end
                 end
             end
-            mq.delay(200)
+            mq.delay("1s")
+            if mq.TLO.Window('ConfirmationDialogBox').Open() then
+                mq.TLO.Window('ConfirmationDialogBox/CD_Yes_Button').LeftMouseUp()
+                mq.delay("1s")
+            end
         end
     end
     manage.uncampGroup(State.group_choice, class_settings)
@@ -657,7 +665,15 @@ function Actions.loot(item, class_settings)
             end
         end
     end
+    mq.delay("1s")
+    if mq.TLO.Window('ConfirmationDialogBox').Open() then
+        mq.TLO.Window('ConfirmationDialogBox/CD_Yes_Button').LeftMouseUp()
+        mq.delay("1s")
+    end
     if mq.TLO.FindItem("=" .. item.what)() ~= nil then
+        if item.gotostep ~= nil then
+            State.step = item.gotostep - 1
+        end
         return
     else
         if looted == true then
@@ -666,6 +682,9 @@ function Actions.loot(item, class_settings)
                 loopCount = loopCount + 1
                 mq.delay(200)
                 if mq.TLO.FindItem("=" .. item.what)() ~= nil then
+                    if item.gotostep ~= nil then
+                        State.step = item.gotostep - 1
+                    end
                     return
                 end
                 if mq.TLO.AdvLoot.PCount() > 0 then
@@ -673,6 +692,11 @@ function Actions.loot(item, class_settings)
                         if mq.TLO.AdvLoot.PList(i).Name() == item.what then
                             mq.cmdf('/squelch /advloot personal %s loot', i, mq.TLO.Me.DisplayName())
                             looted = true
+                        end
+                        mq.delay("1s")
+                        if mq.TLO.Window('ConfirmationDialogBox').Open() then
+                            mq.TLO.Window('ConfirmationDialogBox/CD_Yes_Button').LeftMouseUp()
+                            mq.delay("1s")
                         end
                     end
                 end
