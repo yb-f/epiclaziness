@@ -1296,6 +1296,9 @@ function Actions.npc_travel(item, class_settings, ignore_path_check)
                         return
                     end
                     mq.delay(500)
+                    if mq.TLO.Spawn("npc " .. item.npc).ID == 0 then
+                        State.status = "Waiting for NPC " .. item.npc
+                    end
                     if State.pause == true then
                         unpause_automation = true
                         State.status = "Paused"
@@ -1572,7 +1575,11 @@ function Actions.zone_continue_travel(item, class_settings)
     end
     State.status = "Traveling to " .. item.zone
     State.traveling = true
-    manage.zoneGroup(State.group_choice, item.zone)
+    if item.invis ~= nil then
+        manage.zoneGroup(State.group_choice, item.zone, class_settings, item.invis)
+    else
+        manage.zoneGroup(State.group_choice, item.zone, class_settings)
+    end
     State.traveling = false
 end
 
