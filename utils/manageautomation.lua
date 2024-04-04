@@ -312,7 +312,7 @@ function manage.faceLoc(group_set, x, y, z)
 end
 
 function manage.followGroup(group_set, npc)
-    if mq.TLO.Spawn("npc " .. npc).Distance ~= nil then
+    if mq.TLO.Spawn("npc " .. npc).Distance() ~= nil then
         if mq.TLO.Spawn("npc " .. npc).Distance() > 100 then
             State.step = State.step - 2
             return
@@ -336,7 +336,7 @@ function manage.followGroup(group_set, npc)
 end
 
 function manage.followGroupLoc(group_set, npc, x, y)
-    if mq.TLO.Spawn("npc " .. npc).Distance ~= nil then
+    if mq.TLO.Spawn("npc " .. npc).Distance() ~= nil then
         if mq.TLO.Spawn("npc " .. npc).Distance() > 100 then
             State.step = State.step - 2
             return
@@ -439,7 +439,7 @@ function manage.gateGroup(group_set)
 end
 
 function manage.groupTalk(group_set, npc, phrase)
-    if mq.TLO.Spawn(npc).Distance ~= nil then
+    if mq.TLO.Spawn(npc).Distance() ~= nil then
         if mq.TLO.Spawn(npc).Distance() > 100 then
             State.step = State.step - 2
             return

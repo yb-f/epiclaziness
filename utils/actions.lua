@@ -57,7 +57,7 @@ function Actions.auto_inv(item, class_settings)
 end
 
 function Actions.backstab(item, class_settings)
-    if mq.TLO.NearestSpawn("npc " .. item.npc).Distance ~= nil then
+    if mq.TLO.NearestSpawn("npc " .. item.npc).Distance() ~= nil then
         if mq.TLO.NearestSpawn("npc " .. item.npc).Distance() > 100 then
             State.step = State.step - 2
             return
@@ -730,7 +730,7 @@ function Actions.npc_buy(item, class_settings)
     manage.removeInvis(State.group_choice)
     State.status = "Buying " .. item.what .. " from " .. item.npc
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
-        if mq.TLO.Spawn(item.npc).Distance ~= nil then
+        if mq.TLO.Spawn(item.npc).Distance() ~= nil then
             if mq.TLO.Spawn(item.npc).Distance() > 100 then
                 State.step = State.step - 2
                 return
@@ -756,7 +756,7 @@ end
 function Actions.npc_damage_until(item, class_settings)
     State.status = "Damaging " .. item.npc .. " to below " .. item.what .. "% health"
     ID = mq.TLO.Spawn('npc ' .. item.npc).ID()
-    if mq.TLO.Spawn(ID).Distance ~= nil then
+    if mq.TLO.Spawn(ID).Distance() ~= nil then
         if mq.TLO.Spawn(ID).Distance() > 100 then
             State.step = State.step - 2
             return
@@ -812,7 +812,7 @@ function Actions.npc_give(item, class_settings)
     manage.removeInvis(State.group_choice)
     State.status = "Giving " .. item.what .. " to " .. item.npc
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
-        if mq.TLO.Spawn(item.npc).Distance ~= nil then
+        if mq.TLO.Spawn(item.npc).Distance() ~= nil then
             if mq.TLO.Spawn(item.npc).Distance() > 100 then
                 State.step = State.step - 2
                 return
@@ -868,7 +868,7 @@ function Actions.npc_give_add(item, class_settings)
     manage.removeInvis(State.group_choice)
     State.status = "Giving " .. item.what .. " to " .. item.npc
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
-        if mq.TLO.Spawn(item.npc).Distance ~= nil then
+        if mq.TLO.Spawn(item.npc).Distance() ~= nil then
             if mq.TLO.Spawn(item.npc).Distance() > 100 then
                 State.step = State.step - 2
                 return
@@ -914,7 +914,7 @@ function Actions.npc_give_money(item, class_settings)
     manage.removeInvis(State.group_choice)
     State.status = "Giving " .. item.what .. "pp to " .. item.npc
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
-        if mq.TLO.Spawn(item.npc).Distance ~= nil then
+        if mq.TLO.Spawn(item.npc).Distance() ~= nil then
             if mq.TLO.Spawn(item.npc).Distance() > 100 then
                 State.step = State.step - 2
                 return
@@ -952,7 +952,7 @@ function Actions.npc_hail(item, class_settings)
     manage.removeInvis(State.group_choice)
     State.status = "Hailing " .. item.npc
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
-        if mq.TLO.Spawn(item.npc).Distance ~= nil then
+        if mq.TLO.Spawn(item.npc).Distance() ~= nil then
             if mq.TLO.Spawn(item.npc).Distance() > 100 then
                 State.step = State.step - 2
                 return
@@ -972,7 +972,7 @@ function Actions.npc_kill(item, class_settings, loot)
     if item.what == nil then
         mq.delay(200)
         local ID = mq.TLO.NearestSpawn("npc " .. item.npc).ID()
-        if mq.TLO.Spawn(ID).Distance ~= nil then
+        if mq.TLO.Spawn(ID).Distance() ~= nil then
             if mq.TLO.Spawn(ID).Distance() > 100 then
                 State.step = State.step - 2
                 return
@@ -1011,7 +1011,7 @@ function Actions.npc_kill(item, class_settings, loot)
     else
         if mq.TLO.Spawn("npc " .. item.npc).ID() ~= 0 then
             local ID = mq.TLO.Spawn("npc " .. item.npc).ID()
-            if mq.TLO.Spawn(ID).Distance ~= nil then
+            if mq.TLO.Spawn(ID).Distance() ~= nil then
                 if mq.TLO.Spawn(ID).Distance() > 100 then
                     State.step = State.step - 2
                     return
@@ -1036,7 +1036,7 @@ function Actions.npc_kill(item, class_settings, loot)
             end
         else
             local ID = mq.TLO.Spawn("npc " .. item.what).ID()
-            if mq.TLO.Spawn(ID).Distance ~= nil then
+            if mq.TLO.Spawn(ID).Distance() ~= nil then
                 if mq.TLO.Spawn(ID).Distance() > 100 then
                     State.step = State.step - 2
                     return
@@ -1117,7 +1117,7 @@ function Actions.npc_kill_all(item, class_settings)
             end
             mq.delay(200)
         end
-        if mq.TLO.Spawn(ID).Distance ~= nil then
+        if mq.TLO.Spawn(ID).Distance() ~= nil then
             if mq.TLO.Spawn(ID).Distance() > 100 then
                 State.step = State.step - 1
                 return
@@ -1141,7 +1141,7 @@ function Actions.npc_kill_all(item, class_settings)
                 return
             end
             mq.delay(200)
-            if mq.TLO.Spawn(ID).Distance ~= nil then
+            if mq.TLO.Spawn(ID).Distance() ~= nil then
                 if mq.TLO.Spawn(ID).Distance() > 100 then
                     State.step = State.step - 1
                     return
@@ -1217,7 +1217,7 @@ function Actions.npc_talk(item, class_settings)
     manage.removeInvis(State.group_choice)
     State.status = "Talking to " .. item.npc .. " (" .. item.what .. ")"
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
-        if mq.TLO.Spawn(item.npc).Distance ~= nil then
+        if mq.TLO.Spawn(item.npc).Distance() ~= nil then
             if mq.TLO.Spawn(item.npc).Distance() > 100 then
                 State.step = State.step - 2
                 return
@@ -1461,7 +1461,7 @@ function Actions.picklock_door(item, class_settings)
 end
 
 function Actions.pickpocket(item, class_settings)
-    if mq.TLO.Spawn(item.npc).Distance ~= nil then
+    if mq.TLO.Spawn(item.npc).Distance() ~= nil then
         if mq.TLO.Spawn(item.npc).Distance() > 100 then
             State.step = State.step - 2
             return
