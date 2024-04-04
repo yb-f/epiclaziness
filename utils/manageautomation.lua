@@ -127,6 +127,7 @@ function manage.doAutomation(character, class, script, action)
         if character == mq.TLO.Me.DisplayName() then
             if script == 1 then
                 mq.cmdf('/squelch /%s mode 0 nosave', class)
+                mq.cmdf('/squelch /%s usestick on nosave', class)
             elseif script == 2 then
                 mq.cmd("/squelch /lua run rgmercs")
             elseif script == 3 then
@@ -676,7 +677,7 @@ function manage.navGroup(group_set, npc, ID, class_settings, invis)
     local unpause_automation = false
     while mq.TLO.Navigation.Active() do
         if mq.TLO.Navigation.Paused() == true then
-            manage.navUnPause(group_set)
+            manage.navUnpause(group_set)
         end
         if State.skip == true then
             manage.navPause(group_set)
@@ -764,7 +765,7 @@ function manage.navGroupGeneral(group_set, npc, ID, class_settings, invis)
     local unpause_automation = false
     while mq.TLO.Navigation.Active() do
         if mq.TLO.Navigation.Paused() == true then
-            manage.navUnPause(group_set)
+            manage.navUnpause(group_set)
         end
         if State.skip == true then
             manage.navPause(group_set)
@@ -851,7 +852,7 @@ function manage.navGroupLoc(group_set, npc, x, y, z, class_settings, invis)
     local unpause_automation = false
     while mq.TLO.Navigation.Active() do
         if mq.TLO.Navigation.Paused() == true then
-            manage.navUnPause(group_set)
+            manage.navUnpause(group_set)
         end
         if State.skip == true then
             manage.navPause(group_set)
@@ -1268,7 +1269,7 @@ function manage.zoneGroup(group_set, zone, class_settings, invis)
     local loopCount = 0
     while mq.TLO.Zone.ShortName() ~= zone and mq.TLO.Zone.Name() ~= zone do
         if mq.TLO.Navigation.Paused() == true then
-            manage.navUnPause(group_set)
+            manage.navUnpause(group_set)
         end
         if State.skip == true then
             manage.navPause(group_set)
