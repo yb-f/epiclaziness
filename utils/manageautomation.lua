@@ -40,8 +40,8 @@ function manage.clearXtarget(group_set, class_settings, npc)
         while looping do
             i = i + 1
             loopCount = loopCount + 1
-            if mq.TLO.Me.XTarget(i)() ~= '' then
-                if mq.TLO.Me.XTarget(i).CleanName() ~= nil then
+            if mq.TLO.Me.XTarget(i)() ~= '' and mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' then
+                if mq.TLO.Me.XTarget(i).CleanName() ~= nil and npc ~= nil then
                     if string.find(string.lower(mq.TLO.Me.XTarget(i).CleanName()), string.lower(npc)) then
                         local ID = mq.TLO.Me.XTarget(i).ID()
                         local notFound = true
@@ -100,6 +100,15 @@ function manage.clearXtarget(group_set, class_settings, npc)
                 loopCount = 0
             end
             if mq.TLO.Me.XTarget() == 0 then
+                looping = false
+            end
+            local continueLoop = true
+            for j = 1, max_xtargs do
+                if mq.TLO.Me.XTarget(j).TargetType == 'Auto Hater' and mq.TLO.Me.XTarget(j)() ~= '' then
+                    continueLoop = false
+                end
+            end
+            if continueLoop == false then
                 looping = false
             end
         end
@@ -1195,7 +1204,11 @@ function manage.unpauseGroup(group_set, class_settings)
     if group_set == 1 then
         return
     elseif group_set == 2 then
-        for i = 0, mq.TLO.Group.GroupSize() - 1 do
+        local groupSize = 1
+        if mq.TLO.Group.GroupSize() ~= nil then
+            groupSize = mq.TLO.Group.GroupSize()
+        end
+        for i = 0, groupSize - 1 do
             if mq.TLO.Group.Member(i).DisplayName() ~= mq.TLO.Me.DisplayName() then
                 manage.doAutomation(mq.TLO.Group.Member(i).DisplayName(), mq.TLO.Group.Member(i).Class.ShortName(),
                     class_settings.class[mq.TLO.Group.Member(i).Class.Name()],
