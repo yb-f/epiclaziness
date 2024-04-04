@@ -38,6 +38,7 @@ function manage.clearXtarget(group_set, class_settings, npc)
         local i = 0
         local idList = {}
         while looping do
+            mq.delay(200)
             i = i + 1
             loopCount = loopCount + 1
             if mq.TLO.Me.XTarget(i)() ~= '' and mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' then
@@ -102,10 +103,12 @@ function manage.clearXtarget(group_set, class_settings, npc)
             if mq.TLO.Me.XTarget() == 0 then
                 looping = false
             end
-            local continueLoop = true
+            local continueLoop = false
             for j = 1, max_xtargs do
-                if mq.TLO.Me.XTarget(j).TargetType == 'Auto Hater' and mq.TLO.Me.XTarget(j)() ~= '' then
-                    continueLoop = false
+                if mq.TLO.Me.XTarget(j).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(j)() ~= '' then
+                    continueLoop = true
+                    printf("%s valid xtarget", j)
+                else
                 end
             end
             if continueLoop == false then
