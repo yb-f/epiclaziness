@@ -1044,19 +1044,43 @@ function manage.picklockGroup(group_set)
             mq.cmd("/squelch /autoinv")
         else
             printf("%s \aoI am not a class that is able to pick locks.", elheader)
+            State.status = "I require a lockpicker to proceed. (" .. State.step .. ")"
+            State.task_run = false
+            mq.cmd('/foreground')
+            return
         end
     elseif group_set == 2 then
-        for i = 0, mq.TLO.Group.GroupSize() - 1 do
-            if mq.TLO.Group.Member(i).Class.ShortName() == 'BRD' or mq.TLO.Group.Member(i).Class.ShortName() == 'ROG' then
-                mq.cmdf("/dex %s /squelch /itemnotify lockpicks leftmouseup", mq.TLO.Group.Member(i).DisplayName())
-                mq.delay(200)
-                mq.cmdf("/dex %s /squelch /doortarget", mq.TLO.Group.Member(i).DisplayName())
-                mq.delay(200)
-                mq.cmdf("/dex %s /squelch /click left door", mq.TLO.Group.Member(i).DisplayName())
-                mq.delay(200)
-                mq.cmdf("/dex %s /squelch /autoinv", mq.TLO.Group.Member(i).DisplayName())
-                break
+        local pickerFound = false
+        if mq.TLO.Me.Class.ShortName() == 'BRD' or mq.TLO.Me.Class.ShortName() == 'ROG' then
+            mq.cmd("/squelch /itemnotify lockpicks leftmouseup")
+            mq.delay(200)
+            mq.cmd("/squelch /doortarget")
+            mq.delay(200)
+            mq.cmd("/squelch /click left door")
+            mq.delay(200)
+            mq.cmd("/squelch /autoinv")
+            pickerFound = true
+        else
+            for i = 0, mq.TLO.Group.GroupSize() - 1 do
+                if mq.TLO.Group.Member(i).Class.ShortName() == 'BRD' or mq.TLO.Group.Member(i).Class.ShortName() == 'ROG' then
+                    mq.cmdf("/dex %s /squelch /itemnotify lockpicks leftmouseup", mq.TLO.Group.Member(i).DisplayName())
+                    mq.delay(200)
+                    mq.cmdf("/dex %s /squelch /doortarget", mq.TLO.Group.Member(i).DisplayName())
+                    mq.delay(200)
+                    mq.cmdf("/dex %s /squelch /click left door", mq.TLO.Group.Member(i).DisplayName())
+                    mq.delay(200)
+                    mq.cmdf("/dex %s /squelch /autoinv", mq.TLO.Group.Member(i).DisplayName())
+                    pickerFound = true
+                    break
+                end
             end
+        end
+        if pickerFound == false then
+            State.status = "I require a lockpicker to proceed. (" .. State.step .. ")"
+            printf("%s \aoI require a class that is able to pick locks.", elheader)
+            State.task_run = false
+            mq.cmd('/foreground')
+            return
         end
     else
         local name = State.group_combo[State.group_choice]
@@ -1077,7 +1101,11 @@ function manage.picklockGroup(group_set)
             mq.delay(200)
             mq.cmd("/squelch /autoinv")
         else
+            State.status = "I require a lockpicker to proceed. (" .. State.step .. ")"
             printf("%s \aoI require a class that is able to pick locks.", elheader)
+            State.task_run = false
+            mq.cmd('/foreground')
+            return
         end
     end
 end
