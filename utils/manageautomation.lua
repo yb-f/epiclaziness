@@ -107,7 +107,6 @@ function manage.clearXtarget(group_set, class_settings, npc)
             for j = 1, max_xtargs do
                 if mq.TLO.Me.XTarget(j).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(j)() ~= '' then
                     continueLoop = true
-                    printf("%s valid xtarget", j)
                 else
                 end
             end
@@ -689,7 +688,6 @@ function manage.navGroup(group_set, npc, ID, class_settings, invis)
         if mq.TLO.Me.XTarget() > 0 then
             for i = 1, mq.TLO.Me.XTargetSlots() do
                 if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
-                    print(i)
                     local temp = State.status
                     manage.navPause(group_set)
                     manage.clearXtarget(group_set, class_settings)
