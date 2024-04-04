@@ -22,6 +22,14 @@ function loadsave.createConfig()
 end
 
 function loadsave.addConfig()
+    if loadsave.SaveState[class] == nil then
+        loadsave.SaveState[class] = {
+            [State.epic_choice] = {
+                ['Step'] = 0
+            },
+            ['Last_Ran'] = 1
+        }
+    end
     loadsave.SaveState[class][State.epic_choice] = {
         ['Step'] = 0
     }
