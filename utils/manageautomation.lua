@@ -1109,7 +1109,86 @@ function manage.picklockGroup(group_set)
     end
 end
 
-function manage.relocateGroup(group_set, relocate)
+function manage.relocateGroup(group_set, relocate, class_settings)
+    local unpause_automation = false
+    local temp = ''
+    if relocate == 'lobby' then
+        if mq.TLO.Me.AltAbilityReady('Throne of Heroes')() == false then
+            while mq.TLO.Me.AltAbilityReady('Throne of Heroes')() == false do
+                if mq.TLO.Navigation.Paused() == true then
+                    manage.navUnpause(group_set)
+                end
+                if State.skip == true then
+                    manage.navPause(group_set)
+                    State.skip = false
+                    return
+                end
+                mq.delay(200)
+                if mq.TLO.Me.XTarget() > 0 then
+                    for i = 1, mq.TLO.Me.XTargetSlots() do
+                        if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
+                            local temp = State.status
+                            manage.navPause(group_set)
+                            manage.clearXtarget(group_set, class_settings)
+                            manage.navUnpause(group_set)
+                            State.status = temp
+                        end
+                    end
+                end
+                if State.pause == true then
+                    manage.navPause(group_set)
+                    unpause_automation = true
+                    State.status = "Paused"
+                end
+                while State.pause == true do
+                    mq.delay(200)
+                end
+                if unpause_automation == true then
+                    State.status = temp
+                    manage.navUnpause(group_set)
+                    unpause_automation = false
+                end
+            end
+        end
+    elseif relocate == 'origin' then
+        if mq.TLO.Me.AltAbilityReady('Origin')() == false then
+            while mq.TLO.Me.AltAbilityReady('Origin')() == false do
+                if mq.TLO.Navigation.Paused() == true then
+                    manage.navUnpause(group_set)
+                end
+                if State.skip == true then
+                    manage.navPause(group_set)
+                    State.skip = false
+                    return
+                end
+                mq.delay(200)
+                if mq.TLO.Me.XTarget() > 0 then
+                    for i = 1, mq.TLO.Me.XTargetSlots() do
+                        if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
+                            local temp = State.status
+                            manage.navPause(group_set)
+                            manage.clearXtarget(group_set, class_settings)
+                            manage.navUnpause(group_set)
+                            State.status = temp
+                        end
+                    end
+                end
+                if State.pause == true then
+                    manage.navPause(group_set)
+                    unpause_automation = true
+                    State.status = "Paused"
+                end
+                while State.pause == true do
+                    mq.delay(200)
+                end
+                if unpause_automation == true then
+                    State.status = temp
+                    manage.navUnpause(group_set)
+                    unpause_automation = false
+                end
+            end
+        end
+    end
     if group_set == 1 then
         mq.cmdf('/squelch /relocate %s', relocate)
     elseif group_set == 2 then
