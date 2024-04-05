@@ -837,14 +837,27 @@ function manage.navGroupLoc(group_set, npc, x, y, z, class_settings, invis)
     State.Y = mq.TLO.Me.Y()
     State.Z = mq.TLO.Me.Z()
     local searchstring = "loc " .. x .. " " .. y .. " " .. z .. " radius 50 npc " .. npc
-    if group_set == 1 then
-        mq.cmdf("/squelch /nav id %s", mq.TLO.Spawn(searchstring).ID())
-    elseif group_set == 2 then
-        mq.cmdf("/dgga /squelch /nav id %s", mq.TLO.Spawn(searchstring).ID())
+    local ID = mq.TLO.Spawn(searchstring).ID()
+    if ID == 0 then
+        if group_set == 1 then
+            mq.cmdf("/squelch /nav locxyz %s %s %s", x, y, z)
+        elseif group_set == 2 then
+            mq.cmdf("/dgga /squelch /nav locxyz %s %s %s", x, y, z)
+        else
+            mq.cmdf("/squelch /nav locxyz %s %s %s", x, y, z)
+            mq.cmdf('/dex %s /squelch /nav locxyz %s %s %s', State.group_combo[State.group_choice], x, y, z)
+        end
     else
-        mq.cmdf("/squelch /nav id %s", mq.TLO.Spawn(searchstring).ID())
-        mq.cmdf('/dex %s /squelch /nav id %s', State.group_combo[State.group_choice], mq.TLO.Spawn(searchstring).ID())
+        if group_set == 1 then
+            mq.cmdf("/squelch /nav id %s", ID)
+        elseif group_set == 2 then
+            mq.cmdf("/dgga /squelch /nav id %s", ID)
+        else
+            mq.cmdf("/squelch /nav id %s", ID)
+            mq.cmdf('/dex %s /squelch /nav id %s', State.group_combo[State.group_choice], ID)
+        end
     end
+
     mq.delay(200)
     local temp = State.status
     local unpause_automation = false
