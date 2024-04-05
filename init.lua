@@ -100,11 +100,6 @@ if mq.TLO.Plugin('mq2portalsetter')() == nil then
     printf("%s \aoPlease load it with the command \ar/plugin portalsetter \aoand rerun this script.", elheader)
     mq.exit()
 end
-if mq.TLO.Plugin('mq2cast')() == nil then
-    printf("%s \arMQ2Cast \aois required for this script.", elheader)
-    printf("%s \aoPlease load it with the command \ar/plugin cast \aoand rerun this script.", elheader)
-    mq.exit()
-end
 
 class_settings.loadSettings()
 
@@ -467,7 +462,7 @@ local function displayGUI()
             end
             ImGui.Separator()
             ImGui.Text("Step " .. tostring(State.step) .. " of " .. tostring(#task_table))
-            ImGui.Text(State.status)
+            ImGui.TextWrapped(State.status)
             ImGui.EndTabItem()
         end
         if ImGui.BeginTabItem("Settings") then
