@@ -347,15 +347,8 @@ local function run_epic(class, choice)
         elseif task_table[State.step].type == "SEND_YES" then
             actions.send_yes(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "WAIT" then
-            if mq.TLO.Me.XTarget() > 0 then
-                for i = 1, mq.TLO.Me.XTargetSlots() do
-                    if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
-                        manage.clearXtarget(State.group_choice, class_settings.settings)
-                    end
-                end
-            end
             State.status = "Pausing for " .. task_table[State.step].what / 1000 .. " seconds"
-            mq.delay(tonumber(task_table[State.step].what))
+            actions.wait(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "WAIT_EVENT" then
             actions.wait_event(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "ZONE_CONTINUE_TRAVEL" then

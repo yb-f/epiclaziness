@@ -1575,6 +1575,65 @@ function Actions.send_yes(item, class_settings)
     manage.sendYes(State.group_choice)
 end
 
+function Actions.wait(item, class_settings)
+    local waiting = true
+    local start_wait = os.clock() * 1000
+    local distance = 0
+    local unpause_automation = false
+    if item.whereZ ~= nil then
+        distance = math.abs(mq.TLO.Me.Z() - item.whereZ)
+    end
+    local loopCount = 0
+    while waiting do
+        mq.delay(50)
+        if mq.TLO.Me.XTarget() > 0 then
+            for i = 1, mq.TLO.Me.XTargetSlots() do
+                if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
+                    local temp = State.status
+                    manage.clearXtarget(State.group_choice, class_settings)
+                    State.status = temp
+                end
+            end
+            State.status = "Pausing for " .. item.what / 1000 .. " seconds"
+        end
+        if State.skip == true then
+            State.skip = false
+            return
+        end
+        if State.pause == true then
+            unpause_automation = true
+            State.status = "Paused"
+        end
+        while State.pause == true do
+            mq.delay(200)
+        end
+        if unpause_automation == true then
+            State.status = "Pausing for " .. item.what / 1000 .. " seconds"
+            unpause_automation = false
+        end
+        mq.delay(200)
+        if os.clock() * 1000 > start_wait + tonumber(item.what) then
+            waiting = false
+        end
+        loopCount = loopCount + 1
+        if loopCount == 10 and item.whereZ ~= nil then
+            if distance - math.abs(mq.TLO.Me.Z() - item.whereZ) < 10 then
+                if math.abs(mq.TLO.Me.Z() - item.whereZ) < 1 then
+                    break
+                end
+                State.step = State.step - 3
+                return
+            else
+                distance = math.abs(mq.TLO.Me.Z() - item.whereZ)
+                if math.abs(mq.TLO.Me.Z() - item.whereZ) < 5 then
+                    break
+                end
+                loopCount = 0
+            end
+        end
+    end
+end
+
 function Actions.wait_event(item, class_settings)
     mq.event('wait_event', item.what, event_wait)
     waiting = true
