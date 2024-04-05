@@ -73,7 +73,8 @@ end
 function Actions.cast_alt(item, class_settings)
     manage.removeInvis(State.group_choice)
     State.status = "Casting " .. item.what
-    mq.cmdf('/squelch /casting "%s"', item.what)
+    local ID = mq.TLO.Me.AltAbility(item.what)()
+    mq.cmdf('/squelch /alt act %s', ID)
     mq.delay(200)
     while mq.TLO.Me.Casting() ~= nil do
         mq.delay(100)
@@ -92,6 +93,10 @@ function Actions.combine_container(item, class_settings)
     end
     State.status = "Preparing combine container"
     if mq.TLO.InvSlot('pack8').Item.Container() then
+        if mq.TLO.InvSlot('pack8').Item.Name() == item.what then
+            inv.empty_bag(8)
+            return
+        end
         inv.empty_bag(8)
         State.bagslot1, State.bagslot2 = inv.move_bag(8)
     end
@@ -1131,7 +1136,8 @@ function Actions.npc_kill_all(item, class_settings)
             mq.delay(100)
         end
         if item.zone ~= nil then
-            mq.cmdf('/squelch /casting "%s"', item.zone)
+            local ID = mq.TLO.Me.AltAbility(item.zone)()
+            mq.cmdf('/squelch /alt act %s', ID)
             mq.delay("1s")
         end
         local loopCount = 0
@@ -1152,7 +1158,8 @@ function Actions.npc_kill_all(item, class_settings)
             if loopCount == 20 then
                 loopCount = 0
                 if item.zone ~= nil then
-                    mq.cmdf('/squelch /casting "%s"', item.zone)
+                    local ID = mq.TLO.Me.AltAbility(item.zone)()
+                    mq.cmdf('/squelch /alt act %s', ID)
                     mq.delay("1s")
                 end
                 if mq.TLO.Me.Combat() == false then
