@@ -11,7 +11,16 @@ local invis_travel = require 'utils/travelandinvis'
 local quests_done = require 'utils/questsdone'
 local PackageMan = require('mq/PackageMan')
 local sqlite3 = PackageMan.Require('lsqlite3')
+local http = PackageMan.Require('socket.http')
+local body, code = http.request("http://raw.githubusercontent.com/yb-f/EL-Ver/master/latest_ver")
+local latest_version = 0.0
+if code == 200 then
+    latest_version = tonumber(body)
+else
+    print("Version check failed.")
+end
 
+local version = 0.010
 local window_flags = bit32.bor(ImGuiWindowFlags.None)
 local openGUI, drawGUI = true, true
 local myName = mq.TLO.Me.DisplayName()
@@ -60,6 +69,15 @@ State.rewound = false
 State.bad_IDs = {}
 State.cannot_count = 0
 State.traveling = false
+
+--Messages that people will ignore
+printf(
+    "%s \aoif you encounter any nav mesh issues please insure you are using the latest mesh from \arhttps://github.com/yb-f/meshes",
+    elheader)
+if latest_version > version then
+    mq.cmd('/beep')
+    printf("\n%s \arNew version available.  Please update.\n", elheader)
+end
 
 --Check if necessary plugins are loaded.
 if mq.TLO.Plugin('mq2nav')() == nil then
