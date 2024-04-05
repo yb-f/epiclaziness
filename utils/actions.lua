@@ -1544,7 +1544,7 @@ function Actions.relocate(item, class_settings)
         end
     end
     State.status = "Relocating to " .. item.what
-    manage.relocateGroup(State.group_choice, item.what)
+    manage.relocateGroup(State.group_choice, item.what, class_settings)
     while mq.TLO.Me.Casting() == nil do
         mq.delay(10)
     end
