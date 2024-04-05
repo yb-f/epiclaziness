@@ -64,41 +64,42 @@ State.traveling = false
 --Check if necessary plugins are loaded.
 if mq.TLO.Plugin('mq2nav')() == nil then
     printf("%s \arMQ2Nav \aois required for this script.", elheader)
-    printf("%s \aoPlease load it with the command \ar/plugin nav \aoand rerun this script.")
+    printf("%s \aoPlease load it with the command \ar/plugin nav \aoand rerun this script.", elheader)
     mq.exit()
 end
 if mq.TLO.Plugin('mq2easyfind')() == nil then
     printf("%s \arMQ2EasyFind \aois required for this script.", elheader)
-    printf("%s \aoPlease load it with the command \ar/plugin easyfind \aoand rerun this script.")
+    printf("%s \aoPlease load it with the command \ar/plugin easyfind \aoand rerun this script.", elheader)
     mq.exit()
 end
 if mq.TLO.Plugin('mq2relocate')() == nil then
     printf("%s \arMQ2Relocate \aois required for this script.", elheader)
-    printf("%s \aoPlease load it with the command \ar/plugin relocate \aoand rerun this script.")
+    printf("%s \aoPlease load it with the command \ar/plugin relocate \aoand rerun this script.", elheader)
     mq.exit()
 end
 if mq.TLO.Plugin('mq2portalsetter')() == nil then
     printf("%s \arMQ2PortalSetter \aois required for this script.", elheader)
-    printf("%s \aoPlease load it with the command \ar/plugin portalsetter \aoand rerun this script.")
+    printf("%s \aoPlease load it with the command \ar/plugin portalsetter \aoand rerun this script.", elheader)
     mq.exit()
 end
 if mq.TLO.Plugin('mq2cast')() == nil then
     printf("%s \arMQ2Cast \aois required for this script.", elheader)
-    printf("%s \aoPlease load it with the command \ar/plugin cast \aoand rerun this script.")
+    printf("%s \aoPlease load it with the command \ar/plugin cast \aoand rerun this script.", elheader)
     mq.exit()
 end
 
 class_settings.loadSettings()
 
 local function matchFilters(spawn)
-    if string.find(string.lower(spawn.Name()), string.lower(exclude_name)) then return true end
+    if string.find(string.lower(spawn.CleanName()), string.lower(exclude_name)) then
+        return true
+    end
     return false
 end
 
 local function create_spawn_list()
     exclude_list = mq.getFilteredSpawns(matchFilters)
     for _, spawn in pairs(exclude_list) do
-        print(spawn.Name())
         table.insert(State.bad_IDs, spawn.ID())
     end
 end
