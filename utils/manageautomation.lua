@@ -1115,6 +1115,7 @@ function manage.relocateGroup(group_set, relocate, class_settings)
     if relocate == 'lobby' then
         if mq.TLO.Me.AltAbilityReady('Throne of Heroes')() == false then
             while mq.TLO.Me.AltAbilityReady('Throne of Heroes')() == false do
+                State.status = 'Waiting for Throne of Heroes AA to be ready'
                 if mq.TLO.Navigation.Paused() == true then
                     manage.navUnpause(group_set)
                 end
@@ -1152,6 +1153,7 @@ function manage.relocateGroup(group_set, relocate, class_settings)
         end
     elseif relocate == 'origin' then
         if mq.TLO.Me.AltAbilityReady('Origin')() == false then
+            State.status = 'Waiting for Origin AA to be ready'
             while mq.TLO.Me.AltAbilityReady('Origin')() == false do
                 if mq.TLO.Navigation.Paused() == true then
                     manage.navUnpause(group_set)
