@@ -371,6 +371,9 @@ local function run_epic(class, choice)
             end
         end
         if State.task_run == false then
+            mq.cmd('/afollow off')
+            mq.cmd('/nav stop')
+            mq.cmd('/stick off')
             return
         end
     end
