@@ -517,7 +517,8 @@ function manage.invis(group_set, class_settings)
             end
         end
     else
-        mq.cmdf('/squelch /casting "%s"', invis_type[class_settings.invis[mq.TLO.Me.Class()]])
+        local ID = class_settings[invis_type[class_settings.invis[mq.TLO.Me.Class()]]]
+        mq.cmdf('/squelch /alt act %s', ID)
         mq.delay(500)
         while mq.TLO.Me.Casting() == true do
             mq.delay(200)
@@ -538,8 +539,9 @@ function manage.invis(group_set, class_settings)
                     mq.delay(250)
                     mq.cmdf("/dex %s /squelch /doability sneak", mq.TLO.Group.Member(i).DisplayName())
                 else
-                    mq.cmdf('/dex %s /squelch /casting "%s"', mq.TLO.Group.Member(i).DisplayName(),
-                        invis_type[class_settings.invis[mq.TLO.Group.Member(i).Class()]])
+                    local ID = class_settings[invis_type[class_settings.invis[mq.TLO.Group.Member(i).Class()]]]
+                    mq.cmdf('/dex %s /squelch /alt act "%s"', mq.TLO.Group.Member(i).DisplayName(),
+                        ID)
                 end
             end
         end
@@ -558,9 +560,10 @@ function manage.invis(group_set, class_settings)
             mq.cmdf("/dex %s /squelch /doability sneak",
                 mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName())
         else
-            mq.cmdf('/dex %s /squelch /casting "%s"',
-                mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName(),
-                invis_type[class_settings.invis[mq.TLO.Group.Member(State.group_combo[State.group_choice]).Class()]])
+            local ID = class_settings
+                [invis_type[class_settings.invis[mq.TLO.Group.Member(State.group_combo[State.group_choice]).Class()]]]
+            mq.cmdf('/dex %s /squelch /alt act "%s"',
+                mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName(), ID)
         end
     end
     mq.delay("4s")
