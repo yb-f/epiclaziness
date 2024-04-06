@@ -74,6 +74,14 @@ function class_settings.createSettings()
             ['Shaman'] = "Silent Presence|Potion",
             ['Warrior'] = "Potion",
             ['Wizard'] = "Perfected Invisibility|Potion"
+        },
+        ['skill_to_num'] = {
+            ["Shauri's Sonorous Clouding"] = 231,
+            ['Natural Invisibility'] = 980,
+            ['Innate Camouflage'] = 80,
+            ['Perfected Invisibility'] = 3812,
+            ['Cloak of Shadows'] = 531,
+            ['Silent Presence'] = 3730
         }
     }
     class_settings.saveSettings()
