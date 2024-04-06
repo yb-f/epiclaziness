@@ -7,6 +7,8 @@ local Actions = {}
 local elheader = "\ay[\agEpic Laziness\ay]"
 local waiting = false
 local gamble_done = false
+local forage_trash = { 'Fruit', 'Roots', 'Vegetables', 'Pod of Water', 'Berries', 'Rabbit Meat', 'Fishing Grubs' }
+
 
 local function target_invalid_switch()
     State.cannot_count = State.cannot_count + 1
@@ -481,14 +483,14 @@ function Actions.forage_farm(item, class_settings)
             if mq.TLO.Me.AbilityReady('Forage')() then
                 mq.cmd('/squelch /doability Forage')
                 mq.delay(500)
-                for i, name in pairs(item_list) do
+                for i, name in pairs(forage_trash) do
                     if mq.TLO.Cursor.Name() == name then
-                        mq.cmd('/squelch /autoinv')
-                        mq.delay(200)
-                    else
                         mq.cmd('/squelch /destroy')
                         mq.delay(200)
                     end
+                end
+                if mq.TLO.Cursor.Name() ~= nil then
+                    mq.cmd('/autoinv')
                 end
             end
         end
@@ -767,6 +769,36 @@ function Actions.npc_damage_until(item, class_settings)
             return
         end
     end
+    local weapon1 = ''
+    local weapon2 = ''
+    if item.zone ~= nil then
+        if mq.TLO.Me.Level() >= item.zone then
+            weapon1 = mq.TLO.InvSlot(13).Item.Name()
+            if mq.TLO.InvSlot(14).Item() ~= nil then
+                weapon2 = mq.TLO.InvSlot(14).Item.Name()
+            else
+                weapon2 = 'none'
+            end
+            mq.cmd('/itemnotify 13 leftmouseup')
+            while mq.TLO.Cursor() == nil do
+                mq.delay(100)
+            end
+            mq.cmd('/autoinv')
+            while mq.TLO.Cursor() ~= nil do
+                mq.delay(100)
+            end
+            if weapon2 ~= 'none' then
+                mq.cmd('/itemnotify 14 leftmouseup')
+                while mq.TLO.Cursor() == nil do
+                    mq.delay(100)
+                end
+                mq.cmd('/autoinv')
+                while mq.TLO.Cursor() ~= nil do
+                    mq.delay(100)
+                end
+            end
+        end
+    end
     mq.TLO.Spawn(ID).DoTarget()
     mq.cmd("/squelch /stick")
     mq.delay(100)
@@ -786,6 +818,28 @@ function Actions.npc_damage_until(item, class_settings)
         mq.delay(50)
     end
     mq.cmd("/squelch /attack off")
+    if item.zone ~= nil then
+        if mq.TLO.Me.Level() >= item.zone then
+            mq.cmdf('/itemnotify "%s" leftmouseup', weapon1)
+            while mq.TLO.Cursor() == nil do
+                mq.delay(100)
+            end
+            mq.cmd('/itemnotify 13 leftmouseup')
+            while mq.TLO.Cursor() ~= nil do
+                mq.delay(100)
+            end
+            if weapon2 ~= 'none' then
+                mq.cmdf('/itemnotify "%s" leftmouseup', weapon2)
+                while mq.TLO.Cursor() == nil do
+                    mq.delay(100)
+                end
+                mq.cmd('/itemnotify 14 leftmouseup')
+                while mq.TLO.Cursor() ~= nil do
+                    mq.delay(100)
+                end
+            end
+        end
+    end
 end
 
 function Actions.npc_follow(item, class_settings)
@@ -1168,7 +1222,7 @@ function Actions.npc_kill_all(item, class_settings)
             end
         end
         if mq.TLO.FindItem("=" .. item.what)() == nil then
-            Actions.loot(item)
+            Actions.loot(item, class_settings)
             State.status = "Killing All " .. item.npc
         end
     end
