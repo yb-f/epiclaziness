@@ -11,21 +11,19 @@ local invis_travel = require 'utils/travelandinvis'
 local quests_done = require 'utils/questsdone'
 local PackageMan = require('mq/PackageMan')
 local sqlite3 = PackageMan.Require('lsqlite3')
-local http = PackageMan.Require('socket.http')
-local body, code = http.request("http://raw.githubusercontent.com/yb-f/EL-Ver/master/latest_ver")
-local latest_version = 0.0
-if code == 200 then
-    latest_version = tonumber(body)
-else
-    print("Version check failed.")
-end
 
-local version = 0.010
+local version = 0.013
+-- to obtain version_time # os.time(os.date("!*t"))
+local version_time = 1712402603
 local window_flags = bit32.bor(ImGuiWindowFlags.None)
+local treeview_table_flags = bit32.bor(ImGuiTableFlags.Hideable, ImGuiTableFlags.RowBg,
+    ImGuiTableFlags.Borders, ImGuiTableFlags.SizingFixedFit)
 local openGUI, drawGUI = true, true
 local myName = mq.TLO.Me.DisplayName()
 local dbn = sqlite3.open(mq.luaDir .. '\\epiclaziness\\epiclaziness.db')
+local db_outline = sqlite3.open(mq.luaDir .. '\\epiclaziness\\epiclaziness_outline.db')
 local task_table = {}
+local task_outline_table = {}
 local running = true
 local start_run = false
 local elheader = "\ay[\agEpic Laziness\ay]"
@@ -37,6 +35,7 @@ local exclude_list = {}
 local exclude_name = ''
 --local epic_list = { "1.0", "Pre-1.5", "1.5", "2.0" }
 local epic_list = quests_done[string.lower(mq.TLO.Me.Class.ShortName())]
+local changed = false
 
 local class_list = { 'Bard', 'Beastlord', 'Berserker', 'Cleric', 'Druid', 'Enchanter', 'Magician', 'Monk', 'Necromancer',
     'Paladin', 'Ranger', 'Rogue', 'Shadow Knight', 'Shaman', 'Warrior', 'Wizard' }
@@ -74,9 +73,10 @@ State.traveling = false
 printf(
     "%s \aoif you encounter any nav mesh issues please insure you are using the latest mesh from \arhttps://github.com/yb-f/meshes",
     elheader)
-if latest_version > version then
-    mq.cmd('/beep')
-    printf("\n%s \arNew version available.  Please update.\n", elheader)
+local t = os.time(os.date("!*t"))
+if version_time + 64800 < t then
+    printf("%s \aoThis version is more than 18 hours old.  \arPlease check to see if an updated version is available.",
+        elheader)
 end
 
 --Check if necessary plugins are loaded.
@@ -102,6 +102,35 @@ if mq.TLO.Plugin('mq2portalsetter')() == nil then
 end
 
 class_settings.loadSettings()
+
+local function step_overview()
+    task_outline_table = {}
+    local class = mq.TLO.Me.Class.ShortName()
+    local choice = State.epic_choice
+    local tablename = ''
+    if epic_list[choice] == "1.0" then
+        tablename = class .. "_10"
+        State.epicstring = "1.0"
+    elseif epic_list[choice] == "Pre-1.5" then
+        tablename = class .. "_pre15"
+        State.epicstring = "Pre-1.5"
+    elseif epic_list[choice] == "1.5" then
+        tablename = class .. "_15"
+        State.epicstring = "1.5"
+    elseif epic_list[choice] == "2.0" then
+        tablename = class .. "_20"
+        State.epicstring = "2.0"
+    end
+    if tablename == '' then
+        printf('%s \ao This class and quest has not yet been implemented.', elheader)
+        State.task_run = false
+        return
+    end
+    local sql = "SELECT * FROM " .. tablename
+    for a in db_outline:nrows(sql) do
+        table.insert(task_outline_table, a)
+    end
+end
 
 local function matchFilters(spawn)
     if string.find(string.lower(spawn.CleanName()), string.lower(exclude_name)) then
@@ -396,9 +425,12 @@ local function displayGUI()
         if ImGui.BeginTabItem("General") then
             ImGui.Text("Class: " .. myClass .. " " .. State.epicstring)
             if State.task_run == false then
-                State.epic_choice = ImGui.Combo('##Combo', State.epic_choice, epic_list)
+                State.epic_choice, changed = ImGui.Combo('##Combo', State.epic_choice, epic_list, #epic_list, #epic_list)
                 if ImGui.IsItemHovered() then
                     ImGui.SetTooltip('Which epic to run.')
+                end
+                if changed == true then
+                    step_overview()
                 end
             end
             if mq.TLO.Me.Grouped() == true then
@@ -515,11 +547,38 @@ local function displayGUI()
             end
             ImGui.EndTabItem()
         end
+        if ImGui.BeginTabItem("Outline") then
+            ImGui.BeginTable('##table1', 3, treeview_table_flags)
+            ImGui.TableSetupColumn("Manual Completion", bit32.bor(ImGuiTableColumnFlags.NoResize), 30)
+            ImGui.TableSetupColumn("Step", bit32.bor(ImGuiTableColumnFlags.NoResize), 30)
+            ImGui.TableSetupColumn("Description",
+                bit32.bor(ImGuiTableColumnFlags.WidthStretch, ImGuiTableColumnFlags.NoResize), 100)
+            ImGui.TableSetupScrollFreeze(0, 1)
+            ImGui.TableHeadersRow()
+            for i = 1, #task_outline_table do
+                ImGui.TableNextRow()
+                ImGui.TableNextColumn()
+                if ImGui.Selectable("##" .. i, false, ImGuiSelectableFlags.SpanAllColumns) then
+                    printf("%s \aoSetting step to \ar%s", elheader, task_outline_table[i].Step)
+                    State.rewound = true
+                    State.step = task_outline_table[i].Step
+                end
+                ImGui.SameLine()
+                ImGui.Text('XX')
+                ImGui.TableNextColumn()
+                ImGui.TextColored(IM_COL32(0, 255, 0, 255), task_outline_table[i].Step)
+                ImGui.TableNextColumn()
+                ImGui.TextWrapped(task_outline_table[i].Description)
+            end
+            ImGui.EndTable()
+            ImGui.EndTabItem()
+        end
         ImGui.EndTabBar()
     end
     ImGui.End()
 end
 
+step_overview()
 populate_group_combo()
 loadsave.loadState()
 mq.imgui.init('displayGUI', displayGUI)
