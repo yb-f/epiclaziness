@@ -56,6 +56,11 @@ function inventory.find_free_slot(exclude_bag)
 end
 
 function inventory.move_item_to_combine(name, slot)
+    if mq.TLO.FindItem("=" .. name)() == nil then
+        State.status = "Unable to find item for combine (" .. name .. ")"
+        State.task_run = false
+        return
+    end
     local slot2     = 0
     local itemslot  = mq.TLO.FindItem("=" .. name).ItemSlot() - 22
     local itemslot2 = mq.TLO.FindItem("=" .. name).ItemSlot2() + 1
@@ -73,6 +78,11 @@ function inventory.move_item_to_combine(name, slot)
 end
 
 function inventory.move_item_to_enviro_combine(name, slot)
+    if mq.TLO.FindItem("=" .. name)() == nil then
+        State.status = "Unable to find item for combine (" .. name .. ")"
+        State.task_run = false
+        return
+    end
     local itemslot  = mq.TLO.FindItem("=" .. name).ItemSlot() - 22
     local itemslot2 = mq.TLO.FindItem("=" .. name).ItemSlot2() + 1
     mq.cmdf("/squelch /nomodkey /ctrl /itemnotify in pack%s %s leftmouseup", itemslot, itemslot2)
@@ -84,6 +94,11 @@ function inventory.move_item_to_enviro_combine(name, slot)
 end
 
 function inventory.move_combine_container(slot, container)
+    if mq.TLO.FindItem("=" .. container)() == nil then
+        State.status = "Unable to find combine container (" .. container .. ")"
+        State.task_run = false
+        return
+    end
     local itemslot = mq.TLO.FindItem("=" .. container).ItemSlot() - 22
     local itemslot2 = mq.TLO.FindItem("=" .. container).ItemSlot2() + 1
     mq.cmdf("/squelch /nomodkey /shiftkey /itemnotify in pack%s %s leftmouseup", itemslot, itemslot2)
