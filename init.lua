@@ -12,9 +12,9 @@ local quests_done = require 'utils/questsdone'
 local PackageMan = require('mq/PackageMan')
 local sqlite3 = PackageMan.Require('lsqlite3')
 
-local version = 0.013
+local version = 0.014
 -- to obtain version_time # os.time(os.date("!*t"))
-local version_time = 1712402603
+local version_time = 1712411821
 local window_flags = bit32.bor(ImGuiWindowFlags.None)
 local treeview_table_flags = bit32.bor(ImGuiTableFlags.Hideable, ImGuiTableFlags.RowBg,
     ImGuiTableFlags.Borders, ImGuiTableFlags.SizingFixedFit)
@@ -36,6 +36,7 @@ local exclude_name = ''
 --local epic_list = { "1.0", "Pre-1.5", "1.5", "2.0" }
 local epic_list = quests_done[string.lower(mq.TLO.Me.Class.ShortName())]
 local changed = false
+local overview_steps = {}
 
 local class_list = { 'Bard', 'Beastlord', 'Berserker', 'Cleric', 'Druid', 'Enchanter', 'Magician', 'Monk', 'Necromancer',
     'Paladin', 'Ranger', 'Rogue', 'Shadow Knight', 'Shaman', 'Warrior', 'Wizard' }
@@ -129,6 +130,9 @@ local function step_overview()
     local sql = "SELECT * FROM " .. tablename
     for a in db_outline:nrows(sql) do
         table.insert(task_outline_table, a)
+    end
+    for _, task in pairs(task_outline_table) do
+        overview_steps[task.Step] = false
     end
 end
 
@@ -558,16 +562,23 @@ local function displayGUI()
             for i = 1, #task_outline_table do
                 ImGui.TableNextRow()
                 ImGui.TableNextColumn()
-                if ImGui.Selectable("##" .. i, false, ImGuiSelectableFlags.SpanAllColumns) then
+                overview_steps[task_outline_table[i].Step] = ImGui.Checkbox("##" .. i,
+                    overview_steps[task_outline_table[i].Step])
+                ImGui.TableNextColumn()
+                if ImGui.Selectable("##a" .. i, false, ImGuiSelectableFlags.None) then
                     printf("%s \aoSetting step to \ar%s", elheader, task_outline_table[i].Step)
                     State.rewound = true
                     State.step = task_outline_table[i].Step
                 end
                 ImGui.SameLine()
-                ImGui.Text('XX')
-                ImGui.TableNextColumn()
                 ImGui.TextColored(IM_COL32(0, 255, 0, 255), task_outline_table[i].Step)
                 ImGui.TableNextColumn()
+                if ImGui.Selectable("##b" .. i, false, ImGuiSelectableFlags.None) then
+                    printf("%s \aoSetting step to \ar%s", elheader, task_outline_table[i].Step)
+                    State.rewound = true
+                    State.step = task_outline_table[i].Step
+                end
+                ImGui.SameLine()
                 ImGui.TextWrapped(task_outline_table[i].Description)
             end
             ImGui.EndTable()
