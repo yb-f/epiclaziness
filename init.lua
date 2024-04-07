@@ -10,6 +10,7 @@ local class_settings = require 'utils/class_settings'
 local invis_travel = require 'utils/travelandinvis'
 local quests_done = require 'utils/questsdone'
 local reqs = require 'utils/questrequirements'
+local tsreqs = require 'utils/tradeskillreqs'
 local PackageMan = require('mq/PackageMan')
 local sqlite3 = PackageMan.Require('lsqlite3')
 
@@ -199,6 +200,45 @@ local function populate_group_combo()
     end
 end
 
+local function check_tradeskills(class, choice)
+    if tsreqs[class] ~= nil then
+        local return_string = ''
+        local quest = ''
+        if epic_list[choice] == "1.0" then
+            quest = '10'
+        elseif epic_list[choice] == "Pre-1.5" then
+            quest = 'pre15'
+        elseif epic_list[choice] == "1.5" then
+            quest = '15'
+        elseif epic_list[choice] == "2.0" then
+            quest = '20'
+        end
+        if tsreqs[class][quest] ~= nil then
+            local first = true
+            for ts, req in pairs(tsreqs[class][quest]) do
+                if mq.TLO.Me.Skill(ts)() < req then
+                    if first == true then
+                        first = false
+                        return_string = elheader ..
+                            " \ar" ..
+                            ts .. " \aorequires \ar" .. req .. " \aoskill. Currently \ar" .. mq.TLO.Me.Skill(ts)()
+                    else
+                        return_string = return_string .. "\n" ..
+                            elheader ..
+                            " \ar" ..
+                            ts .. " \aorequires \ar" .. req .. " \aoskill. Currently \ar" .. mq.TLO.Me.Skill(ts)()
+                    end
+                end
+            end
+            if return_string == '' then
+                return false
+            else
+                return return_string
+            end
+        end
+    end
+end
+
 local function run_epic(class, choice)
     task_table = {}
     local tablename = ''
@@ -218,9 +258,19 @@ local function run_epic(class, choice)
         State.epicstring = "2.0"
     end
     if tablename == '' then
-        printf('%s \ao This class and quest has not yet been implemented.', elheader)
+        printf('%s \aoThis class and quest has not yet been implemented.', elheader)
         State.task_run = false
         return
+    end
+    local ts_return = check_tradeskills(class, choice)
+    if ts_return then
+        print(ts_return)
+        if class_settings.settings.general.stopTS == true then
+            printf(
+            '%s \aoPlease raise your tradeskills to continue, or turn off the "\agStop if tradeskill requirements are unmet\ao" setting.',
+                elheader)
+            State.task_run = false
+        end
     end
     local sql = "SELECT * FROM " .. tablename
     for a in dbn:nrows(sql) do
@@ -518,8 +568,8 @@ local function displayGUI()
         end
         if ImGui.BeginTabItem("Settings") then
             if ImGui.CollapsingHeader('General Settings') then
-                --class_settings.settings.general.useAOC = ImGui.Checkbox("Use Agent of Change",
-                --  class_settings.settings.general.useAOC)
+                class_settings.settings.general.stopTS = ImGui.Checkbox("Stop if tradeskill requirements are unmet",
+                    class_settings.settings.general.stopTS)
                 class_settings.settings.general.returnToBind = ImGui.Checkbox("Return to Bind Between Travel",
                     class_settings.settings.general.returnToBind)
                 class_settings.settings.general.invisForTravel = ImGui.Checkbox("Invis When Travelling",
@@ -611,7 +661,7 @@ local function main()
         if start_run == true then
             start_run = false
             State.step = 0
-            run_epic(mq.TLO.Me.Class.ShortName(), State.epic_choice)
+            run_epic(string.lower(mq.TLO.Me.Class.ShortName()), State.epic_choice)
         end
         mq.delay(200)
     end
