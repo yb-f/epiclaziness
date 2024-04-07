@@ -187,7 +187,7 @@ end
 
 function Actions.enviro_combine_do(item, class_settings)
     State.status = "Combining"
-    mq.delay("1s")
+    mq.delay("3s")
     mq.TLO.Window("ContainerWindow/Container_Combine").LeftMouseUp()
     while mq.TLO.Cursor() == nil do
         mq.delay(100)
