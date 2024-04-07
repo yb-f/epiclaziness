@@ -9,6 +9,7 @@ local manage = require 'utils/manageautomation'
 local class_settings = require 'utils/class_settings'
 local invis_travel = require 'utils/travelandinvis'
 local quests_done = require 'utils/questsdone'
+local reqs = require 'utils/questrequirements'
 local PackageMan = require('mq/PackageMan')
 local sqlite3 = PackageMan.Require('lsqlite3')
 
@@ -52,6 +53,7 @@ State.bind_travel = false
 State.task_run = false
 State.step = 0
 State.status = ''
+State.reqs = ''
 State.bagslot1 = 0
 State.bagslot2 = 0
 State.group_combo = {}
@@ -106,22 +108,28 @@ class_settings.loadSettings()
 
 local function step_overview()
     task_outline_table = {}
-    local class = mq.TLO.Me.Class.ShortName()
+    local class = string.lower(mq.TLO.Me.Class.ShortName())
     local choice = State.epic_choice
     local tablename = ''
+    local quest = ''
     if epic_list[choice] == "1.0" then
         tablename = class .. "_10"
+        quest = '10'
         State.epicstring = "1.0"
     elseif epic_list[choice] == "Pre-1.5" then
         tablename = class .. "_pre15"
+        quest = 'pre15'
         State.epicstring = "Pre-1.5"
     elseif epic_list[choice] == "1.5" then
         tablename = class .. "_15"
+        quest = '15'
         State.epicstring = "1.5"
     elseif epic_list[choice] == "2.0" then
         tablename = class .. "_20"
+        quest = '20'
         State.epicstring = "2.0"
     end
+    State.reqs = reqs[class][quest]
     if tablename == '' then
         printf('%s \ao This class and quest has not yet been implemented.', elheader)
         State.task_run = false
@@ -502,6 +510,10 @@ local function displayGUI()
             ImGui.Separator()
             ImGui.Text("Step " .. tostring(State.step) .. " of " .. tostring(#task_table))
             ImGui.TextWrapped(State.status)
+            for i = 1, 3 do
+                ImGui.NewLine()
+            end
+            ImGui.TextWrapped(State.reqs)
             ImGui.EndTabItem()
         end
         if ImGui.BeginTabItem("Settings") then
@@ -589,9 +601,9 @@ local function displayGUI()
     ImGui.End()
 end
 
-step_overview()
 populate_group_combo()
 loadsave.loadState()
+step_overview()
 mq.imgui.init('displayGUI', displayGUI)
 
 local function main()
