@@ -11,6 +11,17 @@ function class_settings.loadSettings()
         class_settings.createSettings()
     elseif configData then
         class_settings.settings = configData()
+        if class_settings.settings['skill_to_num'] == nil then
+            class_settings.settings['skill_to_num'] = {
+                ["Shauri's Sonorous Clouding"] = 231,
+                ['Natural Invisibility'] = 980,
+                ['Innate Camouflage'] = 80,
+                ['Perfected Invisibility'] = 3812,
+                ['Cloak of Shadows'] = 531,
+                ['Silent Presence'] = 3730
+            }
+            class_settings.saveSettings()
+        end
     end
 end
 
