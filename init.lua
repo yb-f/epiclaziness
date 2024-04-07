@@ -14,9 +14,9 @@ local tsreqs = require 'utils/tradeskillreqs'
 local PackageMan = require('mq/PackageMan')
 local sqlite3 = PackageMan.Require('lsqlite3')
 
-local version = 0.014
+local version = 0.015
 -- to obtain version_time # os.time(os.date("!*t"))
-local version_time = 1712411821
+local version_time = 1712493400
 local window_flags = bit32.bor(ImGuiWindowFlags.None)
 local treeview_table_flags = bit32.bor(ImGuiTableFlags.Hideable, ImGuiTableFlags.RowBg,
     ImGuiTableFlags.Borders, ImGuiTableFlags.SizingFixedFit)
@@ -267,7 +267,7 @@ local function run_epic(class, choice)
         print(ts_return)
         if class_settings.settings.general.stopTS == true then
             printf(
-            '%s \aoPlease raise your tradeskills to continue, or turn off the "\agStop if tradeskill requirements are unmet\ao" setting.',
+                '%s \aoPlease raise your tradeskills to continue, or turn off the "\agStop if tradeskill requirements are unmet\ao" setting.',
                 elheader)
             State.task_run = false
         end
