@@ -4,7 +4,7 @@ local elheader = "\ay[\agEpic Laziness\ay]"
 
 local quests_done = {
     ['brd'] = { "Pre-1.5", "1.5", "2.0" },
-    ['bst'] = { "Pre-1.5", "1.5", },
+    ['bst'] = { "Pre-1.5", "1.5", "2.0" },
     ['ber'] = {},
     ['clr'] = { "Pre-1.5", "1.5", "2.0" },
     ['dru'] = {},
