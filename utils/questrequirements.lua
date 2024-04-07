@@ -26,7 +26,8 @@ local quests_requirements = {
     ['rog'] = {
         ['10'] = '',
         ['pre15'] = 'No tradeskill or requirements for assistance from other classes.',
-        ['15'] = '',
+        ['15'] =
+        'Requires baking 192, tailoring 82, blacksmithing 104, jewelry making 12, make poison 277, and brewing 121.',
         ['20'] = ''
     },
     ['shd'] = {
