@@ -75,11 +75,11 @@ State.traveling = false
 
 --Messages that people will ignore
 printf(
-    "%s \aoif you encounter any nav mesh issues please insure you are using the latest mesh from \arhttps://github.com/yb-f/meshes",
+    "%s \aoif you encounter any nav mesh issues please ensure you are using the latest mesh from \arhttps://github.com/yb-f/meshes",
     elheader)
 local t = os.time(os.date("!*t"))
 if version_time + 64800 < t then
-    printf("%s \aoThis version is more than 18 hours old.  \arPlease check to see if an updated version is available.",
+    printf("%s \aoThis version is more than 18 hours old. \arPlease check to see if an updated version is available.",
         elheader)
 end
 
@@ -549,6 +549,7 @@ local function displayGUI()
                 if ImGui.SmallButton(ICONS.MD_FAST_FORWARD) then
                     State.skip = true
                     State.step = State.step + 1
+                    State.rewound = true
                     printf("%s \aoSkipping to step \ar%s", elheader, State.step)
                 end
                 if ImGui.IsItemHovered() then
@@ -632,6 +633,7 @@ local function displayGUI()
                 if ImGui.Selectable("##a" .. i, false, ImGuiSelectableFlags.None) then
                     printf("%s \aoSetting step to \ar%s", elheader, task_outline_table[i].Step)
                     State.rewound = true
+                    State.skip = true
                     State.step = task_outline_table[i].Step
                 end
                 ImGui.SameLine()
