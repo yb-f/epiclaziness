@@ -338,6 +338,8 @@ local function run_epic(class, choice)
             actions.farm_check_pause(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "FARM_RADIUS" then
             actions.farm_radius(task_table[State.step], class_settings.settings)
+        elseif task_table[State.step].type == "FISH_FARM" then
+            actions.fish_farm(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "FORAGE_FARM" then
             actions.forage_farm(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "FORWARD_ZONE" then
