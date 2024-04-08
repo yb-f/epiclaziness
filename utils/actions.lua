@@ -8,7 +8,7 @@ local elheader = "\ay[\agEpic Laziness\ay]"
 local waiting = false
 local gamble_done = false
 local forage_trash = { 'Fruit', 'Roots', 'Vegetables', 'Pod of Water', 'Berries', 'Rabbit Meat', 'Fishing Grubs' }
-local fishing_trash = { 'Fish Scales', 'Tattered Cloth Sandal' }
+local fishing_trash = { 'Fish Scales', 'Tattered Cloth Sandal', 'Rusty Dagger' }
 
 local function target_invalid_switch()
     State.cannot_count = State.cannot_count + 1
@@ -122,6 +122,7 @@ function Actions.combine_do(item, class_settings)
     end
     mq.cmd("/squelch /autoinv")
     while mq.TLO.Cursor() ~= nil do
+        mq.cmd("/squelch /autoinv")
         mq.delay(100)
     end
 end
@@ -427,6 +428,19 @@ function Actions.fish_farm(item, class_settings)
     else
         State.status = "Fishing for " .. item.what
     end
+    local weapon1 = mq.TLO.InvSlot('13').Item.Name()
+    if weapon1 ~= 'Fishing Pole' then
+        mq.cmd('/itemnotify "Fishing Pole" leftmouseup')
+        while mq.TLO.Cursor() == nil do
+            mq.delay(100)
+        end
+        mq.cmd('/itemnotify 13 leftmouseup')
+        mq.delay(500)
+        while mq.TLO.Cursor() ~= nil do
+            mq.cmd('autoinv')
+            mq.delay(100)
+        end
+    end
     if item.count == nil then
         local item_list = {}
         local item_status = ''
@@ -480,10 +494,6 @@ function Actions.fish_farm(item, class_settings)
             if loop_check then
                 looping = false
             end
-            if mq.TLO.Me.AbilityReady('Fishing')() then
-                mq.cmd('/squelch /doability Fishing')
-                mq.delay(500)
-            end
             if mq.TLO.Cursor() ~= nil then
                 for i, name in pairs(fishing_trash) do
                     if mq.TLO.Cursor.Name() == name then
@@ -495,8 +505,25 @@ function Actions.fish_farm(item, class_settings)
                     mq.cmd('/autoinv')
                 end
             end
+            mq.delay(100)
+            if mq.TLO.Me.AbilityReady('Fishing')() then
+                mq.cmd('/squelch /doability Fishing')
+                mq.delay(500)
+            end
         end
     else
+    end
+    if weapon1 ~= 'Fishing Pole' then
+        mq.cmdf('/itemnotify "%s" leftmouseup', weapon1)
+        while mq.TLO.Cursor() == nil do
+            mq.delay(100)
+        end
+        mq.cmd('/itemnotify 13 leftmouseup')
+        mq.delay(500)
+        while mq.TLO.Cursor() ~= nil do
+            mq.cmd('autoinv')
+            mq.delay(100)
+        end
     end
 end
 
@@ -851,19 +878,22 @@ function Actions.npc_damage_until(item, class_settings)
     local weapon1 = ''
     local weapon2 = ''
     if item.zone ~= nil then
-        if mq.TLO.Me.Level() >= item.zone then
+        if mq.TLO.Me.Level() >= tonumber(item.zone) then
             weapon1 = mq.TLO.InvSlot(13).Item.Name()
+            print(weapon1)
             if mq.TLO.InvSlot(14).Item() ~= nil then
                 weapon2 = mq.TLO.InvSlot(14).Item.Name()
             else
                 weapon2 = 'none'
             end
+            print(weapon2)
             mq.cmd('/itemnotify 13 leftmouseup')
             while mq.TLO.Cursor() == nil do
                 mq.delay(100)
             end
-            mq.cmd('/autoinv')
+            local slot1, slot2 = inv.find_free_slot()
             while mq.TLO.Cursor() ~= nil do
+                mq.cmdf("/squelch /nomodkey /shiftkey /itemnotify in pack%s %s leftmouseup", slot1, slot2)
                 mq.delay(100)
             end
             if weapon2 ~= 'none' then
@@ -871,8 +901,9 @@ function Actions.npc_damage_until(item, class_settings)
                 while mq.TLO.Cursor() == nil do
                     mq.delay(100)
                 end
-                mq.cmd('/autoinv')
+                slot1, slot2 = inv.find_free_slot()
                 while mq.TLO.Cursor() ~= nil do
+                    mq.cmdf("/squelch /nomodkey /shiftkey /itemnotify in pack%s %s leftmouseup", slot1, slot2)
                     mq.delay(100)
                 end
             end
@@ -899,13 +930,13 @@ function Actions.npc_damage_until(item, class_settings)
     end
     mq.cmd("/squelch /attack off")
     if item.zone ~= nil then
-        if mq.TLO.Me.Level() >= item.zone then
+        if mq.TLO.Me.Level() >= tonumber(item.zone) then
             mq.cmdf('/itemnotify "%s" leftmouseup', weapon1)
             while mq.TLO.Cursor() == nil do
                 mq.delay(100)
             end
-            mq.cmd('/itemnotify 13 leftmouseup')
             while mq.TLO.Cursor() ~= nil do
+                mq.cmd('/itemnotify 13 leftmouseup')
                 mq.delay(100)
             end
             if weapon2 ~= 'none' then
@@ -913,8 +944,8 @@ function Actions.npc_damage_until(item, class_settings)
                 while mq.TLO.Cursor() == nil do
                     mq.delay(100)
                 end
-                mq.cmd('/itemnotify 14 leftmouseup')
                 while mq.TLO.Cursor() ~= nil do
+                    mq.cmd('/itemnotify 14 leftmouseup')
                     mq.delay(100)
                 end
             end
