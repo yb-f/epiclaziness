@@ -811,9 +811,10 @@ function Actions.npc_damage_until(item, class_settings)
         end
         if mq.TLO.Spawn(ID)() == nil then
             looping = false
-        end
-        if mq.TLO.Spawn(ID).PctHPs() < 80 then
-            looping = false
+        else
+            if mq.TLO.Spawn(ID).PctHPs() < 80 then
+                looping = false
+            end
         end
         mq.delay(50)
     end
