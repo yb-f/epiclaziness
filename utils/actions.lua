@@ -8,7 +8,7 @@ local elheader = "\ay[\agEpic Laziness\ay]"
 local waiting = false
 local gamble_done = false
 local forage_trash = { 'Fruit', 'Roots', 'Vegetables', 'Pod of Water', 'Berries', 'Rabbit Meat', 'Fishing Grubs' }
-
+local fishing_trash = { 'Fish Scales', 'Tattered Cloth Sandal' }
 
 local function target_invalid_switch()
     State.cannot_count = State.cannot_count + 1
@@ -419,6 +419,85 @@ function Actions.farm_radius(item, class_settings)
     end
     manage.uncampGroup(State.group_choice, class_settings)
     manage.pauseGroup(State.group_choice, class_settings)
+end
+
+function Actions.fish_farm(item, class_settings)
+    if item.count ~= nil then
+        State.status = "Fishing for " .. item.what .. " (" .. item.count .. ")"
+    else
+        State.status = "Fishing for " .. item.what
+    end
+    if item.count == nil then
+        local item_list = {}
+        local item_status = ''
+        local looping = true
+        local loop_check = true
+        local unpause_automation = false
+        for word in string.gmatch(item.what, '([^|]+)') do
+            table.insert(item_list, word)
+        end
+        while looping do
+            mq.delay(200)
+            if State.skip == true then
+                State.skip = false
+                return
+            end
+            if State.pause == true then
+                unpause_automation = true
+                State.status = "Paused"
+            end
+            while State.pause == true do
+                mq.delay(200)
+            end
+            if unpause_automation == true then
+                State.status = "Foraging for " .. item_status
+                unpause_automation = false
+            end
+            if mq.TLO.Me.XTarget() > 0 then
+                for i = 1, mq.TLO.Me.XTargetSlots() do
+                    if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
+                        local temp = State.status
+                        manage.clearXtarget(State.group_choice, class_settings)
+                        State.status = temp
+                    end
+                end
+            end
+            item_status = ''
+            loop_check = true
+            local item_remove = 0
+            for i, name in pairs(item_list) do
+                if mq.TLO.FindItem("=" .. name)() == nil then
+                    loop_check = false
+                    item_status = item_status .. "|" .. name
+                else
+                    item_remove = i
+                end
+            end
+            if item_remove > 0 then
+                table.remove(item_list, item_remove)
+            end
+            State.status = "Fishing for " .. item_status
+            if loop_check then
+                looping = false
+            end
+            if mq.TLO.Me.AbilityReady('Fishing')() then
+                mq.cmd('/squelch /doability Fishing')
+                mq.delay(500)
+            end
+            if mq.TLO.Cursor() ~= nil then
+                for i, name in pairs(fishing_trash) do
+                    if mq.TLO.Cursor.Name() == name then
+                        mq.cmd('/squelch /destroy')
+                        mq.delay(200)
+                    end
+                end
+                if mq.TLO.Cursor.Name() ~= nil then
+                    mq.cmd('/autoinv')
+                end
+            end
+        end
+    else
+    end
 end
 
 function Actions.forage_farm(item, class_settings)
