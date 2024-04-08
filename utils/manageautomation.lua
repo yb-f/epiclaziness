@@ -506,6 +506,9 @@ function manage.invis(group_set, class_settings)
         mq.cmd("/squelch /doability hide")
         while mq.TLO.Me.Invis() == false do
             mq.delay(100)
+            if mq.TLO.Me.AbilityReady('Hide')() == false then
+                mq.cmd("/squelch /doability hide")
+            end
         end
         if mq.TLO.Me.Sneaking() == false then
             while mq.TLO.Me.AbilityReady('Sneak')() == false do
@@ -514,6 +517,9 @@ function manage.invis(group_set, class_settings)
             mq.cmd("/squelch /doability sneak")
             while mq.TLO.Me.Sneaking() == false do
                 mq.delay(100)
+                if mq.TLO.Me.AbilityReady('Sneak')() == false then
+                    mq.cmd("/squelch /doability sneak")
+                end
             end
         end
     else
