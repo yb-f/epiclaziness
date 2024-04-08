@@ -8,7 +8,8 @@ local elheader = "\ay[\agEpic Laziness\ay]"
 local waiting = false
 local gamble_done = false
 local forage_trash = { 'Fruit', 'Roots', 'Vegetables', 'Pod of Water', 'Berries', 'Rabbit Meat', 'Fishing Grubs' }
-local fishing_trash = { 'Fish Scales', 'Tattered Cloth Sandal', 'Rusty Dagger' }
+local fishing_trash = { 'Fish Scales', 'Tattered Cloth Sandal', 'Rusty Dagger', "Moray Eel", "Gunthak Gourami",
+    "Deep Sea Urchin", "Fresh Fish" }
 
 local function target_invalid_switch()
     State.cannot_count = State.cannot_count + 1
@@ -437,7 +438,7 @@ function Actions.fish_farm(item, class_settings)
         mq.cmd('/itemnotify 13 leftmouseup')
         mq.delay(500)
         while mq.TLO.Cursor() ~= nil do
-            mq.cmd('autoinv')
+            mq.cmd('/autoinv')
             mq.delay(100)
         end
     end
@@ -521,7 +522,7 @@ function Actions.fish_farm(item, class_settings)
         mq.cmd('/itemnotify 13 leftmouseup')
         mq.delay(500)
         while mq.TLO.Cursor() ~= nil do
-            mq.cmd('autoinv')
+            mq.cmd('/autoinv')
             mq.delay(100)
         end
     end
@@ -1513,6 +1514,9 @@ function Actions.npc_travel(item, class_settings, ignore_path_check)
                 end
                 State.nextmob = false
                 loop_count = loop_count + 1
+                if mq.TLO.NearestSpawn(loop_count, "npc " .. item.npc).ID() == nil then
+                    loop_count = 1
+                end
             else
                 break
             end
