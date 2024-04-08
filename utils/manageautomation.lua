@@ -999,7 +999,7 @@ function manage.navUnpause(group_set, travelData)
         mq.cmd('/dgga /squelch /nav pause')
     else
         mq.cmd('/squelch /nav pause')
-        mq.cmdf('/dex %s /squelch /nav id %s', State.group_combo[State.group_choice])
+        mq.cmdf('/dex %s /squelch /nav pause', State.group_combo[State.group_choice])
     end
     mq.delay(500)
 end
