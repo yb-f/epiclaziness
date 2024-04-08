@@ -540,12 +540,13 @@ function manage.invis(group_set, class_settings)
                     mq.cmdf("/dex %s /squelch /doability sneak", mq.TLO.Group.Member(i).DisplayName())
                 else
                     local ID = class_settings['skill_to_num']
-                    [invis_type[class_settings.invis[mq.TLO.Group.Member(i).Class()]]]
+                        [invis_type[class_settings.invis[mq.TLO.Group.Member(i).Class()]]]
                     mq.cmdf('/dex %s /squelch /alt act "%s"', mq.TLO.Group.Member(i).DisplayName(),
                         ID)
                 end
             end
         end
+        mq.delay("4s")
     else
         local invis_type = {}
         for word in string.gmatch(class_settings.class_invis[mq.TLO.Group.Member(State.group_combo[State.group_choice]).Class()], '([^|]+)') do
@@ -562,12 +563,13 @@ function manage.invis(group_set, class_settings)
                 mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName())
         else
             local ID = class_settings['skill_to_num']
-            [invis_type[class_settings.invis[mq.TLO.Group.Member(State.group_combo[State.group_choice]).Class()]]]
+                [invis_type[class_settings.invis[mq.TLO.Group.Member(State.group_combo[State.group_choice]).Class()]]]
             mq.cmdf('/dex %s /squelch /alt act "%s"',
                 mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName(), ID)
         end
+        mq.delay("4s")
     end
-    mq.delay("4s")
+    mq.delay(100)
 end
 
 function manage.invisTranslocatorCheck()
