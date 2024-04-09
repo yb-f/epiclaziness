@@ -671,6 +671,11 @@ function manage.locTravelGroup(group_set, x, y, z, class_settings, invis)
             loopCount = 0
         end
     end
+    local distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
+    if distance > 30 then
+        State.step = State.step - 2
+        State.skip = true
+    end
 end
 
 function manage.navGroup(group_set, npc, ID, class_settings, invis)
@@ -758,6 +763,13 @@ function manage.navGroup(group_set, npc, ID, class_settings, invis)
             loopCount = 0
         end
     end
+    local x = mq.TLO.Spawn("npc " .. npc).X()
+    local y = mq.TLO.Spawn("npc " .. npc).Y()
+    local distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
+    if distance > 30 then
+        State.step = State.step - 2
+        State.skip = true
+    end
 end
 
 function manage.navGroupGeneral(group_set, npc, ID, class_settings, invis)
@@ -843,6 +855,13 @@ function manage.navGroupGeneral(group_set, npc, ID, class_settings, invis)
             State.Z = mq.TLO.Me.Z()
             loopCount = 0
         end
+    end
+    local x = mq.TLO.Spawn(npc).X()
+    local y = mq.TLO.Spawn(npc).Y()
+    local distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
+    if distance > 30 then
+        State.step = State.step - 2
+        State.skip = true
     end
 end
 
@@ -943,6 +962,11 @@ function manage.navGroupLoc(group_set, npc, x, y, z, class_settings, invis)
             State.Z = mq.TLO.Me.Z()
             loopCount = 0
         end
+    end
+    local distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
+    if distance > 30 then
+        State.step = State.step - 2
+        State.skip = true
     end
 end
 
@@ -1424,7 +1448,6 @@ function manage.zoneGroup(group_set, zone, class_settings, invis)
             end
         end
         if not mq.TLO.Navigation.Active() then
-            print(loopCount)
             if loopCount == 30 then
                 loopCount = 0
                 if mq.TLO.Cursor() ~= nil then
