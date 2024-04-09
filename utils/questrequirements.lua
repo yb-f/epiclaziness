@@ -23,6 +23,12 @@ local quests_requirements = {
         ['15'] = 'Requires brewing 100 (120+ recomended).',
         ['20'] = 'Requires manually obtaining a Globe of Discordant Energy.'
     },
+    ['pal'] = {
+        ['10'] = '',
+        ['pre15'] = 'No tradeskill or requirements for assistance from other classes.',
+        ['15'] = '',
+        ['20'] = ''
+    },
     ['rog'] = {
         ['10'] = '',
         ['pre15'] = 'No tradeskill or requirements for assistance from other classes.',
