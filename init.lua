@@ -106,6 +106,8 @@ if mq.TLO.Plugin('mq2portalsetter')() == nil then
 end
 
 class_settings.loadSettings()
+loadsave.loadState()
+
 
 local function step_overview()
     task_outline_table = {}
@@ -340,6 +342,8 @@ local function run_epic(class, choice)
             actions.farm_radius(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "FISH_FARM" then
             actions.fish_farm(task_table[State.step], class_settings.settings)
+        elseif task_table[State.step].type == "FISH_ONCE" then
+            actions.fish_farm(task_table[State.step], class_settings.settings, true)
         elseif task_table[State.step].type == "FORAGE_FARM" then
             actions.forage_farm(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "FORWARD_ZONE" then
@@ -561,6 +565,11 @@ local function displayGUI()
                 end
             end
             ImGui.Separator()
+            ImGui.PushStyleColor(ImGuiCol.PlotHistogram, IM_COL32(40, 150, 40, 255))
+            ImGui.ProgressBar(State.step / #task_table, ImGui.GetWindowWidth(), 17, "##hp")
+            ImGui.PopStyleColor()
+            ImGui.SetCursorPosY(ImGui.GetCursorPosY() - 20)
+            ImGui.SetCursorPosX(ImGui.GetCursorPosX() + (ImGui.GetWindowWidth() / 2) - 60)
             ImGui.Text("Step " .. tostring(State.step) .. " of " .. tostring(#task_table))
             ImGui.TextWrapped(State.status)
             for i = 1, 3 do
@@ -577,6 +586,7 @@ local function displayGUI()
                     class_settings.settings.general.returnToBind)
                 class_settings.settings.general.invisForTravel = ImGui.Checkbox("Invis When Travelling",
                     class_settings.settings.general.invisForTravel)
+                ImGui.InputInt("Number of mobs to clear XTarget list.")
                 if ImGui.Button("Save") then
                     class_settings.saveSettings()
                 end
@@ -656,7 +666,6 @@ local function displayGUI()
 end
 
 populate_group_combo()
-loadsave.loadState()
 step_overview()
 mq.imgui.init('displayGUI', displayGUI)
 
