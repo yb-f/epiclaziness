@@ -9,7 +9,7 @@ local waiting = false
 local gamble_done = false
 local forage_trash = { 'Fruit', 'Roots', 'Vegetables', 'Pod of Water', 'Berries', 'Rabbit Meat', 'Fishing Grubs' }
 local fishing_trash = { 'Fish Scales', 'Tattered Cloth Sandal', 'Rusty Dagger', "Moray Eel", "Gunthak Gourami",
-    "Deep Sea Urchin", "Fresh Fish" }
+    "Deep Sea Urchin", "Fresh Fish", "Gunthak Mackerel", "Saltwater Seaweed", "Dark Fish's Scales" }
 
 local function target_invalid_switch()
     State.cannot_count = State.cannot_count + 1
@@ -120,6 +120,7 @@ function Actions.combine_do(item, class_settings)
     mq.cmdf("/squelch /combine pack8")
     while mq.TLO.Cursor() == nil do
         mq.delay(100)
+        mq.cmdf("/squelch /combine pack8")
     end
     mq.cmd("/squelch /autoinv")
     while mq.TLO.Cursor() ~= nil do
@@ -183,7 +184,8 @@ end
 
 function Actions.enviro_combine_item(item, class_settings)
     State.status = "Moving " .. item.what .. " to combine container slot " .. item.npc
-    mq.cmd("/squelch /keypress OPEN_INV_BAGS")
+    --mq.cmd("/squelch /keypress OPEN_INV_BAGS")
+    print(item.what)
     inv.move_item_to_enviro_combine(item.what, item.npc)
 end
 
@@ -191,12 +193,17 @@ function Actions.enviro_combine_do(item, class_settings)
     State.status = "Combining"
     mq.delay("3s")
     mq.TLO.Window("ContainerWindow/Container_Combine").LeftMouseUp()
+    mq.delay("1s")
+    local i = 0
     while mq.TLO.Cursor() == nil do
+        i = i + 1
+        State.status = "Combining " .. i
         mq.delay(100)
+        mq.TLO.Window("ContainerWindow/Container_Combine").LeftMouseUp()
     end
-    mq.cmd("/squelch /autoinv")
     while mq.TLO.Cursor() ~= nil do
         mq.delay(100)
+        mq.cmd("/squelch /autoinv")
     end
 end
 
@@ -423,13 +430,15 @@ function Actions.farm_radius(item, class_settings)
     manage.pauseGroup(State.group_choice, class_settings)
 end
 
-function Actions.fish_farm(item, class_settings)
+function Actions.fish_farm(item, class_settings, once)
+    once = once or false
     if item.count ~= nil then
         State.status = "Fishing for " .. item.what .. " (" .. item.count .. ")"
     else
         State.status = "Fishing for " .. item.what
     end
     local weapon1 = mq.TLO.InvSlot('13').Item.Name()
+    local slot1, slot2 = 0, 0
     if weapon1 ~= 'Fishing Pole' then
         mq.cmd('/itemnotify "Fishing Pole" leftmouseup')
         while mq.TLO.Cursor() == nil do
@@ -438,7 +447,8 @@ function Actions.fish_farm(item, class_settings)
         mq.cmd('/itemnotify 13 leftmouseup')
         mq.delay(500)
         while mq.TLO.Cursor() ~= nil do
-            mq.cmd('/autoinv')
+            slot1, slot2 = inv.find_free_slot(20)
+            mq.cmdf('/itemnotify in pack%s %s leftmouseup', slot1, slot2)
             mq.delay(100)
         end
     end
@@ -505,9 +515,15 @@ function Actions.fish_farm(item, class_settings)
                 if mq.TLO.Cursor.Name() ~= nil then
                     mq.cmd('/autoinv')
                 end
+                if once then break end
             end
             mq.delay(100)
+            local did_once = false
             if mq.TLO.Me.AbilityReady('Fishing')() then
+                if did_once == true then
+                    if once then break end
+                end
+                did_once = true
                 mq.cmd('/squelch /doability Fishing')
                 mq.delay(500)
             end
@@ -515,7 +531,7 @@ function Actions.fish_farm(item, class_settings)
     else
     end
     if weapon1 ~= 'Fishing Pole' then
-        mq.cmdf('/itemnotify "%s" leftmouseup', weapon1)
+        mq.cmdf('/itemnotify in pack%s %s leftmouseup', slot1, slot2)
         while mq.TLO.Cursor() == nil do
             mq.delay(100)
         end
