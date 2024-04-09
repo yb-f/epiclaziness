@@ -14,9 +14,9 @@ local tsreqs = require 'utils/tradeskillreqs'
 local PackageMan = require('mq/PackageMan')
 local sqlite3 = PackageMan.Require('lsqlite3')
 
-local version = 0.020
+local version = 0.021
 -- to obtain version_time # os.time(os.date("!*t"))
-local version_time = 1712615118
+local version_time = 1712661965
 local window_flags = bit32.bor(ImGuiWindowFlags.None)
 local treeview_table_flags = bit32.bor(ImGuiTableFlags.Hideable, ImGuiTableFlags.RowBg,
     ImGuiTableFlags.Borders, ImGuiTableFlags.SizingFixedFit)
