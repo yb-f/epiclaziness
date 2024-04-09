@@ -881,13 +881,11 @@ function Actions.npc_damage_until(item, class_settings)
     if item.zone ~= nil then
         if mq.TLO.Me.Level() >= tonumber(item.zone) then
             weapon1 = mq.TLO.InvSlot(13).Item.Name()
-            print(weapon1)
             if mq.TLO.InvSlot(14).Item() ~= nil then
                 weapon2 = mq.TLO.InvSlot(14).Item.Name()
             else
                 weapon2 = 'none'
             end
-            print(weapon2)
             mq.cmd('/itemnotify 13 leftmouseup')
             while mq.TLO.Cursor() == nil do
                 mq.delay(100)
