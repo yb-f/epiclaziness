@@ -673,8 +673,13 @@ function manage.locTravelGroup(group_set, x, y, z, class_settings, invis)
     end
     local distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
     if distance > 30 then
-        State.step = State.step - 2
-        State.skip = true
+        if State.step == 2 then
+            State.step = 1
+            State.rewound = true
+        else
+            State.step = State.step - 2
+            State.skip = true
+        end
     end
 end
 
@@ -767,8 +772,13 @@ function manage.navGroup(group_set, npc, ID, class_settings, invis)
     local y = mq.TLO.Spawn("npc " .. npc).Y()
     local distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
     if distance > 30 then
-        State.step = State.step - 2
-        State.skip = true
+        if State.step == 2 then
+            State.step = 1
+            State.rewound = true
+        else
+            State.step = State.step - 2
+            State.skip = true
+        end
     end
 end
 
@@ -860,8 +870,13 @@ function manage.navGroupGeneral(group_set, npc, ID, class_settings, invis)
     local y = mq.TLO.Spawn(npc).Y()
     local distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
     if distance > 30 then
-        State.step = State.step - 2
-        State.skip = true
+        if State.step == 2 then
+            State.step = 1
+            State.rewound = true
+        else
+            State.step = State.step - 2
+            State.skip = true
+        end
     end
 end
 
@@ -965,8 +980,13 @@ function manage.navGroupLoc(group_set, npc, x, y, z, class_settings, invis)
     end
     local distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
     if distance > 30 then
-        State.step = State.step - 2
-        State.skip = true
+        if State.step == 2 then
+            State.step = 1
+            State.rewound = true
+        else
+            State.step = State.step - 2
+            State.skip = true
+        end
     end
 end
 
