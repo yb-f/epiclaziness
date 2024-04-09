@@ -216,6 +216,7 @@ function manage.doAutomation(character, class, script, action)
             elseif script == 2 then
                 mq.cmd("/squelch /rgl campon")
                 mq.cmd("/squelch /rgl unpause")
+                mq.cmd("/squelch /rgl set pullmode 3")
                 mq.cmd("/squelch /rgl set dopull on")
             elseif script == 3 then
                 mq.cmd("/squelch /rg camphere")
@@ -502,11 +503,14 @@ function manage.invis(group_set, class_settings)
     elseif invis_type[class_settings.invis[mq.TLO.Me.Class()]] == 'Hide/Sneak' then
         while mq.TLO.Me.AbilityReady('Hide')() == false do
             mq.delay(100)
+            if mq.TLO.Me.Invis() == true then
+                break
+            end
         end
         mq.cmd("/squelch /doability hide")
         while mq.TLO.Me.Invis() == false do
             mq.delay(100)
-            if mq.TLO.Me.AbilityReady('Hide')() == false then
+            if mq.TLO.Me.AbilityReady('Hide')() == true then
                 mq.cmd("/squelch /doability hide")
             end
         end
@@ -517,7 +521,7 @@ function manage.invis(group_set, class_settings)
             mq.cmd("/squelch /doability sneak")
             while mq.TLO.Me.Sneaking() == false do
                 mq.delay(100)
-                if mq.TLO.Me.AbilityReady('Sneak')() == false then
+                if mq.TLO.Me.AbilityReady('Sneak')() == true then
                     mq.cmd("/squelch /doability sneak")
                 end
             end
@@ -1266,7 +1270,7 @@ function manage.setRadius(character, class, script, radius)
     if script == 1 then
         mq.cmdf('/squelch /%s pullradius %s nosave', class, radius)
     elseif script == 2 then
-        mq.cmd("/squelch /rgl set pullradius %s", radius)
+        mq.cmdf("/squelch /rgl set pullradiushunt %s", radius)
     elseif script == 3 then
         mq.cmd("/squelch /rg pullrad %s", radius)
     elseif script == 4 then
@@ -1420,7 +1424,9 @@ function manage.zoneGroup(group_set, zone, class_settings, invis)
             end
         end
         if not mq.TLO.Navigation.Active() then
-            if loopCount == 60 then
+            print(loopCount)
+            if loopCount == 30 then
+                loopCount = 0
                 if mq.TLO.Cursor() ~= nil then
                     if mq.TLO.Cursor() == "Spire Stone" then
                         mq.cmd('/squelch /autoinv')
