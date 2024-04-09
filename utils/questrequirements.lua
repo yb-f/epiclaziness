@@ -26,7 +26,7 @@ local quests_requirements = {
     ['pal'] = {
         ['10'] = '',
         ['pre15'] = 'No tradeskill or requirements for assistance from other classes.',
-        ['15'] = '',
+        ['15'] = '100 Fishing required.  Shaman with 224 Alchemy required for Mist of the Breathless.',
         ['20'] = ''
     },
     ['rog'] = {
