@@ -72,6 +72,8 @@ function inventory.move_item_to_combine(name, slot)
     local itemslot  = mq.TLO.FindItem("=" .. name).ItemSlot() - 22
     local itemslot2 = mq.TLO.FindItem("=" .. name).ItemSlot2() + 1
     mq.cmdf("/squelch /nomodkey /ctrl /itemnotify in pack%s %s leftmouseup", itemslot, itemslot2)
+    mq.delay(500)
+    print(mq.TLO.Cursor())
     while mq.TLO.Cursor() == nil do
         mq.delay(100)
     end
@@ -81,7 +83,11 @@ function inventory.move_item_to_combine(name, slot)
         end
     end
     mq.cmdf("/squelch /nomodkey /shiftkey /itemnotify in pack%s %s leftmouseup", slot, slot2)
-    mq.delay("1s")
+    mq.delay(500)
+    print(mq.TLO.Cursor())
+    while mq.TLO.Cursor() ~= nil do
+        mq.delay(100)
+    end
 end
 
 function inventory.move_item_to_enviro_combine(name, slot)
@@ -93,11 +99,15 @@ function inventory.move_item_to_enviro_combine(name, slot)
     local itemslot  = mq.TLO.FindItem("=" .. name).ItemSlot() - 22
     local itemslot2 = mq.TLO.FindItem("=" .. name).ItemSlot2() + 1
     mq.cmdf("/squelch /nomodkey /ctrl /itemnotify in pack%s %s leftmouseup", itemslot, itemslot2)
+    mq.delay(500)
     while mq.TLO.Cursor() == nil do
         mq.delay(100)
     end
     mq.cmdf("/squelch /itemnotify enviro%s leftmouseup", slot)
-    mq.delay("1s")
+    mq.delay(500)
+    while mq.TLO.Cursor() ~= nil do
+        mq.delay(100)
+    end
 end
 
 function inventory.move_combine_container(slot, container)
