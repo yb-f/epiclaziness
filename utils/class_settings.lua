@@ -22,10 +22,6 @@ function class_settings.loadSettings()
             }
             class_settings.saveSettings()
         end
-        if class_settings.settings.general['stopTS'] == nil then
-            class_settings.settings.general['stopTS'] = true
-            class_settings.saveSettings()
-        end
     end
 end
 
@@ -48,12 +44,6 @@ function class_settings.createSettings()
             ['Shaman'] = 1,
             ['Warrior'] = 1,
             ['Wizard'] = 2
-        },
-        ['general'] = {
-            ['stopTS'] = true,
-            ['useAOC'] = true,
-            ['invisForTravel'] = false,
-            ['returnToBind'] = false
         },
         ['invis'] = {
             ['Bard'] = 1,

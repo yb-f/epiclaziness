@@ -75,23 +75,6 @@ local travel = {
         ['invis'] = 6
     },
     --Not accurate
-    ['clr_10'] = {
-        ['gate'] = 69,
-        ['invis'] = 420
-    },
-    ['clr_15'] = {
-        ['gate'] = 0,
-        ['invis'] = 17
-    },
-    ['clr_20'] = {
-        ['gate'] = 0,
-        ['invis'] = 12
-    },
-    ['clr_pre15'] = {
-        ['gate'] = 0,
-        ['invis'] = 6
-    },
-    --Not accurate
     ['dru_10'] = {
         ['gate'] = 69,
         ['invis'] = 420

@@ -1,11 +1,13 @@
 local mq = require('mq')
 local ImGui = require 'ImGui'
-local dist = require 'utils/distance'
-local inv = require 'utils/inventory'
 local ICONS = require('mq.Icons')
-local actions = require 'utils/actions'
-local loadsave = require 'utils/loadsave'
+local dist = require 'utils/distance'
+Actions = require 'utils/actions'
+local inv = require 'utils/inventory'
+Mob = require 'utils/mob'
+local travel = require 'utils/travel'
 local manage = require 'utils/manageautomation'
+local loadsave = require 'utils/loadsave'
 local class_settings = require 'utils/class_settings'
 local invis_travel = require 'utils/travelandinvis'
 local quests_done = require 'utils/questsdone'
@@ -14,9 +16,9 @@ local tsreqs = require 'utils/tradeskillreqs'
 local PackageMan = require('mq/PackageMan')
 local sqlite3 = PackageMan.Require('lsqlite3')
 
-local version = 0.021
+local version = 0.022
 -- to obtain version_time # os.time(os.date("!*t"))
-local version_time = 1712661965
+local version_time = 1712657289
 local window_flags = bit32.bor(ImGuiWindowFlags.None)
 local treeview_table_flags = bit32.bor(ImGuiTableFlags.Hideable, ImGuiTableFlags.RowBg,
     ImGuiTableFlags.Borders, ImGuiTableFlags.SizingFixedFit)
@@ -108,6 +110,15 @@ end
 class_settings.loadSettings()
 loadsave.loadState()
 
+if loadsave.SaveState['general'] == nil then
+    loadsave.SaveState['general'] = {
+        ['useAOC'] = class_settings.settings.general.useAOC,
+        ['invisForTravel'] = class_settings.settings.general.invisForTravel,
+        ['stopTS'] = class_settings.settings.general.stopTS,
+        ['returnToBind'] = class_settings.settings.general.returnToBind,
+    }
+    loadsave.saveState()
+end
 
 local function step_overview()
     task_outline_table = {}
@@ -267,7 +278,7 @@ local function run_epic(class, choice)
     local ts_return = check_tradeskills(class, choice)
     if ts_return then
         print(ts_return)
-        if class_settings.settings.general.stopTS == true then
+        if loadsave.SaveState.general.stopTS == true then
             printf(
                 '%s \aoPlease raise your tradeskills to continue, or turn off the "\agStop if tradeskill requirements are unmet\ao" setting.',
                 elheader)
@@ -278,10 +289,11 @@ local function run_epic(class, choice)
     for a in dbn:nrows(sql) do
         table.insert(task_table, a)
     end
-    manage.startGroup(State.group_choice, class_settings.settings)
+    manage.startGroup(State.group_choice, class_settings.settings, loadsave.SaveState)
     mq.delay("5s")
-    manage.pauseGroup(State.group_choice, class_settings.settings)
+    manage.pauseGroup(class_settings.settings)
     while State.step < #task_table do
+        State.cannot_count = 0
         while State.pause == true do
             State.status = "Paused"
             mq.delay(500)
@@ -296,158 +308,146 @@ local function run_epic(class, choice)
             mq.cmd('/attack off')
         end
         if task_table[State.step].type == "AUTO_INV" then
-            actions.auto_inv(task_table[State.step], class_settings.settings)
+            inv.auto_inv()
         elseif task_table[State.step].type == "BACKSTAB" then
-            actions.backstab(task_table[State.step], class_settings.settings)
+            Mob.backstab(task_table[State.step])
         elseif task_table[State.step].type == "CAST_ALT" then
-            actions.cast_alt(task_table[State.step], class_settings.settings)
+            Actions.cast_alt(task_table[State.step])
         elseif task_table[State.step].type == "COMBINE_CONTAINER" then
-            actions.combine_container(task_table[State.step], class_settings.settings)
+            inv.combine_container(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "COMBINE_DO" then
-            actions.combine_do(task_table[State.step], class_settings.settings)
+            inv.combine_do(class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "COMBINE_DONE" then
-            actions.combine_done(task_table[State.step], class_settings.settings)
+            inv.combine_done(class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "COMBINE_ITEM" then
-            actions.combine_item(task_table[State.step], class_settings.settings)
+            inv.combine_item(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "ENVIRO_COMBINE_CONTAINER" then
-            actions.enviro_combine_container(task_table[State.step], class_settings.settings)
+            inv.enviro_combine_container(task_table[State.step])
         elseif task_table[State.step].type == "ENVIRO_COMBINE_DO" then
-            actions.enviro_combine_do(task_table[State.step], class_settings.settings)
+            inv.enviro_combine_do()
         elseif task_table[State.step].type == "ENVIRO_COMBINE_ITEM" then
-            actions.enviro_combine_item(task_table[State.step], class_settings.settings)
+            inv.enviro_combine_item(task_table[State.step])
         elseif task_table[State.step].type == "EQUIP_ITEM" then
-            inv.equip_item(task_table[State.step], class_settings.settings)
+            inv.equip_item(task_table[State.step])
         elseif task_table[State.step].type == "EXCLUDE_NPC" then
             exclude_name = task_table[State.step].npc
             create_spawn_list()
         elseif task_table[State.step].type == "EXECUTE_COMMAND" then
-            if mq.TLO.Me.XTarget() > 0 then
-                for i = 1, mq.TLO.Me.XTargetSlots() do
-                    if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
-                        manage.clearXtarget(State.group_choice, class_settings.settings)
-                    end
-                end
+            if Mob.xtargetCheck(loadsave.SaveState) then
+                Mob.clearXtarget(class_settings.settings, loadsave.SaveState)
             end
             mq.cmdf("%s", task_table[State.step].what)
             mq.delay(500)
         elseif task_table[State.step].type == "FACE_HEADING" then
-            actions.face_heading(task_table[State.step], class_settings.settings)
+            travel.face_heading(task_table[State.step].what)
         elseif task_table[State.step].type == "FACE_LOC" then
-            actions.face_loc(task_table[State.step], class_settings.settings)
+            travel.face_loc(task_table[State.step])
         elseif task_table[State.step].type == "FARM_CHECK" then
-            actions.farm_check(task_table[State.step], class_settings.settings)
+            Actions.farm_check(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "FARM_CHECK_PAUSE" then
-            actions.farm_check_pause(task_table[State.step], class_settings.settings)
+            Actions.farm_check_pause(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "FARM_RADIUS" then
-            actions.farm_radius(task_table[State.step], class_settings.settings)
+            Actions.farm_radius(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "FISH_FARM" then
-            actions.fish_farm(task_table[State.step], class_settings.settings)
+            Actions.fish_farm(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "FISH_ONCE" then
-            actions.fish_farm(task_table[State.step], class_settings.settings, true)
+            Actions.fish_farm(task_table[State.step], class_settings.settings, loadsave.SaveState, true)
         elseif task_table[State.step].type == "FORAGE_FARM" then
-            actions.forage_farm(task_table[State.step], class_settings.settings)
+            Actions.forage_farm(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "FORWARD_ZONE" then
-            actions.forward_zone(task_table[State.step], class_settings.settings)
+            travel.forward_zone(task_table[State.step].zone, class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "GENERAL_SEARCH" then
-            actions.general_search(task_table[State.step], class_settings.settings)
+            Mob.general_search(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "GENERAL_TRAVEL" then
-            actions.general_travel(task_table[State.step], class_settings.settings)
+            travel.general_travel(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "GROUND_SPAWN" then
-            actions.ground_spawn(task_table[State.step], class_settings.settings)
+            Actions.ground_spawn(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "IGNORE_MOB" then
-            actions.ignore_mob(task_table[State.step], class_settings.settings)
+            Actions.ignore_mob(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "LOC_TRAVEL" then
-            actions.loc_travel(task_table[State.step], class_settings.settings)
+            travel.loc_travel(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "LOOT" then
-            if mq.TLO.Me.XTarget() > 0 then
-                for i = 1, mq.TLO.Me.XTargetSlots() do
-                    if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
-                        manage.clearXtarget(State.group_choice, class_settings.settings)
-                    end
-                end
+            if Mob.xtargetCheck(loadsave.SaveState) then
+                Mob.clearXtarget(class_settings.settings, loadsave.SaveState)
             end
-            actions.loot(task_table[State.step], class_settings.settings)
+            inv.loot(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "NO_NAV_TRAVEL" then
-            actions.no_nav_travel(task_table[State.step], class_settings.settings)
+            travel.no_nav_travel(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "NPC_BUY" then
-            actions.npc_buy(task_table[State.step], class_settings.settings)
+            inv.npc_buy(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "NPC_DAMAGE_UNTIL" then
-            actions.npc_damage_until(task_table[State.step], class_settings.settings)
+            Mob.npc_damage_until(task_table[State.step])
         elseif task_table[State.step].type == "NPC_FOLLOW" then
-            actions.npc_follow(task_table[State.step], class_settings.settings)
+            travel.npc_follow(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "NPC_GIVE" then
-            actions.npc_give(task_table[State.step], class_settings.settings)
+            Actions.npc_give(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "NPC_GIVE_ADD" then
-            actions.npc_give_add(task_table[State.step], class_settings.settings)
+            Actions.npc_give_add(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "NPC_GIVE_CLICK" then
-            actions.npc_give_click(task_table[State.step], class_settings.settings)
+            Actions.npc_give_click(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "NPC_GIVE_MONEY" then
-            actions.npc_give_money(task_table[State.step], class_settings.settings)
+            Actions.npc_give_money(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "NPC_HAIL" then
-            actions.npc_hail(task_table[State.step], class_settings.settings)
+            Actions.npc_hail(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "NPC_KILL" then
-            actions.npc_kill(task_table[State.step], class_settings.settings, task_table[State.step + 1].type)
+            Mob.npc_kill(task_table[State.step], class_settings.settings, task_table[State.step + 1].type)
         elseif task_table[State.step].type == "NPC_KILL_ALL" then
-            actions.npc_kill_all(task_table[State.step], class_settings.settings)
+            Actions.npc_kill_all(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "NPC_SEARCH" then
-            actions.npc_search(task_table[State.step], class_settings.settings)
+            Mob.general_search(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "NPC_STOP_FOLLOW" then
-            actions.npc_stop_follow(task_table[State.step], class_settings.settings)
+            travel.npc_stop_follow()
         elseif task_table[State.step].type == "NPC_TALK" then
-            actions.npc_talk(task_table[State.step], class_settings.settings)
+            Actions.npc_talk(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "NPC_TALK_ALL" then
-            if mq.TLO.Me.XTarget() > 0 then
-                for i = 1, mq.TLO.Me.XTargetSlots() do
-                    if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
-                        manage.clearXtarget(State.group_choice, class_settings.settings)
-                    end
-                end
+            if Mob.xtargetCheck(loadsave.SaveState) then
+                Mob.clearXtarget(class_settings.settings, loadsave.SaveState)
             end
-            actions.npc_talk_all(task_table[State.step], class_settings.settings)
+            Actions.npc_talk_all(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "NPC_TRAVEL" then
-            actions.npc_travel(task_table[State.step], class_settings.settings)
+            travel.npc_travel(task_table[State.step], class_settings.settings, false, loadsave.SaveState)
         elseif task_table[State.step].type == "NPC_TRAVEL_NO_PATH_CHECK" then
-            actions.npc_travel(task_table[State.step], class_settings.settings, true)
+            travel.npc_travel(task_table[State.step], class_settings.settings, true, loadsave.SaveState)
         elseif task_table[State.step].type == "NPC_WAIT" then
-            actions.npc_wait(task_table[State.step], class_settings.settings)
+            Actions.npc_wait(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "NPC_WAIT_DESPAWN" then
-            actions.npc_wait_despawn(task_table[State.step], class_settings.settings)
+            Actions.npc_wait_despawn(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "OPEN_DOOR" then
-            actions.open_door(task_table[State.step], class_settings.settings)
+            travel.open_door()
         elseif task_table[State.step].type == "OPEN_DOOR_ALL" then
-            actions.open_door_all(task_table[State.step], class_settings.settings)
+            manage.openDoorAll()
         elseif task_table[State.step].type == "PH_SEARCH" then
-            actions.ph_search(task_table[State.step], class_settings.settings)
+            Mob.ph_search(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "PICK_DOOR" then
-            actions.picklock_door(task_table[State.step], class_settings.settings)
+            manage.picklockGroup()
         elseif task_table[State.step].type == "PICK_POCKET" then
-            actions.pickpocket(task_table[State.step], class_settings.settings)
+            Actions.pickpocket(task_table[State.step])
         elseif task_table[State.step].type == "PICKUP_KEY" then
             mq.cmdf("/squelch /itemnotify \"%s\" leftmouseup", task_table[State.step].what)
         elseif task_table[State.step].type == "PORTAL_SET" then
-            actions.portal_set(task_table[State.step], class_settings.settings)
+            travel.portal_set(task_table[State.step])
         elseif task_table[State.step].type == "PRE_FARM_CHECK" then
-            actions.pre_farm_check(task_table[State.step], class_settings.settings)
+            Actions.pre_farm_check(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "RELOCATE" then
-            actions.relocate(task_table[State.step], class_settings.settings)
+            Actions.relocate(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "REMOVE_INVIS" then
-            actions.remove_invis(task_table[State.step], class_settings.settings)
+            manage.removeInvis()
         elseif task_table[State.step].type == "RESTORE_ITEM" then
             inv.restore_item()
         elseif task_table[State.step].type == "ROG_GAMBLE" then
-            actions.rog_gamble(task_table[State.step], class_settings.settings)
+            Actions.rog_gamble(task_table[State.step])
         elseif task_table[State.step].type == "SEND_YES" then
-            actions.send_yes(task_table[State.step], class_settings.settings)
+            manage.sendYes()
         elseif task_table[State.step].type == "WAIT" then
             State.status = "Pausing for " .. task_table[State.step].what / 1000 .. " seconds"
-            actions.wait(task_table[State.step], class_settings.settings)
+            Actions.wait(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "WAIT_EVENT" then
-            actions.wait_event(task_table[State.step], class_settings.settings)
+            Actions.wait_event(task_table[State.step])
         elseif task_table[State.step].type == "ZONE_CONTINUE_TRAVEL" then
-            actions.zone_continue_travel(task_table[State.step], class_settings.settings)
+            travel.zone_travel(task_table[State.step], class_settings.settings, loadsave.SaveState, true)
         elseif task_table[State.step].type == "ZONE_TRAVEL" then
             State.bad_IDs = {}
-            actions.zone_travel(task_table[State.step], class_settings.settings)
+            travel.zone_travel(task_table[State.step], class_settings.settings, loadsave.SaveState, false)
         else
             printf("%s \aoUnknown Type: \ar%s!", elheader, task_table[State.step].type)
             mq.exit()
@@ -580,15 +580,16 @@ local function displayGUI()
         end
         if ImGui.BeginTabItem("Settings") then
             if ImGui.CollapsingHeader('General Settings') then
-                class_settings.settings.general.stopTS = ImGui.Checkbox("Stop if tradeskill requirements are unmet",
-                    class_settings.settings.general.stopTS)
-                class_settings.settings.general.returnToBind = ImGui.Checkbox("Return to Bind Between Travel",
-                    class_settings.settings.general.returnToBind)
-                class_settings.settings.general.invisForTravel = ImGui.Checkbox("Invis When Travelling",
-                    class_settings.settings.general.invisForTravel)
-                ImGui.InputInt("Number of mobs to clear XTarget list.")
+                loadsave.SaveState.general.stopTS = ImGui.Checkbox("Stop if tradeskill requirements are unmet",
+                    loadsave.SaveState.general.stopTS)
+                loadsave.SaveState.general.returnToBind = ImGui.Checkbox("Return to Bind Between Travel",
+                    loadsave.SaveState.general.returnToBind)
+                loadsave.SaveState.general.invisForTravel = ImGui.Checkbox("Invis When Travelling",
+                    loadsave.SaveState.general.invisForTravel)
+                loadsave.SaveState.general.xtargClear = ImGui.InputInt("Number of mobs to clear XTarget list.",
+                    loadsave.SaveState.general.xtargClear)
                 if ImGui.Button("Save") then
-                    class_settings.saveSettings()
+                    loadsave.saveState()
                 end
             end
             if ImGui.CollapsingHeader('Class Settings') then

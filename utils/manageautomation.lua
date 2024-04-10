@@ -6,12 +6,12 @@ local elheader = "\ay[\agEpic Laziness\ay]"
 local translocators = { "Magus", "Translocator", "Priest of Discord", "Nexus Scion", "Deaen Greyforge",
     "Ambassador Cogswald", "Madronoa", "Belinda", "Herald of Druzzil Ro" }
 
-function manage.campGroup(group_set, radius, class_settings)
+function manage.campGroup(group_set, radius, class_settings, char_settings)
     manage.doAutomation(mq.TLO.Me.DisplayName(), mq.TLO.Me.Class.ShortName(),
         class_settings.class[mq.TLO.Me.Class.Name()],
-        'camp')
+        'camp', char_settings)
     manage.setRadius(mq.TLO.Me.DisplayName(), mq.TLO.Me.Class.ShortName(), class_settings.class[mq.TLO.Me.Class.Name()],
-        radius)
+        radius, char_settings)
     if group_set == 1 then
         return
     elseif group_set == 2 then
@@ -19,109 +19,18 @@ function manage.campGroup(group_set, radius, class_settings)
             if mq.TLO.Group.Member(i).DisplayName() ~= mq.TLO.Me.DisplayName() then
                 manage.doAutomation(mq.TLO.Group.Member(i).DisplayName(), mq.TLO.Group.Member(i).Class.ShortName(),
                     class_settings.class[mq.TLO.Group.Member(i).Class.Name()],
-                    'camp')
+                    'camp', char_settings)
             end
         end
     else
         manage.doAutomation(State.group_combo[State.group_choice],
             mq.TLO.Group.Member(State.group_combo[State.group_choice]).Class.ShortName(),
-            class_settings.class[mq.TLO.Group.Member(State.group_combo[State.group_choice]).Class.Name()], 'camp')
+            class_settings.class[mq.TLO.Group.Member(State.group_combo[State.group_choice]).Class.Name()], 'camp',
+            char_settings)
     end
 end
 
-function manage.clearXtarget(group_set, class_settings, npc)
-    npc = npc or "thiswontmatchanything"
-    local max_xtargs = mq.TLO.Me.XTargetSlots()
-    if mq.TLO.Me.XTarget() > 0 then
-        local looping = true
-        local loopCount = 0
-        local i = 0
-        local idList = {}
-        while looping do
-            mq.delay(200)
-            i = i + 1
-            loopCount = loopCount + 1
-            if mq.TLO.Me.XTarget(i)() ~= '' and mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' then
-                if mq.TLO.Me.XTarget(i).CleanName() ~= nil and npc ~= nil then
-                    if string.find(string.lower(mq.TLO.Me.XTarget(i).CleanName()), string.lower(npc)) then
-                        local ID = mq.TLO.Me.XTarget(i).ID()
-                        local notFound = true
-                        for _, ids in pairs(idList) do
-                            if ID == ids then
-                                notFound = false
-                            end
-                        end
-                        if notFound then
-                            table.insert(idList, ID)
-                        end
-                        if #idList == mq.TLO.Me.XTarget() then
-                            break
-                        end
-                    else
-                        if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
-                            if mq.TLO.Me.XTarget(i).Distance() ~= nil then
-                                if mq.TLO.Me.XTarget(i).Distance() < 300 and mq.TLO.Me.XTarget(i).LineOfSight() == true then
-                                    mq.TLO.Me.XTarget(i).DoTarget()
-                                    ID = mq.TLO.Me.XTarget(i).ID()
-                                    State.status = "Clearing XTarget " .. i .. ": " .. mq.TLO.Me.XTarget(i)()
-                                    manage.unpauseGroup(group_set, class_settings)
-                                    mq.cmd("/squelch /stick")
-                                    mq.delay(100)
-                                    mq.cmd("/squelch /attack on")
-                                    while mq.TLO.Spawn(ID).Type() == 'NPC' do
-                                        local breakout = true
-                                        for j = 1, max_xtargs do
-                                            if mq.TLO.Me.XTarget(j).ID() == ID then
-                                                breakout = false
-                                            end
-                                        end
-                                        if breakout == true then break end
-                                        if mq.TLO.Target.ID() ~= ID then
-                                            mq.TLO.Spawn(ID).DoTarget()
-                                        end
-                                        if mq.TLO.Me.Combat() == false then
-                                            mq.cmd("/squelch /attack on")
-                                        end
-                                        mq.delay(200)
-                                    end
-                                    i = 0
-                                    loopCount = 0
-                                elseif i > mq.TLO.Me.XTarget() then
-                                    i = 0
-                                end
-                            else
-                                i = 0
-                            end
-                        end
-                    end
-                end
-            end
-            if loopCount == 20 then
-                i = 0
-                loopCount = 0
-            end
-            if mq.TLO.Me.XTarget() == 0 then
-                looping = false
-            end
-            local continueLoop = false
-            for j = 1, max_xtargs do
-                if mq.TLO.Me.XTarget(j).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(j)() ~= '' then
-                    continueLoop = true
-                else
-                end
-            end
-            if continueLoop == false then
-                looping = false
-            end
-        end
-        manage.pauseGroup(group_set, class_settings)
-        if mq.TLO.Stick.Active() == true then
-            mq.cmd('/squelch /stick off')
-        end
-    end
-end
-
-function manage.doAutomation(character, class, script, action)
+function manage.doAutomation(character, class, script, action, char_settings)
     if action == 'start' then
         if character == mq.TLO.Me.DisplayName() then
             if script == 1 then
@@ -290,170 +199,22 @@ function manage.doAutomation(character, class, script, action)
     end
 end
 
-function manage.faceHeading(group_set, heading)
-    if group_set == 1 then
-        mq.cmdf("/squelch /face heading %s", heading)
-    elseif group_set == 2 then
-        mq.cmdf("/dgga /squelch /face heading %s", heading)
-    else
-        mq.cmdf("/squelch /face heading %s", heading)
-        mq.cmdf("/dex %s /squelch /face heading %s", State.group_combo[State.group_choice], heading)
-    end
-end
-
-function manage.faceLoc(group_set, x, y, z)
-    if group_set == 1 then
-        mq.cmdf("/squelch /face loc %s,%s,%s", y, x, z)
-    elseif group_set == 2 then
-        mq.cmdf("/dgga /squelch /face loc %s,%s,%s", y, x, z)
-    else
-        mq.cmdf("/squelch /face loc %s,%s,%s", y, x, z)
-        mq.cmdf("/dex %s /squelch /face loc %s,%s,%s", State.group_combo[State.group_choice], y, x, z)
-    end
-end
-
-function manage.followGroup(group_set, npc)
-    if mq.TLO.Spawn("npc " .. npc).Distance() ~= nil then
-        if mq.TLO.Spawn("npc " .. npc).Distance() > 100 then
-            State.step = State.step - 2
-            return
-        end
-    end
-    if group_set == 1 then
-        mq.TLO.Spawn("npc " .. npc).DoTarget()
-        mq.delay(300)
-        mq.cmd('/squelch /afollow')
-    elseif group_set == 2 then
-        mq.cmdf('/dgga /squelch /target id %s', mq.TLO.Spawn("npc " .. npc).ID())
-        mq.delay(300)
-        mq.cmd('/dgga /squelch /afollow')
-    else
-        mq.TLO.Spawn("npc " .. npc).DoTarget()
-        mq.cmdf('/dex %s /squelch /nav id %s', State.group_combo[State.group_choice], mq.TLO.Spawn("npc " .. npc).ID())
-        mq.delay(300)
-        mq.cmd('/squelch /afollow')
-        mq.cmdf('/dex %s /squelch /afollow', State.group_combo[State.group_choice])
-    end
-end
-
-function manage.followGroupLoc(group_set, npc, x, y)
-    if mq.TLO.Spawn("npc " .. npc).Distance() ~= nil then
-        if mq.TLO.Spawn("npc " .. npc).Distance() > 100 then
-            State.step = State.step - 2
-            return
-        end
-    end
-    if group_set == 1 then
-        mq.TLO.Spawn("npc " .. npc).DoTarget()
-        mq.delay(300)
-        mq.cmd('/squelch /afollow')
-        local distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
-        while distance > 50 do
-            if State.skip == true then
-                mq.cmd('/squelch /afollow off')
-                State.skip = false
-                return
-            end
-            mq.delay(200)
-            distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
-        end
-        mq.cmd('/squelch /afollow off')
-    elseif group_set == 2 then
-        mq.cmdf('/dgga /squelch /target id %s', mq.TLO.Spawn("npc " .. npc).ID())
-        mq.delay(300)
-        mq.cmd('/dgga /squelch /afollow')
-        local distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
-        while distance > 50 do
-            if State.skip == true then
-                mq.cmd('/dgga /squelch /afollow off')
-                State.skip = false
-                return
-            end
-            mq.delay(200)
-            distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
-        end
-        mq.cmd('/dgga /squelch /afollow off')
-    else
-        mq.TLO.Spawn("npc " .. npc).DoTarget()
-        mq.cmdf('/dex %s /squelch /nav id %s', State.group_combo[State.group_choice], mq.TLO.Spawn("npc " .. npc).ID())
-        mq.delay(300)
-        mq.cmd('/squelch /afollow')
-        mq.cmdf('/dex %s /squelch /afollow', State.group_combo[State.group_choice])
-        local distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
-        while distance > 50 do
-            if State.skip == true then
-                mq.cmd('/squelch /afollow off')
-                mq.cmdf('/dex %s /squelch /afollow off', State.group_combo[State.group_choice])
-                State.skip = false
-                return
-            end
-            mq.delay(200)
-            distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
-        end
-        mq.cmd('/squelch /afollow off')
-        mq.cmdf('/dex %s /squelch /afollow off', State.group_combo[State.group_choice])
-    end
-end
-
---WORK ON THIS ONE
-function manage.forwardZone(group_set, zone)
-    if group_set == 1 then
-        mq.cmd("/squelch /keypress forward hold")
-        while mq.TLO.Zone.ShortName() ~= zone do
-            mq.delay(500)
-        end
-        mq.delay("5s")
-    elseif group_set == 2 then
-        mq.cmd("/dgge /squelch /keypress forward hold")
-        mq.cmd("/squelch /keypress forward hold")
-        while mq.TLO.Zone.ShortName() ~= zone do
-            mq.delay(500)
-        end
-        while mq.TLO.Group.AnyoneMissing() do
-            mq.delay(500)
-        end
-        mq.delay("5s")
-    else
-        mq.cmdf("/dex %s /keypress forward hold", State.group_combo[State.group_choice])
-        mq.cmd("/squelch /keypress forward hold")
-        while mq.TLO.Zone.ShortName() ~= zone do
-            mq.delay(500)
-        end
-        while mq.TLO.Group.Member(State.group_combo[State.group_choice]).OtherZone() do
-            mq.delay(500)
-        end
-        mq.delay("5s")
-    end
-end
-
-function manage.gateGroup(group_set)
-    if group_set == 1 then
-        mq.cmd("/squelch /relocate gate")
-        mq.delay(500)
-    elseif group_set == 2 then
-        mq.cmd("/dgga /squelch/relocate gate")
-        mq.delay(500)
-    else
-        mq.cmd("/squelch /relocate gate")
-        mq.cmdf('/dex %s /squelch /relocate gate', State.group_combo[State.group_choice])
-    end
-end
-
-function manage.groupTalk(group_set, npc, phrase)
+function manage.groupTalk(npc, phrase)
     if mq.TLO.Spawn(npc).Distance() ~= nil then
         if mq.TLO.Spawn(npc).Distance() > 100 then
-            State.step = State.step - 2
+            State.rewound = true
+            State.step = State.step - 1
             return
         end
     end
-    if group_set == 1 then
+    if State.group_choice == 1 then
         if mq.TLO.Target.ID() ~= mq.TLO.Spawn(npc).ID() then
             mq.TLO.Spawn(npc).DoTarget()
             mq.delay(300)
         end
         mq.cmdf("/say %s", phrase)
         mq.delay(750)
-    elseif group_set == 2 then
+    elseif State.group_choice == 2 then
         for i = 0, mq.TLO.Group.GroupSize() - 1 do
             if mq.TLO.Group.Member(i).DisplayName() ~= mq.TLO.Me.DisplayName() then
                 mq.cmdf("/dex %s /squelch /target id %s", mq.TLO.Group.Member(i).DisplayName(), mq.TLO.Spawn(npc).ID())
@@ -489,7 +250,7 @@ function manage.groupTalk(group_set, npc, phrase)
     end
 end
 
-function manage.invis(group_set, class_settings)
+function manage.invis(group_set, class_settings, char_settings)
     State.status = "Using invis"
     local invis_type = {}
     if mq.TLO.Me.Combat() == true then
@@ -593,7 +354,7 @@ function manage.invisTranslocatorCheck()
     return false
 end
 
-function manage.locTravelGroup(group_set, x, y, z, class_settings, invis)
+function manage.locTravelGroup(group_set, x, y, z, class_settings, invis, char_settings)
     invis = invis or 0
     local loopCount = 0
     if group_set == 1 then
@@ -619,7 +380,7 @@ function manage.locTravelGroup(group_set, x, y, z, class_settings, invis)
                 if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
                     local temp = State.status
                     manage.navPause(group_set)
-                    manage.clearXtarget(group_set, class_settings)
+                    manage.clearXtarget(group_set, class_settings, char_settings)
                     manage.navUnpause(group_set)
                     State.status = temp
                 end
@@ -645,7 +406,7 @@ function manage.locTravelGroup(group_set, x, y, z, class_settings, invis)
                     local transCheck = manage.invisTranslocatorCheck()
                     if transCheck == false then
                         manage.navPause(group_set)
-                        manage.invis(State.group_choice, class_settings)
+                        manage.invis(State.group_choice, class_settings, char_settings)
                         manage.navUnpause(group_set)
                         State.status = temp
                     end
@@ -683,7 +444,7 @@ function manage.locTravelGroup(group_set, x, y, z, class_settings, invis)
     end
 end
 
-function manage.navGroup(group_set, npc, ID, class_settings, invis)
+function manage.navGroup(group_set, npc, ID, class_settings, invis, char_settings)
     invis = invis or 0
     local loopCount = 0
     if ID == 0 then
@@ -716,7 +477,7 @@ function manage.navGroup(group_set, npc, ID, class_settings, invis)
                 if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
                     local temp = State.status
                     manage.navPause(group_set)
-                    manage.clearXtarget(group_set, class_settings)
+                    manage.clearXtarget(group_set, class_settings, char_settings)
                     manage.navUnpause(group_set)
                     State.status = temp
                 end
@@ -742,7 +503,7 @@ function manage.navGroup(group_set, npc, ID, class_settings, invis)
                     local transCheck = manage.invisTranslocatorCheck()
                     if transCheck == false then
                         manage.navPause(group_set)
-                        manage.invis(State.group_choice, class_settings)
+                        manage.invis(State.group_choice, class_settings, char_settings)
                         manage.navUnpause(group_set)
                         State.status = temp
                     end
@@ -782,105 +543,7 @@ function manage.navGroup(group_set, npc, ID, class_settings, invis)
     end
 end
 
-function manage.navGroupGeneral(group_set, npc, ID, class_settings, invis)
-    invis = invis or 0
-    local loopCount = 0
-    if ID == 0 then
-        ID = mq.TLO.Spawn(npc).ID()
-    end
-    if group_set == 1 then
-        mq.cmdf("/squelch /nav id %s", ID)
-    elseif group_set == 2 then
-        mq.cmdf("/dgga /squelch /nav id %s", ID)
-    else
-        mq.cmdf("/squelch /nav id %s", ID)
-        mq.cmdf('/dex %s /squelch /nav id %s', State.group_combo[State.group_choice], ID)
-    end
-    mq.delay(200)
-    local temp = State.status
-    local unpause_automation = false
-    while mq.TLO.Navigation.Active() do
-        if mq.TLO.Navigation.Paused() == true then
-            manage.navUnpause(group_set)
-        end
-        if State.skip == true then
-            manage.navPause(group_set)
-            State.skip = false
-            return
-        end
-        mq.delay(200)
-        if mq.TLO.Me.XTarget() > 0 then
-            for i = 1, mq.TLO.Me.XTargetSlots() do
-                if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
-                    local temp = State.status
-                    manage.navPause(group_set)
-                    manage.clearXtarget(group_set, class_settings)
-                    manage.navUnpause(group_set)
-                    State.status = temp
-                end
-            end
-        end
-        if State.pause == true then
-            manage.navPause(group_set)
-            unpause_automation = true
-            State.status = "Paused"
-        end
-        while State.pause == true do
-            mq.delay(200)
-        end
-        if unpause_automation == true then
-            State.status = temp
-            manage.navUnpause(group_set)
-            unpause_automation = false
-        end
-        if mq.TLO.Me.Invis() == false then
-            if class_settings.general.invisForTravel == true then
-                if invis == 1 then
-                    local temp = State.status
-                    local transCheck = manage.invisTranslocatorCheck()
-                    if transCheck == false then
-                        manage.navPause(group_set)
-                        manage.invis(State.group_choice, class_settings)
-                        manage.navUnpause(group_set)
-                        State.status = temp
-                    end
-                end
-            end
-        end
-        if loopCount == 10 then
-            mq.cmd('/squelch /doortarget')
-            mq.delay(200)
-            if mq.TLO.Switch.Distance() ~= nil then
-                if mq.TLO.Switch.Distance() < 20 then
-                    mq.cmd('/squelch /click left door')
-                end
-            end
-            loopCount = 0
-        end
-        if dist.GetDistance3D(mq.TLO.Me.X(), mq.TLO.Me.Y(), mq.TLO.Me.Z(), State.X, State.Y, State.Z) < 20 then
-            loopCount = loopCount + 1
-        else
-            State.X = mq.TLO.Me.X()
-            State.Y = mq.TLO.Me.Y()
-            State.Z = mq.TLO.Me.Z()
-            loopCount = 0
-        end
-    end
-    local x = mq.TLO.Spawn(npc).X()
-    local y = mq.TLO.Spawn(npc).Y()
-    local distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
-    if distance > 30 then
-        if State.step == 2 then
-            State.step = 1
-            State.rewound = true
-        else
-            State.step = State.step - 2
-            State.skip = true
-        end
-    end
-end
-
-function manage.navGroupLoc(group_set, npc, x, y, z, class_settings, invis)
+function manage.navGroupLoc(group_set, npc, x, y, z, class_settings, invis, char_settings)
     invis = invis or 0
     local loopCount = 0
     State.X = mq.TLO.Me.X()
@@ -926,7 +589,7 @@ function manage.navGroupLoc(group_set, npc, x, y, z, class_settings, invis)
                 if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
                     local temp = State.status
                     manage.navPause(group_set)
-                    manage.clearXtarget(group_set, class_settings)
+                    manage.clearXtarget(group_set, class_settings, char_settings)
                     manage.navUnpause(group_set)
                     State.status = temp
                 end
@@ -952,7 +615,7 @@ function manage.navGroupLoc(group_set, npc, x, y, z, class_settings, invis)
                     local transCheck = manage.invisTranslocatorCheck()
                     if transCheck == false then
                         manage.navPause(group_set)
-                        manage.invis(State.group_choice, class_settings)
+                        manage.invis(State.group_choice, class_settings, char_settings)
                         manage.navUnpause(group_set)
                         State.status = temp
                     end
@@ -990,82 +653,14 @@ function manage.navGroupLoc(group_set, npc, x, y, z, class_settings, invis)
     end
 end
 
-function manage.noNavTravel(group_set, x, y, z)
-    if group_set == 1 then
-        mq.cmd("/squelch /keypress forward hold")
-        local distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
-        while distance > 5 do
-            mq.delay(10)
-            distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
-            if State.skip == true then
-                State.skip = false
-                return
-            end
-        end
-        mq.cmd("/squelch /keypress forward")
-    elseif group_set == 2 then
-        mq.cmd("/dgge /squelch /keypress forward hold")
-        mq.cmd("/squelch /keypress forward hold")
-        local distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
-        while distance > 5 do
-            mq.delay(10)
-            distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
-            if State.skip == true then
-                State.skip = false
-                return
-            end
-        end
-        mq.cmd("/dgge /squelch /keypress forward")
-        mq.cmd("/squelch /keypress forward")
-    else
-        mq.cmdf("/dex %s /squelch /keypress forward hold", State.group_combo[State.group_choice])
-        mq.cmd("/squelch /keypress forward hold")
-        local distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
-        while distance > 5 do
-            mq.delay(10)
-            distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
-            if State.skip == true then
-                State.skip = false
-                return
-            end
-        end
-        mq.cmdf("/dex %s /squelch /keypress forward", State.group_combo[State.group_choice])
-        mq.cmd("/squelch /keypress forward")
-    end
-end
-
-function manage.navPause(group_set)
-    if group_set == 1 then
-        mq.cmd('/squelch /nav pause')
-    elseif group_set == 2 then
-        mq.cmd('/dgga /squelch /nav pause')
-    else
-        mq.cmd('/squelch /nav pause')
-        mq.cmdf('/dex %s /nav pause', State.group_combo[State.group_choice])
-    end
-    mq.delay(500)
-end
-
-function manage.navUnpause(group_set, travelData)
-    if group_set == 1 then
-        mq.cmd('/squelch /nav pause')
-    elseif group_set == 2 then
-        mq.cmd('/dgga /squelch /nav pause')
-    else
-        mq.cmd('/squelch /nav pause')
-        mq.cmdf('/dex %s /squelch /nav pause', State.group_combo[State.group_choice])
-    end
-    mq.delay(500)
-end
-
-function manage.openDoorAll(group_set)
-    if group_set == 1 then
+function manage.openDoorAll()
+    if State.group_choice == 1 then
         mq.delay(200)
         mq.cmd("/squelch /doortarget")
         mq.delay(200)
         mq.cmd("/squelch /click left door")
         mq.delay(1000)
-    elseif group_set == 2 then
+    elseif State.group_choice == 2 then
         mq.delay(200)
         mq.cmd("/dgga /squelch /doortarget")
         mq.delay(200)
@@ -1083,13 +678,13 @@ function manage.openDoorAll(group_set)
     end
 end
 
-function manage.pauseGroup(group_set, class_settings)
+function manage.pauseGroup(class_settings)
     manage.doAutomation(mq.TLO.Me.DisplayName(), mq.TLO.Me.Class.ShortName(),
         class_settings.class[mq.TLO.Me.Class.Name()],
         'pause')
-    if group_set == 1 then
+    if State.group_choice == 1 then
         return
-    elseif group_set == 2 then
+    elseif State.group_choice == 2 then
         for i = 0, mq.TLO.Group.GroupSize() - 1 do
             if mq.TLO.Group.Member(i).DisplayName() ~= mq.TLO.Me.DisplayName() then
                 manage.doAutomation(mq.TLO.Group.Member(i).DisplayName(), mq.TLO.Group.Member(i).Class.ShortName(),
@@ -1104,8 +699,9 @@ function manage.pauseGroup(group_set, class_settings)
     end
 end
 
-function manage.picklockGroup(group_set)
-    if group_set == 1 then
+function manage.picklockGroup()
+    State.status = "Lockpicking door"
+    if State.group_choice == 1 then
         if mq.TLO.Me.Class.ShortName() == 'BRD' or mq.TLO.Me.Class.ShortName() == 'ROG' then
             mq.cmd("/squelch /itemnotify lockpicks leftmouseup")
             mq.delay(200)
@@ -1121,7 +717,7 @@ function manage.picklockGroup(group_set)
             mq.cmd('/foreground')
             return
         end
-    elseif group_set == 2 then
+    elseif State.group_choice == 2 then
         local pickerFound = false
         if mq.TLO.Me.Class.ShortName() == 'BRD' or mq.TLO.Me.Class.ShortName() == 'ROG' then
             mq.cmd("/squelch /itemnotify lockpicks leftmouseup")
@@ -1182,7 +778,7 @@ function manage.picklockGroup(group_set)
     end
 end
 
-function manage.relocateGroup(group_set, relocate, class_settings)
+function manage.relocateGroup(group_set, relocate, class_settings, char_settings)
     local unpause_automation = false
     local temp = ''
     if relocate == 'lobby' then
@@ -1203,7 +799,7 @@ function manage.relocateGroup(group_set, relocate, class_settings)
                         if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
                             local temp = State.status
                             manage.navPause(group_set)
-                            manage.clearXtarget(group_set, class_settings)
+                            manage.clearXtarget(group_set, class_settings, char_settings)
                             manage.navUnpause(group_set)
                             State.status = temp
                         end
@@ -1242,7 +838,7 @@ function manage.relocateGroup(group_set, relocate, class_settings)
                         if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
                             local temp = State.status
                             manage.navPause(group_set)
-                            manage.clearXtarget(group_set, class_settings)
+                            manage.clearXtarget(group_set, class_settings, char_settings)
                             manage.navUnpause(group_set)
                             State.status = temp
                         end
@@ -1274,11 +870,11 @@ function manage.relocateGroup(group_set, relocate, class_settings)
     end
 end
 
-function manage.removeInvis(group_set)
+function manage.removeInvis()
     State.status = "Removing invis"
-    if group_set == 1 then
+    if State.group_choice == 1 then
         mq.cmd("/squelch /makemevis")
-    elseif group_set == 2 then
+    elseif State.group_choice == 2 then
         mq.cmd("/dgga /squelch /makemevis")
     else
         mq.cmdf("/squelch /makemevis")
@@ -1298,11 +894,11 @@ function manage.removeLev(group_set)
     end
 end
 
-function manage.sendYes(group_set)
+function manage.sendYes()
     State.status = "Removing levitate"
-    if group_set == 1 then
+    if State.group_choice == 1 then
         mq.cmd("/squelch /yes")
-    elseif group_set == 2 then
+    elseif State.group_choice == 2 then
         mq.cmd("/dgga /squelch /yes")
     else
         mq.cmdf("/squelch /yes")
@@ -1310,7 +906,7 @@ function manage.sendYes(group_set)
     end
 end
 
-function manage.setRadius(character, class, script, radius)
+function manage.setRadius(character, class, script, radius, char_settings)
     if script == 1 then
         mq.cmdf('/squelch /%s pullradius %s nosave', class, radius)
     elseif script == 2 then
@@ -1324,7 +920,7 @@ function manage.setRadius(character, class, script, radius)
     end
 end
 
-function manage.startGroup(group_set, class_settings)
+function manage.startGroup(group_set, class_settings, char_settings)
     if mq.TLO.Me.Grouped() == true and mq.TLO.Group.Leader() == mq.TLO.Me.DisplayName() then
         mq.cmdf("/squelch /grouprole set %s 1", mq.TLO.Me.DisplayName())
         mq.cmdf("/squelch /grouprole set %s 2", mq.TLO.Me.DisplayName())
@@ -1332,7 +928,7 @@ function manage.startGroup(group_set, class_settings)
     end
     manage.doAutomation(mq.TLO.Me.DisplayName(), mq.TLO.Me.Class.ShortName(),
         class_settings.class[mq.TLO.Me.Class.Name()],
-        'start')
+        'start', char_settings)
     if group_set == 1 then
         return
     elseif group_set == 2 then
@@ -1340,34 +936,24 @@ function manage.startGroup(group_set, class_settings)
             if mq.TLO.Group.Member(i).DisplayName() ~= mq.TLO.Me.DisplayName() then
                 manage.doAutomation(mq.TLO.Group.Member(i).DisplayName(), mq.TLO.Group.Member(i).Class.ShortName(),
                     class_settings.class[mq.TLO.Group.Member(i).Class.Name()],
-                    'start')
+                    'start', char_settings)
             end
         end
     else
         manage.doAutomation(State.group_combo[State.group_choice],
             mq.TLO.Group.Member(State.group_combo[State.group_choice]).Class.ShortName(),
-            class_settings.class[mq.TLO.Group.Member(State.group_combo[State.group_choice]).Class.Name()], 'start')
+            class_settings.class[mq.TLO.Group.Member(State.group_combo[State.group_choice]).Class.Name()], 'start',
+            char_settings)
     end
 end
 
-function manage.stopfollowGroup(group_set)
-    if group_set == 1 then
-        mq.cmd('/squelch /afollow off')
-    elseif group_set == 2 then
-        mq.cmd('/dgga /squelch /afollow off')
-    else
-        mq.cmd('/squelch /afollow off')
-        mq.cmdf('/dex %s /squelch /afollow off', State.group_combo[State.group_choice])
-    end
-end
-
-function manage.uncampGroup(group_set, class_settings)
+function manage.uncampGroup(class_settings)
     manage.doAutomation(mq.TLO.Me.DisplayName(), mq.TLO.Me.Class.ShortName(),
         class_settings.class[mq.TLO.Me.Class.Name()],
         'uncamp')
-    if group_set == 1 then
+    if State.group_choice == 1 then
         return
-    elseif group_set == 2 then
+    elseif State.group_choice == 2 then
         for i = 0, mq.TLO.Group.GroupSize() - 1 do
             if mq.TLO.Group.Member(i).DisplayName() ~= mq.TLO.Me.DisplayName() then
                 manage.doAutomation(mq.TLO.Group.Member(i).DisplayName(), mq.TLO.Group.Member(i).Class.ShortName(),
@@ -1382,12 +968,12 @@ function manage.uncampGroup(group_set, class_settings)
     end
 end
 
-function manage.unpauseGroup(group_set, class_settings)
+function manage.unpauseGroup(class_settings)
     manage.doAutomation(mq.TLO.Me.DisplayName(), mq.TLO.Me.Class.ShortName(),
         class_settings.class[mq.TLO.Me.Class.Name()], 'unpause')
-    if group_set == 1 then
+    if State.group_choice == 1 then
         return
-    elseif group_set == 2 then
+    elseif State.group_choice == 2 then
         local groupSize = 1
         if mq.TLO.Group.GroupSize() ~= nil then
             groupSize = mq.TLO.Group.GroupSize()
@@ -1404,110 +990,6 @@ function manage.unpauseGroup(group_set, class_settings)
             mq.TLO.Group.Member(State.group_combo[State.group_choice]).Class.ShortName(),
             class_settings.class[mq.TLO.Group.Member(State.group_combo[State.group_choice]).Class.Name()], 'unpause')
     end
-end
-
-function manage.zoneGroup(group_set, zone, class_settings, invis)
-    invis = invis or 0
-    if group_set == 1 then
-        mq.cmdf("/squelch /travelto %s", zone)
-    elseif group_set == 2 then
-        mq.cmdf("/dgga /squelch /travelto %s", zone)
-    else
-        mq.cmdf("/squelch /travelto %s", zone)
-        mq.cmdf('/dex %s /squelch /travelto %s', State.group_combo[State.group_choice], zone)
-    end
-    local temp = State.status
-    local unpause_automation = false
-    local loopCount = 0
-    while mq.TLO.Zone.ShortName() ~= zone and mq.TLO.Zone.Name() ~= zone do
-        if mq.TLO.Navigation.Paused() == true then
-            manage.navUnpause(group_set)
-        end
-        if State.skip == true then
-            manage.navPause(group_set)
-            State.skip = false
-            return
-        end
-        mq.delay(500)
-        if mq.TLO.Me.XTarget() > 0 then
-            for i = 1, mq.TLO.Me.XTargetSlots() do
-                if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
-                    local temp = State.status
-                    manage.navPause(group_set)
-                    manage.clearXtarget(group_set, class_settings)
-                    manage.navUnpause(group_set)
-                    State.status = temp
-                end
-            end
-        end
-        if State.pause == true then
-            manage.navPause(group_set)
-            unpause_automation = true
-            State.status = "Paused"
-        end
-        while State.pause == true do
-            mq.delay(200)
-        end
-        if unpause_automation == true then
-            State.status = temp
-            manage.navUnpause(group_set)
-            unpause_automation = false
-        end
-        if mq.TLO.Me.Invis() == false then
-            if class_settings.general.invisForTravel == true then
-                if invis == 1 then
-                    local temp = State.status
-                    local transCheck = manage.invisTranslocatorCheck()
-                    if transCheck == false then
-                        manage.navPause(group_set)
-                        manage.invis(State.group_choice, class_settings)
-                        manage.navUnpause(group_set)
-                        State.status = temp
-                    end
-                end
-            end
-        end
-        if not mq.TLO.Navigation.Active() then
-            if loopCount == 30 then
-                loopCount = 0
-                if mq.TLO.Cursor() ~= nil then
-                    if mq.TLO.Cursor() == "Spire Stone" then
-                        mq.cmd('/squelch /autoinv')
-                    end
-                end
-                if mq.TLO.FindItem('=Spire Stone')() == nil then
-                    if group_set == 1 then
-                        mq.cmdf("/squelch /travelto %s", zone)
-                    elseif group_set == 2 then
-                        mq.cmdf("/dgga /squelch /travelto %s", zone)
-                    else
-                        mq.cmdf("/squelch /travelto %s", zone)
-                        mq.cmdf('/dex %s /squelch /travelto %s', State.group_combo[State.group_choice], zone)
-                    end
-                end
-            end
-            loopCount = loopCount + 1
-        end
-    end
-    if group_set == 2 then
-        while mq.TLO.Group.AnyoneMissing() do
-            mq.delay(500)
-            if State.skip == true then
-                State.skip = false
-                return
-            end
-        end
-    end
-    if group_set > 2 then
-        while mq.TLO.Group.Member(State.group_combo[State.group_choice]).OtherZone() do
-            mq.delay(500)
-            if State.skip == true then
-                State.skip = false
-                return
-            end
-        end
-    end
-    mq.delay("5s")
 end
 
 return manage

@@ -16,6 +16,13 @@ function loadsave.createConfig()
                 ['Step'] = 0
             },
             ['Last_Ran'] = 1
+        },
+        ['general'] = {
+            ['stopTS'] = true,
+            ['useAOC'] = true,
+            ['invisForTravel'] = false,
+            ['returnToBind'] = false,
+            ['xtargClear'] = 1
         }
     }
     loadsave.saveState()
@@ -58,6 +65,11 @@ function loadsave.loadState()
             end
         else
             loadsave.addConfig()
+        end
+        if loadsave.SaveState.general ~= nil then
+            if loadsave.SaveState.general['xtargClear'] == nil then
+                loadsave.SaveState.general['xtargClear'] = 1
+            end
         end
     end
 end
