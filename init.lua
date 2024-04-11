@@ -13,7 +13,6 @@ local invis_travel = require 'utils/travelandinvis'
 local quests_done = require 'utils/questsdone'
 local reqs = require 'utils/questrequirements'
 local tsreqs = require 'utils/tradeskillreqs'
-local LoadTheme = require('lib.theme_loader')
 local PackageMan = require('mq/PackageMan')
 local sqlite3 = PackageMan.Require('lsqlite3')
 
@@ -42,6 +41,37 @@ local exclude_name = ''
 local epic_list = quests_done[string.lower(mq.TLO.Me.Class.ShortName())]
 local changed = false
 local overview_steps = {}
+
+local LoadTheme = require('lib.theme_loader')
+local themeFile = string.format('%s/MyThemeZ.lua', mq.configDir)
+local themeName = 'Default'
+local themeID = 5
+local theme = {}
+local function File_Exists(name)
+    local f = io.open(name, "r")
+    if f ~= nil then
+        io.close(f)
+        return true
+    else
+        return false
+    end
+end
+
+local function loadTheme()
+    if File_Exists(themeFile) then
+        theme = dofile(themeFile)
+    else
+        theme = require('themes') -- your local themes file incase the user doesn't have one in config folder
+    end
+    if not themeName then themeName = theme.LoadTheme or 'Default' end
+    if theme and theme.Theme then
+        for tID, tData in pairs(theme.Theme) do
+            if tData['Name'] == themeName then
+                themeID = tID
+            end
+        end
+    end
+end
 
 local class_list = { 'Bard', 'Beastlord', 'Berserker', 'Cleric', 'Druid', 'Enchanter', 'Magician', 'Monk', 'Necromancer',
     'Paladin', 'Ranger', 'Rogue', 'Shadow Knight', 'Shaman', 'Warrior', 'Wizard' }
@@ -110,6 +140,13 @@ end
 
 class_settings.loadSettings()
 loadsave.loadState()
+if not class_settings.settings.LoadTheme then           --whatever your setting is saved as
+    class_settings.settings.LoadTheme = theme.LoadTheme -- load the theme tables default if not set.
+    class_settings.saveSettings()
+end
+themeName = class_settings.settings.LoadTheme
+loadTheme()
+
 
 if loadsave.SaveState['general'] == nil then
     loadsave.SaveState['general'] = {
@@ -284,6 +321,7 @@ local function run_epic(class, choice)
                 '%s \aoPlease raise your tradeskills to continue, or turn off the "\agStop if tradeskill requirements are unmet\ao" setting.',
                 elheader)
             State.task_run = false
+            return
         end
     end
     local sql = "SELECT * FROM " .. tablename
@@ -488,6 +526,7 @@ local function displayGUI()
         return
     end
     ImGui.SetNextWindowSize(ImVec2(415, 475), ImGuiCond.FirstUseEver)
+    local ColorCount, StyleCount = LoadTheme.StartTheme(theme.Theme[themeID])
     openGUI, drawGUI = ImGui.Begin("Epic Laziness##" .. myName, openGUI, window_flags)
     if drawGUI then
         ImGui.BeginTabBar("##Tabs")
@@ -581,6 +620,21 @@ local function displayGUI()
         end
         if ImGui.BeginTabItem("Settings") then
             if ImGui.CollapsingHeader('General Settings') then
+                ImGui.Text("Cur Theme: %s", themeName)
+                -- Combo Box Load Theme
+                if ImGui.BeginCombo("Load Theme##Waypoints", themeName) then
+                    --ImGui.SetWindowFontScale(ZoomLvl)
+                    for k, data in pairs(theme.Theme) do
+                        local isSelected = data.Name == themeName
+                        if ImGui.Selectable(data.Name, isSelected) then
+                            theme.LoadTheme = data.Name
+                            themeName = theme.LoadTheme
+                            themeID = k
+                            class_settings.settings.LoadTheme = theme.LoadTheme
+                        end
+                    end
+                    ImGui.EndCombo()
+                end
                 loadsave.SaveState.general.stopTS = ImGui.Checkbox("Stop if tradeskill requirements are unmet",
                     loadsave.SaveState.general.stopTS)
                 loadsave.SaveState.general.returnToBind = ImGui.Checkbox("Return to Bind Between Travel",
@@ -591,6 +645,7 @@ local function displayGUI()
                     loadsave.SaveState.general.xtargClear)
                 if ImGui.Button("Save") then
                     loadsave.saveState()
+                    class_settings.saveSettings()
                 end
             end
             if ImGui.CollapsingHeader('Class Settings') then
@@ -664,6 +719,7 @@ local function displayGUI()
         end
         ImGui.EndTabBar()
     end
+    LoadTheme.EndTheme(ColorCount, StyleCount)
     ImGui.End()
 end
 
