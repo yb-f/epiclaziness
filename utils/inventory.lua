@@ -22,7 +22,6 @@ function inventory.auto_inv()
     else
         State.status = "Moving item to inventory"
     end
-    State.status = "Moving " .. mq.TLO.Cursor() .. " to inventory"
     mq.delay(200)
     while mq.TLO.Cursor() ~= nil do
         mq.cmd('/squelch /autoinv')
