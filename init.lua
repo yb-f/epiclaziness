@@ -16,9 +16,9 @@ local tsreqs = require 'utils/tradeskillreqs'
 local PackageMan = require('mq/PackageMan')
 local sqlite3 = PackageMan.Require('lsqlite3')
 
-local version = 0.024
+local version = 0.025
 -- to obtain version_time # os.time(os.date("!*t"))
-local version_time = 1712798643
+local version_time = 1712842225
 local window_flags = bit32.bor(ImGuiWindowFlags.None)
 local treeview_table_flags = bit32.bor(ImGuiTableFlags.Hideable, ImGuiTableFlags.RowBg,
     ImGuiTableFlags.Borders, ImGuiTableFlags.SizingFixedFit)
@@ -622,6 +622,7 @@ local function displayGUI()
             if ImGui.CollapsingHeader('General Settings') then
                 ImGui.Text("Cur Theme: %s", themeName)
                 -- Combo Box Load Theme
+                ImGui.PushItemWidth(120)
                 if ImGui.BeginCombo("Load Theme##Waypoints", themeName) then
                     --ImGui.SetWindowFontScale(ZoomLvl)
                     for k, data in pairs(theme.Theme) do
@@ -635,14 +636,17 @@ local function displayGUI()
                     end
                     ImGui.EndCombo()
                 end
+                ImGui.PopItemWidth()
                 loadsave.SaveState.general.stopTS = ImGui.Checkbox("Stop if tradeskill requirements are unmet",
                     loadsave.SaveState.general.stopTS)
                 loadsave.SaveState.general.returnToBind = ImGui.Checkbox("Return to Bind Between Travel",
                     loadsave.SaveState.general.returnToBind)
                 loadsave.SaveState.general.invisForTravel = ImGui.Checkbox("Invis When Travelling",
                     loadsave.SaveState.general.invisForTravel)
+                ImGui.PushItemWidth(120)
                 loadsave.SaveState.general.xtargClear = ImGui.InputInt("Number of mobs to clear XTarget list.",
                     loadsave.SaveState.general.xtargClear)
+                ImGui.PopItemWidth()
                 if ImGui.Button("Save") then
                     loadsave.saveState()
                     class_settings.saveSettings()
