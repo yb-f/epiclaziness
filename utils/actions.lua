@@ -128,6 +128,11 @@ function Actions.farm_radius(item, class_settings, char_settings)
     travel.loc_travel(item, class_settings, char_settings)
     manage.campGroup(State.group_choice, item.radius, class_settings, char_settings)
     manage.unpauseGroup(class_settings)
+    if item.count ~= nil then
+        State.status = "Farming for " .. item.what .. " (" .. item.count .. ")"
+    else
+        State.status = "Farming for " .. item.what
+    end
     local item_list = {}
     local item_status = ''
     local looping = true
