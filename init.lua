@@ -13,12 +13,13 @@ local invis_travel = require 'utils/travelandinvis'
 local quests_done = require 'utils/questsdone'
 local reqs = require 'utils/questrequirements'
 local tsreqs = require 'utils/tradeskillreqs'
+local LoadTheme = require('lib.theme_loader')
 local PackageMan = require('mq/PackageMan')
 local sqlite3 = PackageMan.Require('lsqlite3')
 
-local version = 0.022
+local version = 0.024
 -- to obtain version_time # os.time(os.date("!*t"))
-local version_time = 1712657289
+local version_time = 1712798643
 local window_flags = bit32.bor(ImGuiWindowFlags.None)
 local treeview_table_flags = bit32.bor(ImGuiTableFlags.Hideable, ImGuiTableFlags.RowBg,
     ImGuiTableFlags.Borders, ImGuiTableFlags.SizingFixedFit)
@@ -429,7 +430,7 @@ local function run_epic(class, choice)
         elseif task_table[State.step].type == "PRE_FARM_CHECK" then
             Actions.pre_farm_check(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "RELOCATE" then
-            Actions.relocate(task_table[State.step], class_settings.settings, loadsave.SaveState)
+            travel.relocate(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "REMOVE_INVIS" then
             manage.removeInvis()
         elseif task_table[State.step].type == "RESTORE_ITEM" then
@@ -453,7 +454,7 @@ local function run_epic(class, choice)
             mq.exit()
         end
         if task_table[State.step].belev == nil then
-            manage.removeLev(State.group_choice)
+            manage.removeLev()
         end
         if task_table[State.step].SaveStep == 1 then
             printf("%s \aosaving step: \ar%s", elheader, State.step)
