@@ -61,7 +61,7 @@ local function loadTheme()
     if File_Exists(themeFile) then
         theme = dofile(themeFile)
     else
-        theme = require('themes') -- your local themes file incase the user doesn't have one in config folder
+        theme = require('lib/themes') -- your local themes file incase the user doesn't have one in config folder
     end
     if not themeName then themeName = theme.LoadTheme or 'Default' end
     if theme and theme.Theme then
