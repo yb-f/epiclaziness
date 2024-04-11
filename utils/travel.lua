@@ -576,7 +576,6 @@ function travel.zone_travel(item, class_settings, char_settings, continue)
     State.status = "Traveling to " .. item.zone
     State.traveling = true
     if State.group_choice == 1 then
-        print('loopity loop loop')
         mq.cmdf("/squelch /travelto %s", item.zone)
     elseif State.group_choice == 2 then
         mq.cmdf("/dgga /squelch /travelto %s", item.zone)
@@ -619,7 +618,6 @@ function travel.zone_travel(item, class_settings, char_settings, continue)
                     end
                 end
                 if mq.TLO.FindItem('=Spire Stone')() == nil then
-                    print('loopity loop loop2')
                     if State.group_choice == 1 then
                         mq.cmdf("/squelch /travelto %s", item.zone)
                     elseif State.group_choice == 2 then
