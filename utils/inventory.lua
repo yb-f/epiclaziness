@@ -17,6 +17,11 @@ function inventory.merchant_window()
 end
 
 function inventory.auto_inv()
+    if mq.TLO.Cursor() ~= nil then
+        State.status = "Moving " .. mq.TLO.Cursor() .. " to inventory"
+    else
+        State.status = "Moving item to inventory"
+    end
     State.status = "Moving " .. mq.TLO.Cursor() .. " to inventory"
     mq.delay(200)
     while mq.TLO.Cursor() ~= nil do
