@@ -284,7 +284,7 @@ function inventory.loot(item, class_settings, char_settings)
                 end
                 if i == 10 then
                     State.task_run = false
-                    State.status = "Tried to loot " .. item.what .. "at step " .. State.Step .. " but failed!"
+                    State.status = "Tried to loot " .. item.what .. "at step " .. State.step .. " but failed!"
                     mq.cmd('/foreground')
                     return
                 end
