@@ -1,24 +1,30 @@
-local mq                   = require('mq')
-local ImGui                = require 'ImGui'
-local ICONS                = require('mq.Icons')
-local dist                 = require 'utils/distance'
-Actions                    = require 'utils/actions'
-local inv                  = require 'utils/inventory'
-Mob                        = require 'utils/mob'
-local travel               = require 'utils/travel'
-local manage               = require 'utils/manageautomation'
-local loadsave             = require 'utils/loadsave'
-local class_settings       = require 'utils/class_settings'
-local invis_travel         = require 'utils/travelandinvis'
-local quests_done          = require 'utils/questsdone'
-local reqs                 = require 'utils/questrequirements'
-local tsreqs               = require 'utils/tradeskillreqs'
-local PackageMan           = require('mq/PackageMan')
-local sqlite3              = PackageMan.Require('lsqlite3')
+local mq             = require('mq')
+local ImGui          = require 'ImGui'
+local ICONS          = require('mq.Icons')
+local dist           = require 'utils/distance'
+Actions              = require 'utils/actions'
+local inv            = require 'utils/inventory'
+Mob                  = require 'utils/mob'
+local travel         = require 'utils/travel'
+local manage         = require 'utils/manageautomation'
+local loadsave       = require 'utils/loadsave'
+local class_settings = require 'utils/class_settings'
+local invis_travel   = require 'utils/travelandinvis'
+local quests_done    = require 'utils/questsdone'
+local reqs           = require 'utils/questrequirements'
+local tsreqs         = require 'utils/tradeskillreqs'
+local PackageMan     = require('mq/PackageMan')
+local sqlite3        = PackageMan.Require('lsqlite3')
+local http           = PackageMan.Require('luasocket', 'socket.http')
+local ok, _          = pcall(require, 'ssl')
+if not ok then
+    PackageMan.Install('luasec')
+end
 
+local version_url          = 'https://raw.githubusercontent.com/yb-f/EL-Ver/master/latest_ver'
 local version              = 0.027
 -- to obtain version_time # os.time(os.date("!*t"))
-local version_time         = 1712908597
+--local version_time         = 1712908597
 local window_flags         = bit32.bor(ImGuiWindowFlags.None)
 local treeview_table_flags = bit32.bor(ImGuiTableFlags.Hideable, ImGuiTableFlags.RowBg,
     ImGuiTableFlags.Borders, ImGuiTableFlags.SizingFixedFit)
@@ -109,11 +115,17 @@ State.traveling           = false
 printf(
     "%s \aoif you encounter any nav mesh issues please ensure you are using the latest mesh from \arhttps://github.com/yb-f/meshes",
     elheader)
-local t = os.time(os.date("!*t"))
+local response = http.request(version_url)
+if tonumber(response) > version then
+    printf("%s \aoA new version is available (\ar%s\ao) please download it and try again.", elheader, response)
+    mq.exit()
+end
+
+--[[local t = os.time(os.date("!*t"))
 if version_time + 64800 < t then
     printf("%s \aoThis version is more than 18 hours old. \arPlease check to see if an updated version is available.",
         elheader)
-end
+end--]]
 
 --Check if necessary plugins are loaded.
 for plugin in ipairs({ 'MQ2Nav', 'MQ2EasyFind', 'MQ2Relocate', 'MQ2PortalSetter', }) do
