@@ -186,8 +186,10 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
             travel.navUnpause(item)
         end
         if loopCount == 10 then
+            local temp = State.status
             travel.open_door()
             loopCount = 0
+            State.status = temp
         end
         if dist.GetDistance3D(mq.TLO.Me.X(), mq.TLO.Me.Y(), mq.TLO.Me.Z(), State.X, State.Y, State.Z) < 20 then
             loopCount = loopCount + 1
