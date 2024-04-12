@@ -126,7 +126,7 @@ function Actions.farm_radius(item, class_settings, char_settings)
         State.status = "Farming for " .. item.what
     end
     travel.loc_travel(item, class_settings, char_settings)
-    manage.campGroup(State.group_choice, item.radius, class_settings, char_settings)
+    manage.campGroup(item.radius, class_settings, char_settings)
     manage.unpauseGroup(class_settings)
     if item.count ~= nil then
         State.status = "Farming for " .. item.what .. " (" .. item.count .. ")"
@@ -401,44 +401,6 @@ function Actions.forage_farm(item, class_settings, char_settings)
     end
 end
 
-function Actions.general_travel(item, class_settings, char_settings)
-    if mq.TLO.Me.Invis() == false then
-        if class_settings.general.invisForTravel == true then
-            if item.invis == 1 then
-                manage.invis(State.group_choice, class_settings, char_settings)
-            end
-        end
-    end
-    State.status = "Waiting for " .. item.npc
-    local ID = mq.TLO.NearestSpawn(1, item.npc).ID()
-    local unpause_automation = false
-    while ID == nil do
-        mq.delay(500)
-        if State.skip == true then
-            State.skip = false
-            return
-        end
-        if State.pause == true then
-            unpause_automation = true
-            State.status = "Paused"
-        end
-        while State.pause == true do
-            mq.delay(200)
-        end
-        if unpause_automation == true then
-            State.status = "Waiting for " .. item.npc
-            unpause_automation = false
-        end
-        ID = mq.TLO.NearestSpawn(1, item.npc).ID()
-    end
-    State.status = "Navigating to " .. item.npc
-    if item.invis ~= nil then
-        manage.navGroupGeneral(State.group_choice, item.npc, ID, class_settings, item.invis)
-    else
-        manage.navGroupGeneral(State.group_choice, item.npc, ID, class_settings, char_settings)
-    end
-end
-
 function Actions.ground_spawn(item, class_settings, char_settings)
     State.status = "Traveling to ground spawn @ " .. item.whereX .. " " .. item.whereY .. " " .. item.whereZ
     travel.loc_travel(item, class_settings, char_settings)
@@ -473,30 +435,6 @@ function Actions.ignore_mob(item, class_settings)
     elseif class_settings.class[mq.TLO.Me.Class()] == 5 then
         mq.cmdf('/squelch /addignore "%s"', item.npc)
     end
-end
-
-function Actions.loc_travel(item, class_settings, char_settings)
-    if mq.TLO.Me.Invis() == false then
-        if class_settings.general.invisForTravel == true then
-            if item.invis == 1 then
-                manage.invis(State.group_choice, class_settings, char_settings)
-            end
-        end
-    end
-    State.status = "Traveling to  " .. item.whereX .. ", " .. item.whereY .. ", " .. item.whereZ
-    if mq.TLO.Navigation.PathExists('locxyz ' .. item.whereX .. ' ' .. item.whereY .. ' ' .. item.whereZ) == false then
-        State.status = "No path exists to loc X: " .. item.whereX .. " Y: " .. item.whereY .. " Z: " .. item.whereZ
-        State.task_run = false
-        mq.cmd('/foreground')
-        return
-    end
-    State.traveling = true
-    if item.invis ~= nil then
-        manage.locTravelGroup(State.group_choice, item.whereX, item.whereY, item.whereZ, class_settings, item.invis)
-    else
-        manage.locTravelGroup(State.group_choice, item.whereX, item.whereY, item.whereZ, class_settings, char_settings)
-    end
-    State.traveling = false
 end
 
 function Actions.pause(status)
