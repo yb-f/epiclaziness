@@ -148,13 +148,16 @@ function mob.findNearestName(npc)
     local mob_list = create_spawn_list()
     local closest_distance = 25000
     local closest_ID = 0
-    for _, spawn in pairs(mob_list) do
-        if mq.TLO.Navigation.PathExists('id ' .. spawn.ID())() then
-            if mq.TLO.Navigation.PathLength('id ' .. spawn.ID())() < closest_distance then
-                closest_distance = mq.TLO.Navigation.PathLength('id ' .. spawn.ID())()
-                closest_ID = spawn.ID()
+    while closest_ID == 0 do
+        mq.delay(50)
+        for _, spawn in pairs(mob_list) do
+            if mq.TLO.Navigation.PathExists('id ' .. spawn.ID())() then
+                if mq.TLO.Navigation.PathLength('id ' .. spawn.ID())() < closest_distance then
+                    closest_distance = mq.TLO.Navigation.PathLength('id ' .. spawn.ID())()
+                    closest_ID = spawn.ID()
+                end
+            else
             end
-        else
         end
     end
     return closest_ID or nil
