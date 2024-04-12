@@ -117,7 +117,7 @@ printf(
     elheader)
 local response = http.request(version_url)
 if tonumber(response) > version then
-    printf("%s \aoA new version is available (\ar%s\ao) please download it and try again.", elheader, response)
+    printf("%s \aoA new version is available (\arv%s\ao) please download it and try again.", elheader, tonumber(response))
     mq.exit()
 end
 
