@@ -114,7 +114,7 @@ end
 function inventory.enviro_combine_container(item)
     State.status = "Moving to " .. item.what
     mq.cmdf("/squelch /itemtarget %s", item.what)
-    if mq.TLO.ItemTarget.DisplayName ~= item.what then
+    if mq.TLO.ItemTarget.DisplayName() ~= item.what then
         State.task_run = false
         State.status = "Could not find item: " .. item.what
         return
