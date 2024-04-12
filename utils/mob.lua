@@ -126,7 +126,7 @@ function mob.clearXtarget(class_settings, char_settings)
 end
 
 local function matchFilters(spawn)
-    if string.find(string.lower(spawn.CleanName()), string.lower(searchFilter)) then
+    if string.find(string.lower(spawn.CleanName()), string.lower(searchFilter)) and spawn.Type() == 'NPC' then
         for ID in pairs(State.bad_IDs) do
             if spawn.ID() == ID then
                 return false
@@ -165,7 +165,7 @@ end
 
 function mob.general_search(item, class_settings, char_settings)
     if mob.xtargetCheck(char_settings) then
-        manage.clearXtarget(State.group_choice, class_settings, char_settings)
+        mob.clearXtarget(State.group_choice, class_settings, char_settings)
     end
     State.status = "Searching for " .. item.npc
     local looping = true
