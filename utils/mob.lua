@@ -159,13 +159,14 @@ function mob.findNearestName(npc)
             else
             end
         end
+        if closest_ID == 0 then return nil end
     end
     return closest_ID or nil
 end
 
 function mob.general_search(item, class_settings, char_settings)
     if mob.xtargetCheck(char_settings) then
-        mob.clearXtarget(State.group_choice, class_settings, char_settings)
+        mob.clearXtarget(class_settings, char_settings)
     end
     State.status = "Searching for " .. item.npc
     local looping = true
