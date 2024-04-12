@@ -84,7 +84,7 @@ function travel.gate_group()
         mq.cmd("/squelch /relocate gate")
         mq.delay(500)
     elseif State.group_choice == 2 then
-        mq.cmd("/dgga /squelch/relocate gate")
+        mq.cmd("/dgga /squelch /relocate gate")
         mq.delay(500)
     else
         mq.cmd("/squelch /relocate gate")
@@ -163,7 +163,7 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
     while mq.TLO.Navigation.Active() do
         mq.delay(200)
         if mq.TLO.Navigation.Paused() == true then
-            manage.navUnpause(item)
+            travel.navUnpause(item)
         end
         if State.skip == true then
             travel.navPause()
@@ -205,7 +205,7 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
         distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), item.whereX, item.whereY)
     end
     if distance > 30 then
-        State.step = State.step - 1
+        State.step = State.step
         State.rewound = true
         State.skip = true
     end
@@ -213,7 +213,7 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
 end
 
 function travel.general_travel(item, class_settings, char_settings, ID)
-    ID = ID or mq.TLO.NearestSpawn(1, item.npc).ID()
+    ID = ID or Mob.findNearestName(item.npc)
     if travel.invisCheck(char_settings) then
         travel.invis(class_settings)
     end
