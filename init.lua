@@ -22,7 +22,7 @@ if not ok then
 end
 
 local version_url          = 'https://raw.githubusercontent.com/yb-f/EL-Ver/master/latest_ver'
-local version              = 0.027
+local version              = 0.029
 -- to obtain version_time # os.time(os.date("!*t"))
 --local version_time         = 1712908597
 local window_flags         = bit32.bor(ImGuiWindowFlags.None)
