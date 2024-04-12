@@ -47,20 +47,20 @@ function travel.face_loc(item)
     mq.delay(250)
 end
 
-function travel.forward_zone(zone, class_settings, char_settings)
-    if travel.invisCheck(char_settings) then
+function travel.forward_zone(item, class_settings, char_settings)
+    if travel.invisCheck(char_settings, item.invis) then
         travel.invis(class_settings)
     end
-    State.status = "Traveling forward to zone: " .. zone
+    State.status = "Traveling forward to zone: " .. item.zone
     if State.group_choice == 1 then
         mq.cmd("/squelch /keypress forward hold")
-        while mq.TLO.Zone.ShortName() ~= zone do
+        while mq.TLO.Zone.ShortName() ~= item.zone do
             mq.delay(500)
         end
     elseif State.group_choice == 2 then
         mq.cmd("/dgge /squelch /keypress forward hold")
         mq.cmd("/squelch /keypress forward hold")
-        while mq.TLO.Zone.ShortName() ~= zone do
+        while mq.TLO.Zone.ShortName() ~= item.zone do
             mq.delay(500)
         end
         while mq.TLO.Group.AnyoneMissing() do
@@ -69,7 +69,7 @@ function travel.forward_zone(zone, class_settings, char_settings)
     else
         mq.cmdf("/dex %s /keypress forward hold", State.group_combo[State.group_choice])
         mq.cmd("/squelch /keypress forward hold")
-        while mq.TLO.Zone.ShortName() ~= zone do
+        while mq.TLO.Zone.ShortName() ~= item.zone and mq.TLO.Zone.Name() ~= item.zone do
             mq.delay(500)
         end
         while mq.TLO.Group.Member(State.group_combo[State.group_choice]).OtherZone() do
@@ -96,7 +96,7 @@ function travel.no_nav_travel(item, class_settings, char_settings)
     local x = item.whereX
     local y = item.whereY
     local z = item.whereZ
-    if travel.invisCheck(char_settings) then
+    if travel.invisCheck(char_settings, item.invis) then
         travel.invis(class_settings)
     end
     State.status = "Traveling forward to  " .. y .. ", " .. x .. ", " .. z
@@ -180,7 +180,7 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
             Actions.pause(State.status)
             travel.navUnpause(item)
         end
-        if travel.invisCheck(char_settings) then
+        if travel.invisCheck(char_settings, item.invis) then
             travel.navPause()
             travel.invis(class_settings)
             travel.navUnpause(item)
@@ -216,7 +216,7 @@ end
 
 function travel.general_travel(item, class_settings, char_settings, ID)
     ID = ID or Mob.findNearestName(item.npc)
-    if travel.invisCheck(char_settings) then
+    if travel.invisCheck(char_settings, item.invis) then
         travel.invis(class_settings)
     end
     State.status = "Waiting for " .. item.npc
@@ -279,9 +279,12 @@ function travel.invis(class_settings)
         end
     else
         local ID = class_settings['skill_to_num'][invis_type[class_settings.invis[mq.TLO.Me.Class()]]]
+        while mq.TLO.Me.AltAbilityReady(ID)() == false do
+            mq.delay(50)
+        end
         mq.cmdf('/squelch /alt act %s', ID)
         mq.delay(500)
-        while mq.TLO.Me.Casting() == true do
+        while mq.TLO.Me.Casting() do
             mq.delay(200)
         end
     end
@@ -334,8 +337,8 @@ function travel.invis(class_settings)
     State.status = temp
 end
 
-function travel.invisCheck(char_settings)
-    if char_settings.general.invisForTravel == true and mq.TLO.Me.Invis() == false then
+function travel.invisCheck(char_settings, invis)
+    if invis == 1 and char_settings.general.invisForTravel == true and mq.TLO.Me.Invis() == false then
         return true
     end
     return false
@@ -417,7 +420,7 @@ function travel.npc_follow(item, class_settings, char_settings)
     if Mob.xtargetCheck(char_settings) then
         Mob.clearXtarget(class_settings, char_settings)
     end
-    if travel.invisCheck(char_settings) then
+    if travel.invisCheck(char_settings, item.invis) then
         travel.invis(class_settings)
     end
     State.status = "Following " .. item.npc
@@ -485,7 +488,7 @@ function travel.npc_travel(item, class_settings, ignore_path_check, char_setting
     if Mob.xtargetCheck(char_settings) then
         Mob.clearXtarget(class_settings, char_settings)
     end
-    if travel.invisCheck(char_settings) then
+    if travel.invisCheck(char_settings, item.invis) then
         travel.invis(class_settings)
     end
     if item.whereX ~= nil then
@@ -571,7 +574,7 @@ function travel.zone_travel(item, class_settings, char_settings, continue)
             mq.delay("15s")
         end
     end
-    if travel.invisCheck(char_settings) then
+    if travel.invisCheck(char_settings, item.invis) then
         travel.navPause()
         travel.invis(class_settings)
     end
@@ -604,7 +607,7 @@ function travel.zone_travel(item, class_settings, char_settings, continue)
             Actions.pause(State.status)
             travel.navUnpause(item)
         end
-        if travel.invisCheck(char_settings) then
+        if travel.invisCheck(char_settings, item.invis) then
             if travel.invisTranslocatorCheck() == false then
                 travel.navPause()
                 travel.invis(class_settings)
