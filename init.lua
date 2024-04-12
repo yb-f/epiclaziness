@@ -1,52 +1,51 @@
-local mq = require('mq')
-local ImGui = require 'ImGui'
-local ICONS = require('mq.Icons')
-local dist = require 'utils/distance'
-Actions = require 'utils/actions'
-local inv = require 'utils/inventory'
-Mob = require 'utils/mob'
-local travel = require 'utils/travel'
-local manage = require 'utils/manageautomation'
-local loadsave = require 'utils/loadsave'
-local class_settings = require 'utils/class_settings'
-local invis_travel = require 'utils/travelandinvis'
-local quests_done = require 'utils/questsdone'
-local reqs = require 'utils/questrequirements'
-local tsreqs = require 'utils/tradeskillreqs'
-local PackageMan = require('mq/PackageMan')
-local sqlite3 = PackageMan.Require('lsqlite3')
+local mq                   = require('mq')
+local ImGui                = require 'ImGui'
+local ICONS                = require('mq.Icons')
+local dist                 = require 'utils/distance'
+Actions                    = require 'utils/actions'
+local inv                  = require 'utils/inventory'
+Mob                        = require 'utils/mob'
+local travel               = require 'utils/travel'
+local manage               = require 'utils/manageautomation'
+local loadsave             = require 'utils/loadsave'
+local class_settings       = require 'utils/class_settings'
+local invis_travel         = require 'utils/travelandinvis'
+local quests_done          = require 'utils/questsdone'
+local reqs                 = require 'utils/questrequirements'
+local tsreqs               = require 'utils/tradeskillreqs'
+local PackageMan           = require('mq/PackageMan')
+local sqlite3              = PackageMan.Require('lsqlite3')
 
-local version = 0.025
+local version              = 0.027
 -- to obtain version_time # os.time(os.date("!*t"))
-local version_time = 1712842225
-local window_flags = bit32.bor(ImGuiWindowFlags.None)
+local version_time         = 1712908597
+local window_flags         = bit32.bor(ImGuiWindowFlags.None)
 local treeview_table_flags = bit32.bor(ImGuiTableFlags.Hideable, ImGuiTableFlags.RowBg,
     ImGuiTableFlags.Borders, ImGuiTableFlags.SizingFixedFit)
-local openGUI, drawGUI = true, true
-local myName = mq.TLO.Me.DisplayName()
-local dbn = sqlite3.open(mq.luaDir .. '\\epiclaziness\\epiclaziness.db')
-local db_outline = sqlite3.open(mq.luaDir .. '\\epiclaziness\\epiclaziness_outline.db')
-local task_table = {}
-local task_outline_table = {}
-local running = true
-local start_run = false
-local elheader = "\ay[\agEpic Laziness\ay]"
-local stop_at_save = false
-local class_list_choice = 1
-local changed = false
-local myClass = mq.TLO.Me.Class()
-local exclude_list = {}
-local exclude_name = ''
---local epic_list = { "1.0", "Pre-1.5", "1.5", "2.0" }
-local epic_list = quests_done[string.lower(mq.TLO.Me.Class.ShortName())]
-local changed = false
-local overview_steps = {}
+local openGUI, drawGUI     = true, true
+local myName               = mq.TLO.Me.DisplayName()
+local dbn                  = sqlite3.open(mq.luaDir .. '\\epiclaziness\\epiclaziness.db')
+local db_outline           = sqlite3.open(mq.luaDir .. '\\epiclaziness\\epiclaziness_outline.db')
+local task_table           = {}
+local task_outline_table   = {}
+local running              = true
+local start_run            = false
+local elheader             = "\ay[\agEpic Laziness\ay]"
+local stop_at_save         = false
+local class_list_choice    = 1
+local changed              = false
+local myClass              = mq.TLO.Me.Class()
+local exclude_list         = {}
+local exclude_name         = ''
+local epic_list            = quests_done[string.lower(mq.TLO.Me.Class.ShortName())]
+local changed              = false
+local overview_steps       = {}
 
-local LoadTheme = require('lib.theme_loader')
-local themeFile = string.format('%s/MyThemeZ.lua', mq.configDir)
-local themeName = 'Default'
-local themeID = 5
-local theme = {}
+local LoadTheme            = require('lib.theme_loader')
+local themeFile            = string.format('%s/MyThemeZ.lua', mq.configDir)
+local themeName            = 'Default'
+local themeID              = 5
+local theme                = {}
 local function File_Exists(name)
     local f = io.open(name, "r")
     if f ~= nil then
@@ -73,38 +72,38 @@ local function loadTheme()
     end
 end
 
-local class_list = { 'Bard', 'Beastlord', 'Berserker', 'Cleric', 'Druid', 'Enchanter', 'Magician', 'Monk', 'Necromancer',
+local class_list          = { 'Bard', 'Beastlord', 'Berserker', 'Cleric', 'Druid', 'Enchanter', 'Magician', 'Monk', 'Necromancer',
     'Paladin', 'Ranger', 'Rogue', 'Shadow Knight', 'Shaman', 'Warrior', 'Wizard' }
 
-local automation_list = { 'CWTN', 'RGMercs (Lua)', 'RGMercs (Macro)', 'KissAssist', 'MuleAssist' }
+local automation_list     = { 'CWTN', 'RGMercs (Lua)', 'RGMercs (Macro)', 'KissAssist', 'MuleAssist' }
 
-local invis_type = {}
+local invis_type          = {}
 
-State = {}
+State                     = {}
 
-State.pause = false
-State.bind_travel = false
-State.task_run = false
-State.step = 0
-State.status = ''
-State.reqs = ''
-State.bagslot1 = 0
-State.bagslot2 = 0
-State.group_combo = {}
-State.group_choice = 1
-State.use_cwtn = false
-State.use_ka = false
-State.use_rgl = false
-State.epic_choice = 1
-State.farming = false
-State.nextmob = false
-State.epicstring = ''
+State.pause               = false
+State.bind_travel         = false
+State.task_run            = false
+State.step                = 0
+State.status              = ''
+State.reqs                = ''
+State.bagslot1            = 0
+State.bagslot2            = 0
+State.group_combo         = {}
+State.group_choice        = 1
+State.use_cwtn            = false
+State.use_ka              = false
+State.use_rgl             = false
+State.epic_choice         = 1
+State.farming             = false
+State.nextmob             = false
+State.epicstring          = ''
 State.X, State.Y, State.Z = 0, 0, 0
-State.skip = false
-State.rewound = false
-State.bad_IDs = {}
-State.cannot_count = 0
-State.traveling = false
+State.skip                = false
+State.rewound             = false
+State.bad_IDs             = {}
+State.cannot_count        = 0
+State.traveling           = false
 
 --Messages that people will ignore
 printf(
@@ -489,7 +488,9 @@ local function run_epic(class, choice)
             travel.zone_travel(task_table[State.step], class_settings.settings, loadsave.SaveState, false)
         else
             printf("%s \aoUnknown Type: \ar%s!", elheader, task_table[State.step].type)
-            mq.exit()
+            State.status = "Unknown type: " .. task_table[State.step].type .. " -- Step: " .. State.step
+            State.task_run = false
+            return
         end
         if task_table[State.step].belev == nil then
             manage.removeLev()
