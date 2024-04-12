@@ -14,11 +14,11 @@ function class_settings.loadSettings()
         if class_settings.settings['skill_to_num'] == nil then
             class_settings.settings['skill_to_num'] = {
                 ["Shauri's Sonorous Clouding"] = 231,
-                ['Natural Invisibility'] = 980,
-                ['Innate Camouflage'] = 80,
-                ['Perfected Invisibility'] = 3812,
-                ['Cloak of Shadows'] = 531,
-                ['Silent Presence'] = 3730
+                ['Natural Invisibility']       = 980,
+                ['Innate Camouflage']          = 80,
+                ['Perfected Invisibility']     = 3812,
+                ['Cloak of Shadows']           = 531,
+                ['Silent Presence']            = 3730
             }
             class_settings.saveSettings()
         end
@@ -46,48 +46,48 @@ function class_settings.createSettings()
             ['Wizard'] = 2
         },
         ['invis'] = {
-            ['Bard'] = 1,
-            ['Beastlord'] = 1,
-            ['Berserker'] = 1,
-            ['Cleric'] = 1,
-            ['Druid'] = 1,
-            ['Enchanter'] = 1,
-            ['Magician'] = 1,
-            ['Monk'] = 1,
-            ['Necromancer'] = 1,
-            ['Paladin'] = 1,
-            ['Ranger'] = 1,
-            ['Rogue'] = 1,
+            ['Bard']          = 1,
+            ['Beastlord']     = 1,
+            ['Berserker']     = 1,
+            ['Cleric']        = 1,
+            ['Druid']         = 1,
+            ['Enchanter']     = 1,
+            ['Magician']      = 1,
+            ['Monk']          = 1,
+            ['Necromancer']   = 1,
+            ['Paladin']       = 1,
+            ['Ranger']        = 1,
+            ['Rogue']         = 1,
             ['Shadow Knight'] = 1,
-            ['Shaman'] = 1,
-            ['Warrior'] = 1,
-            ['Wizard'] = 1
+            ['Shaman']        = 1,
+            ['Warrior']       = 1,
+            ['Wizard']        = 1
         },
         ['class_invis'] = {
-            ['Bard'] = "Shauri's Sonorous Clouding|Potion",
-            ['Beastlord'] = "Natural Invisibility|Potion",
-            ['Berserker'] = "Potion",
-            ['Cleric'] = "Potion",
-            ['Druid'] = "Innate Camouflage|Potion",
-            ['Enchanter'] = "Perfected Invisibility|Potion",
-            ['Magician'] = "Perfected Invisibility|Potion",
-            ['Monk'] = "Potion",
-            ['Necromancer'] = "Cloak of Shadows|Potion",
-            ['Paladin'] = "Potion",
-            ['Ranger'] = "Innate Camouflage|Potion",
-            ['Rogue'] = "Hide/Sneak|Potion",
+            ['Bard']          = "Shauri's Sonorous Clouding|Potion",
+            ['Beastlord']     = "Natural Invisibility|Potion",
+            ['Berserker']     = "Potion",
+            ['Cleric']        = "Potion",
+            ['Druid']         = "Innate Camouflage|Potion",
+            ['Enchanter']     = "Perfected Invisibility|Potion",
+            ['Magician']      = "Perfected Invisibility|Potion",
+            ['Monk']          = "Potion",
+            ['Necromancer']   = "Cloak of Shadows|Potion",
+            ['Paladin']       = "Potion",
+            ['Ranger']        = "Innate Camouflage|Potion",
+            ['Rogue']         = "Hide/Sneak|Potion",
             ['Shadow Knight'] = "Cloak of Shadows|Potion",
-            ['Shaman'] = "Silent Presence|Potion",
-            ['Warrior'] = "Potion",
-            ['Wizard'] = "Perfected Invisibility|Potion"
+            ['Shaman']        = "Silent Presence|Potion",
+            ['Warrior']       = "Potion",
+            ['Wizard']        = "Perfected Invisibility|Potion"
         },
         ['skill_to_num'] = {
             ["Shauri's Sonorous Clouding"] = 231,
-            ['Natural Invisibility'] = 980,
-            ['Innate Camouflage'] = 80,
-            ['Perfected Invisibility'] = 3812,
-            ['Cloak of Shadows'] = 531,
-            ['Silent Presence'] = 3730
+            ['Natural Invisibility']       = 980,
+            ['Innate Camouflage']          = 80,
+            ['Perfected Invisibility']     = 3812,
+            ['Cloak of Shadows']           = 531,
+            ['Silent Presence']            = 3730
         }
     }
     class_settings.saveSettings()
