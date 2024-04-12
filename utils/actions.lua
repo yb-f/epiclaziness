@@ -86,7 +86,7 @@ function Actions.farm_check(item, class_settings, char_settings)
     else
         --using item.zone as a filler slot for split goto for this function
         State.rewound = true
-        State.step = item.zone
+        State.step = tonumber(item.zone)
     end
 end
 
