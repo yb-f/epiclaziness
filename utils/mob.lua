@@ -183,7 +183,7 @@ function mob.general_search(item, class_settings, char_settings)
         else
             if item.zone ~= nil then
                 State.rewound = true
-                State.step = item.zone
+                State.step = tonumber(item.zone)
             end
             return
         end
