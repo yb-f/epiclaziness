@@ -326,7 +326,7 @@ local function run_epic(class, choice)
     for a in dbn:nrows(sql) do
         table.insert(task_table, a)
     end
-    manage.startGroup(State.group_choice, class_settings.settings, loadsave.SaveState)
+    manage.startGroup(class_settings.settings, loadsave.SaveState)
     mq.delay("5s")
     manage.pauseGroup(class_settings.settings)
     while State.step < #task_table do
@@ -392,7 +392,7 @@ local function run_epic(class, choice)
         elseif task_table[State.step].type == "FORAGE_FARM" then
             Actions.forage_farm(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "FORWARD_ZONE" then
-            travel.forward_zone(task_table[State.step].zone, class_settings.settings, loadsave.SaveState)
+            travel.forward_zone(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "GENERAL_SEARCH" then
             Mob.general_search(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "GENERAL_TRAVEL" then
