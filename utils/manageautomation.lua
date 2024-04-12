@@ -4,15 +4,15 @@ local dist = require 'utils/distance'
 local manage = {}
 local elheader = "\ay[\agEpic Laziness\ay]"
 
-function manage.campGroup(group_set, radius, class_settings, char_settings)
+function manage.campGroup(radius, class_settings, char_settings)
     manage.doAutomation(mq.TLO.Me.DisplayName(), mq.TLO.Me.Class.ShortName(),
         class_settings.class[mq.TLO.Me.Class.Name()],
         'camp', char_settings)
     manage.setRadius(mq.TLO.Me.DisplayName(), mq.TLO.Me.Class.ShortName(), class_settings.class[mq.TLO.Me.Class.Name()],
         radius, char_settings)
-    if group_set == 1 then
+    if State.group_choice == 1 then
         return
-    elseif group_set == 2 then
+    elseif State.group_choice == 2 then
         for i = 0, mq.TLO.Group.GroupSize() - 1 do
             if mq.TLO.Group.Member(i).DisplayName() ~= mq.TLO.Me.DisplayName() then
                 manage.doAutomation(mq.TLO.Group.Member(i).DisplayName(), mq.TLO.Group.Member(i).Class.ShortName(),
@@ -248,7 +248,7 @@ function manage.groupTalk(npc, phrase)
     end
 end
 
-function manage.invis(group_set, class_settings, char_settings)
+function manage.invis(class_settings, char_settings)
     State.status = "Using invis"
     local invis_type = {}
     if mq.TLO.Me.Combat() == true then
@@ -293,8 +293,8 @@ function manage.invis(group_set, class_settings, char_settings)
             mq.delay(200)
         end
     end
-    if group_set == 1 then
-    elseif group_set == 2 then
+    if State.group_choice == 1 then
+    elseif State.group_choice == 2 then
         for i = 0, mq.TLO.Group.GroupSize() - 1 do
             if mq.TLO.Group.Member(i).DisplayName() ~= mq.TLO.Me.DisplayName() then
                 local invis_type = {}
@@ -516,7 +516,7 @@ function manage.setRadius(character, class, script, radius, char_settings)
     end
 end
 
-function manage.startGroup(group_set, class_settings, char_settings)
+function manage.startGroup(class_settings, char_settings)
     if mq.TLO.Me.Grouped() == true and mq.TLO.Group.Leader() == mq.TLO.Me.DisplayName() then
         mq.cmdf("/squelch /grouprole set %s 1", mq.TLO.Me.DisplayName())
         mq.cmdf("/squelch /grouprole set %s 2", mq.TLO.Me.DisplayName())
@@ -525,9 +525,9 @@ function manage.startGroup(group_set, class_settings, char_settings)
     manage.doAutomation(mq.TLO.Me.DisplayName(), mq.TLO.Me.Class.ShortName(),
         class_settings.class[mq.TLO.Me.Class.Name()],
         'start', char_settings)
-    if group_set == 1 then
+    if State.group_choice == 1 then
         return
-    elseif group_set == 2 then
+    elseif State.group_choice == 2 then
         for i = 0, mq.TLO.Group.GroupSize() - 1 do
             if mq.TLO.Group.Member(i).DisplayName() ~= mq.TLO.Me.DisplayName() then
                 manage.doAutomation(mq.TLO.Group.Member(i).DisplayName(), mq.TLO.Group.Member(i).Class.ShortName(),
