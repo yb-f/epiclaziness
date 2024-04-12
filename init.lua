@@ -116,25 +116,12 @@ if version_time + 64800 < t then
 end
 
 --Check if necessary plugins are loaded.
-if mq.TLO.Plugin('mq2nav')() == nil then
-    printf("%s \arMQ2Nav \aois required for this script.", elheader)
-    printf("%s \aoPlease load it with the command \ar/plugin nav \aoand rerun this script.", elheader)
-    mq.exit()
-end
-if mq.TLO.Plugin('mq2easyfind')() == nil then
-    printf("%s \arMQ2EasyFind \aois required for this script.", elheader)
-    printf("%s \aoPlease load it with the command \ar/plugin easyfind \aoand rerun this script.", elheader)
-    mq.exit()
-end
-if mq.TLO.Plugin('mq2relocate')() == nil then
-    printf("%s \arMQ2Relocate \aois required for this script.", elheader)
-    printf("%s \aoPlease load it with the command \ar/plugin relocate \aoand rerun this script.", elheader)
-    mq.exit()
-end
-if mq.TLO.Plugin('mq2portalsetter')() == nil then
-    printf("%s \arMQ2PortalSetter \aois required for this script.", elheader)
-    printf("%s \aoPlease load it with the command \ar/plugin portalsetter \aoand rerun this script.", elheader)
-    mq.exit()
+for plugin in ipairs({ 'MQ2Nav', 'MQ2EasyFind', 'MQ2Relocate', 'MQ2PortalSetter', }) do
+    if mq.TLO.Plugin(plugin)() == nil then
+        printf("%s \ar%s \aois required for this script.", elheader, plugin)
+        printf("%s \aoPlease load it with the command \ar/plugin %s \aoand rerun this script.", elheader, plugin)
+        mq.exit()
+    end
 end
 
 class_settings.loadSettings()
