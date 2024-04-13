@@ -17,17 +17,59 @@ local quests_requirements = {
         ['20'] =
         'Requires baking 100, blacksmithing 100, pottery 100. Also requires manually obtaining a Globe of Discordant Energy.'
     },
+    ['ber'] = {
+        ['10'] = '',
+        ['pre15'] = '',
+        ['15'] = '',
+        ['20'] = '',
+    },
     ['clr'] = {
         ['10'] = '',
         ['pre15'] = 'No tradeskill or requirements for assistance from other classes.',
         ['15'] = 'Requires brewing 100 (120+ recomended).',
         ['20'] = 'Requires manually obtaining a Globe of Discordant Energy.'
     },
+    ['dru'] = {
+        ['10'] = '',
+        ['pre15'] = '',
+        ['15'] = '',
+        ['20'] = '',
+    },
+    ['enc'] = {
+        ['10'] = '',
+        ['pre15'] = '',
+        ['15'] = '',
+        ['20'] = '',
+    },
+    ['mag'] = {
+        ['10'] = '',
+        ['pre15'] = '',
+        ['15'] = '',
+        ['20'] = '',
+    },
+    ['mnk'] = {
+        ['10'] = '',
+        ['pre15'] = '',
+        ['15'] = '',
+        ['20'] = '',
+    },
+    ['nec'] = {
+        ['10'] = '',
+        ['pre15'] = '',
+        ['15'] = '',
+        ['20'] = '',
+    },
     ['pal'] = {
         ['10'] = '',
         ['pre15'] = 'No tradeskill or requirements for assistance from other classes.',
         ['15'] = '100 Fishing required.  Shaman with 224 Alchemy required for Mist of the Breathless.',
         ['20'] = ''
+    },
+    ['rng'] = {
+        ['10'] = '',
+        ['pre15'] = '',
+        ['15'] = '',
+        ['20'] = '',
     },
     ['rog'] = {
         ['10'] = '',
@@ -47,6 +89,18 @@ local quests_requirements = {
         ['pre15'] = '',
         ['15'] = 'Requires alchemy 100.',
         ['20'] = 'Requires manually obtaining a Globe of Discordant Energy.'
+    },
+    ['war'] = {
+        ['10'] = '',
+        ['pre15'] = '',
+        ['15'] = '',
+        ['20'] = '',
+    },
+    ['wiz'] = {
+        ['10'] = '',
+        ['pre15'] = '',
+        ['15'] = '',
+        ['20'] = '',
     },
 }
 
