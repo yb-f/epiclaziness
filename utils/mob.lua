@@ -286,6 +286,9 @@ function mob.npc_damage_until(item)
     end
     mq.cmd("/squelch /attack off")
     Logger.log_info("\aoTarget has either despawned or has decreased below \ag%s% \aohealth.", item.what)
+    while mq.TLO.Spawn(ID)() ~= nil do
+        mq.delay(50)
+    end
     if item.zone ~= nil then
         if mq.TLO.Me.Level() >= tonumber(item.zone) then
             Logger.log_info("\aoReequiping weapons.")
