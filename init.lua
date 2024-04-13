@@ -795,8 +795,9 @@ local function init()
     step_overview()
     mq.imgui.init('displayGUI', displayGUI)
     local response = http.request(version_url)
+    response = string.gsub(response, "\n", "")
     if response ~= version then
-        Logger.log_error("\aoA new version is available (\arv%s\ao) please download it and try again.", tonumber(response))
+        Logger.log_error("\aoA new version is available (\arv%s\ao) please download it and try again.", response)
         mq.exit()
     end
     Logger.log_warn("If you encounter any nav mesh issues please ensure you are using the latest mesh from \arhttps://github.com/yb-f/meshes")
