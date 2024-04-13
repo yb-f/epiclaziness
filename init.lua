@@ -25,7 +25,7 @@ end
 LogConsole                 = nil
 
 local version_url          = 'https://raw.githubusercontent.com/yb-f/EL-Ver/master/latest_ver'
-local version              = "0.1.1"
+local version              = "0.1.2"
 local window_flags         = bit32.bor(ImGuiWindowFlags.None)
 local treeview_table_flags = bit32.bor(ImGuiTableFlags.Hideable, ImGuiTableFlags.RowBg, ImGuiTableFlags.Borders, ImGuiTableFlags.SizingFixedFit)
 local openGUI, drawGUI     = true, true
