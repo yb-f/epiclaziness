@@ -320,7 +320,7 @@ local function run_epic(class, choice)
     local tablename = ''
     State.task_run = true
     loadsave.loadState()
-    Logger.log_info("%sBegining quest for %s epic %s", mq.TLO.Me.Class(), epic_list[choice])
+    Logger.log_info("Begining quest for %s epic %s", mq.TLO.Me.Class(), epic_list[choice])
     if epic_list[choice] == "1.0" then
         tablename = class .. "_10"
         State.epicstring = "1.0"
