@@ -258,7 +258,7 @@ function inventory.loot(item, class_settings, char_settings)
             if mq.TLO.AdvLoot.SList(i).Name() == item.what then
                 mq.cmdf('/squelch /advloot shared %s giveto %s', i, mq.TLO.Me.DisplayName())
                 looted = true
-                Logger.loot_info("\aoAttempting to loot \ag%s\ao.", item.what)
+                Logger.log_info("\aoAttempting to loot \ag%s\ao.", item.what)
             end
         end
     end
@@ -267,7 +267,7 @@ function inventory.loot(item, class_settings, char_settings)
             if mq.TLO.AdvLoot.PList(i).Name() == item.what then
                 mq.cmdf('/squelch /advloot personal %s loot', i, mq.TLO.Me.DisplayName())
                 looted = true
-                Logger.loot_info("\aoAttempting to loot \ag%s\ao.", item.what)
+                Logger.log_info("\aoAttempting to loot \ag%s\ao.", item.what)
             end
         end
     end
@@ -278,7 +278,7 @@ function inventory.loot(item, class_settings, char_settings)
         mq.delay("1s")
     end
     if mq.TLO.FindItem("=" .. item.what)() ~= nil then
-        Logger.loot_info("\aoSuccessfully looted \ag%s\ao.", item.what)
+        Logger.log_info("\aoSuccessfully looted \ag%s\ao.", item.what)
         if item.gotostep ~= nil then
             Logger.log_verbose("\aoAdvancing to step \ar%s\ao.", item.gotostep)
             State.rewound = true
