@@ -121,7 +121,6 @@ function manage.doAutomation(character, class, script, action, char_settings)
                 mq.cmdf('/squelch /%s mode HunterTank nosave', class)
                 mq.cmdf('/squelch /%s pause off nosave', class)
             elseif script == 2 then
-                mq.cmd("/squelch /rgl campon")
                 mq.cmd("/squelch /rgl unpause")
                 mq.cmd("/squelch /rgl set pullmode 3")
                 mq.cmd("/squelch /rgl set dopull on")
