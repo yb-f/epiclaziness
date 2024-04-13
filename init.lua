@@ -344,7 +344,9 @@ local function run_epic(class, choice)
         if mq.TLO.Me.Combat() == true then
             mq.cmd('/attack off')
         end
-        if task_table[State.step].type == "AUTO_INV" then
+        if task_table[State.step].type == 'ADVENTURE_ENTRANCE' then
+            Actions.adventure_entrance(task_table[State.step], class_settings.settings, loadsave.SaveState)
+        elseif task_table[State.step].type == "AUTO_INV" then
             inv.auto_inv()
         elseif task_table[State.step].type == "BACKSTAB" then
             Mob.backstab(task_table[State.step])
@@ -473,6 +475,8 @@ local function run_epic(class, choice)
             inv.restore_item()
         elseif task_table[State.step].type == "ROG_GAMBLE" then
             Actions.rog_gamble(task_table[State.step])
+        elseif task_table[State.step].type == "START_ADVENTURE" then
+            Actions.start_adventure(task_table[State.step])
         elseif task_table[State.step].type == "SEND_YES" then
             manage.sendYes()
         elseif task_table[State.step].type == "WAIT" then

@@ -17,6 +17,21 @@ local function gamble_event(line, arg1)
     end
 end
 
+function Actions.adventure_window()
+    return mq.TLO.Window('AdventureRequestWnd').Open()
+end
+
+function Actions.adventure_button()
+    return mq.TLO.Window('AdventureRequestWnd/AdvRqst_AcceptButton').Enabled()
+end
+
+function Actions.adventure_selection()
+    if mq.TLO.Window('AdventureRequestWnd/AdvRqst_TypeCombobox').GetCurSel() == 2 then
+        return true
+    end
+    return false
+end
+
 function Actions.give_window()
     return mq.TLO.Window('GiveWnd').Open()
 end
@@ -87,6 +102,18 @@ function Actions.farm_check(item, class_settings, char_settings)
         --using item.zone as a filler slot for split goto for this function
         State.rewound = true
         State.step = tonumber(item.zone)
+    end
+end
+
+function Actions.adventure_entrance(item, class_settings, char_settings)
+    print(mq.TLO.Window('AdventureRequestWnd/AdvRqst_NPCText').Text())
+    while string.find(mq.TLO.Window('AdventureRequestWnd/AdvRqst_NPCText').Text(), item.zone) do
+        mq.delay(50)
+    end
+    if string.find(mq.TLO.Window('AdventureRequestWnd/AdvRqst_NPCText').Text(), item.what) then
+        travel.loc_travel(item, class_settings, char_settings)
+        State.step = item.gotostep
+        State.rewound = true
     end
 end
 
@@ -210,7 +237,7 @@ function Actions.farm_radius(item, class_settings, char_settings)
             end
             if State.pause == true then
                 manage.pauseGroup(class_settings)
-                Actions.Pause(State.status)
+                Actions.pause(State.status)
                 manage.unpauseGroup(class_settings)
             end
             if mq.TLO.AdvLoot.SCount() > 0 then
@@ -732,6 +759,26 @@ function Actions.rog_gamble(item)
         mq.doevents()
     end
     gamble_done = false
+end
+
+function Actions.start_adventure(item)
+    if mq.TLO.Me.Grouped() == false then
+        printf("%s \aoYou must be grouped in order to request an LDON adventure.", elheader)
+        State.status = "Please be a part of a group to continue."
+        State.task_run = false
+        return
+    end
+    State.status = "Requesting adventure from " .. item.npc
+    mq.TLO.Spawn('npc ' .. item.npc).DoTarget()
+    mq.delay(200)
+    mq.TLO.Target.RightClick()
+    mq.delay("5s", Actions.adventure_window)
+    mq.TLO.Window('AdventureRequestWnd/AdvRqst_TypeCombobox').Select(2)()
+    mq.delay("5s", Actions.adventure_selection)
+    mq.TLO.Window('AdventureRequestWnd/AdvRqst_RequestButton').LeftMouseUp()
+    mq.delay("5s", Actions.adventure_button)
+    mq.TLO.Window('AdventureRequestWnd/AdvRqst_AcceptButton').LeftMouseUp()
+    mq.delay(1500)
 end
 
 function Actions.wait(item, class_settings, char_settings)
