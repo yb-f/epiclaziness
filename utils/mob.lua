@@ -4,8 +4,6 @@ local inv = require 'utils/inventory'
 local travel = require 'utils/travel'
 
 local mob = {}
-
-local elheader = "\ay[\agEpic Laziness\ay]"
 local searchFilter = ''
 
 local function target_invalid_switch()
@@ -13,15 +11,28 @@ local function target_invalid_switch()
 end
 
 function mob.backstab(item)
+    Logger.log_info("\aoBackstabbing \ag%s\ao.", item.npc)
     local ID = mob.findNearestName(item)
-    mq.TLO.Spawn("id " .. ID).DoTarget()
+    if mq.TLO.Spawn(item.npc).Distance() ~= nil then
+        if mq.TLO.Spawn(item.npc).Distance() > 100 then
+            State.rewound = true
+            State.step = State.step - 1
+            Logger.log_warn("\ar%s \aois over 100 units away. Moving back to step \ar%s\ao.", item.npc, State.step)
+            return
+        end
+    end
+    Logger.log_verbose("\aoTargeting \ar%s\ao.", item.npc)
+    mq.TLO.Spawn(item.npc).DoTarget()
+    mq.delay(300)
     mq.cmd('/squelch /stick behind')
     mq.delay("2s")
+    Logger.log_super_verbose("\aoPerforming backstab.")
     mq.cmd('/squelch /doability backstab')
     mq.delay(500)
 end
 
 function mob.xtargetCheck(char_settings)
+    Logger.log_super_verbose("\aoPerforming xtarget check.")
     if mq.TLO.Me.XTarget() >= char_settings.general.xtargClear then
         local haterCount = 0
         for i = 1, mq.TLO.Me.XTargetSlots() do
@@ -30,6 +41,7 @@ function mob.xtargetCheck(char_settings)
             end
         end
         if haterCount >= char_settings.general.xtargClear then
+            Logger.log_info("\aoSuffecient auto hater targets found. Calling clear xtarget function.")
             return true
         end
     end
@@ -41,16 +53,19 @@ function mob.ph_search(item, class_settings, char_settings)
         mob.clearXtarget(class_settings, char_settings)
     end
     State.status = 'Searching for PH for ' .. item.npc
+    Logger.log_info("\aoSearching for PH for \ag%s\ao.", item.npc)
     local spawn_search = "npc loc " ..
         item.whereX .. " " .. item.whereY .. " " .. item.whereZ .. " radius " .. item.radius
     if mq.TLO.Spawn(spawn_search).ID() ~= 0 then
         State.rewound = true
         State.step = item.gotostep
+        Logger.log_info("\aoPH found. Moving to step: \ar%s\ao.", State.step)
     end
     mq.delay(500)
 end
 
 function mob.clearXtarget(class_settings, char_settings)
+    Logger.log_info("\aoClearing all auto hater targets from XTarget list.")
     local temp = State.status
     local max_xtargs = mq.TLO.Me.XTargetSlots()
     local looping = true
@@ -66,9 +81,11 @@ function mob.clearXtarget(class_settings, char_settings)
                 if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
                     if mq.TLO.Me.XTarget(i).Distance() ~= nil then
                         if mq.TLO.Me.XTarget(i).Distance() < 300 and mq.TLO.Me.XTarget(i).LineOfSight() == true then
+                            Logger.log_verbose("\aoTargeting XTarget #\ag%s\ao.", i)
                             mq.TLO.Me.XTarget(i).DoTarget()
                             ID = mq.TLO.Me.XTarget(i).ID()
                             State.status = "Clearing XTarget " .. i .. ": " .. mq.TLO.Me.XTarget(i)() .. "(" .. ID .. ")"
+                            Logger.log_info("\aoClearing XTarget \ag%s \ao: \ag%s \ao(\ag%s\ao).", i, mq.TLO.Me.XTarget(i)(), ID)
                             manage.unpauseGroup(class_settings)
                             mq.cmd("/squelch /stick")
                             mq.delay(100)
@@ -85,6 +102,7 @@ function mob.clearXtarget(class_settings, char_settings)
                                     mq.TLO.Spawn(ID).DoTarget()
                                 end
                                 if mq.TLO.Me.Combat() == false then
+                                    Logger.log_super_verbose("\aoAttack was off when it should have been on. Turning it back on.")
                                     mq.cmd("/squelch /attack on")
                                 end
                                 mq.delay(200)
@@ -119,6 +137,7 @@ function mob.clearXtarget(class_settings, char_settings)
         end
     end
     manage.pauseGroup(class_settings)
+    Logger.log_info("\aoAll auto hater targets cleared from XTarget list.")
     if mq.TLO.Stick.Active() == true then
         mq.cmd('/squelch /stick off')
     end
@@ -138,6 +157,7 @@ local function matchFilters(spawn)
 end
 
 local function create_spawn_list()
+    Logger.log_verbose("\aoCreating spawn list.")
     local mob_list = mq.getFilteredSpawns(matchFilters)
     return mob_list
 end
@@ -145,6 +165,7 @@ end
 function mob.findNearestName(npc)
     State.status = "Searching for nearest " .. npc
     searchFilter = npc
+    Logger.log_info("\aoSearching for nearest \ag%s\ao.", npc)
     local mob_list = create_spawn_list()
     local closest_distance = 25000
     local closest_ID = 0
@@ -159,8 +180,12 @@ function mob.findNearestName(npc)
             else
             end
         end
-        if closest_ID == 0 then return nil end
+        if closest_ID == 0 then
+            Logger.log_warn("\aoUnable to find \ar%s\ao.", npc)
+            return nil
+        end
     end
+    Logger.log_verbose("\aoNearest ID found is \ag%s\ao.", closest_ID)
     return closest_ID or nil
 end
 
@@ -169,6 +194,7 @@ function mob.general_search(item, class_settings, char_settings)
         mob.clearXtarget(class_settings, char_settings)
     end
     State.status = "Searching for " .. item.npc
+    Logger.log_info("\aoSearching for \ag%s\ao.", item.npc)
     local looping = true
     local i = 1
     while looping do
@@ -180,11 +206,13 @@ function mob.general_search(item, class_settings, char_settings)
         if ID ~= nil then
             State.rewound = true
             State.step = item.gotostep
+            Logger.log_verbose("\aoFound \ag%s \ao(\ag%s\ao) going to step \ar%s\ao.", item.npc, ID, State.step)
             return
         else
             if item.zone ~= nil then
                 State.rewound = true
                 State.step = tonumber(item.zone)
+                Logger.log_warn("\aoUnable to find \ar%s \aolooping back to step \ar%s\ao.", item.npc, State.step)
             end
             return
         end
@@ -194,10 +222,13 @@ end
 
 function mob.npc_damage_until(item)
     State.status = "Damaging " .. item.npc .. " to below " .. item.what .. "% health"
+    Logger.log_info("\aoDamaging \ag%s \ao to below \ag%s%health\ao.", item.npc, item.what)
     ID = mq.TLO.Spawn('npc ' .. item.npc).ID()
     if mq.TLO.Spawn(ID).Distance() ~= nil then
         if mq.TLO.Spawn(ID).Distance() > 100 then
-            State.step = State.step - 2
+            State.rewound = false
+            State.step = State.step - 1
+            Logger.log_warn("\ar%s \aois over 100 units away. Moving back to step \ar%s\ao.", item.npc, State.step)
             return
         end
     end
@@ -205,6 +236,7 @@ function mob.npc_damage_until(item)
     local weapon2 = ''
     if item.zone ~= nil then
         if mq.TLO.Me.Level() >= tonumber(item.zone) then
+            Logger.log_warn("Our level is \ag%s \aoor greater. Removing weapons before engaging.", item.zone)
             weapon1 = mq.TLO.InvSlot(13).Item.Name()
             if mq.TLO.InvSlot(14).Item() ~= nil then
                 weapon2 = mq.TLO.InvSlot(14).Item.Name()
@@ -246,15 +278,17 @@ function mob.npc_damage_until(item)
         if mq.TLO.Spawn(ID)() == nil then
             looping = false
         else
-            if mq.TLO.Spawn(ID).PctHPs() < 80 then
+            if mq.TLO.Spawn(ID).PctHPs() < item.what then
                 looping = false
             end
         end
         mq.delay(50)
     end
     mq.cmd("/squelch /attack off")
+    Logger.log_info("\aoTarget has either despawned or has decreased below \ag%s% \aohealth.", item.what)
     if item.zone ~= nil then
         if mq.TLO.Me.Level() >= tonumber(item.zone) then
+            Logger.log_info("\aoReequiping weapons.")
             mq.cmdf('/itemnotify "%s" leftmouseup', weapon1)
             while mq.TLO.Cursor() == nil do
                 mq.delay(100)
@@ -280,6 +314,7 @@ end
 function mob.npc_kill(item, class_settings, loot)
     manage.removeInvis()
     State.status = "Killing " .. item.npc
+    Logger.log_info("\aoKilling \ag%s\ao.", item.npc)
     manage.unpauseGroup(class_settings)
     if item.what == nil then
         mq.delay(200)
@@ -288,13 +323,16 @@ function mob.npc_kill(item, class_settings, loot)
             if mq.TLO.Spawn(ID).Distance() > 100 then
                 State.rewound = true
                 State.step = State.step - 1
+                Logger.log_warn("\ar%s \aois over 100 units away. Moving back to step \ar%s\ao.", item.npc, State.step)
                 return
             end
         end
+        Logger.log_verbose("\aoTargeting \ar%s\ao.", item.npc)
         mq.TLO.Spawn(ID).DoTarget()
         mq.cmd("/squelch /stick")
         mq.delay(100)
         mq.cmd("/squelch /attack on")
+        Logger.log_super_verbose("\aoGenerating events to detect unhittable or bugged target.")
         mq.event("cannot_see", "You cannot see your target.", target_invalid_switch)
         mq.event("cannot_cast", "You cannot cast#*#on#*#", target_invalid_switch)
         while mq.TLO.Spawn(ID).Type() == 'NPC' do
@@ -312,12 +350,15 @@ function mob.npc_kill(item, class_settings, loot)
                 State.step = State.step - 1
                 mq.unevent('cannot_see')
                 mq.unevent('cannot_cast')
+                Logger.log_warn('\aoUnable to hit this target. Adding \ar%s \aoto bad IDs and moving back to step \ar%s\ao.', ID, State.step)
                 return
             end
             if mq.TLO.Target.ID() ~= ID then
+                Logger.log_verbose("\aoRetargeting \ag%s\ao.", ID)
                 mq.TLO.Spawn(ID).DoTarget()
             end
             if mq.TLO.Me.Combat() == false then
+                Logger.log_super_verbose("\aoAttack was off when it should have been on. Turning it back on.")
                 mq.cmd("/squelch /attack on")
             end
             mq.delay(200)
@@ -331,9 +372,11 @@ function mob.npc_kill(item, class_settings, loot)
                 if mq.TLO.Spawn(ID).Distance() > 100 then
                     State.rewound = true
                     State.step = State.step - 1
+                    Logger.log_warn("\ar%s \aois over 100 units away. Moving back to step \ar%s\ao.", item.npc, State.step)
                     return
                 end
             end
+            Logger.log_verbose("\aoTargeting \ar%s\ao.", item.npc)
             mq.TLO.Spawn(ID).DoTarget()
             mq.cmd("/squelch /stick")
             mq.delay(100)
@@ -344,21 +387,27 @@ function mob.npc_kill(item, class_settings, loot)
                     return
                 end
                 if mq.TLO.Target.ID() ~= ID then
+                    Logger.log_verbose("\aoRetargeting \ag%s\ao.", ID)
                     mq.TLO.Spawn(ID).DoTarget()
                 end
                 if mq.TLO.Me.Combat() == false then
+                    Logger.log_super_verbose("\aoAttack was off when it should have been on. Turning it back on.")
                     mq.cmd("/squelch /attack on")
                 end
                 mq.delay(200)
             end
         else
+            Logger.log_warn("\ag%s \aonot found. Searching for \ag%s \aoinstead.", item.npc, item.what)
             local ID = mob.findNearestName(item.what)
             if mq.TLO.Spawn(ID).Distance() ~= nil then
                 if mq.TLO.Spawn(ID).Distance() > 100 then
-                    State.step = State.step - 2
+                    State.rewound = true
+                    State.step = State.step - 1
+                    Logger.log_warn("\ar%s \aois over 100 units away. Moving back to step \ar%s\ao.", item.what, State.step)
                     return
                 end
             end
+            Logger.log_verbose("\aoTargeting \ar%s\ao.", item.what)
             mq.TLO.Spawn(ID).DoTarget()
             mq.cmd("/squelch /stick")
             mq.delay(100)
@@ -376,29 +425,31 @@ function mob.npc_kill(item, class_settings, loot)
     mq.delay("2s")
     if mq.TLO.AdvLoot.SCount() > 0 then
         if loot ~= 'LOOT' then
-            printf("%s \aoIgnoring unneeded loot.", elheader)
+            Logger.log_info("\aoIgnoring unneeded loot.")
         else
-            printf("%s \aoLooting necessary items only.", elheader)
+            Logger.log_info("\aoLooting necessary items only.")
         end
     end
     State.cannot_count = 0
     if item.gotostep ~= nil then
         State.rewound = true
         State.step = item.gotostep
+        Logger.log_info("\aoSetting step to \ar%s\ao.", State.step)
     end
 end
 
 function mob.npc_kill_all(item, class_settings, char_settings)
     manage.removeInvis()
     State.status = "Killing All " .. item.npc
+    Logger.log_info("\aoKilling all \ag%s\ao.", item.npc)
     manage.unpauseGroup(class_settings)
-    local unpause_automation = false
     while true do
         if State.skip == true then
             State.skip = false
             return
         end
         if mq.TLO.Spawn('npc ' .. item.npc).ID() == 0 then
+            Logger.log_info("\aoNo \ar%s \ao found.", item.npc)
             break
         end
         mq.delay(500)
@@ -409,10 +460,12 @@ function mob.npc_kill_all(item, class_settings, char_settings)
         travel.general_travel(item, class_settings, char_settings, ID)
         if mq.TLO.Spawn(ID).Distance() ~= nil then
             if mq.TLO.Spawn(ID).Distance() > 100 then
-                State.step = State.step - 1
+                State.step = State.step
+                Logger.log_warn("\ar%s \aois over 100 units away. Moving closer.", item.npc)
                 return
             end
         end
+        Logger.log_verbose("\aoTargeting \ar%s\ao.", item.npc)
         mq.TLO.Spawn(ID).DoTarget()
         mq.cmd("/squelch /stick")
         mq.delay(100)
@@ -423,6 +476,7 @@ function mob.npc_kill_all(item, class_settings, char_settings)
         if item.zone ~= nil then
             local ID = mq.TLO.Me.AltAbility(item.zone)()
             mq.cmdf('/squelch /alt act %s', ID)
+            Logger.log_verbose("\aoCasting \ag%s \ao(\ag%s\ao) to pull.", item.zone, ID)
             mq.delay("1s")
         end
         local loopCount = 0
@@ -435,10 +489,13 @@ function mob.npc_kill_all(item, class_settings, char_settings)
             mq.delay(200)
             if mq.TLO.Spawn(ID).Distance() ~= nil then
                 if mq.TLO.Spawn(ID).Distance() > 100 then
-                    State.step = State.step - 1
+                    State.rewound = true
+                    State.step = State.step
+                    Logger.log_warn("\ar%s \aois over 100 units away. Moving closer.", item.npc)
                     return
                 end
             end
+            Logger.log_verbose("\aoTargeting \ar%s\ao.", item.npc)
             mq.TLO.Spawn(ID).DoTarget()
             loopCount = loopCount + 1
             if loopCount == 20 then
@@ -446,9 +503,11 @@ function mob.npc_kill_all(item, class_settings, char_settings)
                 if item.zone ~= nil then
                     local ID = mq.TLO.Me.AltAbility(item.zone)()
                     mq.cmdf('/squelch /alt act %s', ID)
+                    Logger.log_verbose("\aoCasting \ag%s \ao(\ag%s\ao) to pull.", item.zone, ID)
                     mq.delay("1s")
                 end
                 if mq.TLO.Me.Combat() == false then
+                    Logger.log_super_verbose("\aoAttack was off when it should have been on. Turning it back on.")
                     mq.cmd('/squelch /attack on')
                 end
             end

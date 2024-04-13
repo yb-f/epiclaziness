@@ -1,11 +1,11 @@
 local mq = require('mq')
 local manage = require 'utils/manageautomation'
 
-local elheader = "\ay[\agEpic Laziness\ay]"
-
 local inventory = {}
 
+--- @type number
 inventory.slot = 0
+--- @type string
 inventory.stored_item = ''
 
 function inventory.tradeskill_window()
@@ -19,8 +19,9 @@ end
 function inventory.auto_inv()
     if mq.TLO.Cursor() ~= nil then
         State.status = "Moving " .. mq.TLO.Cursor() .. " to inventory"
+        Logger.log_info("\aoMoving \ag%s\ao to inventory.", mq.TLO.Cursor())
     else
-        State.status = "Moving item to inventory"
+        return
     end
     mq.delay(200)
     while mq.TLO.Cursor() ~= nil do
@@ -34,9 +35,11 @@ function inventory.combine_container(item, class_settings, char_settings)
     if Mob.xtargetCheck(char_settings) then
         Mob.clearXtarget(class_settings, char_settings)
     end
-    State.status = "Preparing combine container"
+    State.status = "Preparing combine container (" .. item.what .. ")"
+    Logger.log_info("\aoPreparing combine container (\ag%s\ao) for use.", item.what)
     if mq.TLO.InvSlot('pack8').Item.Container() then
         if mq.TLO.InvSlot('pack8').Item.Name() == item.what then
+            Logger.log_info("\ag%s \aoalready in slot 8.", item.what)
             inventory.empty_bag(8)
             return
         end
@@ -51,9 +54,12 @@ function inventory.combine_item(item, class_settings, char_settings)
         Mob.clearXtarget(class_settings, char_settings)
     end
     State.status = "Moving " .. item.what .. " to combine container"
+    Logger.log_info("\aoMoving \ag%s \aoto combine container.", item.what)
     if mq.TLO.FindItem("=" .. item.what)() == nil then
         State.status = "Unable to find item for combine (" .. item.what .. ")"
+        Logger.log_error("\aoUnable to find \ar%s \aofor combine.", item.what)
         State.task_run = false
+        mq.cmd('/foreground')
         return
     end
     local slot2     = 0
@@ -74,13 +80,15 @@ function inventory.combine_item(item, class_settings, char_settings)
     while mq.TLO.Cursor() ~= nil do
         mq.delay(100)
     end
+    Logger.log_verbose("\aoSuccessfully moved \ag%s \aoto combine container.", item.what)
 end
 
 function inventory.combine_do(class_settings, char_settings)
     if Mob.xtargetCheck(char_settings) then
         Mob.clearXtarget(class_settings, char_settings)
     end
-    State.status = "Combining"
+    State.status = "Performing combine"
+    Logger.log_info("\aoPerforming combine in container in slot \ag8\ao.")
     mq.cmdf("/squelch /combine pack8")
     while mq.TLO.Cursor() == nil do
         mq.delay(100)
@@ -99,6 +107,7 @@ function inventory.combine_done(class_settings, char_settings)
     end
     if State.bagslot1 ~= 0 and State.bagslot2 ~= 0 then
         State.status = "Moving container back to slot 8"
+        Logger.log_info("\aoRestoring container to slot 8.")
         mq.cmdf("/squelch /nomodkey /shiftkey /itemnotify in pack%s %s leftmouseup", State.bagslot1, State.bagslot2)
         while mq.TLO.Cursor() == nil do
             mq.delay(100)
@@ -113,10 +122,13 @@ end
 
 function inventory.enviro_combine_container(item)
     State.status = "Moving to " .. item.what
+    Logger.log_info("\aoMoving to \ag%s \aoto perform combine.", item.what)
     mq.cmdf("/squelch /itemtarget %s", item.what)
     if mq.TLO.ItemTarget.DisplayName() ~= item.what then
         State.task_run = false
         State.status = "Could not find item: " .. item.what
+        mq.cmd('/foreground')
+        Logger.log_error("\aoCould not find item \ar%s\ao.", item.what)
         return
     end
     mq.delay(500)
@@ -125,17 +137,22 @@ function inventory.enviro_combine_container(item)
         mq.delay(500)
     end
     State.status = "Opening " .. item.what .. " window"
+    Logger.log_info("\aoOpening \ag%s \aowindow.", item.what)
     mq.cmd("/squelch /click left item")
     mq.delay("5s", inventory.tradeskill_window)
+    Logger.log_verbose("\aoClicking experiment button.")
     mq.TLO.Window("TradeskillWnd/COMBW_ExperimentButton").LeftMouseUp()
     mq.delay("1s")
 end
 
 function inventory.enviro_combine_item(item)
     State.status = "Moving " .. item.what .. " to combine container slot " .. item.npc
+    Logger.log_info("\aoMoving \ag%s \aoto combine container.", item.what)
     if mq.TLO.FindItem("=" .. item.what)() == nil then
         State.status = "Unable to find item for combine (" .. item.what .. ")"
+        Logger.log_error("\aoUnable to find \ar%s \aofor combine.", item.what)
         State.task_run = false
+        mq.cmd('/foreground')
         return
     end
     local itemslot  = mq.TLO.FindItem("=" .. item.what).ItemSlot() - 22
@@ -150,10 +167,12 @@ function inventory.enviro_combine_item(item)
     while mq.TLO.Cursor() ~= nil do
         mq.delay(100)
     end
+    Logger.log_verbose("\aoSuccessfully moved \ag%s \aoto combine container in slot \ag%s\ao.", item.what, item.npc)
 end
 
 function inventory.enviro_combine_do()
     State.status = "Combining"
+    Logger.log_info("\aoPerforming combine in enviromental container.")
     mq.delay("3s")
     mq.TLO.Window("ContainerWindow/Container_Combine").LeftMouseUp()
     mq.delay("1s")
@@ -169,9 +188,11 @@ end
 
 function inventory.equip_item(item)
     State.status = "Equiping " .. item.what
+    Logger.log_info('\aoEquiping \ag%s\ao.', item.what)
     mq.delay("1s")
     inventory.slot = mq.TLO.FindItem('=' .. item.what).WornSlot(1)()
     inventory.stored_item = mq.TLO.Me.Inventory(inventory.slot)()
+    Logger.log_verbose("\aoUnequiping \ag%s\ao.", inventory.stored_item)
     mq.cmdf("/squelch /itemnotify \"%s\" leftmouseup", item.what)
     while mq.TLO.Cursor() == nil do
         mq.delay(100)
@@ -188,6 +209,7 @@ function inventory.equip_item(item)
 end
 
 function inventory.restore_item()
+    Logger.log_info("\aoReequiping \ag%s\ao.", inventory.stored_item)
     mq.delay("1s")
     mq.cmdf("/squelch /itemnotify \"%s\" leftmouseup", inventory.stored_item)
     while mq.TLO.Cursor() == nil do
@@ -206,6 +228,7 @@ end
 
 function inventory.find_free_slot(exclude_bag)
     exclude_bag = exclude_bag or 15
+    Logger.log_verbose("\aoFinding free slot to place item.")
     for i = mq.TLO.Me.NumBagSlots(), 1, -1 do
         if i ~= exclude_bag then
             if mq.TLO.InvSlot('pack' .. i).Item.Container() ~= 0 then
@@ -235,7 +258,7 @@ function inventory.loot(item, class_settings, char_settings)
             if mq.TLO.AdvLoot.SList(i).Name() == item.what then
                 mq.cmdf('/squelch /advloot shared %s giveto %s', i, mq.TLO.Me.DisplayName())
                 looted = true
-                printf('%s \aoLooting: \ar%s', elheader, item.what)
+                Logger.loot_info("\aoAttempting to loot \ag%s\ao.", item.what)
             end
         end
     end
@@ -244,17 +267,20 @@ function inventory.loot(item, class_settings, char_settings)
             if mq.TLO.AdvLoot.PList(i).Name() == item.what then
                 mq.cmdf('/squelch /advloot personal %s loot', i, mq.TLO.Me.DisplayName())
                 looted = true
-                printf('%s \aoLooting: \ar%s', elheader, item.what)
+                Logger.loot_info("\aoAttempting to loot \ag%s\ao.", item.what)
             end
         end
     end
     mq.delay("1s")
     if mq.TLO.Window('ConfirmationDialogBox').Open() then
+        Logger.log_verbose("\aoNo drop confirmation window open.  Clicking yes.")
         mq.TLO.Window('ConfirmationDialogBox/CD_Yes_Button').LeftMouseUp()
         mq.delay("1s")
     end
     if mq.TLO.FindItem("=" .. item.what)() ~= nil then
+        Logger.loot_info("\aoSuccessfully looted \ag%s\ao.", item.what)
         if item.gotostep ~= nil then
+            Logger.log_verbose("\aoAdvancing to step \ar%s\ao.", item.gotostep)
             State.rewound = true
             State.step = item.gotostep
         end
@@ -277,6 +303,7 @@ function inventory.loot(item, class_settings, char_settings)
                         end
                         mq.delay("1s")
                         if mq.TLO.Window('ConfirmationDialogBox').Open() then
+                            Logger.log_verbose("\aoNo drop confirmation window open.  Clicking yes.")
                             mq.TLO.Window('ConfirmationDialogBox/CD_Yes_Button').LeftMouseUp()
                             mq.delay("1s")
                         end
@@ -285,6 +312,7 @@ function inventory.loot(item, class_settings, char_settings)
                 if i == 10 then
                     State.task_run = false
                     State.status = "Tried to loot " .. item.what .. "at step " .. State.step .. " but failed!"
+                    Logger.log_error("\aoFailed to loot \ar%s \aoat step \ar%s\ao.", item.what, State.step)
                     mq.cmd('/foreground')
                     return
                 end
@@ -292,18 +320,23 @@ function inventory.loot(item, class_settings, char_settings)
         end
     end
     if item.gotostep ~= nil then
-        State.step = item.gotostep - 1
+        State.rewound = true
+        State.step = item.gotostep
+        Logger.log_verbose("\aoAdvancing to step \ar%s\ao.", item.gotostep)
     end
 end
 
 function inventory.move_combine_container(slot, container)
     if mq.TLO.FindItem("=" .. container)() == nil then
         State.status = "Unable to find combine container (" .. container .. ")"
+        Logger.log_error("\aoUnable to find combine container (\ar%s\ao).", container)
         State.task_run = false
+        mq.cmd('/foreground')
         return
     end
     local itemslot = mq.TLO.FindItem("=" .. container).ItemSlot() - 22
     local itemslot2 = mq.TLO.FindItem("=" .. container).ItemSlot2() + 1
+    Logger.log_info("\aoMoving \ag%s \aoto bag slot \ag%s\ao.", container, slot)
     mq.cmdf("/squelch /nomodkey /shiftkey /itemnotify in pack%s %s leftmouseup", itemslot, itemslot2)
     while mq.TLO.Cursor() == nil do
         mq.delay(100)
@@ -315,6 +348,7 @@ end
 
 function inventory.move_bag(slot)
     local free_pack, free_slot = inventory.find_free_slot(slot)
+    Logger.log_info("\aoMoving item from bag slot \ag%s \ao to bag \ag%s\ao slot \ag%s\ao.", slot, free_pack, free_slot)
     mq.cmdf("/squelch /nomodkey /shiftkey /itemnotify pack%s leftmouseup", slot)
     while mq.TLO.Cursor() == nil do
         mq.delay(100)
@@ -326,13 +360,17 @@ end
 function inventory.npc_buy(item, class_settings, char_settings)
     manage.removeInvis()
     State.status = "Buying " .. item.what .. " from " .. item.npc
+    Logger.log_info("\aoBuying \ag%s \ao from \ag%s\ao.", item.what, item.npc)
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
         if mq.TLO.Spawn(item.npc).Distance() ~= nil then
             if mq.TLO.Spawn(item.npc).Distance() > 100 then
-                State.step = State.step - 2
+                State.rewound = true
+                State.step = State.step - 1
+                Logger.log_warn("\ar%s \aois over 100 units away. Moving back to step \ar%s\ao.", item.npc, State.step)
                 return
             end
         end
+        Logger.log_verbose("\aoTargeting \ar%s\ao.", item.npc)
         mq.TLO.Spawn(item.npc).DoTarget()
         mq.delay(300)
     end
@@ -353,6 +391,7 @@ end
 function inventory.empty_bag(slot)
     mq.cmd("/squelch /keypress OPEN_INV_BAGS")
     if mq.TLO.InvSlot('pack' .. slot).Item.Container() then
+        Logger.log_info("\aoEmptying bag in slot \ag%s\ao.", slot)
         for i = 1, mq.TLO.InvSlot('pack' .. slot).Item.Container() do
             if mq.TLO.InvSlot('pack' .. slot).Item.Item(i)() ~= nil then
                 local free_pack, free_slot = inventory.find_free_slot(slot)

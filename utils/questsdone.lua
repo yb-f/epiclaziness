@@ -1,7 +1,5 @@
 local mq = require('mq')
 
-local elheader = "\ay[\agEpic Laziness\ay]"
-
 local quests_done = {
     ['brd'] = { "Pre-1.5", "1.5", "2.0" },
     ['bst'] = { "Pre-1.5", "1.5", "2.0" },
@@ -12,9 +10,9 @@ local quests_done = {
     ['mag'] = {},
     ['mnk'] = {},
     ['nec'] = {},
-    ['pal'] = { "Pre-1.5", "1.5" },
+    ['pal'] = { "Pre-1.5" },
     ['rng'] = {},
-    ['rog'] = { "Pre-1.5", "1.5" },
+    ['rog'] = { "Pre-1.5" },
     ['shd'] = { "Pre-1.5", "1.5", "2.0" },
     ['shm'] = { "1.0", "1.5", "2.0" },
     ['war'] = {},

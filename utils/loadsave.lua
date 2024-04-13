@@ -6,8 +6,6 @@ local myName = mq.TLO.Me.DisplayName()
 loadsave.configPath = mq.configDir ..
     '/epiclaziness/epiclaziness_' .. mq.TLO.EverQuest.Server() .. "_" .. myName .. '.lua'
 local class = mq.TLO.Me.Class.Name()
-local elheader = "\ay[\agEpic Laziness\ay]"
-
 
 function loadsave.createConfig()
     loadsave.SaveState = {
@@ -58,7 +56,7 @@ function loadsave.loadState()
                     State.epic_choice = loadsave.SaveState[class]['Last_Ran']
                 else
                     State.step = loadsave.SaveState[class][State.epic_choice].Step
-                    printf("%s \aoStarting on step: \ar%s", elheader, State.step)
+                    Logger.log_info("\aoStarting on step: \ar%s\ao.", State.step)
                 end
             else
                 loadsave.addConfig()
@@ -81,6 +79,7 @@ function loadsave.prepSave(step)
 end
 
 function loadsave.saveState()
+    Logger.log_info("\aoSaving character settings.")
     mq.pickle(loadsave.configPath, loadsave.SaveState)
 end
 

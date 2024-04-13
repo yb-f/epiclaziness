@@ -1,7 +1,5 @@
 local mq = require('mq')
 
-local elheader = "\ay[\agEpic Laziness\ay]"
-
 local quests_requirements = {
     ['brd'] = {
         ['10'] = '',

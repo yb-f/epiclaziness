@@ -1,7 +1,5 @@
 local mq = require('mq')
 
-local elheader = "\ay[\agEpic Laziness\ay]"
-
 local class_settings = {}
 class_settings.configPath = mq.configDir .. '/epiclaziness/epiclaziness_class_settings.lua'
 
@@ -91,11 +89,11 @@ function class_settings.createSettings()
         }
     }
     class_settings.saveSettings()
-    printf("%s \aocreated default settings. Please set them appropriately for your use.", elheader)
+    Logger.log_warn("\aoCreated default settings. Please set them appropriately for your use.")
 end
 
 function class_settings.saveSettings()
-    printf("%s \aoSettings saved.", elheader)
+    Logger.log_info("\aoGeneral settings saved.")
     mq.pickle(class_settings.configPath, class_settings.settings)
 end
 

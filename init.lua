@@ -1,6 +1,7 @@
 local mq             = require('mq')
 local ImGui          = require 'ImGui'
 local ICONS          = require('mq.Icons')
+Logger               = require('utils/logger')
 local dist           = require 'utils/distance'
 Actions              = require 'utils/actions'
 local inv            = require 'utils/inventory'
@@ -21,13 +22,14 @@ if not ok then
     PackageMan.Install('luasec')
 end
 
+LogConsole                 = nil
+
 local version_url          = 'https://raw.githubusercontent.com/yb-f/EL-Ver/master/latest_ver'
 local version              = 0.029
 -- to obtain version_time # os.time(os.date("!*t"))
 --local version_time         = 1712908597
 local window_flags         = bit32.bor(ImGuiWindowFlags.None)
-local treeview_table_flags = bit32.bor(ImGuiTableFlags.Hideable, ImGuiTableFlags.RowBg,
-    ImGuiTableFlags.Borders, ImGuiTableFlags.SizingFixedFit)
+local treeview_table_flags = bit32.bor(ImGuiTableFlags.Hideable, ImGuiTableFlags.RowBg, ImGuiTableFlags.Borders, ImGuiTableFlags.SizingFixedFit)
 local openGUI, drawGUI     = true, true
 local myName               = mq.TLO.Me.DisplayName()
 local dbn                  = sqlite3.open(mq.luaDir .. '\\epiclaziness\\epiclaziness.db')
@@ -36,7 +38,6 @@ local task_table           = {}
 local task_outline_table   = {}
 local running              = true
 local start_run            = false
-local elheader             = "\ay[\agEpic Laziness\ay]"
 local stop_at_save         = false
 local class_list_choice    = 1
 local changed              = false
@@ -46,12 +47,21 @@ local exclude_name         = ''
 local epic_list            = quests_done[string.lower(mq.TLO.Me.Class.ShortName())]
 local changed              = false
 local overview_steps       = {}
+local LogLevels            = {
+    "Errors",
+    "Warnings",
+    "Info",
+    "Debug",
+    "Verbose",
+    "Super-Verbose",
+}
 
-local LoadTheme            = require('lib.theme_loader')
-local themeFile            = string.format('%s/MyThemeZ.lua', mq.configDir)
-local themeName            = 'Default'
-local themeID              = 5
-local theme                = {}
+
+local LoadTheme = require('lib.theme_loader')
+local themeFile = string.format('%s/MyThemeZ.lua', mq.configDir)
+local themeName = 'Default'
+local themeID   = 5
+local theme     = {}
 local function File_Exists(name)
     local f = io.open(name, "r")
     if f ~= nil then
@@ -111,31 +121,6 @@ State.bad_IDs             = {}
 State.cannot_count        = 0
 State.traveling           = false
 
---Messages that people will ignore
-printf(
-    "%s \aoif you encounter any nav mesh issues please ensure you are using the latest mesh from \arhttps://github.com/yb-f/meshes",
-    elheader)
-local response = http.request(version_url)
-if tonumber(response) > version then
-    printf("%s \aoA new version is available (\arv%s\ao) please download it and try again.", elheader, tonumber(response))
-    mq.exit()
-end
-
---[[local t = os.time(os.date("!*t"))
-if version_time + 64800 < t then
-    printf("%s \aoThis version is more than 18 hours old. \arPlease check to see if an updated version is available.",
-        elheader)
-end--]]
-
---Check if necessary plugins are loaded.
-for plugin in ipairs({ 'MQ2Nav', 'MQ2EasyFind', 'MQ2Relocate', 'MQ2PortalSetter', }) do
-    if mq.TLO.Plugin(plugin)() == nil then
-        printf("%s \ar%s \aois required for this script.", elheader, plugin)
-        printf("%s \aoPlease load it with the command \ar/plugin %s \aoand rerun this script.", elheader, plugin)
-        mq.exit()
-    end
-end
-
 class_settings.loadSettings()
 loadsave.loadState()
 if not class_settings.settings.LoadTheme then           --whatever your setting is saved as
@@ -145,6 +130,16 @@ end
 themeName = class_settings.settings.LoadTheme
 loadTheme()
 
+if class_settings.settings['logger'] == nil then
+    class_settings.settings['logger'] = {
+        ['LogLevel'] = 3,
+        ['LogToFile'] = false
+    }
+    class_settings.saveSettings()
+end
+
+Logger.set_log_level(class_settings.settings.logger.LogLevel)
+Logger.set_log_to_file(class_settings.settings.logger.LogToFile)
 
 if loadsave.SaveState['general'] == nil then
     loadsave.SaveState['general'] = {
@@ -156,12 +151,43 @@ if loadsave.SaveState['general'] == nil then
     loadsave.saveState()
 end
 
+local function RenderOptionToggle(id, text, on)
+    local toggled = false
+    local state = on
+    ImGui.PushID(id .. "_tog_btn")
+
+    ImGui.PushStyleColor(ImGuiCol.ButtonActive, 1.0, 1.0, 1.0, 0)
+    ImGui.PushStyleColor(ImGuiCol.ButtonHovered, 1.0, 1.0, 1.0, 0)
+    ImGui.PushStyleColor(ImGuiCol.Button, 1.0, 1.0, 1.0, 0)
+
+    if on then
+        ImGui.PushStyleColor(ImGuiCol.Text, 0.3, 1.0, 0.3, 0.9)
+        if ImGui.Button(ICONS.FA_TOGGLE_ON) then
+            toggled = true
+            state   = false
+        end
+    else
+        ImGui.PushStyleColor(ImGuiCol.Text, 1.0, 0.3, 0.3, 0.8)
+        if ImGui.Button(ICONS.FA_TOGGLE_OFF) then
+            toggled = true
+            state   = true
+        end
+    end
+    ImGui.PopStyleColor(4)
+    ImGui.PopID()
+    ImGui.SameLine()
+    ImGui.Text(text)
+
+    return state, toggled
+end
+
 local function step_overview()
     task_outline_table = {}
     local class = string.lower(mq.TLO.Me.Class.ShortName())
     local choice = State.epic_choice
     local tablename = ''
     local quest = ''
+    Logger.log_super_verbose("\aoLoading step outline for %s - %s.", mq.TLO.Me.Class(), epic_list[choice])
     if epic_list[choice] == "1.0" then
         tablename = class .. "_10"
         quest = '10'
@@ -181,7 +207,7 @@ local function step_overview()
     end
     State.reqs = reqs[class][quest]
     if tablename == '' then
-        printf('%s \ao This class and quest has not yet been implemented.', elheader)
+        Logger.log_error("\aoThis class and quest has not yet been implemented.")
         State.task_run = false
         return
     end
@@ -192,6 +218,7 @@ local function step_overview()
     for _, task in pairs(task_outline_table) do
         overview_steps[task.Step] = false
     end
+    Logger.log_super_verbose("\aoSuccessfuly loaded outline.")
 end
 
 local function matchFilters(spawn)
@@ -204,6 +231,7 @@ end
 local function create_spawn_list()
     exclude_list = mq.getFilteredSpawns(matchFilters)
     for _, spawn in pairs(exclude_list) do
+        Logger.log_verbose("\aoInserting \ar%s (%s) \aointo list of bad IDs.", spawn.DisplayName(), spawn.ID())
         table.insert(State.bad_IDs, spawn.ID())
     end
 end
@@ -247,6 +275,7 @@ local function populate_group_combo()
             end
         end
     end
+    Logger.log_super_verbose("\aoPopulating group combo box with characters in your current zone.")
 end
 
 local function check_tradeskills(class, choice)
@@ -293,6 +322,7 @@ local function run_epic(class, choice)
     local tablename = ''
     State.task_run = true
     loadsave.loadState()
+    Logger.log_info("%sBegining quest for %s epic %s", mq.TLO.Me.Class(), epic_list[choice])
     if epic_list[choice] == "1.0" then
         tablename = class .. "_10"
         State.epicstring = "1.0"
@@ -307,19 +337,18 @@ local function run_epic(class, choice)
         State.epicstring = "2.0"
     end
     if tablename == '' then
-        printf('%s \aoThis class and quest has not yet been implemented.', elheader)
+        Logger.log_error("\aoThis class and quest has not yet been implemented.")
         State.task_run = false
         return
     end
     local ts_return = check_tradeskills(class, choice)
     if ts_return then
-        print(ts_return)
         if loadsave.SaveState.general.stopTS == true then
-            printf(
-                '%s \aoPlease raise your tradeskills to continue, or turn off the "\agStop if tradeskill requirements are unmet\ao" setting.',
-                elheader)
+            Logger.log_error("\aoPlease raise your tradeskills to continue, or turn off the \"\agStop if tradeskill requirements are unmet\ao\" setting.")
             State.task_run = false
             return
+        else
+            Logger.log_warn("\aoYour tradeskills do not meet requirements for this quest but you have opted to start the quest anyways.")
         end
     end
     local sql = "SELECT * FROM " .. tablename
@@ -490,8 +519,10 @@ local function run_epic(class, choice)
             State.bad_IDs = {}
             travel.zone_travel(task_table[State.step], class_settings.settings, loadsave.SaveState, false)
         else
-            printf("%s \aoUnknown Type: \ar%s!", elheader, task_table[State.step].type)
-            State.status = "Unknown type: " .. task_table[State.step].type .. " -- Step: " .. State.step
+            local type = task_table[State.step].type
+            if type == '' then type = 'none' end
+            Logger.log_error("\aoUnknown Type: \ar%s!", type)
+            State.status = "Unknown type: " .. type .. " -- Step: " .. State.step
             State.task_run = false
             return
         end
@@ -499,10 +530,10 @@ local function run_epic(class, choice)
             manage.removeLev()
         end
         if task_table[State.step].SaveStep == 1 then
-            printf("%s \aosaving step: \ar%s", elheader, State.step)
+            Logger.log_info("\aosaving step: \ar%s", State.step)
             loadsave.prepSave(State.step)
             if stop_at_save then
-                printf("%s \aoStopping.", elheader)
+                Logger.log_warn("\aoStopping at step \ar%s.", State.Step)
                 State.epicstring = ''
                 State.task_run = false
                 stop_at_save = false
@@ -520,7 +551,7 @@ local function run_epic(class, choice)
     State.status = "Completed " .. mq.TLO.Me.Class() .. ": " .. State.epicstring
     State.epicstring = ''
     State.task_run = false
-    printf("%s \aoCompleted!", elheader)
+    Logger.log_info("\aoCompleted \ay%s \ao- \ar%s!", mq.TLO.Me.Class(), State.epicstring)
 end
 
 local function displayGUI()
@@ -529,6 +560,12 @@ local function displayGUI()
         mq.exit()
         return
     end
+    if LogConsole == nil then
+        LogConsole = ImGui.ConsoleWidget.new("##ELConsole")
+        LogConsole.maxBufferLines = 100
+        LogConsole.autoScroll = true
+    end
+
     ImGui.SetNextWindowSize(ImVec2(415, 475), ImGuiCond.FirstUseEver)
     local ColorCount, StyleCount = LoadTheme.StartTheme(theme.Theme[themeID])
     openGUI, drawGUI = ImGui.Begin("Epic Laziness##" .. myName, openGUI, window_flags)
@@ -572,7 +609,8 @@ local function displayGUI()
                     State.skip = true
                     State.rewound = true
                     State.step = State.step - 1
-                    printf("%s \aoMoving to previous step \ar%s", elheader, State.step)
+                    Logger.log_info("\aoMoving to previous step \ar%s", State.step)
+                    Logger.log_verbose("\aoStep type: \ar%s", task_table[State.step].type)
                 end
                 if ImGui.IsItemHovered() then
                     ImGui.SetTooltip("Move to previous step.")
@@ -580,6 +618,7 @@ local function displayGUI()
                 ImGui.SameLine()
                 if State.pause == false then
                     if ImGui.SmallButton(ICONS.MD_PAUSE) then
+                        Logger.log_info("\aoPausing script.")
                         State.pause = true
                     end
                     if ImGui.IsItemHovered() then
@@ -588,6 +627,7 @@ local function displayGUI()
                 else
                     if ImGui.SmallButton(ICONS.FA_PLAY) then
                         State.pause = false
+                        Logger.log_info("\aoResuming script.")
                     end
                     if ImGui.IsItemHovered() then
                         ImGui.SetTooltip("Resume script.")
@@ -598,13 +638,14 @@ local function displayGUI()
                     State.skip = true
                     State.step = State.step + 1
                     State.rewound = true
-                    printf("%s \aoSkipping to step \ar%s", elheader, State.step)
+                    Logger.log_info("\aoMoving to next step \ar%s", State.step)
+                    Logger.log_verbose("\aoStep type: \ar%s", task_table[State.step].type)
                 end
                 if ImGui.IsItemHovered() then
                     ImGui.SetTooltip("Skip to next step.")
                 end
                 if ImGui.Button("Stop @ Next Save") then
-                    printf("%s \aoStopping at next save point.", elheader)
+                    Logger.log_info("\aoStopping at next save point.")
                     stop_at_save = true
                 end
             end
@@ -706,23 +747,43 @@ local function displayGUI()
                     overview_steps[task_outline_table[i].Step])
                 ImGui.TableNextColumn()
                 if ImGui.Selectable("##a" .. i, false, ImGuiSelectableFlags.None) then
-                    printf("%s \aoSetting step to \ar%s", elheader, task_outline_table[i].Step)
                     State.rewound = true
                     State.skip = true
                     State.step = task_outline_table[i].Step
+                    Logger.log_info('\aoSetting step to \ar%s', State.step)
+                    Logger.log_verbose("\aoStep type: \ar%s", task_table[State.step].type)
                 end
                 ImGui.SameLine()
                 ImGui.TextColored(IM_COL32(0, 255, 0, 255), task_outline_table[i].Step)
                 ImGui.TableNextColumn()
                 if ImGui.Selectable("##b" .. i, false, ImGuiSelectableFlags.None) then
-                    printf("%s \aoSetting step to \ar%s", elheader, task_outline_table[i].Step)
                     State.rewound = true
                     State.step = task_outline_table[i].Step
+                    Logger.log_info('\aoSetting step to \ar%s', State.step)
+                    Logger.log_verbose("\aoStep type: \ar%s", task_table[State.step].type)
                 end
                 ImGui.SameLine()
                 ImGui.TextWrapped(task_outline_table[i].Description)
             end
             ImGui.EndTable()
+            ImGui.EndTabItem()
+        end
+        if ImGui.BeginTabItem("Console") then
+            local changed
+            class_settings.settings.logger.LogLevel, changed = ImGui.Combo("Debug Levels", class_settings.settings.logger.LogLevel, LogLevels, #LogLevels)
+            if changed then
+                class_settings.saveSettings()
+            end
+
+            ImGui.SameLine()
+            class_settings.settings.logger.LogToFile, changed = RenderOptionToggle("##log_to_file", "Log to File", class_settings.settings.logger.LogToFile)
+            if changed then
+                class_settings.saveSettings()
+            end
+
+            local cur_x, cur_y = ImGui.GetCursorPos()
+            local contentSizeX, contentSizeY = ImGui.GetContentRegionAvail()
+            LogConsole:Render(ImVec2(contentSizeX, math.max(200, (contentSizeY - 10))))
             ImGui.EndTabItem()
         end
         ImGui.EndTabBar()
@@ -731,9 +792,24 @@ local function displayGUI()
     ImGui.End()
 end
 
-populate_group_combo()
-step_overview()
-mq.imgui.init('displayGUI', displayGUI)
+local function init()
+    populate_group_combo()
+    step_overview()
+    mq.imgui.init('displayGUI', displayGUI)
+    local response = http.request(version_url)
+    if tonumber(response) > version then
+        Logger.log_error("\aoA new version is available (\arv%s\ao) please download it and try again.", tonumber(response))
+        mq.exit()
+    end
+    Logger.log_warn("If you encounter any nav mesh issues please ensure you are using the latest mesh from \arhttps://github.com/yb-f/meshes")
+    for plugin in ipairs({ 'MQ2Nav', 'MQ2EasyFind', 'MQ2Relocate', 'MQ2PortalSetter', }) do
+        if mq.TLO.Plugin(plugin)() == nil then
+            Logger.log_error("\ar%s \aois required for this script.", plugin)
+            Logger.log_error("\aoPlease load it with the command \ar/plugin %s \aoand rerun this script.", plugin)
+            mq.exit()
+        end
+    end
+end
 
 local function main()
     while running == true do
@@ -746,4 +822,5 @@ local function main()
     end
 end
 
+init()
 main()
