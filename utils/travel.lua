@@ -306,7 +306,7 @@ function travel.invis(class_settings)
         end
         mq.cmdf('/squelch /alt act %s', ID)
         mq.delay(500)
-        while mq.TLO.Me.Casting() do
+        while mq.TLO.Me.Casting() and mq.TLO.Me.Class() ~= "Bard" do
             mq.delay(200)
         end
     end
