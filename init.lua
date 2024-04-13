@@ -25,9 +25,7 @@ end
 LogConsole                 = nil
 
 local version_url          = 'https://raw.githubusercontent.com/yb-f/EL-Ver/master/latest_ver'
-local version              = 0.029
--- to obtain version_time # os.time(os.date("!*t"))
---local version_time         = 1712908597
+local version              = "0.1.1"
 local window_flags         = bit32.bor(ImGuiWindowFlags.None)
 local treeview_table_flags = bit32.bor(ImGuiTableFlags.Hideable, ImGuiTableFlags.RowBg, ImGuiTableFlags.Borders, ImGuiTableFlags.SizingFixedFit)
 local openGUI, drawGUI     = true, true
@@ -797,7 +795,7 @@ local function init()
     step_overview()
     mq.imgui.init('displayGUI', displayGUI)
     local response = http.request(version_url)
-    if tonumber(response) > version then
+    if response ~= version then
         Logger.log_error("\aoA new version is available (\arv%s\ao) please download it and try again.", tonumber(response))
         mq.exit()
     end
