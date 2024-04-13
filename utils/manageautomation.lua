@@ -34,14 +34,19 @@ function manage.doAutomation(character, class, script, action, char_settings)
             if script == 1 then
                 mq.cmdf('/squelch /%s mode 0 nosave', class)
                 mq.cmdf('/squelch /%s usestick on nosave', class)
+                mq.cmdf('/squelch /%s zhigh 100 nosave', class)
+                mq.cmdf('/squelch /%s zlow 100 nosave', class)
             elseif script == 2 then
                 mq.cmd("/squelch /lua run rgmercs")
+                mq.cmd("/squelch /rgl set PullZRadius 100")
             elseif script == 3 then
                 mq.cmd("/squelch /mac rgmercs")
             elseif script == 4 then
                 mq.cmd("/squelch /mac kissassist")
+                mq.cmd("/squelch /maxzrange 100")
             elseif script == 5 then
                 mq.cmd("/squelch /mac muleassist")
+                mq.cmd("/squelch /maxzrange 100")
             end
         else
             if script == 1 then
