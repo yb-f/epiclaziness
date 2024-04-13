@@ -106,7 +106,6 @@ function Actions.farm_check(item, class_settings, char_settings)
 end
 
 function Actions.adventure_entrance(item, class_settings, char_settings)
-    print(mq.TLO.Window('AdventureRequestWnd/AdvRqst_NPCText').Text())
     while string.find(mq.TLO.Window('AdventureRequestWnd/AdvRqst_NPCText').Text(), item.zone) do
         mq.delay(50)
     end
