@@ -12,7 +12,7 @@ function travel.invisTranslocatorCheck()
     for _, name in pairs(translocators) do
         if mq.TLO.Spawn('npc ' .. name).Distance() ~= nil then
             if mq.TLO.Spawn('npc ' .. name).Distance() < 50 then
-                Logger.log_warn("\aoWe are near \ag%s\ao. Skipping invis.", mq.TLO.Spawn('npc ' .. name).DisplayName())
+                Logger.log_super_verbose("\aoWe are near \ag%s\ao. Skipping invis.", mq.TLO.Spawn('npc ' .. name).DisplayName())
                 return true
             end
         end
