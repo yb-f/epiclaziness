@@ -1,11 +1,10 @@
-local mq = require('mq')
+local mq            = require('mq')
 
-local loadsave = {}
-loadsave.SaveState = {}
-local myName = mq.TLO.Me.DisplayName()
-loadsave.configPath = mq.configDir ..
-    '/epiclaziness/epiclaziness_' .. mq.TLO.EverQuest.Server() .. "_" .. myName .. '.lua'
-local class = mq.TLO.Me.Class.Name()
+local loadsave      = {}
+loadsave.SaveState  = {}
+local myName        = mq.TLO.Me.DisplayName()
+loadsave.configPath = mq.configDir .. '/epiclaziness/epiclaziness_' .. mq.TLO.EverQuest.Server() .. "_" .. myName .. '.lua'
+local class         = mq.TLO.Me.Class.Name()
 
 function loadsave.createConfig()
     loadsave.SaveState = {
@@ -16,11 +15,11 @@ function loadsave.createConfig()
             ['Last_Ran'] = 1
         },
         ['general'] = {
-            ['stopTS'] = true,
-            ['useAOC'] = true,
+            ['stopTS']         = true,
+            ['useAOC']         = true,
             ['invisForTravel'] = false,
-            ['returnToBind'] = false,
-            ['xtargClear'] = 1
+            ['returnToBind']   = false,
+            ['xtargClear']     = 1
         }
     }
     loadsave.saveState()

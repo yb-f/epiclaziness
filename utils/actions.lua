@@ -1,12 +1,12 @@
-local mq = require('mq')
-local inv = require 'utils/inventory'
-local manage = require 'utils/manageautomation'
-local travel = require 'utils/travel'
+local mq            = require('mq')
+local inv           = require 'utils/inventory'
+local manage        = require 'utils/manageautomation'
+local travel        = require 'utils/travel'
 
-local Actions = {}
-local waiting = false
-local gamble_done = false
-local forage_trash = { 'Fruit', 'Roots', 'Vegetables', 'Pod of Water', 'Berries', 'Rabbit Meat', 'Fishing Grubs' }
+local Actions       = {}
+local waiting       = false
+local gamble_done   = false
+local forage_trash  = { 'Fruit', 'Roots', 'Vegetables', 'Pod of Water', 'Berries', 'Rabbit Meat', 'Fishing Grubs' }
 local fishing_trash = { 'Fish Scales', 'Tattered Cloth Sandal', 'Rusty Dagger', "Moray Eel", "Gunthak Gourami",
     "Deep Sea Urchin", "Fresh Fish", "Gunthak Mackerel", "Saltwater Seaweed", "Dark Fish's Scales" }
 

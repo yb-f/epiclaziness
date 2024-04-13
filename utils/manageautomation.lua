@@ -1,5 +1,5 @@
-local mq = require('mq')
-local dist = require 'utils/distance'
+local mq     = require('mq')
+local dist   = require 'utils/distance'
 
 local manage = {}
 

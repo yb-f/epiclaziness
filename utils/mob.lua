@@ -1,9 +1,9 @@
-local mq = require('mq')
-local manage = require 'utils/manageautomation'
-local inv = require 'utils/inventory'
-local travel = require 'utils/travel'
+local mq           = require('mq')
+local manage       = require 'utils/manageautomation'
+local inv          = require 'utils/inventory'
+local travel       = require 'utils/travel'
 
-local mob = {}
+local mob          = {}
 local searchFilter = ''
 
 local function target_invalid_switch()

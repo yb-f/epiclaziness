@@ -1,4 +1,4 @@
-local mq = require('mq')
+local mq          = require('mq')
 
 local quests_done = {
     ['brd'] = { "Pre-1.5", "1.5", "2.0" },

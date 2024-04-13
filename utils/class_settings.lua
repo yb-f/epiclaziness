@@ -1,6 +1,6 @@
-local mq = require('mq')
+local mq                  = require('mq')
 
-local class_settings = {}
+local class_settings      = {}
 class_settings.configPath = mq.configDir .. '/epiclaziness/epiclaziness_class_settings.lua'
 
 function class_settings.loadSettings()

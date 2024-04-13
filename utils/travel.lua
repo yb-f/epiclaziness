@@ -1,11 +1,11 @@
-local mq = require('mq')
-local manage = require 'utils/manageautomation'
+local mq            = require('mq')
+local manage        = require 'utils/manageautomation'
 local translocators = { "Magus", "Translocator", "Priest of Discord", "Nexus Scion", "Deaen Greyforge",
     "Ambassador Cogswald", "Madronoa", "Belinda", "Herald of Druzzil Ro" }
 
-local dist = require 'utils/distance'
+local dist          = require 'utils/distance'
 
-local travel = {}
+local travel        = {}
 
 function travel.invisTranslocatorCheck()
     Logger.log_verbose('\aoChecking if we are near a translocator npc before invising.')

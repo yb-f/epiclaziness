@@ -1,10 +1,10 @@
-local mq = require('mq')
-local manage = require 'utils/manageautomation'
+local mq              = require('mq')
+local manage          = require 'utils/manageautomation'
 
-local inventory = {}
+local inventory       = {}
 
 --- @type number
-inventory.slot = 0
+inventory.slot        = 0
 --- @type string
 inventory.stored_item = ''
 

@@ -4,15 +4,15 @@ local tradeskill_requirements = {
     ['bst'] = {
         ['pre15'] = {
             ['Tailoring'] = 100,
-            ['Brewing'] = 122,
+            ['Brewing']   = 122,
         },
         ['15'] = {
             ['Tailoring'] = 100,
         },
         ['20'] = {
-            ['Baking'] = 100,
+            ['Baking']        = 100,
             ['Blacksmithing'] = 100,
-            ['Pottery'] = 100
+            ['Pottery']       = 100
         }
     },
     ['clr'] = {
@@ -27,12 +27,12 @@ local tradeskill_requirements = {
     },
     ['rog'] = {
         ['15'] = {
-            ['Baking'] = 192,
-            ['Tailoring'] = 82,
-            ['Blacksmithing'] = 104,
+            ['Baking']         = 192,
+            ['Tailoring']      = 82,
+            ['Blacksmithing']  = 104,
             ['Jewelry Making'] = 120,
-            ['Make Poison'] = 277,
-            ['Brewing'] = 121
+            ['Make Poison']    = 277,
+            ['Brewing']        = 121
         },
     },
     ['shd'] = {
