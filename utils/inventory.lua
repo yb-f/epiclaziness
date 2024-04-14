@@ -251,7 +251,7 @@ function inventory.loot(item, class_settings, char_settings)
         Mob.clearXtarget(class_settings, char_settings)
     end
     State.status = "Looting " .. item.what
-    mq.delay("1s")
+    mq.delay("2s")
     local looted = false
     if mq.TLO.AdvLoot.SCount() > 0 then
         for i = 1, mq.TLO.AdvLoot.SCount() do
