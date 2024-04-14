@@ -222,7 +222,7 @@ end
 
 function mob.npc_damage_until(item)
     State.status = "Damaging " .. item.npc .. " to below " .. item.what .. "% health"
-    Logger.log_info("\aoDamaging \ag%s \ao to below \ag%s%health\ao.", item.npc, item.what)
+    Logger.log_info("\aoDamaging \ag%s \ao to below \ag%s%% health\ao.", item.npc, item.what)
     ID = mq.TLO.Spawn('npc ' .. item.npc).ID()
     if mq.TLO.Spawn(ID).Distance() ~= nil then
         if mq.TLO.Spawn(ID).Distance() > 100 then
