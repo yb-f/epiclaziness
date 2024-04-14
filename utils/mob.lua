@@ -12,7 +12,7 @@ end
 
 function mob.backstab(item)
     Logger.log_info("\aoBackstabbing \ag%s\ao.", item.npc)
-    local ID = mob.findNearestName(item)
+    local ID = mob.findNearestName(item.npc)
     if mq.TLO.Spawn(item.npc).Distance() ~= nil then
         if mq.TLO.Spawn(item.npc).Distance() > 100 then
             State.rewound = true
