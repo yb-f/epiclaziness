@@ -1,4 +1,5 @@
 local mq       = require('mq')
+local ICONS    = require('mq.Icons')
 
 local draw_gui = {}
 
