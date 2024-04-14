@@ -177,4 +177,34 @@ function draw_gui.generate_outline_text(item)
     return step, text
 end
 
+function draw_gui.RenderOptionToggle(id, text, on)
+    local toggled = false
+    local state = on
+    ImGui.PushID(id .. "_tog_btn")
+
+    ImGui.PushStyleColor(ImGuiCol.ButtonActive, 1.0, 1.0, 1.0, 0)
+    ImGui.PushStyleColor(ImGuiCol.ButtonHovered, 1.0, 1.0, 1.0, 0)
+    ImGui.PushStyleColor(ImGuiCol.Button, 1.0, 1.0, 1.0, 0)
+
+    if on then
+        ImGui.PushStyleColor(ImGuiCol.Text, 0.3, 1.0, 0.3, 0.9)
+        if ImGui.Button(ICONS.FA_TOGGLE_ON) then
+            toggled = true
+            state   = false
+        end
+    else
+        ImGui.PushStyleColor(ImGuiCol.Text, 1.0, 0.3, 0.3, 0.8)
+        if ImGui.Button(ICONS.FA_TOGGLE_OFF) then
+            toggled = true
+            state   = true
+        end
+    end
+    ImGui.PopStyleColor(4)
+    ImGui.PopID()
+    ImGui.SameLine()
+    ImGui.Text(text)
+
+    return state, toggled
+end
+
 return draw_gui
