@@ -266,14 +266,9 @@ local function check_tradeskills(class, choice)
                 if mq.TLO.Me.Skill(ts)() < req then
                     if first == true then
                         first = false
-                        return_string = elheader ..
-                            " \ar" ..
-                            ts .. " \aorequires \ar" .. req .. " \aoskill. Currently \ar" .. mq.TLO.Me.Skill(ts)()
+                        return_string = " \ar" .. ts .. " \aorequires \ar" .. req .. " \aoskill. Currently \ar" .. mq.TLO.Me.Skill(ts)()
                     else
-                        return_string = return_string .. "\n" ..
-                            elheader ..
-                            " \ar" ..
-                            ts .. " \aorequires \ar" .. req .. " \aoskill. Currently \ar" .. mq.TLO.Me.Skill(ts)()
+                        return_string = return_string .. "\n" .. " \ar" .. ts .. " \aorequires \ar" .. req .. " \aoskill. Currently \ar" .. mq.TLO.Me.Skill(ts)()
                     end
                 end
             end
