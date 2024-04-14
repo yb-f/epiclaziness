@@ -6,6 +6,7 @@ local dist           = require 'utils/distance'
 Actions              = require 'utils/actions'
 local inv            = require 'utils/inventory'
 Mob                  = require 'utils/mob'
+local draw_gui       = require 'utils/drawgui'
 local travel         = require 'utils/travel'
 local manage         = require 'utils/manageautomation'
 local loadsave       = require 'utils/loadsave'
@@ -731,18 +732,16 @@ local function displayGUI()
             ImGui.EndTabItem()
         end
         if ImGui.BeginTabItem("Outline") then
-            ImGui.BeginTable('##table1', 3, treeview_table_flags)
+            ImGui.BeginTable('##outlinetable', 3, treeview_table_flags)
             ImGui.TableSetupColumn("Manual Completion", bit32.bor(ImGuiTableColumnFlags.NoResize), 30)
             ImGui.TableSetupColumn("Step", bit32.bor(ImGuiTableColumnFlags.NoResize), 30)
-            ImGui.TableSetupColumn("Description",
-                bit32.bor(ImGuiTableColumnFlags.WidthStretch, ImGuiTableColumnFlags.NoResize), 100)
+            ImGui.TableSetupColumn("Description", bit32.bor(ImGuiTableColumnFlags.WidthStretch, ImGuiTableColumnFlags.NoResize), 100)
             ImGui.TableSetupScrollFreeze(0, 1)
             ImGui.TableHeadersRow()
             for i = 1, #task_outline_table do
                 ImGui.TableNextRow()
                 ImGui.TableNextColumn()
-                overview_steps[task_outline_table[i].Step] = ImGui.Checkbox("##" .. i,
-                    overview_steps[task_outline_table[i].Step])
+                overview_steps[task_outline_table[i].Step] = ImGui.Checkbox("##" .. i, overview_steps[task_outline_table[i].Step])
                 ImGui.TableNextColumn()
                 if ImGui.Selectable("##a" .. i, false, ImGuiSelectableFlags.None) then
                     State.rewound = true
@@ -756,6 +755,7 @@ local function displayGUI()
                 ImGui.TableNextColumn()
                 if ImGui.Selectable("##b" .. i, false, ImGuiSelectableFlags.None) then
                     State.rewound = true
+                    State.skip = true
                     State.step = task_outline_table[i].Step
                     Logger.log_info('\aoSetting step to \ar%s', State.step)
                     Logger.log_verbose("\aoStep type: \ar%s", task_table[State.step].type)
@@ -765,6 +765,20 @@ local function displayGUI()
             end
             ImGui.EndTable()
             ImGui.EndTabItem()
+        end
+        if State.task_run == true then
+            if ImGui.BeginTabItem("Full Outline") then
+                ImGui.BeginTable('##outlinetable', 2, treeview_table_flags)
+                ImGui.TableSetupColumn("Step", bit32.bor(ImGuiTableColumnFlags.NoResize), 30)
+                ImGui.TableSetupColumn("Description", bit32.bor(ImGuiTableColumnFlags.WidthStretch, ImGuiTableColumnFlags.NoResize), 100)
+                ImGui.TableSetupScrollFreeze(0, 1)
+                ImGui.TableHeadersRow()
+                for i = 1, #task_table do
+                    draw_gui.full_outline_row(task_table[i])
+                end
+                ImGui.EndTable()
+                ImGui.EndTabItem()
+            end
         end
         if ImGui.BeginTabItem("Console") then
             local changed
