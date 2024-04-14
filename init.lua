@@ -43,7 +43,6 @@ local changed              = false
 local myClass              = mq.TLO.Me.Class()
 local exclude_list         = {}
 local exclude_name         = ''
-local epic_list            = quests_done[string.lower(mq.TLO.Me.Class.ShortName())]
 local changed              = false
 local overview_steps       = {}
 local LogLevels            = {
@@ -109,6 +108,7 @@ State.group_choice        = 1
 State.use_cwtn            = false
 State.use_ka              = false
 State.use_rgl             = false
+State.epic_list           = quests_done[string.lower(mq.TLO.Me.Class.ShortName())]
 State.epic_choice         = 1
 State.farming             = false
 State.nextmob             = false
@@ -156,20 +156,20 @@ local function step_overview()
     local choice = State.epic_choice
     local tablename = ''
     local quest = ''
-    Logger.log_super_verbose("\aoLoading step outline for %s - %s.", mq.TLO.Me.Class(), epic_list[choice])
-    if epic_list[choice] == "1.0" then
+    Logger.log_super_verbose("\aoLoading step outline for %s - %s.", mq.TLO.Me.Class(), State.epic_list[choice])
+    if State.epic_list[choice] == "1.0" then
         tablename = class .. "_10"
         quest = '10'
         State.epicstring = "1.0"
-    elseif epic_list[choice] == "Pre-1.5" then
+    elseif State.epic_list[choice] == "Pre-1.5" then
         tablename = class .. "_pre15"
         quest = 'pre15'
         State.epicstring = "Pre-1.5"
-    elseif epic_list[choice] == "1.5" then
+    elseif State.epic_list[choice] == "1.5" then
         tablename = class .. "_15"
         quest = '15'
         State.epicstring = "1.5"
-    elseif epic_list[choice] == "2.0" then
+    elseif State.epic_list[choice] == "2.0" then
         tablename = class .. "_20"
         quest = '20'
         State.epicstring = "2.0"
@@ -251,13 +251,13 @@ local function check_tradeskills(class, choice)
     if tsreqs[class] ~= nil then
         local return_string = ''
         local quest = ''
-        if epic_list[choice] == "1.0" then
+        if State.epic_list[choice] == "1.0" then
             quest = '10'
-        elseif epic_list[choice] == "Pre-1.5" then
+        elseif State.epic_list[choice] == "Pre-1.5" then
             quest = 'pre15'
-        elseif epic_list[choice] == "1.5" then
+        elseif State.epic_list[choice] == "1.5" then
             quest = '15'
-        elseif epic_list[choice] == "2.0" then
+        elseif State.epic_list[choice] == "2.0" then
             quest = '20'
         end
         if tsreqs[class][quest] ~= nil then
@@ -286,17 +286,17 @@ local function run_epic(class, choice)
     local tablename = ''
     State.task_run = true
     loadsave.loadState()
-    Logger.log_info("Begining quest for %s epic %s", mq.TLO.Me.Class(), epic_list[choice])
-    if epic_list[choice] == "1.0" then
+    Logger.log_info("Begining quest for %s epic %s", mq.TLO.Me.Class(), State.epic_list[choice])
+    if State.epic_list[choice] == "1.0" then
         tablename = class .. "_10"
         State.epicstring = "1.0"
-    elseif epic_list[choice] == "Pre-1.5" then
+    elseif State.epic_list[choice] == "Pre-1.5" then
         tablename = class .. "_pre15"
         State.epicstring = "Pre-1.5"
-    elseif epic_list[choice] == "1.5" then
+    elseif State.epic_list[choice] == "1.5" then
         tablename = class .. "_15"
         State.epicstring = "1.5"
-    elseif epic_list[choice] == "2.0" then
+    elseif State.epic_list[choice] == "2.0" then
         tablename = class .. "_20"
         State.epicstring = "2.0"
     end
@@ -397,6 +397,8 @@ local function run_epic(class, choice)
             Actions.ground_spawn(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "IGNORE_MOB" then
             Actions.ignore_mob(task_table[State.step], class_settings.settings)
+        elseif task_table[State.step].type == "LDON_COUNT_CHECK" then
+            Actions.ldon_count_check(task_table[State.step])
         elseif task_table[State.step].type == "LOC_TRAVEL" then
             travel.loc_travel(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "LOOT" then
@@ -491,8 +493,10 @@ local function run_epic(class, choice)
             State.task_run = false
             return
         end
-        if task_table[State.step].belev == nil then
-            manage.removeLev()
+        if mq.TLO.Me.Levitating() then
+            if task_table[State.step].belev == nil then
+                manage.removeLev()
+            end
         end
         if task_table[State.step].SaveStep == 1 then
             Logger.log_info("\aosaving step: \ar%s", State.step)
@@ -538,7 +542,7 @@ local function displayGUI()
         if ImGui.BeginTabItem("General") then
             ImGui.Text("Class: " .. myClass .. " " .. State.epicstring)
             if State.task_run == false then
-                State.epic_choice, changed = ImGui.Combo('##Combo', State.epic_choice, epic_list, #epic_list, #epic_list)
+                State.epic_choice, changed = ImGui.Combo('##Combo', State.epic_choice, State.epic_list, #State.epic_list, #State.epic_list)
                 if ImGui.IsItemHovered() then
                     ImGui.SetTooltip('Which epic to run.')
                 end
