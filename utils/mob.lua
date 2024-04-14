@@ -145,7 +145,7 @@ function mob.clearXtarget(class_settings, char_settings)
 end
 
 local function matchFilters(spawn)
-    if string.find(string.lower(spawn.CleanName()), string.lower(searchFilter)) and (spawn.Type() == 'NPC' or spawn.Type() == 'Trigger') then
+    if string.find(string.lower(spawn.CleanName()), string.lower(searchFilter)) and (spawn.Type() == 'NPC' or spawn.Type() == 'Trigger' or spawn.Type() == 'Chest') then
         for ID in pairs(State.bad_IDs) do
             if spawn.ID() == ID then
                 return false
@@ -338,7 +338,7 @@ function mob.npc_kill(item, class_settings, loot)
         Logger.log_super_verbose("\aoGenerating events to detect unhittable or bugged target.")
         mq.event("cannot_see", "You cannot see your target.", target_invalid_switch)
         mq.event("cannot_cast", "You cannot cast#*#on#*#", target_invalid_switch)
-        while mq.TLO.Spawn(ID).Type() == 'NPC' do
+        while mq.TLO.Spawn(ID).Type() == 'NPC' or mq.TLO.Spawn(ID).Type() == 'Chest' do
             mq.doevents()
             if State.skip == true then
                 mq.unevent('cannot_see')
