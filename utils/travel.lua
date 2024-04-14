@@ -200,6 +200,9 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
             travel.navUnpause(item)
         end
         if loopCount == 10 then
+            if item.radius == 1 then
+                return
+            end
             local temp = State.status
             travel.open_door()
             loopCount = 0
@@ -220,7 +223,7 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
     elseif item.whereX ~= 0 then
         distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), item.whereX, item.whereY)
     end
-    if distance > 30 then
+    if distance > 30 and item.radius == nil then
         Logger.log_warn("\aoStopped before reaching our destination. Attempting to restart navigation.")
         State.step = State.step
         State.rewound = true
