@@ -55,7 +55,9 @@ local function log(logLevel, output, ...)
         LogConsole:AppendText(consoleText)
     end
 
-    printf('%s\aw:%s \aw<\at%s\aw> \aw(%s\aw)%s \ax%s', elHeaderStart, logLevels[logLevel].header, now, callerTracer, elHeaderEnd, output)
+    printf('%s\aw:%s \aw<\at%s\aw> \aw(\ag%s%s-%s\aw) \aw(%s\aw)%s \ax%s', elHeaderStart, logLevels[logLevel].header, now, mq.TLO.Me.Class.ShortName(),
+        State.epic_list[State.epic_choice], State.step, callerTracer, elHeaderEnd,
+        output)
 end
 
 function actions.GenerateShortcuts()
