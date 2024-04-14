@@ -36,8 +36,8 @@ end
 
 function travel.face_loc(item)
     local x = item.whereX
-    local y = item.wherey
-    local z = item.wherez
+    local y = item.whereY
+    local z = item.whereZ
     State.status = "Facing " .. y .. ", " .. x .. ", " .. z
     Logger.log_info("\aoFacing location \ag%s, %s, %s\ao.", y, x, z)
     if State.group_choice == 1 then
