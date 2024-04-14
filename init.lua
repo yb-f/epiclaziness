@@ -790,16 +790,35 @@ local function displayGUI()
     ImGui.End()
 end
 
+local function version_check()
+    local response = http.request(version_url)
+    local version_table = {}
+    local response_table = {}
+    local new_version_available = false
+    response = string.gsub(response, "\n", "")
+    for word in string.gmatch(version, '([^.]+)') do
+        table.insert(version_table, word)
+    end
+    for word in string.gmatch(response, '([^.]+)') do
+        table.insert(response_table, word)
+    end
+    for i = 1, 3 do
+        if response_table[i] > version_table[i] then
+            new_version_available = true
+            break
+        end
+    end
+    if new_version_available then
+        Logger.log_error("\aoA new version is available (\arv%s\ao) please download it and try again.", response)
+        mq.exit()
+    end
+end
+
 local function init()
     populate_group_combo()
     step_overview()
     mq.imgui.init('displayGUI', displayGUI)
-    local response = http.request(version_url)
-    response = string.gsub(response, "\n", "")
-    if response ~= version then
-        Logger.log_error("\aoA new version is available (\arv%s\ao) please download it and try again.", response)
-        mq.exit()
-    end
+    version_check()
     Logger.log_warn("If you encounter any nav mesh issues please ensure you are using the latest mesh from \arhttps://github.com/yb-f/meshes")
     for plugin in ipairs({ 'MQ2Nav', 'MQ2EasyFind', 'MQ2Relocate', 'MQ2PortalSetter', }) do
         if mq.TLO.Plugin(plugin)() == nil then
