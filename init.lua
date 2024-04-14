@@ -28,7 +28,7 @@ LogConsole                 = nil
 local version_url          = 'https://raw.githubusercontent.com/yb-f/EL-Ver/master/latest_ver'
 local version              = "0.1.1"
 local window_flags         = bit32.bor(ImGuiWindowFlags.None)
-local treeview_table_flags = bit32.bor(ImGuiTableFlags.Hideable, ImGuiTableFlags.RowBg, ImGuiTableFlags.Borders, ImGuiTableFlags.SizingFixedFit)
+local treeview_table_flags = bit32.bor(ImGuiTableFlags.Hideable, ImGuiTableFlags.RowBg, ImGuiTableFlags.Borders, ImGuiTableFlags.SizingFixedFit, ImGuiTableFlags.ScrollX)
 local openGUI, drawGUI     = true, true
 local myName               = mq.TLO.Me.DisplayName()
 local dbn                  = sqlite3.open(mq.luaDir .. '\\epiclaziness\\epiclaziness.db')
@@ -534,7 +534,6 @@ local function displayGUI()
         LogConsole.maxBufferLines = 100
         LogConsole.autoScroll = true
     end
-
     ImGui.SetNextWindowSize(ImVec2(415, 475), ImGuiCond.FirstUseEver)
     local ColorCount, StyleCount = LoadTheme.StartTheme(theme.Theme[themeID])
     openGUI, drawGUI = ImGui.Begin("Epic Laziness##" .. myName, openGUI, window_flags)
@@ -633,6 +632,7 @@ local function displayGUI()
             ImGui.EndTabItem()
         end
         if ImGui.BeginTabItem("Settings") then
+            ImGui.BeginChild("##SettingsChild")
             if ImGui.CollapsingHeader('General Settings') then
                 ImGui.Text("Cur Theme: %s", themeName)
                 -- Combo Box Load Theme
@@ -699,6 +699,7 @@ local function displayGUI()
                 end
                 ImGui.EndTable()
             end
+            ImGui.EndChild()
             ImGui.EndTabItem()
         end
         if ImGui.BeginTabItem("Outline") then
