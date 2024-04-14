@@ -25,8 +25,15 @@ function Actions.adventure_button()
     return mq.TLO.Window('AdventureRequestWnd/AdvRqst_AcceptButton').Enabled()
 end
 
-function Actions.adventure_selection()
-    if mq.TLO.Window('AdventureRequestWnd/AdvRqst_TypeCombobox').GetCurSel() == 2 then
+function Actions.adventure_type_selection()
+    if mq.TLO.Window('AdventureRequestWnd/AdvRqst_TypeCombobox').GetCurSel() == 3 then
+        return true
+    end
+    return false
+end
+
+function Actions.adventure_risk_selection()
+    if mq.TLO.Window('AdventureRequestWnd/AdvRqst_RiskCombobox').GetCurSel() == 2 then
         return true
     end
     return false
@@ -847,13 +854,29 @@ function Actions.start_adventure(item)
     mq.delay(200)
     mq.TLO.Target.RightClick()
     mq.delay("5s", Actions.adventure_window)
-    mq.TLO.Window('AdventureRequestWnd/AdvRqst_TypeCombobox').Select(2)()
-    mq.delay("5s", Actions.adventure_selection)
+    mq.TLO.Window('AdventureRequestWnd/AdvRqst_TypeCombobox').Select(3)()
+    mq.delay("5s", Actions.adventure_type_selection)
+    mq.TLO.Window('AdventureRequestWnd/AdvRqst_RiskCombobox').Select(2)()
+    mq.delay("5s", Actions.adventure_risk_selection)
     mq.delay("2s")
     mq.TLO.Window('AdventureRequestWnd/AdvRqst_RequestButton').LeftMouseUp()
     mq.delay("5s", Actions.adventure_button)
     mq.TLO.Window('AdventureRequestWnd/AdvRqst_AcceptButton').LeftMouseUp()
     mq.delay("2s")
+end
+
+function Actions.ldon_count_check(item)
+    local timeString = mq.TLO.Window("AdventureRequestWnd/AdvRqst_CompleteTimeLeftLabel").Text()
+    local progressString = mq.TLO.Window("AdventureRequestWnd/AdvRqst_ProgressTextLabel").Text()
+    if timeString == '' and progressString == '' then
+        State.rewound = true
+        State.step = item.gotostep
+        Logger.log_info("\aoCompleted LDON adventure!")
+    else
+        State.rewound = true
+        State.step = tonumber(item.zone)
+        Logger.log_super_verbose("\aoAdventure not yet complete.")
+    end
 end
 
 function Actions.wait(item, class_settings, char_settings)
