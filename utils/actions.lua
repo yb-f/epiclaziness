@@ -761,6 +761,7 @@ function Actions.npc_wait_despawn(item, class_settings, char_settings)
 end
 
 function Actions.pickpocket(item)
+    State.status = "Pickpocketing " .. item.what .. " from " .. item.npc
     Logger.log_info("\aoPickpocketing \ag%s \aofrom \ag%s\ao.", item.what, item.npc)
     if mq.TLO.Spawn(item.npc).Distance() ~= nil then
         if mq.TLO.Spawn(item.npc).Distance() > 100 then
