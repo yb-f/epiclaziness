@@ -849,10 +849,11 @@ function Actions.start_adventure(item)
     mq.delay("5s", Actions.adventure_window)
     mq.TLO.Window('AdventureRequestWnd/AdvRqst_TypeCombobox').Select(2)()
     mq.delay("5s", Actions.adventure_selection)
+    mq.delay("2s")
     mq.TLO.Window('AdventureRequestWnd/AdvRqst_RequestButton').LeftMouseUp()
     mq.delay("5s", Actions.adventure_button)
     mq.TLO.Window('AdventureRequestWnd/AdvRqst_AcceptButton').LeftMouseUp()
-    mq.delay(1500)
+    mq.delay("2s")
 end
 
 function Actions.wait(item, class_settings, char_settings)
