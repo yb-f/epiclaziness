@@ -266,9 +266,9 @@ local function check_tradeskills(class, choice)
                 if mq.TLO.Me.Skill(ts)() < req then
                     if first == true then
                         first = false
-                        return_string = " \ar" .. ts .. " \aorequires \ar" .. req .. " \aoskill. Currently \ar" .. mq.TLO.Me.Skill(ts)()
+                        return_string = " \ag" .. ts .. " \aorequires \ar" .. req .. " \aoskill. Currently \ar" .. mq.TLO.Me.Skill(ts)() .. "."
                     else
-                        return_string = return_string .. "\n" .. " \ar" .. ts .. " \aorequires \ar" .. req .. " \aoskill. Currently \ar" .. mq.TLO.Me.Skill(ts)()
+                        return_string = return_string .. " \ag" .. ts .. " \aorequires \ar" .. req .. " \aoskill. Currently \ar" .. mq.TLO.Me.Skill(ts)() .. "."
                     end
                 end
             end
@@ -309,6 +309,7 @@ local function run_epic(class, choice)
     if ts_return then
         if loadsave.SaveState.general.stopTS == true then
             Logger.log_error("\aoPlease raise your tradeskills to continue, or turn off the \"\agStop if tradeskill requirements are unmet\ao\" setting.")
+            Logger.log_error(ts_return)
             State.task_run = false
             return
         else
