@@ -925,6 +925,10 @@ function Actions.wait(item, class_settings, char_settings)
             end
         end
     end
+    if item.gotostep ~= nil then
+        State.rewound = true
+        State.step = item.gotostep
+    end
 end
 
 function Actions.wait_event(item)
