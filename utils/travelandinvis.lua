@@ -3,7 +3,7 @@ local mq = require('mq')
 local travel = {
     ['brd_pre15'] = {
         ['gate']  = 5,
-        ['invis'] = 8
+        ['invis'] = 13
     },
     ['brd_10']    = {
         ['gate']  = 5,
@@ -11,31 +11,28 @@ local travel = {
     },
     ['brd_15']    = {
         ['gate']  = 27,
-        ['invis'] = 33
+        ['invis'] = 57
     },
     ['brd_20']    = {
         ['gate']  = 4,
-        ['invis'] = 13
+        ['invis'] = 15
     },
     --Not accurate
     ['bst_10']    = {
         ['gate']  = 69,
         ['invis'] = 420
     },
-    --Not accurate
     ['bst_15']    = {
-        ['gate']  = 69,
-        ['invis'] = 420
+        ['gate']  = 30,
+        ['invis'] = 63
     },
-    --Not accurate
     ['bst_20']    = {
-        ['gate']  = 69,
-        ['invis'] = 420
+        ['gate']  = 14,
+        ['invis'] = 39
     },
-    --Not accurate
     ['bst_pre15'] = {
-        ['gate']  = 69,
-        ['invis'] = 420
+        ['gate']  = 9,
+        ['invis'] = 19
     },
     --Not accurate
     ['ber_10']    = {
@@ -64,15 +61,15 @@ local travel = {
     },
     ['clr_15']    = {
         ['gate']  = 0,
-        ['invis'] = 17
+        ['invis'] = 31
     },
     ['clr_20']    = {
         ['gate'] = 0,
-        ['invis'] = 12
+        ['invis'] = 27
     },
     ['clr_pre15'] = {
         ['gate']  = 0,
-        ['invis'] = 6
+        ['invis'] = 12
     },
     --Not accurate
     ['dru_10']    = {
@@ -191,8 +188,8 @@ local travel = {
     },
     --Not accurate
     ['pal_pre15'] = {
-        ['gate']  = 69,
-        ['invis'] = 420
+        ['gate']  = 11,
+        ['invis'] = 23
     },
     --Not accurate
     ['rng_10']    = {
@@ -219,10 +216,9 @@ local travel = {
         ['gate']  = 69,
         ['invis'] = 420
     },
-    --Not accurate
     ['rog_15']    = {
-        ['gate']  = 69,
-        ['invis'] = 420
+        ['gate']  = 71,
+        ['invis'] = 135
     },
     --Not accurate
     ['rog_20']    = {
@@ -238,22 +234,21 @@ local travel = {
         ['gate']  = 69,
         ['invis'] = 420
     },
-    --Not accurate
     ['shd_pre15'] = {
-        ['gate']  = 69,
-        ['invis'] = 420
+        ['gate']  = 5,
+        ['invis'] = 15
     },
     ['shd_15']    = {
-        ['gate']  = 19,
-        ['invis'] = 23
+        ['gate']  = 20,
+        ['invis'] = 31
     },
     ['shd_20']    = {
-        ['gate']  = 19,
+        ['gate']  = 8,
         ['invis'] = 23
     },
     ['shm_10']    = {
-        ['gate']  = 20,
-        ['invis'] = 23
+        ['gate']  = 19,
+        ['invis'] = 59
     },
     --Not accurate
     ['shm_pre15'] = {
@@ -262,11 +257,11 @@ local travel = {
     },
     ['shm_15']    = {
         ['gate']  = 24,
-        ['invis'] = 32
+        ['invis'] = 60
     },
     ['shm_20']    = {
-        ['gate']  = 16,
-        ['invis'] = 14
+        ['gate']  = 15,
+        ['invis'] = 32
     },
     --Not accurate
     ['war_10']    = {
