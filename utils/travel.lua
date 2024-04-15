@@ -285,6 +285,9 @@ function travel.invis(class_settings)
     if invis_type[class_settings.invis[mq.TLO.Me.Class()]] == 'Potion' then
         Logger.log_super_verbose("\aoUsing a cloudy potion.")
         mq.cmd('/squelch /useitem "Cloudy Potion"')
+    elseif invis_type[class_settings.invis[mq.TLO.Me.Class()]] == 'Circlet of Shadows' then
+        Logger.log_super_verbose("\aoUsing Circlet of Shadows.")
+        mq.cmd('/squelch /useitem "Circlet of Shadows"')
     elseif invis_type[class_settings.invis[mq.TLO.Me.Class()]] == 'Hide/Sneak' then
         Logger.log_super_verbose("\aoUsing hide/sneak.")
         while mq.TLO.Me.Invis() == false do
