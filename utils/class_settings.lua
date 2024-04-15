@@ -23,6 +23,13 @@ function class_settings.loadSettings()
                 class_settings['version'] = '0.1.5'
                 class_settings['class_invis']['Necromancer'] = "Cloak of Shadows|Potion|Circlet of Shadows"
                 class_settings['class_invis']['Shadow Knight'] = "Cloak of Shadows|Potion|Circlet of Shadows"
+                class_settings['move_speed'] = {
+                    ['Bard'] = "Selo's Sonata",
+                    ['Druid'] = "Communion of the Cheetah|Spirit of Eagles",
+                    ['Shaman'] = "Communion of the Cheetah",
+                    ['Ranger'] = 'Spirit of Eagles'
+                }
+                class_settings.saveSettings()
             end
         end
     end
@@ -92,6 +99,12 @@ function class_settings.createSettings()
             ['Perfected Invisibility']     = 3812,
             ['Cloak of Shadows']           = 531,
             ['Silent Presence']            = 3730
+        },
+        ['move_speed']   = {
+            ['Bard'] = "Selo's Sonata",
+            ['Druid'] = "Communion of the Cheetah|Spirit of Eagles",
+            ['Shaman'] = "Communion of the Cheetah",
+            ['Ranger'] = 'Spirit of Eagles'
         }
     }
     class_settings.saveSettings()
