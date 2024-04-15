@@ -69,6 +69,8 @@ function draw_gui.settingsTab(themeName, theme, themeID, class_settings, char_se
                 char_settings.SaveState.general.returnToBind)
             char_settings.SaveState.general.invisForTravel = ImGui.Checkbox("Invis When Travelling",
                 char_settings.SaveState.general.invisForTravel)
+            char_settings.SaveState.general.speedForTravel = ImGui.Checkbox("Use Travel Speed Skills",
+                char_settings.SaveState.general.speedForTravel)
             ImGui.PushItemWidth(120)
             char_settings.SaveState.general.xtargClear = ImGui.InputInt("Number of mobs to clear XTarget list.",
                 char_settings.SaveState.general.xtargClear)
