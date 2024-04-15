@@ -90,7 +90,7 @@ local quests_requirements = {
     },
     ['war'] = {
         ['10']    = '',
-        ['pre15'] = '',
+        ['pre15'] = 'Requires brewing 100.',
         ['15']    = '',
         ['20']    = '',
     },

@@ -45,6 +45,11 @@ local tradeskill_requirements = {
             ['Alchemy'] = 100,
         },
     },
+    ['war'] = {
+        ['pre15'] = {
+            ['Brewing'] = 100
+        }
+    }
 }
 
 return tradeskill_requirements
