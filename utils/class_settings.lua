@@ -19,13 +19,19 @@ function class_settings.loadSettings()
                 ['Silent Presence']            = 3730
             }
             class_settings.saveSettings()
+            if class_settings['version'] == nil then
+                class_settings['version'] = '0.1.5'
+                class_settings['class_invis']['Necromancer'] = "Cloak of Shadows|Potion|Circlet of Shadows"
+                class_settings['class_invis']['Shadow Knight'] = "Cloak of Shadows|Potion|Circlet of Shadows"
+            end
         end
     end
 end
 
 function class_settings.createSettings()
     class_settings.settings = {
-        ['class'] = {
+        ['version']      = "0.1.5",
+        ['class']        = {
             ['Bard'] = 2,
             ['Beastlord'] = 1,
             ['Berserker'] = 1,
@@ -43,7 +49,7 @@ function class_settings.createSettings()
             ['Warrior'] = 1,
             ['Wizard'] = 2
         },
-        ['invis'] = {
+        ['invis']        = {
             ['Bard']          = 1,
             ['Beastlord']     = 1,
             ['Berserker']     = 1,
@@ -61,7 +67,7 @@ function class_settings.createSettings()
             ['Warrior']       = 1,
             ['Wizard']        = 1
         },
-        ['class_invis'] = {
+        ['class_invis']  = {
             ['Bard']          = "Shauri's Sonorous Clouding|Potion",
             ['Beastlord']     = "Natural Invisibility|Potion",
             ['Berserker']     = "Potion",
@@ -70,11 +76,11 @@ function class_settings.createSettings()
             ['Enchanter']     = "Perfected Invisibility|Potion",
             ['Magician']      = "Perfected Invisibility|Potion",
             ['Monk']          = "Potion",
-            ['Necromancer']   = "Cloak of Shadows|Potion",
+            ['Necromancer']   = "Cloak of Shadows|Potion|Circlet of Shadows",
             ['Paladin']       = "Potion",
             ['Ranger']        = "Innate Camouflage|Potion",
             ['Rogue']         = "Hide/Sneak|Potion",
-            ['Shadow Knight'] = "Cloak of Shadows|Potion",
+            ['Shadow Knight'] = "Cloak of Shadows|Potion|Circlet of Shadows",
             ['Shaman']        = "Silent Presence|Potion",
             ['Warrior']       = "Potion",
             ['Wizard']        = "Perfected Invisibility|Potion"
