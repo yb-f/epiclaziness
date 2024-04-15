@@ -680,6 +680,7 @@ local function displayGUI()
             local changed
             class_settings.settings.logger.LogLevel, changed = ImGui.Combo("Debug Levels", class_settings.settings.logger.LogLevel, LogLevels, #LogLevels)
             if changed then
+                Logger.set_log_level(class_settings.settings.logger.LogLevel)
                 class_settings.saveSettings()
             end
 
