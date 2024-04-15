@@ -826,7 +826,6 @@ function travel.zone_travel(item, class_settings, char_settings, continue)
         end
         if char_settings.general.speedForTravel == true then
             local speedChar, speedSkill = travel.speedCheck(class_settings, char_settings)
-            print(speedChar)
             if speedChar ~= 'none' then
                 travel.navPause()
                 travel.doSpeed(speedChar, speedSkill)
