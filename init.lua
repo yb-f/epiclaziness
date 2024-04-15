@@ -140,6 +140,10 @@ if loadsave.SaveState['general'] == nil then
     }
     loadsave.saveState()
 end
+if loadsave.SaveState.general['speedForTravel'] == nil then
+    loadsave.SaveState.general['speedForTravel'] = true
+    loadsave.saveState()
+end
 
 local function step_overview()
     task_outline_table = {}
