@@ -21,20 +21,26 @@ function class_settings.loadSettings()
             class_settings.saveSettings()
         end
         if class_settings.settings['version'] == nil then
-            class_settings.settings['version'] = '0.1.5'
-            class_settings.settings['class_invis']['Necromancer'] = "Cloak of Shadows|Potion|Circlet of Shadows"
+            class_settings.settings['version']                      = '0.1.5'
+            class_settings.settings['class_invis']['Necromancer']   = "Cloak of Shadows|Potion|Circlet of Shadows"
             class_settings.settings['class_invis']['Shadow Knight'] = "Cloak of Shadows|Potion|Circlet of Shadows"
-            class_settings.settings['move_speed'] = {
-                ['Bard'] = "Selo's Sonata|None",
-                ['Druid'] = "Communion of the Cheetah|Spirit of Eagles|None",
+            class_settings.settings['move_speed']                   = {
+                ['Bard']   = "Selo's Sonata|None",
+                ['Druid']  = "Communion of the Cheetah|Spirit of Eagles|None",
                 ['Shaman'] = "Communion of the Cheetah|None",
                 ['Ranger'] = 'Spirit of Eagles|None'
             }
-            class_settings.settings['speed'] = {
-                ['Druid'] = 1,
+            class_settings.settings['speed']                        = {
+                ['Druid']  = 1,
                 ['Ranger'] = 1,
                 ['Shaman'] = 1,
-                ['Bard'] = 1,
+                ['Bard']   = 1,
+            }
+            class_settings.settings['speed_to_num']                 = {
+                ['Spirit of Eagles(Druid)']  = 8601,
+                ['Spirit of Eagles(Ranger)'] = 8600,
+                ['Communion of the Cheetah'] = 939,
+                ["Selo's Sonata"]            = 3704,
             }
             class_settings.saveSettings()
         end
