@@ -550,56 +550,47 @@ function travel.portal_set(item)
     end
 end
 
+--- @return string
+function travel.findReadyRelocate()
+    if mq.TLO.Me.AltAbilityReady("Gate")() then
+        return 'gate'
+    end
+    if mq.TLO.FindItem("=Drunkard's Stein").Timer() == 0 then
+        return 'pok'
+    end
+    if mq.TLO.Me.AltAbilityReady("Throne of Heroes")() then
+        return 'lobby'
+    end
+    if mq.TLO.Me.AltAbilityReady("Origin")() then
+        return 'origin'
+    end
+    if mq.TLO.FindItem("=Philter of Major Transloation")() then
+        return 'gate'
+    end
+    return 'none'
+end
+
 function travel.relocate(item, class_settings, char_settings)
     if Mob.xtargetCheck(char_settings) then
         Mob.clearXtarget(class_settings, char_settings)
     end
-    State.status = "Relocating to " .. item.what
-    Logger.log_info("\aoRelocating to \ag%s\ao.", item.what)
-    if item.what == 'lobby' then
-        if mq.TLO.Me.AltAbilityReady('Throne of Heroes')() == false then
-            Logger.log_info("\aoWaiting for Throne of Heroes AA to be ready.")
-            while mq.TLO.Me.AltAbilityReady('Throne of Heroes')() == false do
-                State.status = 'Waiting for Throne of Heroes AA to be ready'
-                if State.skip == true then
-                    State.skip = false
-                    return
-                end
-                mq.delay(200)
-                if Mob.xtargetCheck(char_settings) then
-                    Mob.clearXtarget(class_settings, char_settings)
-                end
-                if State.pause == true then
-                    Actions.pause(State.status)
-                end
-            end
-        end
-    elseif item.what == 'origin' then
-        if mq.TLO.Me.AltAbilityReady('Origin')() == false then
-            State.status = 'Waiting for Origin AA to be ready'
-            Logger.log_info("\aoWaiting for Origin AA to be ready.")
-            while mq.TLO.Me.AltAbilityReady('Origin')() == false do
-                if State.skip == true then
-                    State.skip = false
-                    return
-                end
-                mq.delay(200)
-                if Mob.xtargetCheck(char_settings) then
-                    Mob.clearXtarget(class_settings, char_settings)
-                end
-                if State.pause == true then
-                    Actions.pause(State.status)
-                end
-            end
-        end
+    State.status = "Searching for relocation ability/item that is ready."
+    Logger.log_info("\aoSearching for a relocation ability/item that is ready.")
+    local relocate = 'none'
+    relocate = travel.findReadyRelocate()
+    while relocate == 'none' do
+        mq.delay("3s")
+        relocate = travel.findReadyRelocate()
     end
+    State.status = "Relocating to " .. relocate
+    Logger.log_info("\aoRelocating to \ag%s\ao.", relocate)
     if State.group_choice == 1 then
-        mq.cmdf('/squelch /relocate %s', item.what)
+        mq.cmdf('/squelch /relocate %s', relocate)
     elseif State.group_choice == 2 then
-        mq.cmdf('/dgga /squelch /relocate %s', item.what)
+        mq.cmdf('/dgga /squelch /relocate %s', relocate)
     else
-        mq.cmdf('/squelch /relocate %s', item.what)
-        mq.cmdf('/dex %s /squelch /relocate %s', State.group_combo[State.group_choice], item.what)
+        mq.cmdf('/squelch /relocate %s', relocate)
+        mq.cmdf('/dex %s /squelch /relocate %s', State.group_combo[State.group_choice], relocate)
     end
     while mq.TLO.Me.Casting() == nil do
         mq.delay(10)
