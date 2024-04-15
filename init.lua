@@ -38,12 +38,10 @@ local task_outline_table   = {}
 local running              = true
 local start_run            = false
 local stop_at_save         = false
-local class_list_choice    = 1
 local changed              = false
 local myClass              = mq.TLO.Me.Class()
 local exclude_list         = {}
 local exclude_name         = ''
-local changed              = false
 local overview_steps       = {}
 local LogLevels            = {
     "Errors",
@@ -85,13 +83,6 @@ local function loadTheme()
         end
     end
 end
-
-local class_list          = { 'Bard', 'Beastlord', 'Berserker', 'Cleric', 'Druid', 'Enchanter', 'Magician', 'Monk', 'Necromancer',
-    'Paladin', 'Ranger', 'Rogue', 'Shadow Knight', 'Shaman', 'Warrior', 'Wizard' }
-
-local automation_list     = { 'CWTN', 'RGMercs (Lua)', 'RGMercs (Macro)', 'KissAssist', 'MuleAssist' }
-
-local invis_type          = {}
 
 State                     = {}
 
@@ -631,77 +622,7 @@ local function displayGUI()
             ImGui.TextWrapped(State.reqs)
             ImGui.EndTabItem()
         end
-        if ImGui.BeginTabItem("Settings") then
-            ImGui.BeginChild("##SettingsChild")
-            if ImGui.CollapsingHeader('General Settings') then
-                ImGui.Text("Cur Theme: %s", themeName)
-                -- Combo Box Load Theme
-                ImGui.PushItemWidth(120)
-                if ImGui.BeginCombo("Load Theme##Waypoints", themeName) then
-                    --ImGui.SetWindowFontScale(ZoomLvl)
-                    for k, data in pairs(theme.Theme) do
-                        local isSelected = data.Name == themeName
-                        if ImGui.Selectable(data.Name, isSelected) then
-                            theme.LoadTheme = data.Name
-                            themeName = theme.LoadTheme
-                            themeID = k
-                            class_settings.settings.LoadTheme = theme.LoadTheme
-                        end
-                    end
-                    ImGui.EndCombo()
-                end
-                ImGui.PopItemWidth()
-                loadsave.SaveState.general.stopTS = ImGui.Checkbox("Stop if tradeskill requirements are unmet",
-                    loadsave.SaveState.general.stopTS)
-                loadsave.SaveState.general.returnToBind = ImGui.Checkbox("Return to Bind Between Travel",
-                    loadsave.SaveState.general.returnToBind)
-                loadsave.SaveState.general.invisForTravel = ImGui.Checkbox("Invis When Travelling",
-                    loadsave.SaveState.general.invisForTravel)
-                ImGui.PushItemWidth(120)
-                loadsave.SaveState.general.xtargClear = ImGui.InputInt("Number of mobs to clear XTarget list.",
-                    loadsave.SaveState.general.xtargClear)
-                ImGui.PopItemWidth()
-                if ImGui.Button("Save") then
-                    loadsave.saveState()
-                    class_settings.saveSettings()
-                end
-            end
-            if ImGui.CollapsingHeader('Class Settings') then
-                ImGui.BeginTable("##Class_Settings", 2, ImGuiTableFlags.Borders)
-                ImGui.TableSetupColumn("##Class_List", ImGuiTableColumnFlags.WidthFixed, 120)
-                ImGui.TableSetupColumn("##Class_Setting", ImGuiTableColumnFlags.None)
-                ImGui.TableNextRow()
-                ImGui.TableNextColumn()
-                ImGui.PushItemWidth(120)
-                ImGui.PushStyleColor(ImGuiCol.FrameBg, IM_COL32(0, 0, 0, 255))
-                class_list_choice = ImGui.ListBox("##classlist", class_list_choice, class_list, #class_list, #class_list)
-                ImGui.PopItemWidth()
-                ImGui.PopStyleColor()
-                ImGui.TableNextColumn()
-                local width = ImGui.GetColumnWidth()
-                local text_width = ImGui.CalcTextSize(class_list[class_list_choice])
-                ImGui.SetCursorPosX((width - text_width))
-                ImGui.Text(class_list[class_list_choice])
-                class_settings.settings.class[class_list[class_list_choice]], changed = ImGui.Combo('##AutomationType',
-                    class_settings.settings.class[class_list[class_list_choice]], automation_list, #automation_list,
-                    #automation_list)
-                invis_type = {}
-                for word in string.gmatch(class_settings.settings.class_invis[class_list[class_list_choice]], '([^|]+)') do
-                    table.insert(invis_type, word)
-                end
-                ImGui.PushItemWidth(230)
-                class_settings.settings.invis[class_list[class_list_choice]], changed = ImGui.Combo('##InvisType',
-                    class_settings.settings.invis[class_list[class_list_choice]], invis_type, #invis_type,
-                    #invis_type)
-                if changed then
-                    changed = false
-                    class_settings.saveSettings()
-                end
-                ImGui.EndTable()
-            end
-            ImGui.EndChild()
-            ImGui.EndTabItem()
-        end
+        theme.LoadTheme, themeName, themeID, class_settings.settings.LoadTheme = draw_gui.settingsTab(themeName, theme, themeID, class_settings, loadsave)
         if ImGui.BeginTabItem("Outline") then
             ImGui.BeginTable('##outlinetable', 3, treeview_table_flags)
             ImGui.TableSetupColumn("Manual Completion", bit32.bor(ImGuiTableColumnFlags.NoResize), 30)
