@@ -5,6 +5,8 @@ local translocators = { "Magus", "Translocator", "Priest of Discord", "Nexus Sci
 
 local dist          = require 'utils/distance'
 
+local speed_classes = { "Bard", "Druid", "Ranger", "Shaman" }
+local speed_buffs   = { "Selo's Accelerato", "Communion of the Cheetah", "Spirit of Falcons", "Flight of Falcons" }
 local travel        = {}
 
 function travel.invisTranslocatorCheck()
@@ -52,6 +54,14 @@ function travel.face_loc(item)
 end
 
 function travel.forward_zone(item, class_settings, char_settings)
+    if char_settings.general.speedForTravel == true then
+        local speedChar, speedSkill = travel.speedCheck(class_settings, char_settings)
+        if speedChar ~= 'none' then
+            travel.navPause()
+            travel.doSpeed(speedChar, speedSkill)
+            travel.navUnpause(item)
+        end
+    end
     if travel.invisCheck(char_settings, item.invis) then
         travel.invis(class_settings)
     end
@@ -102,6 +112,14 @@ function travel.no_nav_travel(item, class_settings, char_settings)
     local x = item.whereX
     local y = item.whereY
     local z = item.whereZ
+    if char_settings.general.speedForTravel == true then
+        local speedChar, speedSkill = travel.speedCheck(class_settings, char_settings)
+        if speedChar ~= 'none' then
+            travel.navPause()
+            travel.doSpeed(speedChar, speedSkill)
+            travel.navUnpause(item)
+        end
+    end
     if travel.invisCheck(char_settings, item.invis) then
         travel.invis(class_settings)
     end
@@ -194,6 +212,14 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
             Actions.pause(State.status)
             travel.navUnpause(item)
         end
+        if char_settings.general.speedForTravel == true then
+            local speedChar, speedSkill = travel.speedCheck(class_settings, char_settings)
+            if speedChar ~= 'none' then
+                travel.navPause()
+                travel.doSpeed(speedChar, speedSkill)
+                travel.navUnpause(item)
+            end
+        end
         if travel.invisCheck(char_settings, item.invis) then
             travel.navPause()
             travel.invis(class_settings)
@@ -235,6 +261,14 @@ end
 
 function travel.general_travel(item, class_settings, char_settings, ID)
     ID = ID or Mob.findNearestName(item.npc)
+    if char_settings.general.speedForTravel == true then
+        local speedChar, speedSkill = travel.speedCheck(class_settings, char_settings)
+        if speedChar ~= 'none' then
+            travel.navPause()
+            travel.doSpeed(speedChar, speedSkill)
+            travel.navUnpause(item)
+        end
+    end
     if travel.invisCheck(char_settings, item.invis) then
         travel.invis(class_settings)
     end
@@ -377,6 +411,127 @@ function travel.invisCheck(char_settings, invis)
     return false
 end
 
+function travel.gotSpeedyClass(class, class_settings)
+    for i, speedy in pairs(speed_classes) do
+        if class == speedy then
+            local speed_type = {}
+            for word in string.gmatch(class_settings.move_speed[class], '([^|]+)') do
+                table.insert(speed_type, word)
+            end
+            local speed_skill = speed_type[class_settings.speed[class]]
+            if speed_skill == 'None' then
+                return false
+            else
+                return true
+            end
+        end
+    end
+    return false
+end
+
+function travel.speedCheck(class_settings, char_settings)
+    Logger.log_super_verbose("\aoChecking if we are missing travel speed buff.")
+    for i, buff in pairs(speed_buffs) do
+        if mq.TLO.Me.Buff(buff)() then
+            Logger.log_super_verbose("\aoWe currently have a travel speed buff active: \ag%s\ao.", buff)
+            return 'none', 'none'
+        end
+    end
+    local amSpeedy = false
+    if State.group_choice == 1 then
+        local class = mq.TLO.Me.Class()
+        amSpeedy = travel.gotSpeedyClass(class, class_settings)
+        if amSpeedy == false then
+            Logger.log_verbose("\aoWe do not have a travel speed buff to cast.")
+            return 'none', 'none'
+        else
+            local speed_type = {}
+            for word in string.gmatch(class_settings.move_speed[class], '([^|]+)') do
+                table.insert(speed_type, word)
+            end
+            local speed_skill = speed_type[class_settings.speed[class]]
+            Logger.log_verbose("\agI \aocan cast \ag%s\ao.", speed_skill)
+            if speed_skill == 'Spirit of Eagles' then
+                if class == 'Ranger' then speed_skill = "Spirit of Eagles(Ranger)" end
+                if class == 'Druid' then speed_skill = "Spirit of Eagles(Druid)" end
+            end
+            local aaNum = class_settings['speed_to_num'][speed_skill]
+            return mq.TLO.Me.DisplayName(), aaNum
+        end
+    elseif State.group_choice == 2 then
+        for i = 0, mq.TLO.Group.GroupSize() - 1 do
+            local class = mq.TLO.Group.Member(i).Class()
+            amSpeedy = travel.gotSpeedyClass(class, class_settings)
+            if amSpeedy == true then
+                local speed_type = {}
+                for word in string.gmatch(class_settings.move_speed[class], '([^|]+)') do
+                    table.insert(speed_type, word)
+                end
+                if speed_type[class_settings.speed[class]] ~= 'none' then
+                    local speed_skill = speed_type[class_settings.speed[class]]
+                    Logger.log_verbose("\ag%s \aocan cast \ag%s\ao.", mq.TLO.Group.Member(i).DisplayName(), speed_skill)
+                    if speed_skill == 'Spirit of Eagles' then
+                        if class == 'Ranger' then speed_skill = "Spirit of Eagles(Ranger)" end
+                        if class == 'Druid' then speed_skill = "Spirit of Eagles(Druid)" end
+                    end
+                    local aaNum = class_settings['speed_to_num'][speed_skill]
+                    return mq.TLO.Group.Member(i).DisplayName(), aaNum
+                end
+            end
+        end
+        Logger.log_verbose("\aoWe do not have a travel speed buff to cast.")
+        return 'none', 'none'
+    else
+        local class = mq.TLO.Me.Class()
+        amSpeedy = travel.gotSpeedyClass(class, class_settings)
+        if amSpeedy == true then
+            local speed_type = {}
+            for word in string.gmatch(class_settings.move_speed[class], '([^|]+)') do
+                table.insert(speed_type, word)
+            end
+            local speed_skill = speed_type[class_settings.speed[class]]
+            Logger.log_verbose("\agI \aocan cast \ag%s\ao.", speed_skill)
+            if speed_skill == 'Spirit of Eagles' then
+                if class == 'Ranger' then speed_skill = "Spirit of Eagles(Ranger)" end
+                if class == 'Druid' then speed_skill = "Spirit of Eagles(Druid)" end
+            end
+            local aaNum = class_settings['speed_to_num'][speed_skill]
+            return mq.TLO.Me.DisplayName(), aaNum
+        else
+            class = mq.TLO.Group.Member(State.group_combo[State.group_choice]).Class()
+            amSpeedy = travel.gotSpeedyClass(class, class_settings)
+            if amSpeedy == true then
+                local speed_type = {}
+                for word in string.gmatch(class_settings.move_speed[class], '([^|]+)') do
+                    table.insert(speed_type, word)
+                end
+                local speed_skill = speed_type[class_settings.speed[class]]
+                Logger.log_verbose("\ag%s \aocan cast \ag%s\ao.", mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName(), speed_skill)
+                if speed_skill == 'Spirit of Eagles' then
+                    if class == 'Ranger' then speed_skill = "Spirit of Eagles(Ranger)" end
+                    if class == 'Druid' then speed_skill = "Spirit of Eagles(Druid)" end
+                end
+                local aaNum = class_settings['speed_to_num'][speed_skill]
+                return mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName(), aaNum
+            else
+                Logger.log_verbose("\aoWe do not have a travel speed buff to cast.")
+                return 'none', 'none'
+            end
+        end
+    end
+end
+
+function travel.doSpeed(name, aaNum)
+    if name == 'none' then return end
+    if name == mq.TLO.Me.DisplayName() then
+        Logger.log_verbose("\aoI am using my travel speed skill.")
+        mq.cmdf("/alt act %s", aaNum)
+    else
+        Logger.log_verbose("\aoHaving \ag%s use their travel speed skill.", name)
+        mq.cmdf("/dex %s /alt act %s", name, aaNum)
+    end
+end
+
 function travel.loc_travel(item, class_settings, char_settings)
     local x = item.whereX
     local y = item.whereY
@@ -458,6 +613,14 @@ function travel.npc_follow(item, class_settings, char_settings)
     if Mob.xtargetCheck(char_settings) then
         Mob.clearXtarget(class_settings, char_settings)
     end
+    if char_settings.general.speedForTravel == true then
+        local speedChar, speedSkill = travel.speedCheck(class_settings, char_settings)
+        if speedChar ~= 'none' then
+            travel.navPause()
+            travel.doSpeed(speedChar, speedSkill)
+            travel.navUnpause(item)
+        end
+    end
     if travel.invisCheck(char_settings, item.invis) then
         travel.invis(class_settings)
     end
@@ -529,6 +692,14 @@ function travel.npc_travel(item, class_settings, ignore_path_check, char_setting
     ignore_path_check = ignore_path_check or false
     if Mob.xtargetCheck(char_settings) then
         Mob.clearXtarget(class_settings, char_settings)
+    end
+    if char_settings.general.speedForTravel == true then
+        local speedChar, speedSkill = travel.speedCheck(class_settings, char_settings)
+        if speedChar ~= 'none' then
+            travel.navPause()
+            travel.doSpeed(speedChar, speedSkill)
+            travel.navUnpause(item)
+        end
     end
     if travel.invisCheck(char_settings, item.invis) then
         travel.invis(class_settings)
@@ -611,6 +782,14 @@ function travel.zone_travel(item, class_settings, char_settings, continue)
             mq.delay("15s")
         end
     end
+    if char_settings.general.speedForTravel == true then
+        local speedChar, speedSkill = travel.speedCheck(class_settings, char_settings)
+        if speedChar ~= 'none' then
+            travel.navPause()
+            travel.doSpeed(speedChar, speedSkill)
+            travel.navUnpause(item)
+        end
+    end
     if travel.invisCheck(char_settings, item.invis) then
         travel.navPause()
         travel.invis(class_settings)
@@ -644,6 +823,15 @@ function travel.zone_travel(item, class_settings, char_settings, continue)
             travel.navPause()
             Actions.pause(State.status)
             travel.navUnpause(item)
+        end
+        if char_settings.general.speedForTravel == true then
+            local speedChar, speedSkill = travel.speedCheck(class_settings, char_settings)
+            print(speedChar)
+            if speedChar ~= 'none' then
+                travel.navPause()
+                travel.doSpeed(speedChar, speedSkill)
+                travel.navUnpause(item)
+            end
         end
         if travel.invisCheck(char_settings, item.invis) then
             if travel.invisTranslocatorCheck() == false then
