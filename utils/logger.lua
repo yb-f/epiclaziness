@@ -36,7 +36,6 @@ end
 
 local function log(logLevel, output, ...)
     if currentLogLevel < logLevels[logLevel].level then return end
-
     local callerTracer = getCallStack()
 
     if (... ~= nil) then output = string.format(output, ...) end
