@@ -110,6 +110,7 @@ State.rewound             = false
 State.bad_IDs             = {}
 State.cannot_count        = 0
 State.traveling           = false
+State.autosize            = false
 
 class_settings.loadSettings()
 loadsave.loadState()
@@ -739,6 +740,14 @@ local function init()
             Logger.log_error("\aoPlease load it with the command \ar/plugin %s \aoand rerun this script.", plugin)
             mq.exit()
         end
+    end
+    if mq.TLO.Plugin('MQ2Autosize') == nil then
+        Logger.log_warn(
+        "\aoThe \agMQ2Autosize \aoplugin is not loaded. This is not required for the script to run, but may help if you are frequently becoming stuck while navigating.")
+        Logger.log_warn("\aoIf you would like the script to make use of it please run the command \ar/plugin autosize \aoand restart Epic Laziness.")
+        State.autosize = false
+    else
+        State.autosize = true
     end
 end
 
