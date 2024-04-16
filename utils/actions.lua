@@ -75,7 +75,7 @@ function Actions.cast_alt(item)
     Logger.log_info('\aoCasting alternate ability: %s (%s)', item.what, ID)
     mq.cmdf('/squelch /alt act %s', ID)
     mq.delay(200)
-    while mq.TLO.Me.Casting() ~= nil do
+    while mq.TLO.Me.Casting() ~= nil and mq.TLO.Me.Class() ~= "Bard" do
         mq.delay(100)
     end
     Logger.log_super_verbose('\aoFinished casting: %s (%s)', item.what, ID)
