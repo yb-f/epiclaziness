@@ -143,6 +143,10 @@ function inventory.enviro_combine_container(item)
     Logger.log_verbose("\aoClicking experiment button.")
     mq.TLO.Window("TradeskillWnd/COMBW_ExperimentButton").LeftMouseUp()
     mq.delay("1s")
+    while mq.TLO.Window("TradeskillWnd/COMBW_ExperimentButton").Open() do
+        mq.TLO.Window("TradeskillWnd/COMBW_ExperimentButton").LeftMouseUp()
+        mq.delay("1s")
+    end
 end
 
 function inventory.enviro_combine_item(item)
