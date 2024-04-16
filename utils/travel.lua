@@ -183,6 +183,9 @@ function travel.open_door()
     if mq.TLO.Switch.Distance() ~= nil then
         if mq.TLO.Switch.Distance() < 20 then
             mq.cmd('/squelch /click left door')
+            return true
+        else
+            return false
         end
     end
     mq.delay(1000)
