@@ -59,7 +59,7 @@ local quests_requirements = {
     },
     ['pal'] = {
         ['10']    = '',
-        ['pre15'] = 'No tradeskill or requirements for assistance from other classes.',
+        ['pre15'] = 'No tradeskill or requirements for assistance from other classes. You are required to be in a guild in order to use the guildhall portal to Plane of Hate.',
         ['15']    = '100 Fishing required.  Shaman with 224 Alchemy required for Mist of the Breathless.',
         ['20']    = ''
     },
@@ -78,14 +78,14 @@ local quests_requirements = {
     },
     ['shd'] = {
         ['10']    = '',
-        ['pre15'] = 'No tradeskill or requirements for assistance from other classes.',
+        ['pre15'] = 'No tradeskill or requirements for assistance from other classes. You are required to be in a guild in order to use the guildhall portal to Plane of Hate.',
         ['15']    = 'Requires tailoring 100.',
         ['20']    = 'Requires manually obtaining a Globe of Discordant Energy.'
     },
     ['shm'] = {
         ['10']    = 'Requires a lockpicker for several steps in City of Mist',
         ['pre15'] = '',
-        ['15']    = 'Requires alchemy 100.',
+        ['15']    = 'Requires alchemy 100. You are required to be in a guild in order to use the guildhall portal to Plane of SKy.',
         ['20']    = 'Requires manually obtaining a Globe of Discordant Energy.'
     },
     ['war'] = {
