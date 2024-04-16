@@ -116,8 +116,8 @@ function draw_gui.settingsTab(themeName, theme, themeID, class_settings, char_se
                 for word in string.gmatch(class_settings.settings.move_speed[class_list[class_list_choice]], '([^|]+)') do
                     table.insert(speed_type, word)
                 end
-                class_settings.settings.speed[class_list[class_list_choice]], changed = ImGui.Combo('##SpeedType',
-                    class_settings.settings.speed[class_list[class_list_choice]], speed_type, #speed_type, #speed_type)
+                class_settings.settings.speed[class_list[class_list_choice]], changed = ImGui.Combo('##SpeedType', class_settings.settings.speed[class_list[class_list_choice]],
+                    speed_type, #speed_type, #speed_type)
                 if changed then
                     changed = false
                     class_settings.saveSettings()
