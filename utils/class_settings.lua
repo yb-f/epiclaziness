@@ -45,6 +45,15 @@ function class_settings.loadSettings()
             class_settings.saveSettings()
         end
     end
+    if class_settings.settings['speed'] == nil then
+        class_settings.settings['speed'] = {
+            ['Druid']  = 1,
+            ['Ranger'] = 1,
+            ['Shaman'] = 1,
+            ['Bard']   = 1,
+        }
+        class_settings.saveSettings()
+    end
 end
 
 function class_settings.createSettings()
@@ -117,6 +126,12 @@ function class_settings.createSettings()
             ['Druid'] = "Communion of the Cheetah|Spirit of Eagles",
             ['Shaman'] = "Communion of the Cheetah",
             ['Ranger'] = 'Spirit of Eagles'
+        },
+        ['speed']        = {
+            ['Druid']  = 1,
+            ['Ranger'] = 1,
+            ['Shaman'] = 1,
+            ['Bard']   = 1,
         }
     }
     class_settings.saveSettings()
