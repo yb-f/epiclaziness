@@ -470,6 +470,8 @@ local function run_epic(class, choice)
             Actions.start_adventure(task_table[State.step])
         elseif task_table[State.step].type == "SEND_YES" then
             manage.sendYes()
+        elseif task_table[State.step].type == "SNEAK" then
+            Actions.sneak()
         elseif task_table[State.step].type == "WAIT" then
             State.status = "Pausing for " .. task_table[State.step].what / 1000 .. " seconds"
             Actions.wait(task_table[State.step], class_settings.settings, loadsave.SaveState)

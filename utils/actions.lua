@@ -841,6 +841,17 @@ function Actions.rog_gamble(item)
     gamble_done = false
 end
 
+function Actions.sneak()
+    if mq.TLO.Me.Sneaking() == false then
+        while mq.TLO.Me.Sneaking() == false do
+            mq.delay(100)
+            if mq.TLO.Me.AbilityReady('Sneak')() == true then
+                mq.cmd("/squelch /doability sneak")
+            end
+        end
+    end
+end
+
 function Actions.start_adventure(item)
     if mq.TLO.Me.Grouped() == false then
         Logger.log_error("\aoYou must be in a group with 3 members to request an LDON adventure.")
