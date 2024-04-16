@@ -774,6 +774,16 @@ function travel.relocate(item, class_settings, char_settings)
     while mq.TLO.Me.Casting() == nil do
         loopCount = loopCount + 1
         mq.delay(10)
+        if State.skip == true then
+            travel.navPause()
+            State.skip = false
+            return
+        end
+        if State.pause == true then
+            travel.navPause()
+            Actions.pause(State.status)
+            travel.navUnpause(item)
+        end
         if loopCount >= 200 then
             Logger.log_warn("\aoSpent 2 seconds waiting for relocate to \ar%s \ao to cast. Moving on.", relocate)
             break
@@ -783,6 +793,16 @@ function travel.relocate(item, class_settings, char_settings)
     while mq.TLO.Me.Casting() ~= nil do
         loopCount = loopCount + 1
         mq.delay(500)
+        if State.skip == true then
+            travel.navPause()
+            State.skip = false
+            return
+        end
+        if State.pause == true then
+            travel.navPause()
+            Actions.pause(State.status)
+            travel.navUnpause(item)
+        end
         if loopCount >= 33 then
             Logger.log_warn("\aoSpent 16 seconds waiting for relocate to \ar%s \ao to finish casting. Moving on.", relocate)
             break
