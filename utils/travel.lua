@@ -183,12 +183,11 @@ function travel.open_door()
     if mq.TLO.Switch.Distance() ~= nil then
         if mq.TLO.Switch.Distance() < 20 then
             mq.cmd('/squelch /click left door')
+            mq.delay(1000)
             return true
-        else
-            return false
         end
     end
-    mq.delay(1000)
+    return false
 end
 
 function travel.travelLoop(item, class_settings, char_settings, ID)
@@ -233,7 +232,22 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
                 return
             end
             local temp = State.status
-            travel.open_door()
+            local door = travel.open_door()
+            if door == false and State.autosize == true then
+                if State.autosize_self == false then
+                    mq.cmd('/autosize self')
+                    State.autosize_self = true
+                end
+                if State.autosize_on == false then
+                    mq.cmd('/squelch /autosize on')
+                    State.autosize_on = true
+                    mq.cmdf('/squelch /autosize sizeself %s', State.autosize_sizes[State.autosize_choice])
+                else
+                    State.autosize_choice = State.autosize_choice + 1
+                    if State.autosize_choice == 6 then State.autosize_choice = 1 end
+                    mq.cmdf('/squelch /autosize sizeself %s', State.autosize_sizes[State.autosize_choice])
+                end
+            end
             loopCount = 0
             State.status = temp
         end
@@ -244,6 +258,10 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
             State.Y = mq.TLO.Me.Y()
             State.Z = mq.TLO.Me.Z()
             loopCount = 0
+            if State.autosize_on == true then
+                State.autosize_on = false
+                mq.cmd('/squelch /autosize off')
+            end
         end
     end
     if ID ~= 0 then
