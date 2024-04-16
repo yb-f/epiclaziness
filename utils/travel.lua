@@ -278,6 +278,8 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
     end
     Logger.log_verbose("\aoWe have reached our destination.")
     State.traveling = false
+    State.autosize_on = false
+    mq.cmd('/squelch /autosize off')
 end
 
 function travel.general_travel(item, class_settings, char_settings, ID)
@@ -869,6 +871,9 @@ function travel.zone_travel(item, class_settings, char_settings, continue)
         mq.cmdf('/dex %s /squelch /travelto %s', State.group_combo[State.group_choice], item.zone)
     end
     local loopCount = 0
+    State.X = mq.TLO.Me.X()
+    State.Y = mq.TLO.Me.Y()
+    State.Z = mq.TLO.Me.Z()
     while mq.TLO.Zone.ShortName() ~= item.zone and mq.TLO.Zone.Name() ~= item.zone do
         if mq.TLO.Navigation.Paused() == true then
             travel.navUnpause(item)
@@ -923,6 +928,43 @@ function travel.zone_travel(item, class_settings, char_settings, continue)
                 end
             end
             loopCount = loopCount + 1
+        else
+            if loopCount == 10 then
+                if item.radius == 1 then
+                    return
+                end
+                local temp = State.status
+                local door = travel.open_door()
+                if door == false and State.autosize == true then
+                    if State.autosize_self == false then
+                        mq.cmd('/autosize self')
+                        State.autosize_self = true
+                    end
+                    if State.autosize_on == false then
+                        mq.cmd('/squelch /autosize on')
+                        State.autosize_on = true
+                        mq.cmdf('/squelch /autosize sizeself %s', State.autosize_sizes[State.autosize_choice])
+                    else
+                        State.autosize_choice = State.autosize_choice + 1
+                        if State.autosize_choice == 6 then State.autosize_choice = 1 end
+                        mq.cmdf('/squelch /autosize sizeself %s', State.autosize_sizes[State.autosize_choice])
+                    end
+                end
+                loopCount = 0
+                State.status = temp
+            end
+            if dist.GetDistance3D(mq.TLO.Me.X(), mq.TLO.Me.Y(), mq.TLO.Me.Z(), State.X, State.Y, State.Z) < 20 then
+                loopCount = loopCount + 1
+            else
+                State.X = mq.TLO.Me.X()
+                State.Y = mq.TLO.Me.Y()
+                State.Z = mq.TLO.Me.Z()
+                loopCount = 0
+                if State.autosize_on == true then
+                    State.autosize_on = false
+                    mq.cmd('/squelch /autosize off')
+                end
+            end
         end
     end
     if State.group_choice == 2 then
