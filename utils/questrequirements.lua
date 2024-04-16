@@ -73,7 +73,7 @@ local quests_requirements = {
         ['10']    = '',
         ['pre15'] = 'No tradeskill or requirements for assistance from other classes.',
         ['15']    =
-        'Requires baking 192, tailoring 82, blacksmithing 104, jewelry making 12, make poison 277, and brewing 121.',
+        'Requires baking 192, tailoring 82, blacksmithing 104, jewelry making 12, make poison 277, and brewing 121. Please make sure your food and drink are in your topmost slots so as to not eat or drink items for this quest.',
         ['20']    = ''
     },
     ['shd'] = {
