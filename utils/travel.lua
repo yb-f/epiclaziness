@@ -745,6 +745,7 @@ function travel.findReadyRelocate()
 end
 
 function travel.relocate(item, class_settings, char_settings)
+    local currentZone = mq.TLO.Zone.Name()
     if Mob.xtargetCheck(char_settings) then
         Mob.clearXtarget(class_settings, char_settings)
     end
@@ -766,11 +767,32 @@ function travel.relocate(item, class_settings, char_settings)
         mq.cmdf('/squelch /relocate %s', relocate)
         mq.cmdf('/dex %s /squelch /relocate %s', State.group_combo[State.group_choice], relocate)
     end
-    while mq.TLO.Me.Casting() == nil do
-        mq.delay(10)
+    if Mob.xtargetCheck(char_settings) then
+        Mob.clearXtarget(class_settings, char_settings)
     end
+    local loopCount = 0
+    while mq.TLO.Me.Casting() == nil do
+        loopCount = loopCount + 1
+        mq.delay(10)
+        if loopCount >= 200 then
+            Logger.log_warn("\aoSpent 2 seconds waiting for relocate to \ar%s \ao to cast. Moving on.", relocate)
+            break
+        end
+    end
+    loopCount = 0
     while mq.TLO.Me.Casting() ~= nil do
+        loopCount = loopCount + 1
         mq.delay(500)
+        if loopCount >= 33 then
+            Logger.log_warn("\aoSpent 16 seconds waiting for relocate to \ar%s \ao to finish casting. Moving on.", relocate)
+            break
+        end
+    end
+    if currentZone == mq.TLO.Zone.Name() then
+        Logger.log_warn("\aoWe are still in \ag%s \aoattempting to relocate again.", currentZone)
+        State.rewound = true
+        State.step = State.step
+        return
     end
 end
 
