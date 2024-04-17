@@ -91,6 +91,7 @@ State.bind_travel         = false
 State.task_run            = false
 State.step                = 0
 State.status              = ''
+State.status2             = ''
 State.reqs                = ''
 State.bagslot1            = 0
 State.bagslot2            = 0
@@ -281,6 +282,14 @@ local function check_tradeskills(class, choice)
     end
 end
 
+local function update_general_status()
+    for i = 1, #task_outline_table do
+        if task_outline_table[i].Step == State.step then
+            State.status2 = task_outline_table[i].Description
+        end
+    end
+end
+
 local function run_epic(class, choice)
     task_table = {}
     local tablename = ''
@@ -324,6 +333,7 @@ local function run_epic(class, choice)
     mq.delay("5s")
     manage.pauseGroup(class_settings.settings)
     while State.step < #task_table do
+        update_general_status()
         State.cannot_count = 0
         while State.pause == true do
             State.status = "Paused"
@@ -712,15 +722,16 @@ end
 
 local function version_check()
     local response = http.request(version_url)
+    print(response)
     local version_table = {}
     local response_table = {}
     local new_version_available = false
     response = string.gsub(response, "\n", "")
     for word in string.gmatch(version, '([^.]+)') do
-        table.insert(version_table, word)
+        table.insert(version_table, tonumber(word))
     end
     for word in string.gmatch(response, '([^.]+)') do
-        table.insert(response_table, word)
+        table.insert(response_table, tonumber(word))
     end
     for i = 1, 3 do
         if response_table[i] > version_table[i] then
