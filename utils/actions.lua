@@ -188,6 +188,7 @@ function Actions.farm_radius(item, class_settings, char_settings)
     for word in string.gmatch(item.what, '([^|]+)') do
         table.insert(item_list, word)
     end
+    manage.removeInvis()
     if item.count == nil then
         while looping do
             if State.skip == true then
