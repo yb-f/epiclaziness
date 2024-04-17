@@ -3,6 +3,8 @@ local mq              = require('mq')
 
 local actions         = {}
 
+actions.LogConsole    = nil
+
 local elHeaderStart   = "\ar[\agEpic Laziness"
 local elHeaderEnd     = "\ag]"
 
@@ -49,9 +51,9 @@ local function log(logLevel, output, ...)
         mq.cmd(string.format('/mqlog [%s:%s(%s)] <%s> %s', mq.TLO.Me.Name(), fileHeader, fileTracer, now, fileOutput))
     end
 
-    if LogConsole ~= nil then
+    if actions.LogConsole ~= nil then
         local consoleText = string.format('[%s] %s', logLevels[logLevel].header, output)
-        LogConsole:AppendText(consoleText)
+        actions.LogConsole:AppendText(consoleText)
     end
 
     printf('%s\aw:%s \aw<\at%s\aw> \aw(\ag%s%s-%s\aw) \aw(%s\aw)%s \ax%s', elHeaderStart, logLevels[logLevel].header, now, mq.TLO.Me.Class.ShortName(),

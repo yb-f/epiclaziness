@@ -1,5 +1,13 @@
 local mq                = require('mq')
 local ICONS             = require('mq.Icons')
+local LogLevels         = {
+    "Errors",
+    "Warnings",
+    "Info",
+    "Debug",
+    "Verbose",
+    "Super-Verbose",
+}
 
 local draw_gui          = {}
 local class_list_choice = 1
@@ -43,6 +51,28 @@ function draw_gui.full_outline_row(item)
     ImGui.TextWrapped(outlineText)
 end
 
+function draw_gui.consoleTab(class_settings)
+    if ImGui.BeginTabItem("Console") then
+        local changed
+        class_settings.settings.logger.LogLevel, changed = ImGui.Combo("Debug Levels", class_settings.settings.logger.LogLevel, LogLevels, #LogLevels)
+        if changed then
+            Logger.set_log_level(class_settings.settings.logger.LogLevel)
+            class_settings.saveSettings()
+        end
+
+        ImGui.SameLine()
+        class_settings.settings.logger.LogToFile, changed = draw_gui.RenderOptionToggle("##log_to_file", "Log to File", class_settings.settings.logger.LogToFile)
+        if changed then
+            class_settings.saveSettings()
+        end
+
+        local cur_x, cur_y = ImGui.GetCursorPos()
+        local contentSizeX, contentSizeY = ImGui.GetContentRegionAvail()
+        Logger.LogConsole:Render(ImVec2(contentSizeX, math.max(200, (contentSizeY - 10))))
+        ImGui.EndTabItem()
+    end
+end
+
 function draw_gui.settingsTab(themeName, theme, themeID, class_settings, char_settings)
     if ImGui.BeginTabItem("Settings") then
         ImGui.BeginChild("##SettingsChild")
@@ -69,7 +99,7 @@ function draw_gui.settingsTab(themeName, theme, themeID, class_settings, char_se
                 char_settings.SaveState.general.returnToBind)
             char_settings.SaveState.general.invisForTravel = draw_gui.RenderOptionToggle("##invis_setting", "Invis while traveling", char_settings.SaveState.general.invisForTravel)
             char_settings.SaveState.general.speedForTravel = draw_gui.RenderOptionToggle("##speed_setting", "Use travel speed skills", char_settings.SaveState.general
-            .speedForTravel)
+                .speedForTravel)
             ImGui.PushItemWidth(120)
             char_settings.SaveState.general.xtargClear = ImGui.InputInt("Number of mobs to clear XTarget list.",
                 char_settings.SaveState.general.xtargClear)

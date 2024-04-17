@@ -23,8 +23,6 @@ if not ok then
     PackageMan.Install('luasec')
 end
 
-LogConsole                 = nil
-
 local version_url          = 'https://raw.githubusercontent.com/yb-f/EL-Ver/master/latest_ver'
 local version              = "0.1.10"
 local window_flags         = bit32.bor(ImGuiWindowFlags.None)
@@ -43,21 +41,12 @@ local myClass              = mq.TLO.Me.Class()
 local exclude_list         = {}
 local exclude_name         = ''
 local overview_steps       = {}
-local LogLevels            = {
-    "Errors",
-    "Warnings",
-    "Info",
-    "Debug",
-    "Verbose",
-    "Super-Verbose",
-}
 
-
-local LoadTheme = require('lib.theme_loader')
-local themeFile = string.format('%s/MyThemeZ.lua', mq.configDir)
-local themeName = 'Default'
-local themeID   = 5
-local theme     = {}
+local LoadTheme            = require('lib.theme_loader')
+local themeFile            = string.format('%s/MyThemeZ.lua', mq.configDir)
+local themeName            = 'Default'
+local themeID              = 5
+local theme                = {}
 local function File_Exists(name)
     local f = io.open(name, "r")
     if f ~= nil then
@@ -543,10 +532,10 @@ local function displayGUI()
         mq.exit()
         return
     end
-    if LogConsole == nil then
-        LogConsole = ImGui.ConsoleWidget.new("##ELConsole")
-        LogConsole.maxBufferLines = 100
-        LogConsole.autoScroll = true
+    if Logger.LogConsole == nil then
+        Logger.LogConsole = ImGui.ConsoleWidget.new("##ELConsole")
+        Logger.LogConsole.maxBufferLines = 100
+        Logger.LogConsole.autoScroll = true
     end
     ImGui.SetNextWindowSize(ImVec2(415, 475), ImGuiCond.FirstUseEver)
     local ColorCount, StyleCount = LoadTheme.StartTheme(theme.Theme[themeID])
@@ -695,25 +684,8 @@ local function displayGUI()
                 ImGui.EndTabItem()
             end
         end
-        if ImGui.BeginTabItem("Console") then
-            local changed
-            class_settings.settings.logger.LogLevel, changed = ImGui.Combo("Debug Levels", class_settings.settings.logger.LogLevel, LogLevels, #LogLevels)
-            if changed then
-                Logger.set_log_level(class_settings.settings.logger.LogLevel)
-                class_settings.saveSettings()
-            end
+        draw_gui.consoleTab(class_settings)
 
-            ImGui.SameLine()
-            class_settings.settings.logger.LogToFile, changed = draw_gui.RenderOptionToggle("##log_to_file", "Log to File", class_settings.settings.logger.LogToFile)
-            if changed then
-                class_settings.saveSettings()
-            end
-
-            local cur_x, cur_y = ImGui.GetCursorPos()
-            local contentSizeX, contentSizeY = ImGui.GetContentRegionAvail()
-            LogConsole:Render(ImVec2(contentSizeX, math.max(200, (contentSizeY - 10))))
-            ImGui.EndTabItem()
-        end
         ImGui.EndTabBar()
     end
     LoadTheme.EndTheme(ColorCount, StyleCount)
