@@ -22,7 +22,7 @@ if not ok then
 end
 
 local version_url        = 'https://raw.githubusercontent.com/yb-f/EL-Ver/master/latest_ver'
-local version            = "0.1.10"
+local version            = "0.1.11"
 local window_flags       = bit32.bor(ImGuiWindowFlags.None)
 local openGUI, drawGUI   = true, true
 local myName             = mq.TLO.Me.DisplayName()
@@ -34,7 +34,6 @@ local running            = true
 local exclude_list       = {}
 local exclude_name       = ''
 local overview_steps     = {}
-
 local LoadTheme          = require('lib.theme_loader')
 local themeFile          = string.format('%s/MyThemeZ.lua', mq.configDir)
 local themeName          = 'Default'
