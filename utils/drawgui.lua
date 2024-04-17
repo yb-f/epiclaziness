@@ -1,6 +1,6 @@
-local mq                = require('mq')
-local ICONS             = require('mq.Icons')
-local LogLevels         = {
+local mq                   = require('mq')
+local ICONS                = require('mq.Icons')
+local LogLevels            = {
     "Errors",
     "Warnings",
     "Info",
@@ -9,14 +9,14 @@ local LogLevels         = {
     "Super-Verbose",
 }
 
-local draw_gui          = {}
-local class_list_choice = 1
-local class_list        = { 'Bard', 'Beastlord', 'Berserker', 'Cleric', 'Druid', 'Enchanter', 'Magician', 'Monk', 'Necromancer', 'Paladin', 'Ranger', 'Rogue', 'Shadow Knight',
+local draw_gui             = {}
+local class_list_choice    = 1
+local class_list           = { 'Bard', 'Beastlord', 'Berserker', 'Cleric', 'Druid', 'Enchanter', 'Magician', 'Monk', 'Necromancer', 'Paladin', 'Ranger', 'Rogue', 'Shadow Knight',
     'Shaman', 'Warrior', 'Wizard' }
-local changed           = false
-local automation_list   = { 'CWTN', 'RGMercs (Lua)', 'RGMercs (Macro)', 'KissAssist', 'MuleAssist' }
-local invis_type        = {}
-
+local changed              = false
+local automation_list      = { 'CWTN', 'RGMercs (Lua)', 'RGMercs (Macro)', 'KissAssist', 'MuleAssist' }
+local invis_type           = {}
+local treeview_table_flags = bit32.bor(ImGuiTableFlags.Hideable, ImGuiTableFlags.RowBg, ImGuiTableFlags.Borders, ImGuiTableFlags.SizingFixedFit, ImGuiTableFlags.ScrollX)
 
 function draw_gui.full_outline_row(item)
     local step, outlineText = draw_gui.generate_outline_text(item)
@@ -69,6 +69,44 @@ function draw_gui.consoleTab(class_settings)
         local cur_x, cur_y = ImGui.GetCursorPos()
         local contentSizeX, contentSizeY = ImGui.GetContentRegionAvail()
         Logger.LogConsole:Render(ImVec2(contentSizeX, math.max(200, (contentSizeY - 10))))
+        ImGui.EndTabItem()
+    end
+end
+
+function draw_gui.outlineTab(task_outline_table, overview_steps, task_table)
+    if ImGui.BeginTabItem("Outline") then
+        ImGui.BeginTable('##outlinetable', 3, treeview_table_flags)
+        ImGui.TableSetupColumn("Manual Completion", bit32.bor(ImGuiTableColumnFlags.NoResize), 30)
+        ImGui.TableSetupColumn("Step", bit32.bor(ImGuiTableColumnFlags.NoResize), 30)
+        ImGui.TableSetupColumn("Description", bit32.bor(ImGuiTableColumnFlags.WidthStretch, ImGuiTableColumnFlags.NoResize), 100)
+        ImGui.TableSetupScrollFreeze(0, 1)
+        ImGui.TableHeadersRow()
+        for i = 1, #task_outline_table do
+            ImGui.TableNextRow()
+            ImGui.TableNextColumn()
+            overview_steps[task_outline_table[i].Step] = ImGui.Checkbox("##" .. i, overview_steps[task_outline_table[i].Step])
+            ImGui.TableNextColumn()
+            if ImGui.Selectable("##a" .. i, false, ImGuiSelectableFlags.None) then
+                State.rewound = true
+                State.skip = true
+                State.step = task_outline_table[i].Step
+                Logger.log_info('\aoSetting step to \ar%s', State.step)
+                Logger.log_verbose("\aoStep type: \ar%s", task_table[State.step].type)
+            end
+            ImGui.SameLine()
+            ImGui.TextColored(IM_COL32(0, 255, 0, 255), task_outline_table[i].Step)
+            ImGui.TableNextColumn()
+            if ImGui.Selectable("##b" .. i, false, ImGuiSelectableFlags.None) then
+                State.rewound = true
+                State.skip = true
+                State.step = task_outline_table[i].Step
+                Logger.log_info('\aoSetting step to \ar%s', State.step)
+                Logger.log_verbose("\aoStep type: \ar%s", task_table[State.step].type)
+            end
+            ImGui.SameLine()
+            ImGui.TextWrapped(task_outline_table[i].Description)
+        end
+        ImGui.EndTable()
         ImGui.EndTabItem()
     end
 end
