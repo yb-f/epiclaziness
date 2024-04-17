@@ -64,14 +64,12 @@ function draw_gui.settingsTab(themeName, theme, themeID, class_settings, char_se
                 ImGui.EndCombo()
             end
             ImGui.PopItemWidth()
-            char_settings.SaveState.general.stopTS = ImGui.Checkbox("Stop if tradeskill requirements are unmet",
-                char_settings.SaveState.general.stopTS)
-            char_settings.SaveState.general.returnToBind = ImGui.Checkbox("Return to Bind Between Travel",
+            char_settings.SaveState.general.stopTS = draw_gui.RenderOptionToggle("##ts_setting", "Stop if tradeskill requirements are unmet", char_settings.SaveState.general.stopTS)
+            char_settings.SaveState.general.returnToBind = draw_gui.RenderOptionToggle("##bind_setting", "Return to bind between travel steps",
                 char_settings.SaveState.general.returnToBind)
-            char_settings.SaveState.general.invisForTravel = ImGui.Checkbox("Invis When Travelling",
-                char_settings.SaveState.general.invisForTravel)
-            char_settings.SaveState.general.speedForTravel = ImGui.Checkbox("Use Travel Speed Skills",
-                char_settings.SaveState.general.speedForTravel)
+            char_settings.SaveState.general.invisForTravel = draw_gui.RenderOptionToggle("##invis_setting", "Invis while traveling", char_settings.SaveState.general.invisForTravel)
+            char_settings.SaveState.general.speedForTravel = draw_gui.RenderOptionToggle("##speed_setting", "Use travel speed skills", char_settings.SaveState.general
+            .speedForTravel)
             ImGui.PushItemWidth(120)
             char_settings.SaveState.general.xtargClear = ImGui.InputInt("Number of mobs to clear XTarget list.",
                 char_settings.SaveState.general.xtargClear)
