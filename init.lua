@@ -333,7 +333,6 @@ local function run_epic(class, choice)
     mq.delay("5s")
     manage.pauseGroup(class_settings.settings)
     while State.step < #task_table do
-        update_general_status()
         State.cannot_count = 0
         while State.pause == true do
             State.status = "Paused"
@@ -348,6 +347,7 @@ local function run_epic(class, choice)
         if mq.TLO.Me.Combat() == true then
             mq.cmd('/attack off')
         end
+        update_general_status()
         mq.doevents()
         if task_table[State.step].type == 'ADVENTURE_ENTRANCE' then
             Actions.adventure_entrance(task_table[State.step], class_settings.settings, loadsave.SaveState)
@@ -639,9 +639,9 @@ local function displayGUI()
             ImGui.SetCursorPosX(ImGui.GetCursorPosX() + (ImGui.GetWindowWidth() / 2) - 60)
             ImGui.Text("Step " .. tostring(State.step) .. " of " .. tostring(#task_table))
             ImGui.TextWrapped(State.status)
-            for i = 1, 3 do
-                ImGui.NewLine()
-            end
+            ImGui.NewLine()
+            ImGui.TextWrapped(State.status2)
+            ImGui.NewLine()
             ImGui.TextWrapped(State.reqs)
             ImGui.EndTabItem()
         end
@@ -722,7 +722,6 @@ end
 
 local function version_check()
     local response = http.request(version_url)
-    print(response)
     local version_table = {}
     local response_table = {}
     local new_version_available = false
