@@ -30,6 +30,7 @@ function draw_gui.full_outline_row(item)
     elseif step > State.step then
         color = IM_COL32(0, 255, 0, 255)
     end
+    --Logger.log_super_verbose("\aoProcessing step \ag%s\ao.", step)
     ImGui.TextColored(color, tostring(step))
     ImGui.TableNextColumn()
     if ImGui.Selectable("##d" .. step, false, ImGuiSelectableFlags.None) then
@@ -96,9 +97,11 @@ function draw_gui.settingsTab(themeName, theme, themeID, class_settings, char_se
             local text_width = ImGui.CalcTextSize(class_list[class_list_choice])
             ImGui.SetCursorPosX((width - text_width))
             ImGui.Text(class_list[class_list_choice])
+            ImGui.PushItemWidth(160)
             class_settings.settings.class[class_list[class_list_choice]], changed = ImGui.Combo('##AutomationType',
                 class_settings.settings.class[class_list[class_list_choice]], automation_list, #automation_list,
                 #automation_list)
+            ImGui.PopItemWidth()
             invis_type = {}
             for word in string.gmatch(class_settings.settings.class_invis[class_list[class_list_choice]], '([^|]+)') do
                 table.insert(invis_type, word)
