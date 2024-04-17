@@ -1,6 +1,5 @@
 local mq             = require('mq')
 local ImGui          = require 'ImGui'
-local ICONS          = require('mq.Icons')
 Logger               = require('utils/logger')
 local dist           = require 'utils/distance'
 Actions              = require 'utils/actions'
@@ -11,7 +10,6 @@ local travel         = require 'utils/travel'
 local manage         = require 'utils/manageautomation'
 local loadsave       = require 'utils/loadsave'
 local class_settings = require 'utils/class_settings'
-local invis_travel   = require 'utils/travelandinvis'
 local quests_done    = require 'utils/questsdone'
 local reqs           = require 'utils/questrequirements'
 local tsreqs         = require 'utils/tradeskillreqs'
@@ -23,30 +21,25 @@ if not ok then
     PackageMan.Install('luasec')
 end
 
-local version_url          = 'https://raw.githubusercontent.com/yb-f/EL-Ver/master/latest_ver'
-local version              = "0.1.10"
-local window_flags         = bit32.bor(ImGuiWindowFlags.None)
-local treeview_table_flags = bit32.bor(ImGuiTableFlags.Hideable, ImGuiTableFlags.RowBg, ImGuiTableFlags.Borders, ImGuiTableFlags.SizingFixedFit, ImGuiTableFlags.ScrollX)
-local openGUI, drawGUI     = true, true
-local myName               = mq.TLO.Me.DisplayName()
-local dbn                  = sqlite3.open(mq.luaDir .. '\\epiclaziness\\epiclaziness.db')
-local db_outline           = sqlite3.open(mq.luaDir .. '\\epiclaziness\\epiclaziness_outline.db')
-local task_table           = {}
-local task_outline_table   = {}
-local running              = true
-local start_run            = false
-local stop_at_save         = false
-local changed              = false
-local myClass              = mq.TLO.Me.Class()
-local exclude_list         = {}
-local exclude_name         = ''
-local overview_steps       = {}
+local version_url        = 'https://raw.githubusercontent.com/yb-f/EL-Ver/master/latest_ver'
+local version            = "0.1.10"
+local window_flags       = bit32.bor(ImGuiWindowFlags.None)
+local openGUI, drawGUI   = true, true
+local myName             = mq.TLO.Me.DisplayName()
+local dbn                = sqlite3.open(mq.luaDir .. '\\epiclaziness\\epiclaziness.db')
+local db_outline         = sqlite3.open(mq.luaDir .. '\\epiclaziness\\epiclaziness_outline.db')
+local task_table         = {}
+local task_outline_table = {}
+local running            = true
+local exclude_list       = {}
+local exclude_name       = ''
+local overview_steps     = {}
 
-local LoadTheme            = require('lib.theme_loader')
-local themeFile            = string.format('%s/MyThemeZ.lua', mq.configDir)
-local themeName            = 'Default'
-local themeID              = 5
-local theme                = {}
+local LoadTheme          = require('lib.theme_loader')
+local themeFile          = string.format('%s/MyThemeZ.lua', mq.configDir)
+local themeName          = 'Default'
+local themeID            = 5
+local theme              = {}
 local function File_Exists(name)
     local f = io.open(name, "r")
     if f ~= nil then
@@ -78,6 +71,8 @@ State                     = {}
 State.pause               = false
 State.bind_travel         = false
 State.task_run            = false
+State.start_run           = false
+State.stop_at_save        = false
 State.step                = 0
 State.status              = ''
 State.status2             = ''
@@ -140,7 +135,7 @@ if loadsave.SaveState.general['speedForTravel'] == nil then
     loadsave.saveState()
 end
 
-local function step_overview()
+function State.step_overview()
     task_outline_table = {}
     local class = string.lower(mq.TLO.Me.Class.ShortName())
     local choice = State.epic_choice
@@ -195,35 +190,7 @@ local function create_spawn_list()
     end
 end
 
-local function invis_needed(class, choice)
-    local class_epic = ''
-    if choice == 1 then
-        class_epic = string.lower(class) .. "_10"
-    elseif choice == 2 then
-        class_epic = string.lower(class) .. "_pre15"
-    elseif choice == 3 then
-        class_epic = string.lower(class) .. "_15"
-    elseif choice == 4 then
-        class_epic = string.lower(class) .. "_20"
-    end
-    return invis_travel[class_epic].invis
-end
-
-local function gate_needed(class, choice)
-    local class_epic = ''
-    if choice == 1 then
-        class_epic = string.lower(class) .. "_10"
-    elseif choice == 2 then
-        class_epic = string.lower(class) .. "_pre15"
-    elseif choice == 3 then
-        class_epic = string.lower(class) .. "_15"
-    elseif choice == 4 then
-        class_epic = string.lower(class) .. "_20"
-    end
-    return invis_travel[class_epic].gate
-end
-
-local function populate_group_combo()
+function State.populate_group_combo()
     State.group_combo = {}
     table.insert(State.group_combo, "None")
     if mq.TLO.Me.Grouped() == true then
@@ -503,11 +470,11 @@ local function run_epic(class, choice)
         if task_table[State.step].SaveStep == 1 then
             Logger.log_info("\aosaving step: \ar%s", State.step)
             loadsave.prepSave(State.step)
-            if stop_at_save then
+            if State.stop_at_save then
                 Logger.log_warn("\aoStopping at step \ar%s.", State.Step)
                 State.epicstring = ''
                 State.task_run = false
-                stop_at_save = false
+                State.stop_at_save = false
                 State.status = "Stopped at step " .. State.step
                 return
             end
@@ -542,98 +509,7 @@ local function displayGUI()
     openGUI, drawGUI = ImGui.Begin("Epic Laziness##" .. myName, openGUI, window_flags)
     if drawGUI then
         ImGui.BeginTabBar("##Tabs")
-        if ImGui.BeginTabItem("General") then
-            ImGui.Text("Class: " .. myClass .. " " .. State.epicstring)
-            if State.task_run == false then
-                State.epic_choice, changed = ImGui.Combo('##Combo', State.epic_choice, State.epic_list, #State.epic_list, #State.epic_list)
-                if ImGui.IsItemHovered() then
-                    ImGui.SetTooltip('Which epic to run.')
-                end
-                if changed == true then
-                    step_overview()
-                end
-            end
-            if mq.TLO.Me.Grouped() == true then
-                State.group_choice = ImGui.Combo('##Group_Combo', State.group_choice, State.group_combo)
-                if ImGui.IsItemHovered() then
-                    ImGui.SetTooltip('Who should come with you (None. Full group. Individual group member.)')
-                end
-                ImGui.SameLine()
-                if ImGui.SmallButton(ICONS.MD_REFRESH) then
-                    populate_group_combo()
-                end
-            end
-            if State.task_run == false then
-                if ImGui.Button("Begin") then
-                    start_run = true
-                end
-                if ImGui.IsItemHovered() then
-                    local invis_num = invis_needed(mq.TLO.Me.Class.ShortName(), State.epic_choice)
-                    local gate_num = gate_needed(mq.TLO.Me.Class.ShortName(), State.epic_choice)
-                    local tooltip = "Begin/resume epic quest\nThis may require at least " ..
-                        invis_num .. " invis potions.\nThis may require at least " .. gate_num .. " gate potions."
-                    ImGui.SetTooltip(tooltip)
-                end
-            end
-            if State.task_run == true then
-                if ImGui.SmallButton(ICONS.MD_FAST_REWIND) then
-                    State.skip = true
-                    State.rewound = true
-                    State.step = State.step - 1
-                    Logger.log_info("\aoMoving to previous step \ar%s", State.step)
-                    Logger.log_verbose("\aoStep type: \ar%s", task_table[State.step].type)
-                end
-                if ImGui.IsItemHovered() then
-                    ImGui.SetTooltip("Move to previous step.")
-                end
-                ImGui.SameLine()
-                if State.pause == false then
-                    if ImGui.SmallButton(ICONS.MD_PAUSE) then
-                        Logger.log_info("\aoPausing script.")
-                        State.pause = true
-                    end
-                    if ImGui.IsItemHovered() then
-                        ImGui.SetTooltip("Pause script.")
-                    end
-                else
-                    if ImGui.SmallButton(ICONS.FA_PLAY) then
-                        State.pause = false
-                        Logger.log_info("\aoResuming script.")
-                    end
-                    if ImGui.IsItemHovered() then
-                        ImGui.SetTooltip("Resume script.")
-                    end
-                end
-                ImGui.SameLine()
-                if ImGui.SmallButton(ICONS.MD_FAST_FORWARD) then
-                    State.skip = true
-                    State.step = State.step + 1
-                    State.rewound = true
-                    Logger.log_info("\aoMoving to next step \ar%s", State.step)
-                    Logger.log_verbose("\aoStep type: \ar%s", task_table[State.step].type)
-                end
-                if ImGui.IsItemHovered() then
-                    ImGui.SetTooltip("Skip to next step.")
-                end
-                if ImGui.Button("Stop @ Next Save") then
-                    Logger.log_info("\aoStopping at next save point.")
-                    stop_at_save = true
-                end
-            end
-            ImGui.Separator()
-            ImGui.PushStyleColor(ImGuiCol.PlotHistogram, IM_COL32(40, 150, 40, 255))
-            ImGui.ProgressBar(State.step / #task_table, ImGui.GetWindowWidth(), 17, "##hp")
-            ImGui.PopStyleColor()
-            ImGui.SetCursorPosY(ImGui.GetCursorPosY() - 20)
-            ImGui.SetCursorPosX(ImGui.GetCursorPosX() + (ImGui.GetWindowWidth() / 2) - 60)
-            ImGui.Text("Step " .. tostring(State.step) .. " of " .. tostring(#task_table))
-            ImGui.TextWrapped(State.status)
-            ImGui.NewLine()
-            ImGui.TextWrapped(State.status2)
-            ImGui.NewLine()
-            ImGui.TextWrapped(State.reqs)
-            ImGui.EndTabItem()
-        end
+        draw_gui.generalTab(task_table)
         theme.LoadTheme, themeName, themeID, class_settings.settings.LoadTheme = draw_gui.settingsTab(themeName, theme, themeID, class_settings, loadsave)
         draw_gui.outlineTab(task_outline_table, overview_steps, task_table)
         if State.task_run == true then
@@ -711,8 +587,8 @@ local function init_autosize()
 end
 
 local function init()
-    populate_group_combo()
-    step_overview()
+    State.populate_group_combo()
+    State.step_overview()
     mq.imgui.init('displayGUI', displayGUI)
     version_check()
     Logger.log_warn("If you encounter any nav mesh issues please ensure you are using the latest mesh from \arhttps://github.com/yb-f/meshes")
@@ -728,7 +604,7 @@ end
 
 local function main()
     while running == true do
-        if start_run == true then
+        if State.start_run == true then
             start_run = false
             State.step = 0
             run_epic(string.lower(mq.TLO.Me.Class.ShortName()), State.epic_choice)

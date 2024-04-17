@@ -1,5 +1,7 @@
 local mq                   = require('mq')
 local ICONS                = require('mq.Icons')
+local invis_travel         = require 'utils/travelandinvis'
+
 local LogLevels            = {
     "Errors",
     "Warnings",
@@ -17,6 +19,7 @@ local changed              = false
 local automation_list      = { 'CWTN', 'RGMercs (Lua)', 'RGMercs (Macro)', 'KissAssist', 'MuleAssist' }
 local invis_type           = {}
 local treeview_table_flags = bit32.bor(ImGuiTableFlags.Hideable, ImGuiTableFlags.RowBg, ImGuiTableFlags.Borders, ImGuiTableFlags.SizingFixedFit, ImGuiTableFlags.ScrollX)
+local myClass              = mq.TLO.Me.Class()
 
 function draw_gui.full_outline_row(item)
     local step, outlineText = draw_gui.generate_outline_text(item)
@@ -51,6 +54,35 @@ function draw_gui.full_outline_row(item)
     ImGui.TextWrapped(outlineText)
 end
 
+local function invis_needed(class, choice)
+    local class_epic = ''
+    if choice == 1 then
+        class_epic = string.lower(class) .. "_10"
+    elseif choice == 2 then
+        class_epic = string.lower(class) .. "_pre15"
+    elseif choice == 3 then
+        class_epic = string.lower(class) .. "_15"
+    elseif choice == 4 then
+        class_epic = string.lower(class) .. "_20"
+    end
+    return invis_travel[class_epic].invis
+end
+
+local function gate_needed(class, choice)
+    local class_epic = ''
+    if choice == 1 then
+        class_epic = string.lower(class) .. "_10"
+    elseif choice == 2 then
+        class_epic = string.lower(class) .. "_pre15"
+    elseif choice == 3 then
+        class_epic = string.lower(class) .. "_15"
+    elseif choice == 4 then
+        class_epic = string.lower(class) .. "_20"
+    end
+    return invis_travel[class_epic].gate
+end
+
+
 function draw_gui.consoleTab(class_settings)
     if ImGui.BeginTabItem("Console") then
         local changed
@@ -84,6 +116,101 @@ function draw_gui.fullOutlineTab(task_table)
             draw_gui.full_outline_row(task_table[i])
         end
         ImGui.EndTable()
+        ImGui.EndTabItem()
+    end
+end
+
+function draw_gui.generalTab(task_table)
+    if ImGui.BeginTabItem("General") then
+        ImGui.Text("Class: " .. myClass .. " " .. State.epicstring)
+        if State.task_run == false then
+            State.epic_choice, changed = ImGui.Combo('##Combo', State.epic_choice, State.epic_list, #State.epic_list, #State.epic_list)
+            if ImGui.IsItemHovered() then
+                ImGui.SetTooltip('Which epic to run.')
+            end
+            if changed == true then
+                State.step_overview()
+            end
+        end
+        if mq.TLO.Me.Grouped() == true then
+            State.group_choice = ImGui.Combo('##Group_Combo', State.group_choice, State.group_combo)
+            if ImGui.IsItemHovered() then
+                ImGui.SetTooltip('Who should come with you (None. Full group. Individual group member.)')
+            end
+            ImGui.SameLine()
+            if ImGui.SmallButton(ICONS.MD_REFRESH) then
+                State.populate_group_combo()
+            end
+        end
+        if State.task_run == false then
+            if ImGui.Button("Begin") then
+                State.start_run = true
+            end
+            if ImGui.IsItemHovered() then
+                local invis_num = invis_needed(mq.TLO.Me.Class.ShortName(), State.epic_choice)
+                local gate_num = gate_needed(mq.TLO.Me.Class.ShortName(), State.epic_choice)
+                local tooltip = "Begin/resume epic quest\nThis may require at least " ..
+                    invis_num .. " invis potions.\nThis may require at least " .. gate_num .. " gate potions."
+                ImGui.SetTooltip(tooltip)
+            end
+        end
+        if State.task_run == true then
+            if ImGui.SmallButton(ICONS.MD_FAST_REWIND) then
+                State.skip = true
+                State.rewound = true
+                State.step = State.step - 1
+                Logger.log_info("\aoMoving to previous step \ar%s", State.step)
+                Logger.log_verbose("\aoStep type: \ar%s", task_table[State.step].type)
+            end
+            if ImGui.IsItemHovered() then
+                ImGui.SetTooltip("Move to previous step.")
+            end
+            ImGui.SameLine()
+            if State.pause == false then
+                if ImGui.SmallButton(ICONS.MD_PAUSE) then
+                    Logger.log_info("\aoPausing script.")
+                    State.pause = true
+                end
+                if ImGui.IsItemHovered() then
+                    ImGui.SetTooltip("Pause script.")
+                end
+            else
+                if ImGui.SmallButton(ICONS.FA_PLAY) then
+                    State.pause = false
+                    Logger.log_info("\aoResuming script.")
+                end
+                if ImGui.IsItemHovered() then
+                    ImGui.SetTooltip("Resume script.")
+                end
+            end
+            ImGui.SameLine()
+            if ImGui.SmallButton(ICONS.MD_FAST_FORWARD) then
+                State.skip = true
+                State.step = State.step + 1
+                State.rewound = true
+                Logger.log_info("\aoMoving to next step \ar%s", State.step)
+                Logger.log_verbose("\aoStep type: \ar%s", task_table[State.step].type)
+            end
+            if ImGui.IsItemHovered() then
+                ImGui.SetTooltip("Skip to next step.")
+            end
+            if ImGui.Button("Stop @ Next Save") then
+                Logger.log_info("\aoStopping at next save point.")
+                State.stop_at_save = true
+            end
+        end
+        ImGui.Separator()
+        ImGui.PushStyleColor(ImGuiCol.PlotHistogram, IM_COL32(40, 150, 40, 255))
+        ImGui.ProgressBar(State.step / #task_table, ImGui.GetWindowWidth(), 17, "##hp")
+        ImGui.PopStyleColor()
+        ImGui.SetCursorPosY(ImGui.GetCursorPosY() - 20)
+        ImGui.SetCursorPosX(ImGui.GetCursorPosX() + (ImGui.GetWindowWidth() / 2) - 60)
+        ImGui.Text("Step " .. tostring(State.step) .. " of " .. tostring(#task_table))
+        ImGui.TextWrapped(State.status)
+        ImGui.NewLine()
+        ImGui.TextWrapped(State.status2)
+        ImGui.NewLine()
+        ImGui.TextWrapped(State.reqs)
         ImGui.EndTabItem()
     end
 end
