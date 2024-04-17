@@ -635,57 +635,11 @@ local function displayGUI()
             ImGui.EndTabItem()
         end
         theme.LoadTheme, themeName, themeID, class_settings.settings.LoadTheme = draw_gui.settingsTab(themeName, theme, themeID, class_settings, loadsave)
-        if ImGui.BeginTabItem("Outline") then
-            ImGui.BeginTable('##outlinetable', 3, treeview_table_flags)
-            ImGui.TableSetupColumn("Manual Completion", bit32.bor(ImGuiTableColumnFlags.NoResize), 30)
-            ImGui.TableSetupColumn("Step", bit32.bor(ImGuiTableColumnFlags.NoResize), 30)
-            ImGui.TableSetupColumn("Description", bit32.bor(ImGuiTableColumnFlags.WidthStretch, ImGuiTableColumnFlags.NoResize), 100)
-            ImGui.TableSetupScrollFreeze(0, 1)
-            ImGui.TableHeadersRow()
-            for i = 1, #task_outline_table do
-                ImGui.TableNextRow()
-                ImGui.TableNextColumn()
-                overview_steps[task_outline_table[i].Step] = ImGui.Checkbox("##" .. i, overview_steps[task_outline_table[i].Step])
-                ImGui.TableNextColumn()
-                if ImGui.Selectable("##a" .. i, false, ImGuiSelectableFlags.None) then
-                    State.rewound = true
-                    State.skip = true
-                    State.step = task_outline_table[i].Step
-                    Logger.log_info('\aoSetting step to \ar%s', State.step)
-                    Logger.log_verbose("\aoStep type: \ar%s", task_table[State.step].type)
-                end
-                ImGui.SameLine()
-                ImGui.TextColored(IM_COL32(0, 255, 0, 255), task_outline_table[i].Step)
-                ImGui.TableNextColumn()
-                if ImGui.Selectable("##b" .. i, false, ImGuiSelectableFlags.None) then
-                    State.rewound = true
-                    State.skip = true
-                    State.step = task_outline_table[i].Step
-                    Logger.log_info('\aoSetting step to \ar%s', State.step)
-                    Logger.log_verbose("\aoStep type: \ar%s", task_table[State.step].type)
-                end
-                ImGui.SameLine()
-                ImGui.TextWrapped(task_outline_table[i].Description)
-            end
-            ImGui.EndTable()
-            ImGui.EndTabItem()
-        end
+        draw_gui.outlineTab(task_outline_table, overview_steps, task_table)
         if State.task_run == true then
-            if ImGui.BeginTabItem("Full Outline") then
-                ImGui.BeginTable('##outlinetable', 2, treeview_table_flags)
-                ImGui.TableSetupColumn("Step", bit32.bor(ImGuiTableColumnFlags.NoResize), 30)
-                ImGui.TableSetupColumn("Description", bit32.bor(ImGuiTableColumnFlags.WidthStretch, ImGuiTableColumnFlags.NoResize), 100)
-                ImGui.TableSetupScrollFreeze(0, 1)
-                ImGui.TableHeadersRow()
-                for i = 1, #task_table do
-                    draw_gui.full_outline_row(task_table[i])
-                end
-                ImGui.EndTable()
-                ImGui.EndTabItem()
-            end
+            draw_gui.fullOutlineTab(task_table)
         end
         draw_gui.consoleTab(class_settings)
-
         ImGui.EndTabBar()
     end
     LoadTheme.EndTheme(ColorCount, StyleCount)
