@@ -73,6 +73,21 @@ function draw_gui.consoleTab(class_settings)
     end
 end
 
+function draw_gui.fullOutlineTab(task_table)
+    if ImGui.BeginTabItem("Full Outline") then
+        ImGui.BeginTable('##outlinetable', 2, treeview_table_flags)
+        ImGui.TableSetupColumn("Step", bit32.bor(ImGuiTableColumnFlags.NoResize), 30)
+        ImGui.TableSetupColumn("Description", bit32.bor(ImGuiTableColumnFlags.WidthStretch, ImGuiTableColumnFlags.NoResize), 100)
+        ImGui.TableSetupScrollFreeze(0, 1)
+        ImGui.TableHeadersRow()
+        for i = 1, #task_table do
+            draw_gui.full_outline_row(task_table[i])
+        end
+        ImGui.EndTable()
+        ImGui.EndTabItem()
+    end
+end
+
 function draw_gui.outlineTab(task_outline_table, overview_steps, task_table)
     if ImGui.BeginTabItem("Outline") then
         ImGui.BeginTable('##outlinetable', 3, treeview_table_flags)
