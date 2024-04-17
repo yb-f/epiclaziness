@@ -514,9 +514,10 @@ local function run_epic(class, choice)
             end
         end
         if State.task_run == false then
-            mq.cmd('/afollow off')
-            mq.cmd('/nav stop')
-            mq.cmd('/stick off')
+            mq.cmdf('/squelch /autosize sizeself %s', loadsave.SaveState.general['self_size'])
+            mq.cmd('/squelch /afollow off')
+            mq.cmd('/squelch /nav stop')
+            mq.cmd('/squelch /stick off')
             return
         end
     end
@@ -733,11 +734,43 @@ local function version_check()
     end
 end
 
-local function auto_size_event(line, arg1)
+local function autosize_self_event(line, arg1)
     if arg1 == "disabled" then
         State.autosize_self = false
     else
         State.autosize_self = true
+    end
+end
+
+local function autosize_self_size(line, arg1)
+    loadsave.SaveState.general['self_size'] = tonumber(autosize_self_size)
+    loadsave.saveState()
+end
+
+local function init_autosize()
+    if mq.TLO.Plugin('MQ2Autosize') == nil then
+        Logger.log_warn(
+            "\aoThe \agMQ2Autosize \aoplugin is not loaded. This is not required for the script to run, but may help if you are frequently becoming stuck while navigating.")
+        Logger.log_warn("\aoIf you would like the script to make use of it please run the command \ar/plugin autosize \aoand restart Epic Laziness.")
+        State.autosize = false
+    else
+        mq.event('auto_self_on', 'MQ2AutoSize:: Option (Self) now #1#', autosize_self_event)
+        mq.cmd('/autosize self')
+        mq.delay(30)
+        mq.doevents()
+        if State.autosize_self == false then
+            mq.cmd('/squelch /autosize self')
+        end
+        mq.cmd('/squelch /autosize off')
+        if loadsave.SaveState.general['self_size'] == nil then
+            mq.event('auto_self_size', 'MQ2AutoSize:: Self size is #1# (was not modified)', autosize_self_size)
+            mq.cmd('/autosize sizeself 0')
+            mq.delay(30)
+            mq.doevents()
+            mq.unevent('autosize_self_size')
+        end
+        State.autosize_on = false
+        State.autosize = true
     end
 end
 
@@ -754,23 +787,7 @@ local function init()
             mq.exit()
         end
     end
-    if mq.TLO.Plugin('MQ2Autosize') == nil then
-        Logger.log_warn(
-            "\aoThe \agMQ2Autosize \aoplugin is not loaded. This is not required for the script to run, but may help if you are frequently becoming stuck while navigating.")
-        Logger.log_warn("\aoIf you would like the script to make use of it please run the command \ar/plugin autosize \aoand restart Epic Laziness.")
-        State.autosize = false
-    else
-        mq.event('auto_self_on', 'MQ2AutoSize:: Option (Self) now #1#', auto_size_event)
-        mq.cmd('/autosize self')
-        mq.delay(30)
-        mq.doevents()
-        if State.autosize_self == false then
-            mq.cmd('/squelch /autosize self')
-        end
-        mq.cmd('/squelch /autosize off')
-        State.autosize_on = false
-        State.autosize = true
-    end
+    init_autosize()
 end
 
 local function main()
