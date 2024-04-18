@@ -776,7 +776,9 @@ function travel.relocate(item, class_settings, char_settings)
     Logger.log_info("\aoSearching for a relocation ability/item that is ready.")
     local relocate = 'none'
     relocate = travel.findReadyRelocate()
+    mq.delay(50)
     while relocate == 'none' do
+        Logger.log_info("\aoWaiting for a relocation ability/item to be ready.")
         mq.delay("3s")
         relocate = travel.findReadyRelocate()
     end
@@ -826,10 +828,10 @@ function travel.relocate(item, class_settings, char_settings)
             Actions.pause(State.status)
             travel.navUnpause(item)
         end
-        if loopCount >= 33 then
+        --[[if loopCount >= 33 then
             Logger.log_warn("\aoSpent 16 seconds waiting for relocate to \ar%s \ao to finish casting. Moving on.", relocate)
             break
-        end
+        end--]]
     end
     if currentZone == mq.TLO.Zone.Name() then
         Logger.log_warn("\aoWe are still in \ag%s \aoattempting to relocate again.", currentZone)
