@@ -45,6 +45,15 @@ function class_settings.loadSettings()
             class_settings.saveSettings()
         end
     end
+    if class_settings.settings['speed_to_num'] == nil then
+        class_settings.settings['speed_to_num'] = {
+            ['Spirit of Eagles(Druid)']  = 8601,
+            ['Spirit of Eagles(Ranger)'] = 8600,
+            ['Communion of the Cheetah'] = 939,
+            ["Selo's Sonata"]            = 3704,
+        }
+        class_settings.saveSettings()
+    end
     if class_settings.settings['speed'] == nil then
         class_settings.settings['speed'] = {
             ['Druid']  = 1,
@@ -132,6 +141,12 @@ function class_settings.createSettings()
             ['Ranger'] = 1,
             ['Shaman'] = 1,
             ['Bard']   = 1,
+        },
+        ['speed_to_num'] = {
+            ['Spirit of Eagles(Druid)']  = 8601,
+            ['Spirit of Eagles(Ranger)'] = 8600,
+            ['Communion of the Cheetah'] = 939,
+            ["Selo's Sonata"]            = 3704,
         }
     }
     class_settings.saveSettings()
