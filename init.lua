@@ -122,10 +122,11 @@ Logger.set_log_to_file(class_settings.settings.logger.LogToFile)
 
 if loadsave.SaveState['general'] == nil then
     loadsave.SaveState['general'] = {
-        ['useAOC'] = class_settings.settings.general.useAOC,
+        ['useAOC']         = class_settings.settings.general.useAOC,
         ['invisForTravel'] = class_settings.settings.general.invisForTravel,
-        ['stopTS'] = class_settings.settings.general.stopTS,
-        ['returnToBind'] = class_settings.settings.general.returnToBind,
+        ['stopTS']         = class_settings.settings.general.stopTS,
+        ['returnToBind']   = class_settings.settings.general.returnToBind,
+        ['xtargClear']     = 1
     }
     loadsave.saveState()
 end
@@ -559,7 +560,7 @@ local function autosize_self_size(line, arg1)
 end
 
 local function init_autosize()
-    if mq.TLO.Plugin('MQ2Autosize') == nil then
+    if mq.TLO.Plugin('MQ2Autosize')() == nil then
         Logger.log_warn(
             "\aoThe \agMQ2Autosize \aoplugin is not loaded. This is not required for the script to run, but may help if you are frequently becoming stuck while navigating.")
         Logger.log_warn("\aoIf you would like the script to make use of it please run the command \ar/plugin autosize \aoand restart Epic Laziness.")
