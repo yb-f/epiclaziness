@@ -517,7 +517,7 @@ end
 function Actions.npc_give(item, class_settings, char_settings)
     manage.removeInvis()
     State.status = "Giving " .. item.what .. " to " .. item.npc
-    Logger.log_info("\aoGiving \ar%s\ao to \ar%s\ao.", item.what, item.npc)
+    Logger.log_info("\aoGiving \ag%s\ao to \ag%s\ao.", item.what, item.npc)
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
         if mq.TLO.Spawn(item.npc).Distance() ~= nil then
             if mq.TLO.Spawn(item.npc).Distance() > 100 then
@@ -529,7 +529,7 @@ function Actions.npc_give(item, class_settings, char_settings)
         end
         Logger.log_verbose("\aoTargeting \ar%s\ao.", item.npc)
         mq.TLO.Spawn(item.npc).DoTarget()
-        mq.delay(300)
+        mq.delay(750)
     end
     if mq.TLO.FindItem('=' .. item.what) == nil then
         Logger.log_error("\ar%s \aowas not found in inventory.", item.what)
