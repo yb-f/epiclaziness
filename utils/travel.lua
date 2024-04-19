@@ -277,6 +277,8 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
         State.skip = true
     end
     Logger.log_verbose("\aoWe have reached our destination.")
+    State.destType = ''
+    State.dest = ''
     State.traveling = false
     State.autosize_on = false
     mq.cmd('/squelch /autosize off')
@@ -325,6 +327,9 @@ function travel.general_travel(item, class_settings, char_settings, ID)
         mq.cmdf("/squelch /nav id %s", ID)
         mq.cmdf('/dex %s /squelch /nav id %s', State.group_combo[State.group_choice], ID)
     end
+    State.startDist = mq.TLO.Navigation.PathLength("id " .. ID)()
+    State.destType = 'ID'
+    State.dest = ID
     mq.delay(200)
     travel.travelLoop(item, class_settings, char_settings, ID)
 end
@@ -578,6 +583,10 @@ function travel.loc_travel(item, class_settings, char_settings)
         mq.cmdf("/squelch /nav loc %s %s %s", y, x, z)
         mq.cmdf("/dex %s /squelch /nav loc %s %s %s", State.group_combo[State.group_choice], y, x, z)
     end
+    local tempString = string.format("loc %s %s %s", y, x, z)
+    State.startDist = mq.TLO.Navigation.PathLength(tempString)()
+    State.destType = 'loc'
+    State.dest = string.format("%s %s %s", y, x, z)
     mq.delay(100)
     travel.travelLoop(item, class_settings, char_settings)
 end
@@ -609,6 +618,10 @@ function travel.navUnpause(item)
             mq.cmdf("/squelch /nav loc %s %s %s", y, x, z)
             mq.cmdf("/dex %s /squelch /nav loc %s %s %s", State.group_combo[State.group_choice], y, x, z)
         end
+        local tempString = string.format("loc %s %s %s", y, x, z)
+        State.startDist = mq.TLO.Navigation.PathLength(tempString)()
+        State.destType = 'loc'
+        State.dest = string.format("%s %s %s", y, x, z)
     elseif item.npc then
         Logger.log_info("\aoResuming navigation to \ag%s\ao.", item.npc)
         if State.group_choice == 1 then
@@ -619,6 +632,10 @@ function travel.navUnpause(item)
             mq.cmdf("/squelch /nav spawn %s", item.npc)
             mq.cmdf("/dex %s /squelch /nav spawn %s", State.group_combo[State.group_choice], item.npc)
         end
+        local tempString = string.format("spawn %s ", item.npc)
+        State.startDist = mq.TLO.Navigation.PathLength(tempString)()
+        State.destType = 'spawn'
+        State.dest = item.npc
     elseif item.zone then
         Logger.log_info("\aoResuming navigation to zone \ag%s\ao.", item.zone)
         if State.group_choice == 1 then

@@ -100,6 +100,13 @@ State.autosize_choice     = 3
 State.autosize_self       = false
 State.autosize_on         = false
 State.combineSlot         = 0
+State.destType            = ''
+State.dest                = ''
+State.pathDist            = 0
+State.velocity            = 0
+State.estimatedTime       = 0
+State.startDist           = 0
+State.updateTime          = math.floor(mq.gettime() / 1000)
 
 class_settings.loadSettings()
 loadsave.loadState()

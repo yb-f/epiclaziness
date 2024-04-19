@@ -166,6 +166,8 @@ function inventory.enviro_combine_container(item)
     end
     mq.delay(500)
     mq.cmd("/squelch /nav item")
+    State.destType = 'loc'
+    State.dest = string.format("%s %s %s", mq.TLO.ItemTarget.Y(), mq.TLO.ItemTarget.X(), mq.TLO.ItemTarget.Z())
     while mq.TLO.Navigation.Active() do
         mq.delay(500)
     end
