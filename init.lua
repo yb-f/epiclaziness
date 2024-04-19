@@ -469,7 +469,7 @@ local function run_epic(class, choice)
             end
         end
         if task_table[State.step].SaveStep == 1 then
-            Logger.log_info("\aosaving step: \ar%s", State.step)
+            Logger.log_info("\aoSaving step: \ar%s", State.step)
             loadsave.prepSave(State.step)
             if State.stop_at_save then
                 Logger.log_warn("\aoStopping at step \ar%s.", State.Step)
