@@ -11,6 +11,8 @@ local LogLevels            = {
     "Super-Verbose",
 }
 
+local outlineFilter        = ''
+local fullOutlineFilter    = ''
 local draw_gui             = {}
 local class_list_choice    = 1
 local class_list           = { 'Bard', 'Beastlord', 'Berserker', 'Cleric', 'Druid', 'Enchanter', 'Magician', 'Monk', 'Necromancer', 'Paladin', 'Ranger', 'Rogue', 'Shadow Knight',
@@ -21,8 +23,7 @@ local invis_type           = {}
 local treeview_table_flags = bit32.bor(ImGuiTableFlags.Hideable, ImGuiTableFlags.RowBg, ImGuiTableFlags.Borders, ImGuiTableFlags.SizingFixedFit, ImGuiTableFlags.ScrollX)
 local myClass              = mq.TLO.Me.Class()
 
-function draw_gui.full_outline_row(item)
-    local step, outlineText = draw_gui.generate_outline_text(item)
+function draw_gui.full_outline_row(item, step, outlineText)
     ImGui.TableNextRow()
     ImGui.TableNextColumn()
     if ImGui.Selectable("##c" .. step, false, ImGuiSelectableFlags.None) then
@@ -108,13 +109,19 @@ end
 
 function draw_gui.fullOutlineTab(task_table)
     if ImGui.BeginTabItem("Full Outline") then
+        fullOutlineFilter = ImGui.InputText("Filter", fullOutlineFilter, ImGuiInputTextFlags.None)
         ImGui.BeginTable('##outlinetable', 2, treeview_table_flags)
         ImGui.TableSetupColumn("Step", bit32.bor(ImGuiTableColumnFlags.NoResize), 30)
         ImGui.TableSetupColumn("Description", bit32.bor(ImGuiTableColumnFlags.WidthStretch, ImGuiTableColumnFlags.NoResize), 100)
         ImGui.TableSetupScrollFreeze(0, 1)
         ImGui.TableHeadersRow()
         for i = 1, #task_table do
-            draw_gui.full_outline_row(task_table[i])
+            local step, outlineText = draw_gui.generate_outline_text(task_table[i])
+            if fullOutlineFilter == '' then
+                draw_gui.full_outline_row(task_table[i], step, outlineText)
+            elseif string.find(string.lower(outlineText), string.lower(fullOutlineFilter)) then
+                draw_gui.full_outline_row(task_table[i], step, outlineText)
+            end
         end
         ImGui.EndTable()
         ImGui.EndTabItem()
@@ -236,8 +243,40 @@ function draw_gui.generalTab(task_table)
     end
 end
 
+function draw_gui.outlineRow(overview_steps, task_outline_table, task_table, i)
+    ImGui.TableNextRow()
+    ImGui.TableNextColumn()
+    overview_steps[task_outline_table[i].Step] = ImGui.Checkbox("##" .. i, overview_steps[task_outline_table[i].Step])
+    ImGui.TableNextColumn()
+    if ImGui.Selectable("##a" .. i, false, ImGuiSelectableFlags.None) then
+        if State.task_run == true then
+            State.rewound = true
+            State.skip = true
+            State.step = task_outline_table[i].Step
+            Logger.log_info('\aoSetting step to \ar%s', State.step)
+            Logger.log_verbose("\aoStep type: \ar%s", task_table[State.step].type)
+        end
+    end
+    ImGui.SameLine()
+    ImGui.TextColored(IM_COL32(0, 255, 0, 255), task_outline_table[i].Step)
+    ImGui.TableNextColumn()
+    if ImGui.Selectable("##b" .. i, false, ImGuiSelectableFlags.None) then
+        if State.task_run == true then
+            State.rewound = true
+            State.skip = true
+            State.step = task_outline_table[i].Step
+            Logger.log_info('\aoSetting step to \ar%s', State.step)
+            Logger.log_verbose("\aoStep type: \ar%s", task_table[State.step].type)
+        end
+    end
+    ImGui.SameLine()
+
+    ImGui.TextWrapped(task_outline_table[i].Description)
+end
+
 function draw_gui.outlineTab(task_outline_table, overview_steps, task_table)
     if ImGui.BeginTabItem("Outline") then
+        outlineFilter = ImGui.InputText("Filter", outlineFilter, ImGuiInputTextFlags.None)
         ImGui.BeginTable('##outlinetable', 3, treeview_table_flags)
         ImGui.TableSetupColumn("Manual Completion", bit32.bor(ImGuiTableColumnFlags.NoResize), 30)
         ImGui.TableSetupColumn("Step", bit32.bor(ImGuiTableColumnFlags.NoResize), 30)
@@ -245,34 +284,11 @@ function draw_gui.outlineTab(task_outline_table, overview_steps, task_table)
         ImGui.TableSetupScrollFreeze(0, 1)
         ImGui.TableHeadersRow()
         for i = 1, #task_outline_table do
-            ImGui.TableNextRow()
-            ImGui.TableNextColumn()
-            overview_steps[task_outline_table[i].Step] = ImGui.Checkbox("##" .. i, overview_steps[task_outline_table[i].Step])
-            ImGui.TableNextColumn()
-            if ImGui.Selectable("##a" .. i, false, ImGuiSelectableFlags.None) then
-                if State.task_run == true then
-                    State.rewound = true
-                    State.skip = true
-                    State.step = task_outline_table[i].Step
-                    Logger.log_info('\aoSetting step to \ar%s', State.step)
-                    Logger.log_verbose("\aoStep type: \ar%s", task_table[State.step].type)
-                end
+            if outlineFilter == '' then
+                draw_gui.outlineRow(overview_steps, task_outline_table, task_table, i)
+            elseif string.find(string.lower(task_outline_table[i].Description), string.lower(outlineFilter)) then
+                draw_gui.outlineRow(overview_steps, task_outline_table, task_table, i)
             end
-            ImGui.SameLine()
-            ImGui.TextColored(IM_COL32(0, 255, 0, 255), task_outline_table[i].Step)
-            ImGui.TableNextColumn()
-            if ImGui.Selectable("##b" .. i, false, ImGuiSelectableFlags.None) then
-                if State.task_run == true then
-                    State.rewound = true
-                    State.skip = true
-                    State.step = task_outline_table[i].Step
-                    Logger.log_info('\aoSetting step to \ar%s', State.step)
-                    Logger.log_verbose("\aoStep type: \ar%s", task_table[State.step].type)
-                end
-            end
-            ImGui.SameLine()
-
-            ImGui.TextWrapped(task_outline_table[i].Description)
         end
         ImGui.EndTable()
         ImGui.EndTabItem()
