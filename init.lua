@@ -613,7 +613,7 @@ end
 local function main()
     while running == true do
         if State.start_run == true then
-            start_run = false
+            State.start_run = false
             State.step = 0
             run_epic(string.lower(mq.TLO.Me.Class.ShortName()), State.epic_choice)
         end
