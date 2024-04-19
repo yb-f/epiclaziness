@@ -69,7 +69,7 @@ function inventory.combine_container(item, class_settings, char_settings)
     State.status = "Preparing combine container (" .. item.what .. ")"
     Logger.log_info("\aoPreparing combine container (\ag%s\ao) for use.", item.what)
     local mySlot = inventory.find_best_bag_slot(item)
-    Logger.log_debug("\aoSlot \ag%s \aochosen.")
+    Logger.log_debug("\aoSlot \ag%s \aochosen.", mySlot)
     if mq.TLO.InvSlot('pack' .. mySlot).Item.Container() then
         if mq.TLO.InvSlot('pack' .. mySlot).Item.Name() == item.what then
             Logger.log_info("\ag%s \aoalready in slot \ag%s.", item.what, mySlot)
@@ -116,16 +116,16 @@ function inventory.combine_item(item, class_settings, char_settings, slot)
     Logger.log_verbose("\aoSuccessfully moved \ag%s \aoto combine container.", item.what)
 end
 
-function inventory.combine_do(class_settings, char_settings)
+function inventory.combine_do(class_settings, char_settings, slot)
     if Mob.xtargetCheck(char_settings) then
         Mob.clearXtarget(class_settings, char_settings)
     end
     State.status = "Performing combine"
-    Logger.log_info("\aoPerforming combine in container in slot \ag8\ao.")
-    mq.cmdf("/squelch /combine pack8")
+    Logger.log_info("\aoPerforming combine in container in slot \ag%s\ao.", slot)
+    mq.cmdf("/squelch /combine pack%s", slot)
     while mq.TLO.Cursor() == nil do
         mq.delay(100)
-        mq.cmdf("/squelch /combine pack8")
+        mq.cmdf("/squelch /combine pack%s", slot)
     end
     mq.cmd("/squelch /autoinv")
     while mq.TLO.Cursor() ~= nil do
@@ -166,8 +166,13 @@ function inventory.enviro_combine_container(item)
     end
     mq.delay(500)
     mq.cmd("/squelch /nav item")
+    local y = mq.TLO.ItemTarget.Y()
+    local x = mq.TLO.ItemTarget.X()
+    local z = mq.TLO.ItemTarget.Z()
+    local tempString = string.format("loc %s %s %s", y, x, z)
+    State.startDist = mq.TLO.Navigation.PathLength(tempString)()
     State.destType = 'loc'
-    State.dest = string.format("%s %s %s", mq.TLO.ItemTarget.Y(), mq.TLO.ItemTarget.X(), mq.TLO.ItemTarget.Z())
+    State.dest = string.format("%s %s %s", y, x, z)
     while mq.TLO.Navigation.Active() do
         mq.delay(500)
     end
@@ -377,7 +382,7 @@ function inventory.move_combine_container(slot, container)
     local itemslot2 = mq.TLO.FindItem("=" .. container).ItemSlot2() + 1
     Logger.log_info("\aoMoving \ag%s \aoto bag slot \ag%s\ao.", container, slot)
     mq.cmdf("/squelch /nomodkey /shiftkey /itemnotify in pack%s %s leftmouseup", itemslot, itemslot2)
-    while mq.TLO.Cursor.Name() ~= container do
+    while string.lower(mq.TLO.Cursor.Name()) ~= string.lower(container) do
         mq.delay(100)
     end
     mq.cmdf("/squelch /nomodkey /shiftkey /itemnotify %s leftmouseup", slot + 22)
@@ -391,8 +396,8 @@ function inventory.move_combine_container(slot, container)
         end
     end
     mq.delay(250)
-    if mq.TLO.Me.Inventory(slot + 22).Name() ~= container then
-        Logger.log_warn("\ar%s \aodid not move to slot \ar%s\ao. Trying again.")
+    if string.lower(mq.TLO.Me.Inventory(slot + 22).Name()) ~= string.lower(container) then
+        Logger.log_warn("\ar%s \aodid not move to slot \ar%s\ao. Trying again.", container, slot)
         State.rewound = true
         State.skip = true
         State.step = State.step
