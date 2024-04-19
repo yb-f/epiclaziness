@@ -389,14 +389,16 @@ end
 
 function manage.removeInvis()
     State.status = "Removing invis"
-    Logger.log_info("\aoRemoving invisibility.")
-    if State.group_choice == 1 then
-        mq.cmd("/squelch /makemevis")
-    elseif State.group_choice == 2 then
-        mq.cmd("/dgga /squelch /makemevis")
-    else
-        mq.cmdf("/squelch /makemevis")
-        mq.cmdf("/dex %s /squelch /makemevis", State.group_combo[State.group_choice])
+    if mq.TLO.Me.Invis() then
+        Logger.log_info("\aoRemoving invisibility.")
+        if State.group_choice == 1 then
+            mq.cmd("/squelch /makemevis")
+        elseif State.group_choice == 2 then
+            mq.cmd("/dgga /squelch /makemevis")
+        else
+            mq.cmdf("/squelch /makemevis")
+            mq.cmdf("/dex %s /squelch /makemevis", State.group_combo[State.group_choice])
+        end
     end
 end
 
