@@ -387,6 +387,13 @@ function inventory.move_combine_container(slot, container)
         end
     end
     mq.delay(250)
+    if mq.TLO.Me.Inventory(slot + 22).Name() ~= container then
+        Logger.log_warn("\ar%s \aodid not move to slot \ar%s\ao. Trying again.")
+        State.rewound = true
+        State.skip = true
+        State.step = State.step
+        return
+    end
     mq.cmdf("/squelch /nomodkey /ctrl /itemnotify %s rightmouseup", slot + 22)
     mq.delay(250)
 end
