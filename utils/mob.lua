@@ -146,7 +146,7 @@ end
 
 local function matchFilters(spawn)
     if string.find(string.lower(spawn.CleanName()), string.lower(searchFilter)) and (spawn.Type() == 'NPC' or spawn.Type() == 'Trigger' or spawn.Type() == 'Chest') then
-        for ID in pairs(State.bad_IDs) do
+        for _, ID in pairs(State.bad_IDs) do
             if spawn.ID() == ID then
                 return false
             end
