@@ -311,7 +311,7 @@ local function run_epic(class, choice)
         elseif task_table[State.step].type == "AUTO_INV" then
             inv.auto_inv()
         elseif task_table[State.step].type == "BACKSTAB" then
-            Mob.backstab(task_table[State.step])
+            Mob.backstab(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "CAST_ALT" then
             Actions.cast_alt(task_table[State.step])
         elseif task_table[State.step].type == "COMBINE_CONTAINER" then
@@ -393,7 +393,7 @@ local function run_epic(class, choice)
         elseif task_table[State.step].type == "NPC_HAIL" then
             Actions.npc_hail(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "NPC_KILL" then
-            Mob.npc_kill(task_table[State.step], class_settings.settings, task_table[State.step + 1].type)
+            Mob.npc_kill(task_table[State.step], class_settings.settings, loadsave.SaveState, task_table[State.step + 1].type)
         elseif task_table[State.step].type == "NPC_KILL_ALL" then
             Mob.npc_kill_all(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "NPC_SEARCH" then

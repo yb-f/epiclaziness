@@ -283,7 +283,7 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
 end
 
 function travel.general_travel(item, class_settings, char_settings, ID)
-    ID = ID or Mob.findNearestName(item.npc)
+    ID = ID or Mob.findNearestName(item.npc, item, class_settings, char_settings)
     if char_settings.general.speedForTravel == true then
         local speedChar, speedSkill = travel.speedCheck(class_settings, char_settings)
         if speedChar ~= 'none' then
@@ -297,7 +297,7 @@ function travel.general_travel(item, class_settings, char_settings, ID)
     end
     State.status = "Waiting for " .. item.npc
     Logger.log_info("\aoLooking for \ag%s\ao.", item.npc)
-    while ID == 0 do
+    while ID == 0 or ID == nil do
         mq.delay(500)
         if State.skip == true then
             travel.navPause()
@@ -309,11 +309,12 @@ function travel.general_travel(item, class_settings, char_settings, ID)
             Actions.pause(State.status)
             travel.navUnpause(item)
         end
-        ID = Mob.findNearestName(item.npc)
+        ID = Mob.findNearestName(item.npc, item, class_settings, char_settings)
+        print(ID)
     end
     State.status = "Navigating to " .. item.npc
     if ID == 0 then
-        ID = Mob.findNearestName(item.npc)
+        ID = Mob.findNearestName(item.npc, item, class_settings, char_settings)
     end
     Logger.log_info("\aoNavigating to \ag%s \ao(\ag%s\ao).", item.npc, ID)
     if State.group_choice == 1 then
@@ -731,7 +732,7 @@ function travel.npc_travel(item, class_settings, ignore_path_check, char_setting
         travel.loc_travel(item, class_settings, char_settings)
     else
         State.status = "Waiting for NPC " .. item.npc
-        local ID = Mob.findNearestName(item.npc)
+        local ID = Mob.findNearestName(item.npc, item, class_settings, char_settings)
         travel.general_travel(item, class_settings, char_settings, ID)
     end
 end

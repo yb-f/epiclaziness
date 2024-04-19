@@ -10,9 +10,9 @@ local function target_invalid_switch()
     State.cannot_count = State.cannot_count + 1
 end
 
-function mob.backstab(item)
+function mob.backstab(item, class_settings, char_settings)
     Logger.log_info("\aoBackstabbing \ag%s\ao.", item.npc)
-    local ID = mob.findNearestName(item.npc)
+    local ID = mob.findNearestName(item.npc, item, class_settings, char_settings)
     if mq.TLO.Spawn(item.npc).Distance() ~= nil then
         if mq.TLO.Spawn(item.npc).Distance() > 100 then
             State.rewound = true
@@ -162,7 +162,7 @@ local function create_spawn_list()
     return mob_list
 end
 
-function mob.findNearestName(npc)
+function mob.findNearestName(npc, item, class_settings, char_settings)
     State.status = "Searching for nearest " .. npc
     searchFilter = npc
     Logger.log_info("\aoSearching for nearest \ag%s\ao.", npc)
@@ -180,10 +180,28 @@ function mob.findNearestName(npc)
             else
             end
         end
-        if closest_ID == 0 then
+        if State.skip == true then
+            return
+        end
+        if Mob.xtargetCheck(char_settings) then
+            Mob.clearXtarget(class_settings, char_settings)
+        end
+        if State.pause == true then
+            Actions.pause(State.status)
+        end
+        if char_settings.general.speedForTravel == true then
+            local speedChar, speedSkill = travel.speedCheck(class_settings, char_settings)
+            if speedChar ~= 'none' then
+                travel.doSpeed(speedChar, speedSkill)
+            end
+        end
+        if travel.invisCheck(char_settings, item.invis) then
+            travel.invis(class_settings)
+        end
+        --[[if closest_ID == 0 then
             Logger.log_warn("\aoUnable to find \ar%s\ao.", npc)
             return nil
-        end
+        end--]]
     end
     Logger.log_verbose("\aoNearest ID found is \ag%s\ao.", closest_ID)
     return closest_ID or nil
@@ -202,7 +220,7 @@ function mob.general_search(item, class_settings, char_settings)
             State.skip = false
             return
         end
-        local ID = mob.findNearestName(item.npc)
+        local ID = mob.findNearestName(item.npc, item, class_settings, char_settings)
         if ID ~= nil then
             State.rewound = true
             State.step = item.gotostep
@@ -314,14 +332,14 @@ function mob.npc_damage_until(item)
     end
 end
 
-function mob.npc_kill(item, class_settings, loot)
+function mob.npc_kill(item, class_settings, char_settings, loot)
     manage.removeInvis()
     State.status = "Killing " .. item.npc
     Logger.log_info("\aoKilling \ag%s\ao.", item.npc)
     manage.unpauseGroup(class_settings)
     if item.what == nil then
         mq.delay(200)
-        local ID = mob.findNearestName(item.npc)
+        local ID = mob.findNearestName(item.npc, item, class_settings, char_settings)
         if mq.TLO.Spawn(ID).Distance() ~= nil then
             if mq.TLO.Spawn(ID).Distance() > 100 then
                 State.rewound = true
@@ -370,7 +388,7 @@ function mob.npc_kill(item, class_settings, loot)
         mq.unevent('cannot_cast')
     else
         if mq.TLO.Spawn("npc " .. item.npc).ID() ~= 0 then
-            local ID = mob.findNearestName(item.npc)
+            local ID = mob.findNearestName(item.npc, item, class_settings, char_settings)
             if mq.TLO.Spawn(ID).Distance() ~= nil then
                 if mq.TLO.Spawn(ID).Distance() > 100 then
                     State.rewound = true
@@ -401,7 +419,7 @@ function mob.npc_kill(item, class_settings, loot)
             end
         else
             Logger.log_warn("\ag%s \aonot found. Searching for \ag%s \aoinstead.", item.npc, item.what)
-            local ID = mob.findNearestName(item.what)
+            local ID = mob.findNearestName(item.npc, item, class_settings, char_settings)
             if mq.TLO.Spawn(ID).Distance() ~= nil then
                 if mq.TLO.Spawn(ID).Distance() > 100 then
                     State.rewound = true
@@ -459,7 +477,7 @@ function mob.npc_kill_all(item, class_settings, char_settings)
         if State.pause == true then
             Actions.pause(State.status)
         end
-        local ID = mob.findNearestName(item.npc)
+        local ID = mob.findNearestName(item.npc, item, class_settings, char_settings)
         travel.general_travel(item, class_settings, char_settings, ID)
         if mq.TLO.Spawn(ID).Distance() ~= nil then
             if mq.TLO.Spawn(ID).Distance() > 100 then
