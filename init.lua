@@ -324,7 +324,7 @@ local function run_epic(class, choice)
         elseif task_table[State.step].type == "COMBINE_CONTAINER" then
             inv.combine_container(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "COMBINE_DO" then
-            inv.combine_do(class_settings.settings, loadsave.SaveState)
+            inv.combine_do(class_settings.settings, loadsave.SaveState, State.combineSlot)
         elseif task_table[State.step].type == "COMBINE_DONE" then
             inv.combine_done(class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "COMBINE_ITEM" then
