@@ -86,6 +86,7 @@ end
 function draw_gui.consoleTab(class_settings)
     if ImGui.BeginTabItem("Console") then
         local changed
+        ImGui.SetNextItemWidth(120)
         class_settings.settings.logger.LogLevel, changed = ImGui.Combo("Debug Levels", class_settings.settings.logger.LogLevel, LogLevels, #LogLevels)
         if changed then
             Logger.set_log_level(class_settings.settings.logger.LogLevel)
