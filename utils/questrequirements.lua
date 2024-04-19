@@ -83,7 +83,8 @@ local quests_requirements = {
         ['20']    = 'Requires manually obtaining a Globe of Discordant Energy.'
     },
     ['shm'] = {
-        ['10']    = 'Requires a lockpicker for several steps in City of Mist',
+        ['10']    =
+        'Requires a lockpicker for several steps in City of Mist. Group with your lockpicker and select their name in the 2nd dropdown box. (They must be in the same zone.)',
         ['pre15'] = '',
         ['15']    = 'Requires alchemy 100. You are required to be in a guild in order to use the guildhall portal to Plane of SKy.',
         ['20']    = 'Requires manually obtaining a Globe of Discordant Energy.'
