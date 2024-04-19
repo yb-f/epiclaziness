@@ -99,6 +99,7 @@ State.autosize_sizes      = { 1, 2, 5, 10, 20 }
 State.autosize_choice     = 3
 State.autosize_self       = false
 State.autosize_on         = false
+State.combineSlot         = 0
 
 class_settings.loadSettings()
 loadsave.loadState()
@@ -320,7 +321,7 @@ local function run_epic(class, choice)
         elseif task_table[State.step].type == "COMBINE_DONE" then
             inv.combine_done(class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "COMBINE_ITEM" then
-            inv.combine_item(task_table[State.step], class_settings.settings, loadsave.SaveState)
+            inv.combine_item(task_table[State.step], class_settings.settings, loadsave.SaveState, State.combineSlot)
         elseif task_table[State.step].type == "ENVIRO_COMBINE_CONTAINER" then
             inv.enviro_combine_container(task_table[State.step])
         elseif task_table[State.step].type == "ENVIRO_COMBINE_DO" then

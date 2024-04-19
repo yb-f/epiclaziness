@@ -32,6 +32,7 @@ function inventory.auto_inv()
 end
 
 function inventory.find_best_bag_slot(item)
+    State.combineSlot = 0
     Logger.log_info("\aoFinding best bag slot for combine container.")
     local bagSlots = mq.TLO.Me.NumBagSlots()
     local freeSlots = mq.TLO.Me.FreeInventory()
@@ -57,6 +58,7 @@ function inventory.find_best_bag_slot(item)
             mySlot = i
         end
     end
+    State.combineSlot = mySlot
     return mySlot
 end
 
@@ -80,7 +82,7 @@ function inventory.combine_container(item, class_settings, char_settings)
     inventory.move_combine_container(mySlot, item.what)
 end
 
-function inventory.combine_item(item, class_settings, char_settings)
+function inventory.combine_item(item, class_settings, char_settings, slot)
     if Mob.xtargetCheck(char_settings) then
         Mob.clearXtarget(class_settings, char_settings)
     end
@@ -101,8 +103,8 @@ function inventory.combine_item(item, class_settings, char_settings)
     while mq.TLO.Cursor() == nil do
         mq.delay(100)
     end
-    for j = mq.TLO.InvSlot('pack8').Item.Container(), 1, -1 do
-        if mq.TLO.InvSlot('pack8').Item.Item(j)() == nil then
+    for j = mq.TLO.InvSlot('pack' .. slot).Item.Container(), 1, -1 do
+        if mq.TLO.InvSlot('pack' .. slot).Item.Item(j)() == nil then
             slot2 = j
         end
     end
