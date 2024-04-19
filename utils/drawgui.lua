@@ -229,23 +229,28 @@ function draw_gui.outlineTab(task_outline_table, overview_steps, task_table)
             overview_steps[task_outline_table[i].Step] = ImGui.Checkbox("##" .. i, overview_steps[task_outline_table[i].Step])
             ImGui.TableNextColumn()
             if ImGui.Selectable("##a" .. i, false, ImGuiSelectableFlags.None) then
-                State.rewound = true
-                State.skip = true
-                State.step = task_outline_table[i].Step
-                Logger.log_info('\aoSetting step to \ar%s', State.step)
-                Logger.log_verbose("\aoStep type: \ar%s", task_table[State.step].type)
+                if State.task_run == true then
+                    State.rewound = true
+                    State.skip = true
+                    State.step = task_outline_table[i].Step
+                    Logger.log_info('\aoSetting step to \ar%s', State.step)
+                    Logger.log_verbose("\aoStep type: \ar%s", task_table[State.step].type)
+                end
             end
             ImGui.SameLine()
             ImGui.TextColored(IM_COL32(0, 255, 0, 255), task_outline_table[i].Step)
             ImGui.TableNextColumn()
             if ImGui.Selectable("##b" .. i, false, ImGuiSelectableFlags.None) then
-                State.rewound = true
-                State.skip = true
-                State.step = task_outline_table[i].Step
-                Logger.log_info('\aoSetting step to \ar%s', State.step)
-                Logger.log_verbose("\aoStep type: \ar%s", task_table[State.step].type)
+                if State.task_run == true then
+                    State.rewound = true
+                    State.skip = true
+                    State.step = task_outline_table[i].Step
+                    Logger.log_info('\aoSetting step to \ar%s', State.step)
+                    Logger.log_verbose("\aoStep type: \ar%s", task_table[State.step].type)
+                end
             end
             ImGui.SameLine()
+
             ImGui.TextWrapped(task_outline_table[i].Description)
         end
         ImGui.EndTable()
