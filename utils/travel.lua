@@ -833,6 +833,7 @@ function travel.relocate(item, class_settings, char_settings)
             break
         end--]]
     end
+    mq.delay("2s")
     if currentZone == mq.TLO.Zone.Name() then
         Logger.log_warn("\aoWe are still in \ag%s \aoattempting to relocate again.", currentZone)
         State.rewound = true
