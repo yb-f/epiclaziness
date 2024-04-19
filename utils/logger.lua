@@ -52,7 +52,7 @@ local function log(logLevel, output, ...)
     end
 
     if actions.LogConsole ~= nil then
-        local consoleText = string.format('[%s] %s', logLevels[logLevel].header, output)
+        local consoleText = string.format('[%s] [%s%s-%s] %s', logLevels[logLevel].header, mq.TLO.Me.Class.ShortName(), State.epic_list[State.epic_choice], State.step, output)
         actions.LogConsole:AppendText(consoleText)
     end
 
