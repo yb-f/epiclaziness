@@ -108,7 +108,7 @@ function inventory.combine_item(item, class_settings, char_settings, slot)
             slot2 = j
         end
     end
-    mq.cmdf("/squelch /nomodkey /shiftkey /itemnotify in pack8 %s leftmouseup", slot2)
+    mq.cmdf("/squelch /nomodkey /shiftkey /itemnotify in pack%s %s leftmouseup", slot, slot2)
     mq.delay(500)
     while mq.TLO.Cursor() ~= nil do
         mq.delay(100)
