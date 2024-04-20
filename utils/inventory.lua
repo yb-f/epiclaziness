@@ -70,8 +70,8 @@ function inventory.combine_container(item, class_settings, char_settings)
     Logger.log_info("\aoPreparing combine container (\ag%s\ao) for use.", item.what)
     local mySlot = inventory.find_best_bag_slot(item)
     Logger.log_debug("\aoSlot \ag%s \aochosen.", mySlot)
-    if mq.TLO.InvSlot('pack' .. mySlot).Item.Container() then
-        if mq.TLO.InvSlot('pack' .. mySlot).Item.Name() == item.what then
+    if mq.TLO.Me.Inventory('pack' .. mySlot).Item.Container() then
+        if mq.TLO.Me.Inventory('pack' .. mySlot).Item.Name() == item.what then
             Logger.log_info("\ag%s \aoalready in slot \ag%s.", item.what, mySlot)
             inventory.empty_bag(mySlot)
             return
@@ -80,6 +80,26 @@ function inventory.combine_container(item, class_settings, char_settings)
         State.bagslot1, State.bagslot2 = inventory.move_bag(mySlot)
     end
     inventory.move_combine_container(mySlot, item.what)
+end
+
+function inventory.find_duplicate_item(item, slot)
+    for i = 1, mq.TLO.Me.NumBagSlots() do
+        if i ~= slot then
+            if mq.TLO.Me.Inventory('pack' .. i).Item.Container() ~= nil then
+                if mq.TLO.Me.Inventory('pack' .. i).Name() == item then
+                    return i, 0
+                end
+                if mq.TLO.Me.Inventory('pack' .. i).Item.Container() ~= 0 then
+                    for j = mq.TLO.Me.Inventory('pack' .. i).Item.Container(), 1, -1 do
+                        if mq.TLO.Me.Inventory('pack' .. i).Item.Item(j)() == item then
+                            return i, j
+                        end
+                    end
+                end
+            end
+        end
+    end
+    return 0, 0
 end
 
 function inventory.combine_item(item, class_settings, char_settings, slot)
@@ -98,13 +118,23 @@ function inventory.combine_item(item, class_settings, char_settings, slot)
     local slot2     = 0
     local itemslot  = mq.TLO.FindItem("=" .. item.what).ItemSlot() - 22
     local itemslot2 = mq.TLO.FindItem("=" .. item.what).ItemSlot2() + 1
+    if itemslot - 22 == slot and item.zone == 1 then
+        itemslot, itemslot2 = inventory.find_duplicate_item(item.what, slot)
+        if itemslot == 0 and itemslot2 == 0 then
+            State.status = "Unable to find item for combine (" .. item.what .. ")"
+            Logger.log_error("\aoUnable to find \ar%s \aofor combine.", item.what)
+            State.task_run = false
+            mq.cmd('/foreground')
+            return
+        end
+    end
     mq.cmdf("/squelch /nomodkey /ctrl /itemnotify in pack%s %s leftmouseup", itemslot, itemslot2)
     mq.delay(500)
     while mq.TLO.Cursor() == nil do
         mq.delay(100)
     end
-    for j = mq.TLO.InvSlot('pack' .. slot).Item.Container(), 1, -1 do
-        if mq.TLO.InvSlot('pack' .. slot).Item.Item(j)() == nil then
+    for j = mq.TLO.Me.Inventory('pack' .. slot).Item.Container(), 1, -1 do
+        if mq.TLO.Me.Inventory('pack' .. slot).Item.Item(j)() == nil then
             slot2 = j
         end
     end
@@ -275,10 +305,10 @@ function inventory.find_free_slot(exclude_bag)
     Logger.log_verbose("\aoFinding free slot to place item.")
     for i = mq.TLO.Me.NumBagSlots(), 1, -1 do
         if i ~= exclude_bag then
-            if mq.TLO.InvSlot('pack' .. i).Item.Container() ~= 0 then
-                if mq.TLO.InvSlot('pack' .. i).Item.Container() ~= nil then
-                    for j = mq.TLO.InvSlot('pack' .. i).Item.Container(), 1, -1 do
-                        if mq.TLO.InvSlot('pack' .. i).Item.Item(j)() == nil then
+            if mq.TLO.Me.Inventory('pack' .. i).Item.Container() ~= 0 then
+                if mq.TLO.Me.Inventory('pack' .. i).Item.Container() ~= nil then
+                    for j = mq.TLO.Me.Inventory('pack' .. i).Item.Container(), 1, -1 do
+                        if mq.TLO.Me.Inventory('pack' .. i).Item.Item(j)() == nil then
                             return i, j
                         end
                     end
@@ -451,10 +481,10 @@ end
 
 function inventory.empty_bag(slot)
     mq.cmd("/squelch /keypress OPEN_INV_BAGS")
-    if mq.TLO.InvSlot('pack' .. slot).Item.Container() then
+    if mq.TLO.Me.Inventory('pack' .. slot).Item.Container() then
         Logger.log_info("\aoEmptying bag in slot \ag%s\ao.", slot)
-        for i = 1, mq.TLO.InvSlot('pack' .. slot).Item.Container() do
-            if mq.TLO.InvSlot('pack' .. slot).Item.Item(i)() ~= nil then
+        for i = 1, mq.TLO.Me.Inventory('pack' .. slot).Item.Container() do
+            if mq.TLO.Me.Inventory('pack' .. slot).Item.Item(i)() ~= nil then
                 local free_pack, free_slot = inventory.find_free_slot(slot)
                 mq.cmdf("/squelch /nomodkey /shiftkey /itemnotify in pack%s %s leftmouseup", slot, i)
                 while mq.TLO.Cursor() == nil do
