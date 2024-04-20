@@ -114,6 +114,10 @@ if not class_settings.settings.LoadTheme then           --whatever your setting 
     class_settings.settings.LoadTheme = theme.LoadTheme -- load the theme tables default if not set.
     class_settings.saveSettings()
 end
+if loadsave.SaveState['version'] == nil then
+    loadsave.SaveState['version'] = version
+    loadsave.saveState()
+end
 themeName = class_settings.settings.LoadTheme
 loadTheme()
 
