@@ -198,6 +198,26 @@ function mob.findNearestName(npc, item, class_settings, char_settings)
         if travel.invisCheck(char_settings, item.invis) then
             travel.invis(class_settings)
         end
+        if item.type == "NPC_KILL" then
+            if tonumber(item.zone) == 1 then
+                if closest_ID == 0 then
+                    if mq.TLO.Spawn('corpse ' .. item.npc).ID() ~= 0 then
+                        Logger.log_warn("\ar%s \aohas already been killed. Advancing to step: \ag%s\ao.", item.npc, item.gotostep)
+                        State.step = item.gotostep
+                        return
+                    end
+                end
+            end
+        end
+        if item.type == "NPC_SEARCH" then
+            if closest_ID == 0 then
+                Logger.log_info("\ar%s \ao not found. Advancing to next step.")
+                State.step = State.step + 1
+                State.rewound = true
+                State.skip = true
+                return nil
+            end
+        end
         --[[if closest_ID == 0 then
             Logger.log_warn("\aoUnable to find \ar%s\ao.", npc)
             return nil
@@ -208,8 +228,10 @@ function mob.findNearestName(npc, item, class_settings, char_settings)
 end
 
 function mob.general_search(item, class_settings, char_settings)
-    if mob.xtargetCheck(char_settings) then
-        mob.clearXtarget(class_settings, char_settings)
+    if item.zone == nil then
+        if mob.xtargetCheck(char_settings) then
+            mob.clearXtarget(class_settings, char_settings)
+        end
     end
     State.status = "Searching for " .. item.npc
     Logger.log_info("\aoSearching for \ag%s\ao.", item.npc)
@@ -326,7 +348,7 @@ function mob.npc_kill(item, class_settings, char_settings, loot)
                         return
                     end
                 end
-            elseif mq.TLO.AdvLoot.PCount > 0 then
+            elseif mq.TLO.AdvLoot.PCount() > 0 then
                 for i = 1, mq.TLO.AdvLoot.PCount() do
                     if mq.TLO.AdvLoot.PList(i).Name() == item.what then
                         State.step = item.gotostep
