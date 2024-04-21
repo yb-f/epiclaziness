@@ -255,32 +255,7 @@ function mob.npc_damage_until(item)
     if item.zone ~= nil then
         if mq.TLO.Me.Level() >= tonumber(item.zone) then
             Logger.log_warn("\aoOur level is \ag%s \aoor higher. Removing weapons before engaging.", item.zone)
-            weapon1 = mq.TLO.InvSlot(13).Item.Name()
-            if mq.TLO.InvSlot(14).Item() ~= nil then
-                weapon2 = mq.TLO.InvSlot(14).Item.Name()
-            else
-                weapon2 = 'none'
-            end
-            mq.cmd('/itemnotify 13 leftmouseup')
-            while mq.TLO.Cursor() == nil do
-                mq.delay(100)
-            end
-            local slot1, slot2 = inv.find_free_slot()
-            while mq.TLO.Cursor() ~= nil do
-                mq.cmdf("/squelch /nomodkey /shiftkey /itemnotify in pack%s %s leftmouseup", slot1, slot2)
-                mq.delay(100)
-            end
-            if weapon2 ~= 'none' then
-                mq.cmd('/itemnotify 14 leftmouseup')
-                while mq.TLO.Cursor() == nil do
-                    mq.delay(100)
-                end
-                slot1, slot2 = inv.find_free_slot()
-                while mq.TLO.Cursor() ~= nil do
-                    mq.cmdf("/squelch /nomodkey /shiftkey /itemnotify in pack%s %s leftmouseup", slot1, slot2)
-                    mq.delay(100)
-                end
-            end
+            inv.remove_weapons()
         end
     end
     mq.TLO.Spawn(ID).DoTarget()
@@ -310,24 +285,7 @@ function mob.npc_damage_until(item)
     if item.zone ~= nil then
         if mq.TLO.Me.Level() >= tonumber(item.zone) then
             Logger.log_info("\aoReequiping weapons.")
-            mq.cmdf('/itemnotify "%s" leftmouseup', weapon1)
-            while mq.TLO.Cursor() == nil do
-                mq.delay(100)
-            end
-            while mq.TLO.Cursor() ~= nil do
-                mq.cmd('/itemnotify 13 leftmouseup')
-                mq.delay(100)
-            end
-            if weapon2 ~= 'none' then
-                mq.cmdf('/itemnotify "%s" leftmouseup', weapon2)
-                while mq.TLO.Cursor() == nil do
-                    mq.delay(100)
-                end
-                while mq.TLO.Cursor() ~= nil do
-                    mq.cmd('/itemnotify 14 leftmouseup')
-                    mq.delay(100)
-                end
-            end
+            inv.restore_weapons()
         end
     end
 end
