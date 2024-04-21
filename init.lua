@@ -430,6 +430,9 @@ local function run_epic(class, choice)
             travel.open_door()
         elseif task_table[State.step].type == "OPEN_DOOR_ALL" then
             manage.openDoorAll()
+        elseif task_table[State.step].type == "PAUSE" then
+            State.status = task_table[State.step].npc
+            State.task_run = false
         elseif task_table[State.step].type == "PH_SEARCH" then
             Mob.ph_search(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "PICK_DOOR" then
