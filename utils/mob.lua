@@ -280,6 +280,7 @@ function mob.npc_damage_until(item)
     mq.cmd("/squelch /attack off")
     Logger.log_info("\aoTarget has either despawned or has decreased below \ag%s% \aohealth.", item.what)
     while mq.TLO.Spawn(ID)() ~= nil do
+        Logger.log_verbose("\aoWaiting for \aritem.npc \aoto despawn before continuing.", item.what)
         mq.delay(50)
     end
     if item.zone ~= nil then
