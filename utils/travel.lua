@@ -204,10 +204,10 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
             State.skip = false
             return
         end
-        if Mob.xtargetCheck(char_settings) then
-            travel.navPause()
-            Mob.clearXtarget(class_settings, char_settings)
-            travel.navUnpause(item)
+        if item.zone == nil then
+            if Mob.xtargetCheck(char_settings) then
+                Mob.clearXtarget(class_settings, char_settings)
+            end
         end
         if State.pause == true then
             travel.navPause()
@@ -731,8 +731,10 @@ end
 
 function travel.npc_travel(item, class_settings, ignore_path_check, char_settings)
     ignore_path_check = ignore_path_check or false
-    if Mob.xtargetCheck(char_settings) then
-        Mob.clearXtarget(class_settings, char_settings)
+    if item.zone == nil then
+        if Mob.xtargetCheck(char_settings) then
+            Mob.clearXtarget(class_settings, char_settings)
+        end
     end
     if char_settings.general.speedForTravel == true then
         local speedChar, speedSkill = travel.speedCheck(class_settings, char_settings)
