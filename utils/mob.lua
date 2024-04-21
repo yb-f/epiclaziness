@@ -254,7 +254,7 @@ function mob.npc_damage_until(item)
     local weapon2 = ''
     if item.zone ~= nil then
         if mq.TLO.Me.Level() >= tonumber(item.zone) then
-            Logger.log_warn("Our level is \ag%s \aoor greater. Removing weapons before engaging.", item.zone)
+            Logger.log_warn("\aoOur level is \ag%s \aoor higher. Removing weapons before engaging.", item.zone)
             weapon1 = mq.TLO.InvSlot(13).Item.Name()
             if mq.TLO.InvSlot(14).Item() ~= nil then
                 weapon2 = mq.TLO.InvSlot(14).Item.Name()
