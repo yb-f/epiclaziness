@@ -296,111 +296,75 @@ function mob.npc_kill(item, class_settings, char_settings, loot)
     State.status = "Killing " .. item.npc
     Logger.log_info("\aoKilling \ag%s\ao.", item.npc)
     manage.unpauseGroup(class_settings)
-    if item.what == nil then
-        mq.delay(200)
-        local ID = mob.findNearestName(item.npc, item, class_settings, char_settings)
-        if mq.TLO.Spawn(ID).Distance() ~= nil then
-            if mq.TLO.Spawn(ID).Distance() > 100 then
-                State.rewound = true
-                State.step = State.step - 1
-                Logger.log_warn("\ar%s \aois over 100 units away. Moving back to step \ar%s\ao.", item.npc, State.step)
-                return
-            end
-        end
-        Logger.log_verbose("\aoTargeting \ar%s\ao.", item.npc)
-        mq.TLO.Spawn(ID).DoTarget()
-        mq.cmd("/squelch /stick")
-        mq.delay(100)
-        mq.cmd("/squelch /attack on")
-        Logger.log_super_verbose("\aoGenerating events to detect unhittable or bugged target.")
-        mq.event("cannot_see", "You cannot see your target.", target_invalid_switch)
-        mq.event("cannot_cast", "You cannot cast#*#on#*#", target_invalid_switch)
-        while mq.TLO.Spawn(ID).Type() == 'NPC' or mq.TLO.Spawn(ID).Type() == 'Chest' do
-            mq.doevents()
-            if State.skip == true then
-                mq.unevent('cannot_see')
-                mq.unevent('cannot_cast')
-                State.skip = false
-                return
-            end
-            if State.cannot_count > 9 then
-                State.cannot_count = 0
-                table.insert(State.bad_IDs, ID)
-                State.rewound = true
-                State.step = State.step - 1
-                mq.unevent('cannot_see')
-                mq.unevent('cannot_cast')
-                Logger.log_warn('\aoUnable to hit this target. Adding \ar%s \aoto bad IDs and moving back to step \ar%s\ao.', ID, State.step)
-                return
-            end
-            if mq.TLO.Target.ID() ~= ID then
-                Logger.log_verbose("\aoRetargeting \ag%s\ao.", ID)
-                mq.TLO.Spawn(ID).DoTarget()
-            end
-            if mq.TLO.Me.Combat() == false then
-                Logger.log_super_verbose("\aoAttack was off when it should have been on. Turning it back on.")
-                mq.cmd("/squelch /attack on")
-            end
-            mq.delay(200)
-        end
-        mq.unevent('cannot_see')
-        mq.unevent('cannot_cast')
-    else
-        if mq.TLO.Spawn("npc " .. item.npc).ID() ~= 0 then
-            local ID = mob.findNearestName(item.npc, item, class_settings, char_settings)
-            if mq.TLO.Spawn(ID).Distance() ~= nil then
-                if mq.TLO.Spawn(ID).Distance() > 100 then
-                    State.rewound = true
-                    State.step = State.step - 1
-                    Logger.log_warn("\ar%s \aois over 100 units away. Moving back to step \ar%s\ao.", item.npc, State.step)
-                    return
-                end
-            end
-            Logger.log_verbose("\aoTargeting \ar%s\ao.", item.npc)
-            mq.TLO.Spawn(ID).DoTarget()
-            mq.cmd("/squelch /stick")
-            mq.delay(100)
-            mq.cmd("/squelch /attack on")
-            while mq.TLO.Spawn(ID).Type() == 'NPC' do
-                if State.skip == true then
-                    State.skip = false
-                    return
-                end
-                if mq.TLO.Target.ID() ~= ID then
-                    Logger.log_verbose("\aoRetargeting \ag%s\ao.", ID)
-                    mq.TLO.Spawn(ID).DoTarget()
-                end
-                if mq.TLO.Me.Combat() == false then
-                    Logger.log_super_verbose("\aoAttack was off when it should have been on. Turning it back on.")
-                    mq.cmd("/squelch /attack on")
-                end
-                mq.delay(200)
-            end
-        else
-            Logger.log_warn("\ag%s \aonot found. Searching for \ag%s \aoinstead.", item.npc, item.what)
-            local ID = mob.findNearestName(item.npc, item, class_settings, char_settings)
-            if mq.TLO.Spawn(ID).Distance() ~= nil then
-                if mq.TLO.Spawn(ID).Distance() > 100 then
-                    State.rewound = true
-                    State.step = State.step - 1
-                    Logger.log_warn("\ar%s \aois over 100 units away. Moving back to step \ar%s\ao.", item.what, State.step)
-                    return
-                end
-            end
-            Logger.log_verbose("\aoTargeting \ar%s\ao.", item.what)
-            mq.TLO.Spawn(ID).DoTarget()
-            mq.cmd("/squelch /stick")
-            mq.delay(100)
-            mq.cmd("/squelch /attack on")
-            while mq.TLO.Spawn(ID).Type() == 'NPC' do
-                if State.skip == true then
-                    State.skip = false
-                    return
-                end
-                mq.delay(200)
-            end
+    mq.delay(200)
+    local ID = mob.findNearestName(item.npc, item, class_settings, char_settings)
+    if mq.TLO.Spawn(ID).Distance() ~= nil then
+        if mq.TLO.Spawn(ID).Distance() > 100 then
+            State.rewound = true
+            State.step = State.step - 1
+            Logger.log_warn("\ar%s \aois over 100 units away. Moving back to step \ar%s\ao.", item.npc, State.step)
+            return
         end
     end
+    Logger.log_verbose("\aoTargeting \ar%s\ao.", item.npc)
+    mq.TLO.Spawn(ID).DoTarget()
+    mq.cmd("/squelch /stick")
+    mq.delay(100)
+    mq.cmd("/squelch /attack on")
+    Logger.log_super_verbose("\aoGenerating events to detect unhittable or bugged target.")
+    mq.event("cannot_see", "You cannot see your target.", target_invalid_switch)
+    mq.event("cannot_cast", "You cannot cast#*#on#*#", target_invalid_switch)
+    while mq.TLO.Spawn(ID).Type() == 'NPC' or mq.TLO.Spawn(ID).Type() == 'Chest' do
+        mq.doevents()
+        if item.what ~= nil then
+            if mq.TLO.AdvLoot.SCount() > 0 then
+                for i = 1, mq.TLO.AdvLoot.SCount() do
+                    if mq.TLO.AdvLoot.SList(i).Name() == item.what then
+                        State.step = item.gotostep
+                        State.rewound = true
+                        State.skip = true
+                        return
+                    end
+                end
+            elseif mq.TLO.AdvLoot.PCount > 0 then
+                for i = 1, mq.TLO.AdvLoot.PCount() do
+                    if mq.TLO.AdvLoot.PList(i).Name() == item.what then
+                        State.step = item.gotostep
+                        State.rewound = true
+                        State.skip = true
+                        return
+                    end
+                end
+            end
+        end
+        if State.skip == true then
+            mq.unevent('cannot_see')
+            mq.unevent('cannot_cast')
+            State.skip = false
+            return
+        end
+        if State.cannot_count > 9 then
+            State.cannot_count = 0
+            table.insert(State.bad_IDs, ID)
+            State.rewound = true
+            State.step = State.step - 1
+            mq.unevent('cannot_see')
+            mq.unevent('cannot_cast')
+            Logger.log_warn('\aoUnable to hit this target. Adding \ar%s \aoto bad IDs and moving back to step \ar%s\ao.', ID, State.step)
+            return
+        end
+        if mq.TLO.Target.ID() ~= ID then
+            Logger.log_verbose("\aoRetargeting \ag%s\ao.", ID)
+            mq.TLO.Spawn(ID).DoTarget()
+        end
+        if mq.TLO.Me.Combat() == false then
+            Logger.log_super_verbose("\aoAttack was off when it should have been on. Turning it back on.")
+            mq.cmd("/squelch /attack on")
+        end
+        mq.delay(200)
+    end
+    mq.unevent('cannot_see')
+    mq.unevent('cannot_cast')
     manage.pauseGroup(class_settings)
     mq.delay("2s")
     if mq.TLO.AdvLoot.SCount() > 0 then
