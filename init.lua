@@ -360,6 +360,8 @@ local function run_epic(class, choice)
             Actions.farm_check_pause(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "FARM_RADIUS" then
             Actions.farm_radius(task_table[State.step], class_settings.settings, loadsave.SaveState)
+        elseif task_table[State.step].type == "FARM_RADIUS_EVENT" then
+            Actions.farm_radius(task_table[State.step], class_settings.settings, loadsave.SaveState, true)
         elseif task_table[State.step].type == "FISH_FARM" then
             Actions.fish_farm(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "FISH_ONCE" then
