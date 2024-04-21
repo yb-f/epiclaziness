@@ -1,13 +1,14 @@
-local mq            = require('mq')
-local inv           = require 'utils/inventory'
-local manage        = require 'utils/manageautomation'
-local travel        = require 'utils/travel'
+local mq                     = require('mq')
+local inv                    = require 'utils/inventory'
+local manage                 = require 'utils/manageautomation'
+local travel                 = require 'utils/travel'
 
-local Actions       = {}
-local waiting       = false
-local gamble_done   = false
-local forage_trash  = { 'Fruit', 'Roots', 'Vegetables', 'Pod of Water', 'Berries', 'Rabbit Meat', 'Fishing Grubs' }
-local fishing_trash = { 'Fish Scales', 'Tattered Cloth Sandal', 'Rusty Dagger', "Moray Eel", "Gunthak Gourami",
+local Actions                = {}
+Actions.farm_event_triggered = false
+local waiting                = false
+local gamble_done            = false
+local forage_trash           = { 'Fruit', 'Roots', 'Vegetables', 'Pod of Water', 'Berries', 'Rabbit Meat', 'Fishing Grubs' }
+local fishing_trash          = { 'Fish Scales', 'Tattered Cloth Sandal', 'Rusty Dagger', "Moray Eel", "Gunthak Gourami",
     "Deep Sea Urchin", "Fresh Fish", "Gunthak Mackerel", "Saltwater Seaweed", "Dark Fish's Scales" }
 
 local function gamble_event(line, arg1)
@@ -165,31 +166,148 @@ function Actions.farm_check_pause(item, class_settings, char_settings)
     end
 end
 
-function Actions.farm_radius(item, class_settings, char_settings)
-    if item.count ~= nil then
-        State.status = "Farming for " .. item.what .. " (" .. item.count .. ")"
-        Logger.log_info("\aoFarming for \ag%s \ao(\ag%s\ao).", item.what, item.count)
+function Actions.farm_event(line)
+    Actions.farm_event_triggered = true
+end
+
+function Actions.farm_radius(item, class_settings, char_settings, event)
+    event = event or false
+    if event == false then
+        if item.count ~= nil then
+            State.status = "Farming for " .. item.what .. " (" .. item.count .. ")"
+            Logger.log_info("\aoFarming for \ag%s \ao(\ag%s\ao).", item.what, item.count)
+        else
+            State.status = "Farming for " .. item.what
+            Logger.log_info("\aoFarming for \ag%s\ao.", item.what)
+        end
     else
-        State.status = "Farming for " .. item.what
-        Logger.log_info("\aoFarming for \ag%s\ao.", item.what)
+        Actions.farm_event_triggered = false
+        State.status = "Killing mobs in radius" .. item.radius .. "until event."
+        Logger.log_info("\aoKilling mobs in radius \ag%s \aountil event.", item.radius)
+        Logger.log_debug("\aoEvent trigger is \ag%s\ao.", item.npc)
+        mq.event('farm_event', item.npc, Actions.farm_event)
     end
     travel.loc_travel(item, class_settings, char_settings)
     manage.campGroup(item.radius, class_settings, char_settings)
     manage.unpauseGroup(class_settings)
-    if item.count ~= nil then
-        State.status = "Farming for " .. item.what .. " (" .. item.count .. ")"
-    else
-        State.status = "Farming for " .. item.what
-    end
     local item_list = {}
     local item_status = ''
     local looping = true
     local loop_check = true
-    for word in string.gmatch(item.what, '([^|]+)') do
-        table.insert(item_list, word)
+    if event == false then
+        if item.count ~= nil then
+            State.status = "Farming for " .. item.what .. " (" .. item.count .. ")"
+        else
+            State.status = "Farming for " .. item.what
+        end
+        for word in string.gmatch(item.what, '([^|]+)') do
+            table.insert(item_list, word)
+        end
     end
     manage.removeInvis()
-    if item.count == nil then
+    if event == false then
+        if item.count == nil then
+            while looping do
+                if State.skip == true then
+                    travel.navPause()
+                    manage.uncampGroup(class_settings)
+                    manage.pauseGroup(class_settings)
+                    State.skip = false
+                    return
+                end
+                if State.pause == true then
+                    manage.pauseGroup(class_settings)
+                    Actions.pause(State.status)
+                    manage.unpauseGroup(class_settings)
+                end
+                item_status = ''
+                loop_check = true
+                local item_remove = 0
+                for i, name in pairs(item_list) do
+                    if mq.TLO.FindItem("=" .. name)() == nil then
+                        loop_check = false
+                        item_status = item_status .. "|" .. name
+                    else
+                        Logger.log_verbose("\aoRemoving \ar%s\ao from list.", name)
+                        item_remove = i
+                    end
+                end
+                if item_remove > 0 then
+                    table.remove(item_list, item_remove)
+                end
+                State.status = "Farming for " .. item_status
+                if loop_check then
+                    looping = false
+                end
+                if mq.TLO.AdvLoot.SCount() > 0 then
+                    for i = 1, mq.TLO.AdvLoot.SCount() do
+                        for _, name in pairs(item_list) do
+                            if mq.TLO.AdvLoot.SList(i).Name() == name then
+                                mq.cmdf('/squelch /advloot shared %s giveto %s', i, mq.TLO.Me.DisplayName())
+                                Logger.log_info("\aoLooting: \ag%s", name)
+                            end
+                        end
+                    end
+                end
+                mq.delay(250)
+                if mq.TLO.AdvLoot.PCount() > 0 then
+                    for i = 1, mq.TLO.AdvLoot.PCount() do
+                        for _, name in pairs(item_list) do
+                            if mq.TLO.AdvLoot.PList(i).Name() == name then
+                                mq.cmdf('/squelch /advloot personal %s loot', i)
+                                Logger.log_info("\aoLooting: \ag%s", name)
+                            end
+                        end
+                    end
+                end
+                mq.delay("1s")
+                if mq.TLO.Window('ConfirmationDialogBox').Open() then
+                    Logger.log_verbose("\aoNo drop confirmation window open.  Clicking yes.")
+                    mq.TLO.Window('ConfirmationDialogBox/CD_Yes_Button').LeftMouseUp()
+                    mq.delay("1s")
+                end
+            end
+        else
+            while mq.TLO.FindItemCount("=" .. item.what)() < item.count do
+                if State.skip == true then
+                    travel.navPause()
+                    manage.uncampGroup(class_settings)
+                    manage.pauseGroup(class_settings)
+                    State.skip = false
+                    return
+                end
+                if State.pause == true then
+                    manage.pauseGroup(class_settings)
+                    Actions.pause(State.status)
+                    manage.unpauseGroup(class_settings)
+                end
+                if mq.TLO.AdvLoot.SCount() > 0 then
+                    for i = 1, mq.TLO.AdvLoot.SCount() do
+                        if mq.TLO.AdvLoot.SList(i).Name() == item.what then
+                            mq.cmdf('/squelch /advloot shared %s giveto %s', i, mq.TLO.Me.DisplayName())
+                            Logger.log_info("\aoLooting: \ag%s", item.what)
+                        end
+                    end
+                end
+                if mq.TLO.AdvLoot.PCount() > 0 then
+                    for i = 1, mq.TLO.AdvLoot.PCount() do
+                        for _, name in pairs(item_list) do
+                            if mq.TLO.AdvLoot.PList(i).Name() == name then
+                                mq.cmdf('/squelch /advloot personal %s loot', i)
+                                Logger.log_info("\aoLooting: \ag%s", item.what)
+                            end
+                        end
+                    end
+                end
+                mq.delay("1s")
+                if mq.TLO.Window('ConfirmationDialogBox').Open() then
+                    Logger.log_verbose("\aoNo drop confirmation window open.  Clicking yes.")
+                    mq.TLO.Window('ConfirmationDialogBox/CD_Yes_Button').LeftMouseUp()
+                    mq.delay("1s")
+                end
+            end
+        end
+    else
         while looping do
             if State.skip == true then
                 travel.navPause()
@@ -203,90 +321,14 @@ function Actions.farm_radius(item, class_settings, char_settings)
                 Actions.pause(State.status)
                 manage.unpauseGroup(class_settings)
             end
-            item_status = ''
-            loop_check = true
-            local item_remove = 0
-            for i, name in pairs(item_list) do
-                if mq.TLO.FindItem("=" .. name)() == nil then
-                    loop_check = false
-                    item_status = item_status .. "|" .. name
-                else
-                    Logger.log_verbose("\aoRemoving \ar%s\ao from list.", name)
-                    item_remove = i
-                end
-            end
-            if item_remove > 0 then
-                table.remove(item_list, item_remove)
-            end
-            State.status = "Farming for " .. item_status
-            if loop_check then
-                looping = false
-            end
-            if mq.TLO.AdvLoot.SCount() > 0 then
-                for i = 1, mq.TLO.AdvLoot.SCount() do
-                    for _, name in pairs(item_list) do
-                        if mq.TLO.AdvLoot.SList(i).Name() == name then
-                            mq.cmdf('/squelch /advloot shared %s giveto %s', i, mq.TLO.Me.DisplayName())
-                            Logger.log_info("\aoLooting: \ag%s", name)
-                        end
-                    end
-                end
-            end
             mq.delay(250)
-            if mq.TLO.AdvLoot.PCount() > 0 then
-                for i = 1, mq.TLO.AdvLoot.PCount() do
-                    for _, name in pairs(item_list) do
-                        if mq.TLO.AdvLoot.PList(i).Name() == name then
-                            mq.cmdf('/squelch /advloot personal %s loot', i)
-                            Logger.log_info("\aoLooting: \ag%s", name)
-                        end
-                    end
-                end
-            end
-            mq.delay("1s")
-            if mq.TLO.Window('ConfirmationDialogBox').Open() then
-                Logger.log_verbose("\aoNo drop confirmation window open.  Clicking yes.")
-                mq.TLO.Window('ConfirmationDialogBox/CD_Yes_Button').LeftMouseUp()
-                mq.delay("1s")
-            end
-        end
-    else
-        while mq.TLO.FindItemCount("=" .. item.what)() < item.count do
-            if State.skip == true then
-                travel.navPause()
-                manage.uncampGroup(class_settings)
-                manage.pauseGroup(class_settings)
-                State.skip = false
-                return
-            end
-            if State.pause == true then
-                manage.pauseGroup(class_settings)
-                Actions.pause(State.status)
-                manage.unpauseGroup(class_settings)
-            end
-            if mq.TLO.AdvLoot.SCount() > 0 then
-                for i = 1, mq.TLO.AdvLoot.SCount() do
-                    if mq.TLO.AdvLoot.SList(i).Name() == item.what then
-                        mq.cmdf('/squelch /advloot shared %s giveto %s', i, mq.TLO.Me.DisplayName())
-                        Logger.log_info("\aoLooting: \ag%s", item.what)
-                    end
-                end
-            end
-            if mq.TLO.AdvLoot.PCount() > 0 then
-                for i = 1, mq.TLO.AdvLoot.PCount() do
-                    for _, name in pairs(item_list) do
-                        if mq.TLO.AdvLoot.PList(i).Name() == name then
-                            mq.cmdf('/squelch /advloot personal %s loot', i)
-                            Logger.log_info("\aoLooting: \ag%s", item.what)
-                        end
-                    end
-                end
-            end
-            mq.delay("1s")
-            if mq.TLO.Window('ConfirmationDialogBox').Open() then
-                Logger.log_verbose("\aoNo drop confirmation window open.  Clicking yes.")
-                mq.TLO.Window('ConfirmationDialogBox/CD_Yes_Button').LeftMouseUp()
-                mq.delay("1s")
+            mq.doevents()
+            if Actions.farm_event_triggered == true then
+                State.status = "Event triggered. Moving on."
+                Logger.log_info("\aoEvent triggered, moving on.")
+                Logger.log_verbose("Removing farm_event trigger")
+                mq.unevent('farm_event')
+                looping = false
             end
         end
     end
@@ -539,9 +581,9 @@ function Actions.npc_give(item, class_settings, char_settings)
         return
     end
     mq.cmdf('/squelch /nomodkey /shift /itemnotify "%s" leftmouseup', item.what)
-    mq.delay("2s", Actions.got_cursor)
+    mq.delay("5s", Actions.got_cursor)
     mq.TLO.Target.LeftClick()
-    mq.delay("5s", Actions.give_window)
+    mq.delay("10s", Actions.give_window)
     local looping = true
     local loopCount = 0
     while looping do
@@ -569,7 +611,8 @@ function Actions.npc_give(item, class_settings, char_settings)
     mq.TLO.Window('GiveWnd').Child('GVW_Give_Button').LeftMouseUp()
     mq.delay(100)
     while mq.TLO.Window('GiveWnd').Open() do
-        mq.delay(100)
+        mq.delay(250)
+        mq.TLO.Window('GiveWnd').Child('GVW_Give_Button').LeftMouseUp()
         if State.skip == true then
             State.skip = false
             return
