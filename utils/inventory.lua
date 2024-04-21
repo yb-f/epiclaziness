@@ -7,6 +7,16 @@ local inventory       = {}
 inventory.slot        = 0
 --- @type string
 inventory.stored_item = ''
+inventory.weapon1     = {
+    ['name']  = '',
+    ['slot1'] = 0,
+    ['slot2'] = 0
+}
+inventory.weapon2     = {
+    ['name']  = '',
+    ['slot1'] = 0,
+    ['slot2'] = 0
+}
 
 function inventory.tradeskill_window()
     return mq.TLO.Window('TradeskillWnd').Open()
@@ -303,6 +313,64 @@ function inventory.restore_item()
         mq.delay(100)
         mq.cmd('/squelch /autoinv')
     end
+end
+
+function inventory.remove_weapons()
+    inventory.weapon1.name = mq.TLO.InvSlot(13).Item.Name()
+    if mq.TLO.InvSlot(14).Item() ~= nil then
+        inventory.weapon2.name = mq.TLO.InvSlot(14).Item.Name()
+    else
+        inventory.weapon2.name = 'none'
+    end
+    inventory.weapon1.slot1, inventory.weapon1.slot2 = inventory.find_free_slot()
+    mq.cmd('/itemnotify 13 leftmouseup')
+    while mq.TLO.Cursor() == nil do
+        mq.delay(100)
+    end
+    while mq.TLO.Cursor() ~= nil do
+        mq.cmdf("/squelch /nomodkey /shiftkey /itemnotify in pack%s %s leftmouseup", inventory.weapon1.slot1, inventory.weapon1.slot2)
+        mq.delay(100)
+    end
+    if inventory.weapon2.name ~= 'none' then
+        inventory.weapon2.slot1, inventory.weapon2.slot2 = inventory.find_free_slot()
+        mq.cmd('/itemnotify 14 leftmouseup')
+        while mq.TLO.Cursor() == nil do
+            mq.delay(100)
+        end
+        while mq.TLO.Cursor() ~= nil do
+            mq.cmdf("/squelch /nomodkey /shiftkey /itemnotify in pack%s %s leftmouseup", inventory.weapon2.slot1, inventory.weapon2.slot2)
+            mq.delay(100)
+        end
+    end
+end
+
+function inventory.restore_weapons()
+    mq.cmdf("/squelch /nomodkey /shiftkey /itemnotify in pack%s %s leftmouseup", inventory.weapon1.slot1, inventory.weapon1.slot2)
+    while mq.TLO.Cursor() == nil do
+        mq.delay(100)
+    end
+    while mq.TLO.Cursor() ~= nil do
+        mq.cmd('/itemnotify 13 leftmouseup')
+        mq.delay(100)
+    end
+    if mq.TLO.Me.Inventory(13).Name() ~= inventory.weapon1.name then
+        Logger.log_warn("\aoThe main hand weapon does not seem to have been properly restored.")
+    end
+    if inventory.weapon2.name ~= 'none' then
+        mq.cmdf("/squelch /nomodkey /shiftkey /itemnotify in pack%s %s leftmouseup", inventory.weapon2.slot1, inventory.weapon2.slot2)
+        while mq.TLO.Cursor() == nil do
+            mq.delay(100)
+        end
+        while mq.TLO.Cursor() ~= nil do
+            mq.cmd('/itemnotify 14 leftmouseup')
+            mq.delay(100)
+        end
+        if mq.TLO.Me.Inventory(14).Name() ~= inventory.weapon2.name then
+            Logger.log_warn("\aoThe main hand weapon does not seem to have been properly restored.")
+        end
+    end
+    inventory.weapon1.name = ''
+    inventory.weapon2.name = ''
 end
 
 function inventory.find_free_slot(exclude_bag)
