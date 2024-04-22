@@ -198,7 +198,12 @@ function mob.findNearestName(npc, item, class_settings, char_settings)
         if travel.invisCheck(char_settings, item.invis) then
             travel.invis(class_settings)
         end
+
+
         if item.type == "NPC_KILL" then
+            if item.what ~= nil then
+                inv.loot_check(item)
+            end
             if tonumber(item.zone) == 1 then
                 if closest_ID == 0 then
                     if mq.TLO.Spawn('corpse ' .. item.npc).ID() ~= 0 then
@@ -339,25 +344,7 @@ function mob.npc_kill(item, class_settings, char_settings, loot)
     while mq.TLO.Spawn(ID).Type() == 'NPC' or mq.TLO.Spawn(ID).Type() == 'Chest' do
         mq.doevents()
         if item.what ~= nil then
-            if mq.TLO.AdvLoot.SCount() > 0 then
-                for i = 1, mq.TLO.AdvLoot.SCount() do
-                    if mq.TLO.AdvLoot.SList(i).Name() == item.what then
-                        State.step = item.gotostep
-                        State.rewound = true
-                        State.skip = true
-                        return
-                    end
-                end
-            elseif mq.TLO.AdvLoot.PCount() > 0 then
-                for i = 1, mq.TLO.AdvLoot.PCount() do
-                    if mq.TLO.AdvLoot.PList(i).Name() == item.what then
-                        State.step = item.gotostep
-                        State.rewound = true
-                        State.skip = true
-                        return
-                    end
-                end
-            end
+            inv.loot_check(item)
         end
         if State.skip == true then
             mq.unevent('cannot_see')
