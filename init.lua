@@ -22,7 +22,7 @@ if not ok then
 end
 
 local version_url        = 'https://raw.githubusercontent.com/yb-f/EL-Ver/master/latest_ver'
-local version            = "0.1.23"
+local version            = "0.1.24"
 local window_flags       = bit32.bor(ImGuiWindowFlags.None)
 local openGUI, drawGUI   = true, true
 local myName             = mq.TLO.Me.DisplayName()
