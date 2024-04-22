@@ -1,7 +1,6 @@
 local mq             = require('mq')
 local ImGui          = require 'ImGui'
 Logger               = require('utils/logger')
-local hashCheck      = require 'utils/hashcheck'
 local dist           = require 'utils/distance'
 Actions              = require 'utils/actions'
 local inv            = require 'utils/inventory'
@@ -23,7 +22,7 @@ if not ok then
 end
 
 local version_url        = 'https://raw.githubusercontent.com/yb-f/EL-Ver/master/latest_ver'
-local version            = "0.1.25"
+local version            = "0.1.26"
 local window_flags       = bit32.bor(ImGuiWindowFlags.None)
 local openGUI, drawGUI   = true, true
 local myName             = mq.TLO.Me.DisplayName()
@@ -108,6 +107,8 @@ State.velocity            = 0
 State.estimatedTime       = 0
 State.startDist           = 0
 State.updateTime          = math.floor(mq.gettime() / 1000)
+
+local hashCheck           = require 'utils/hashcheck'
 
 class_settings.loadSettings()
 loadsave.loadState()
