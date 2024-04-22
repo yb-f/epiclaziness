@@ -110,20 +110,21 @@ end
 function draw_gui.fullOutlineTab(task_table)
     if ImGui.BeginTabItem("Full Outline") then
         fullOutlineFilter = ImGui.InputText("Filter", fullOutlineFilter, ImGuiInputTextFlags.None)
-        ImGui.BeginTable('##outlinetable', 2, treeview_table_flags)
-        ImGui.TableSetupColumn("Step", bit32.bor(ImGuiTableColumnFlags.NoResize), 30)
-        ImGui.TableSetupColumn("Description", bit32.bor(ImGuiTableColumnFlags.WidthStretch, ImGuiTableColumnFlags.NoResize), 100)
-        ImGui.TableSetupScrollFreeze(0, 1)
-        ImGui.TableHeadersRow()
-        for i = 1, #task_table do
-            local step, outlineText = draw_gui.generate_outline_text(task_table[i])
-            if fullOutlineFilter == '' then
-                draw_gui.full_outline_row(task_table[i], step, outlineText)
-            elseif string.find(string.lower(outlineText), string.lower(fullOutlineFilter)) then
-                draw_gui.full_outline_row(task_table[i], step, outlineText)
+        if ImGui.BeginTable('##outlinetable', 2, treeview_table_flags) then
+            ImGui.TableSetupColumn("Step", bit32.bor(ImGuiTableColumnFlags.NoResize), 30)
+            ImGui.TableSetupColumn("Description", bit32.bor(ImGuiTableColumnFlags.WidthStretch, ImGuiTableColumnFlags.NoResize), 100)
+            ImGui.TableSetupScrollFreeze(0, 1)
+            ImGui.TableHeadersRow()
+            for i = 1, #task_table do
+                local step, outlineText = draw_gui.generate_outline_text(task_table[i])
+                if fullOutlineFilter == '' then
+                    draw_gui.full_outline_row(task_table[i], step, outlineText)
+                elseif string.find(string.lower(outlineText), string.lower(fullOutlineFilter)) then
+                    draw_gui.full_outline_row(task_table[i], step, outlineText)
+                end
             end
+            ImGui.EndTable()
         end
-        ImGui.EndTable()
         ImGui.EndTabItem()
     end
 end
@@ -277,20 +278,21 @@ end
 function draw_gui.outlineTab(task_outline_table, overview_steps, task_table)
     if ImGui.BeginTabItem("Outline") then
         outlineFilter = ImGui.InputText("Filter", outlineFilter, ImGuiInputTextFlags.None)
-        ImGui.BeginTable('##outlinetable', 3, treeview_table_flags)
-        ImGui.TableSetupColumn("Manual Completion", bit32.bor(ImGuiTableColumnFlags.NoResize), 30)
-        ImGui.TableSetupColumn("Step", bit32.bor(ImGuiTableColumnFlags.NoResize), 30)
-        ImGui.TableSetupColumn("Description", bit32.bor(ImGuiTableColumnFlags.WidthStretch, ImGuiTableColumnFlags.NoResize), 100)
-        ImGui.TableSetupScrollFreeze(0, 1)
-        ImGui.TableHeadersRow()
-        for i = 1, #task_outline_table do
-            if outlineFilter == '' then
-                draw_gui.outlineRow(overview_steps, task_outline_table, task_table, i)
-            elseif string.find(string.lower(task_outline_table[i].Description), string.lower(outlineFilter)) then
-                draw_gui.outlineRow(overview_steps, task_outline_table, task_table, i)
+        if ImGui.BeginTable('##outlinetable', 3, treeview_table_flags) then
+            ImGui.TableSetupColumn("Manual Completion", bit32.bor(ImGuiTableColumnFlags.NoResize), 30)
+            ImGui.TableSetupColumn("Step", bit32.bor(ImGuiTableColumnFlags.NoResize), 30)
+            ImGui.TableSetupColumn("Description", bit32.bor(ImGuiTableColumnFlags.WidthStretch, ImGuiTableColumnFlags.NoResize), 100)
+            ImGui.TableSetupScrollFreeze(0, 1)
+            ImGui.TableHeadersRow()
+            for i = 1, #task_outline_table do
+                if outlineFilter == '' then
+                    draw_gui.outlineRow(overview_steps, task_outline_table, task_table, i)
+                elseif string.find(string.lower(task_outline_table[i].Description), string.lower(outlineFilter)) then
+                    draw_gui.outlineRow(overview_steps, task_outline_table, task_table, i)
+                end
             end
+            ImGui.EndTable()
         end
-        ImGui.EndTable()
         ImGui.EndTabItem()
     end
 end
