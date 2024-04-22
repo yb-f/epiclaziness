@@ -1,6 +1,7 @@
 local mq             = require('mq')
 local ImGui          = require 'ImGui'
 Logger               = require('utils/logger')
+local hashCheck      = require 'utils/hashcheck'
 local dist           = require 'utils/distance'
 Actions              = require 'utils/actions'
 local inv            = require 'utils/inventory'
