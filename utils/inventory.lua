@@ -72,6 +72,28 @@ function inventory.find_best_bag_slot(item)
     return mySlot
 end
 
+function inventory.lootcheck(item)
+    if mq.TLO.AdvLoot.SCount() > 0 then
+        for i = 1, mq.TLO.AdvLoot.SCount() do
+            if mq.TLO.AdvLoot.SList(i).Name() == item.what then
+                State.step = item.gotostep
+                State.rewound = true
+                State.skip = true
+                return
+            end
+        end
+    elseif mq.TLO.AdvLoot.PCount() > 0 then
+        for i = 1, mq.TLO.AdvLoot.PCount() do
+            if mq.TLO.AdvLoot.PList(i).Name() == item.what then
+                State.step = item.gotostep
+                State.rewound = true
+                State.skip = true
+                return
+            end
+        end
+    end
+end
+
 function inventory.combine_container(item, class_settings, char_settings)
     if Mob.xtargetCheck(char_settings) then
         Mob.clearXtarget(class_settings, char_settings)
