@@ -298,7 +298,7 @@ function mob.npc_damage_until(item)
         if mq.TLO.Spawn(ID)() == nil then
             looping = false
         else
-            if mq.TLO.Spawn(ID).PctHPs() < item.what then
+            if mq.TLO.Spawn(ID).PctHPs() < tonumber(item.what) then
                 looping = false
             end
         end
