@@ -59,7 +59,8 @@ local quests_requirements = {
     },
     ['pal'] = {
         ['10']    = '',
-        ['pre15'] = 'No tradeskill or requirements for assistance from other classes. You are required to be in a guild in order to use the guildhall portal to Plane of Hate.',
+        ['pre15'] =
+        'No tradeskill or requirements for assistance from other classes. Some of the spawns in this quest are incredibly long so we use the Agent of Change for Plane of Storms and Plane of Hate. You will need to be in a group of 6 in order to do this.',
         ['15']    = '100 Fishing required.  Shaman with 224 Alchemy required for Mist of the Breathless.',
         ['20']    = ''
     },
