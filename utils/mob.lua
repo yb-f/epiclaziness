@@ -216,7 +216,7 @@ function mob.findNearestName(npc, item, class_settings, char_settings)
         end
         if item.type == "NPC_SEARCH" then
             if closest_ID == 0 then
-                Logger.log_info("\ar%s \ao not found. Advancing to next step.")
+                Logger.log_info("\ar%s \ao not found. Advancing to next step.", item.npc)
                 State.step = State.step + 1
                 State.rewound = true
                 State.skip = true
