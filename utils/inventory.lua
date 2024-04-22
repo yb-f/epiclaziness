@@ -72,7 +72,7 @@ function inventory.find_best_bag_slot(item)
     return mySlot
 end
 
-function inventory.lootcheck(item)
+function inventory.loot_check(item)
     if mq.TLO.AdvLoot.SCount() > 0 then
         for i = 1, mq.TLO.AdvLoot.SCount() do
             if mq.TLO.AdvLoot.SList(i).Name() == item.what then
