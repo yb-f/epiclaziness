@@ -529,6 +529,69 @@ function Actions.ground_spawn(item, class_settings, char_settings)
     inv.auto_inv()
 end
 
+function Actions.ground_spawn_farm(item, class_settings, char_settings)
+    State.status = "Farming for ground spawns: " .. item.what
+    Logger.log_info("\aoFarming for \ag%s", item.what)
+    local item_list = {}
+    local item_status = ''
+    local looping = true
+    local loop_check = true
+    for word in string.gmatch(item.what, '([^|]+)') do
+        table.insert(item_list, word)
+    end
+    while looping == true do
+        if State.skip == true then
+            travel.navPause()
+            manage.uncampGroup(class_settings)
+            manage.pauseGroup(class_settings)
+            State.skip = false
+            return
+        end
+        if State.pause == true then
+            manage.pauseGroup(class_settings)
+            Actions.pause(State.status)
+            manage.unpauseGroup(class_settings)
+        end
+        item_status = ''
+        local item_remove = 0
+        for i, name in pairs(item_list) do
+            if mq.TLO.FindItem("=" .. name)() == nil then
+                loop_check = false
+                item_status = item_status .. "|" .. name
+            else
+                Logger.log_verbose("\aoRemoving \ar%s\ao from list.", name)
+                item_remove = i
+            end
+        end
+        if item_remove > 0 then
+            table.remove(item_list, item_remove)
+        end
+        State.status = "Farming for " .. item_status
+        if loop_check then
+            looping = false
+        end
+
+        mq.cmdf('/squelch /itemtarget "%s"', item.npc)
+        mq.delay(50)
+        if mq.TLO.ItemTarget() ~= nil then
+            item.whereX = mq.TLO.ItemTarget.X()
+            item.whereY = mq.TLO.ItemTarget.Y()
+            item.whereZ = mq.TLO.ItemTarget.Z()
+            item.whereZ = item.whereZ * 100
+            item.whereZ = math.floor(item.whereZ)
+            item.whereZ = item.whereZ / 100
+            travel.loc_travel(item, class_settings, char_settings)
+            mq.delay(200)
+            mq.cmd("/squelch /click left itemtarget")
+            mq.delay(200)
+            if mq.TLO.Cursor() ~= nil then
+                Logger.log_debug("\aoWe have picked up a \ag%s\ao.", mq.TLO.Cursor())
+            end
+            mq.cmd("/squelch /autoinv")
+        end
+    end
+end
+
 function Actions.ignore_mob(item, class_settings)
     Logger.log_verbose("\aoAdding \ag%s\ao to mob ignore list.", item.npc)
     if class_settings.class[mq.TLO.Me.Class()] == 1 then
