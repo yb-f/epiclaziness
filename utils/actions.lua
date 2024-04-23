@@ -702,7 +702,7 @@ function Actions.npc_give_add(item, class_settings, char_settings)
         mq.TLO.Spawn(item.npc).DoTarget()
         mq.delay(300)
     end
-    mq.cmdf('/squelch /itemnotify "%s" leftmouseup', item.what)
+    mq.cmdf('/squelch /ctrl /itemnotify "%s" leftmouseup', item.what)
     mq.delay("2s", Actions.got_cursor)
     mq.TLO.Target.LeftClick()
     mq.delay("5s", Actions.give_window)
