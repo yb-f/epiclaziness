@@ -23,6 +23,9 @@ local invis_type           = {}
 local treeview_table_flags = bit32.bor(ImGuiTableFlags.Hideable, ImGuiTableFlags.RowBg, ImGuiTableFlags.Borders, ImGuiTableFlags.SizingFixedFit, ImGuiTableFlags.ScrollX)
 local myClass              = mq.TLO.Me.Class()
 
+draw_gui.travelPct         = 0
+draw_gui.travelText        = ''
+
 function draw_gui.full_outline_row(item, step, outlineText)
     ImGui.TableNextRow()
     ImGui.TableNextColumn()
@@ -129,15 +132,6 @@ function draw_gui.fullOutlineTab(task_table)
     end
 end
 
-function draw_gui.pathUpdate()
-    if math.floor(mq.gettime() / 1000) > State.updateTime then
-        local path = string.format("%s %s", State.destType, State.dest)
-        State.pathDist = mq.TLO.Navigation.PathLength(path)()
-        State.velocity = mq.TLO.Navigation.Velocity()
-        State.estimatedTime = State.pathDist / State.velocity
-    end
-end
-
 function draw_gui.generalTab(task_table)
     if ImGui.BeginTabItem("General") then
         ImGui.Text("Class: " .. myClass .. " " .. State.epicstring)
@@ -225,15 +219,18 @@ function draw_gui.generalTab(task_table)
         ImGui.SetCursorPosX(ImGui.GetCursorPosX() + (ImGui.GetWindowWidth() / 2) - 60)
         ImGui.Text("Step " .. tostring(State.step) .. " of " .. tostring(#task_table))
         if State.destType ~= '' then
-            draw_gui.pathUpdate()
-            local travelPct = 1.0 - (State.pathDist / State.startDist)
-            local travelText = string.format("Distance: %s Velocity: %s ETA: %s seconds", math.floor(State.pathDist), math.floor(State.velocity), math.floor(State.estimatedTime))
+            local path = string.format("%s %s", State.destType, State.dest)
+            State.pathDist = mq.TLO.Navigation.PathLength(path)()
+            State.velocity = mq.TLO.Navigation.Velocity()
+            State.estimatedTime = State.pathDist / State.velocity
+            draw_gui.travelPct = 1.0 - (State.pathDist / State.startDist)
+            draw_gui.travelText = string.format("Distance: %s Velocity: %s ETA: %s seconds", math.floor(State.pathDist), math.floor(State.velocity), math.floor(State.estimatedTime))
             ImGui.PushStyleColor(ImGuiCol.PlotHistogram, IM_COL32(150, 150, 40, 255))
-            ImGui.ProgressBar(travelPct, ImGui.GetWindowWidth(), 17, "##dist")
+            ImGui.ProgressBar(draw_gui.travelPct, ImGui.GetWindowWidth(), 17, "##dist")
             ImGui.PopStyleColor()
             ImGui.SetCursorPosY(ImGui.GetCursorPosY() - 20)
             ImGui.SetCursorPosX(ImGui.GetCursorPosX() + (ImGui.GetWindowWidth() / 2) - 115)
-            ImGui.Text(travelText)
+            ImGui.Text(draw_gui.travelText)
         end
         ImGui.TextWrapped(State.status)
         ImGui.NewLine()
