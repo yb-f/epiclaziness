@@ -516,7 +516,6 @@ function inventory.move_combine_container(slot, container)
     mq.cmdf("/squelch /nomodkey /shiftkey /itemnotify %s leftmouseup", slot + 22)
     local loopCount = 0
     while mq.TLO.Cursor() == container do
-        print(mq.TLO.Cursor())
         loopCount = loopCount + 1
         mq.delay(100)
         if loopCount == 10 then
