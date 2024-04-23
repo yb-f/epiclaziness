@@ -145,7 +145,7 @@ function mob.clearXtarget(class_settings, char_settings)
 end
 
 local function matchFilters(spawn)
-    if string.find(string.lower(spawn.CleanName()), string.lower(searchFilter)) and (spawn.Type() == 'NPC' or spawn.Type() == 'Trigger' or spawn.Type() == 'Chest') then
+    if string.find(string.lower(spawn.CleanName()), string.lower(searchFilter)) and (spawn.Type() == 'NPC' or spawn.Type() == 'Trigger' or spawn.Type() == 'Chest' or spawn.Type() == 'Corpse') then
         for _, ID in pairs(State.bad_IDs) do
             if spawn.ID() == ID then
                 return false
@@ -170,12 +170,17 @@ function mob.findNearestName(npc, item, class_settings, char_settings)
     local closest_distance = 25000
     local closest_ID = 0
     while closest_ID == 0 do
+        local foundCorpse = false
         mq.delay(50)
         for _, spawn in pairs(mob_list) do
             if mq.TLO.Navigation.PathExists('id ' .. spawn.ID())() then
                 if mq.TLO.Navigation.PathLength('id ' .. spawn.ID())() < closest_distance then
-                    closest_distance = mq.TLO.Navigation.PathLength('id ' .. spawn.ID())()
-                    closest_ID = spawn.ID()
+                    if spawn.Type() == 'Corpse' then
+                        foundCorpse = true
+                    else
+                        closest_distance = mq.TLO.Navigation.PathLength('id ' .. spawn.ID())()
+                        closest_ID = spawn.ID()
+                    end
                 end
             else
             end
@@ -198,8 +203,6 @@ function mob.findNearestName(npc, item, class_settings, char_settings)
         if travel.invisCheck(char_settings, item.invis) then
             travel.invis(class_settings)
         end
-
-
         if item.type == "NPC_KILL" then
             if item.what ~= nil then
                 inv.loot_check(item)
