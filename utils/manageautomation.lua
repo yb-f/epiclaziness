@@ -39,6 +39,7 @@ function manage.doAutomation(character, class, script, action, char_settings)
             elseif script == 2 then
                 mq.cmdf("/squelch /lua run rgmercs %s", mq.TLO.Me.DisplayName())
                 mq.cmd("/squelch /rgl set PullZRadius 100")
+                mq.cmd("/squelch /rgl set pullmincon 1")
             elseif script == 3 then
                 mq.cmd("/squelch /mac rgmercs")
             elseif script == 4 then
