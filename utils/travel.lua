@@ -312,7 +312,6 @@ function travel.general_travel(item, class_settings, char_settings, ID)
             travel.navUnpause(item)
         end
         ID = Mob.findNearestName(item.npc, item, class_settings, char_settings)
-        print(ID)
     end
     State.status = "Navigating to " .. item.npc
     if ID == 0 then
