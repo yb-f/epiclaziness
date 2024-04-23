@@ -132,6 +132,18 @@ function draw_gui.fullOutlineTab(task_table)
     end
 end
 
+function draw_gui.pathUpdate()
+    if math.floor(mq.gettime() / 1000) > State.updateTime then
+        State.updateTime    = math.floor(mq.gettime() / 1000) + 1
+        local path          = string.format("%s %s", State.destType, State.dest)
+        State.pathDist      = mq.TLO.Navigation.PathLength(path)()
+        State.velocity      = mq.TLO.Navigation.Velocity()
+        State.estimatedTime = State.pathDist / State.velocity
+        draw_gui.travelPct  = 1.0 - (State.pathDist / State.startDist)
+        draw_gui.travelText = string.format("Distance: %s Velocity: %s ETA: %s seconds", math.floor(State.pathDist), math.floor(State.velocity), math.floor(State.estimatedTime))
+    end
+end
+
 function draw_gui.generalTab(task_table)
     if ImGui.BeginTabItem("General") then
         ImGui.Text("Class: " .. myClass .. " " .. State.epicstring)
@@ -219,12 +231,7 @@ function draw_gui.generalTab(task_table)
         ImGui.SetCursorPosX(ImGui.GetCursorPosX() + (ImGui.GetWindowWidth() / 2) - 60)
         ImGui.Text("Step " .. tostring(State.step) .. " of " .. tostring(#task_table))
         if State.destType ~= '' then
-            local path = string.format("%s %s", State.destType, State.dest)
-            State.pathDist = mq.TLO.Navigation.PathLength(path)()
-            State.velocity = mq.TLO.Navigation.Velocity()
-            State.estimatedTime = State.pathDist / State.velocity
-            draw_gui.travelPct = 1.0 - (State.pathDist / State.startDist)
-            draw_gui.travelText = string.format("Distance: %s Velocity: %s ETA: %s seconds", math.floor(State.pathDist), math.floor(State.velocity), math.floor(State.estimatedTime))
+            draw_gui.pathUpdate()
             ImGui.PushStyleColor(ImGuiCol.PlotHistogram, IM_COL32(150, 150, 40, 255))
             ImGui.ProgressBar(draw_gui.travelPct, ImGui.GetWindowWidth(), 17, "##dist")
             ImGui.PopStyleColor()
