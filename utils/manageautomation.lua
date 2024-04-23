@@ -388,6 +388,7 @@ function manage.picklockGroup()
 end
 
 function manage.removeInvis()
+    local temp = State.status
     State.status = "Removing invis"
     if mq.TLO.Me.Invis() then
         Logger.log_info("\aoRemoving invisibility.")
@@ -400,6 +401,7 @@ function manage.removeInvis()
             mq.cmdf("/dex %s /squelch /makemevis", State.group_combo[State.group_choice])
         end
     end
+    State.status = temp
 end
 
 function manage.removeLev()
