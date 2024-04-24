@@ -1065,4 +1065,31 @@ function Actions.wait_event(item)
     end
 end
 
+function Actions.wait_for(item)
+    local looping     = true
+    local cur_eq_hour = mq.TLO.GameTime.Hour()
+    local cur_eq_min  = mq.TLO.GameTime.Minute()
+    while looping do
+        if cur_eq_hour == tonumber(item.what) and cur_eq_min == 0 then
+            looping = false
+        end
+        mq.delay(500)
+        cur_eq_hour = mq.TLO.GameTime.Hour()
+        cur_eq_min  = mq.TLO.GameTime.Minute()
+        if cur_eq_hour < tonumber(item.what) then
+            local hour_calc = tonumber(item.what) - cur_eq_hour
+            local min_calc = 60 - cur_eq_min
+            min_calc = min_calc + (hour_calc * 60)
+            local real_time = math.floor(min_calc / 20)
+            State.status = "Waiting for EQ Time: " .. tonumber(item.what) .. ":00 (" .. real_time .. " minutes)."
+        elseif cur_eq_hour >= tonumber(item.what) then
+            local hour_calc = 24 - cur_eq_hour + tonumber(item.what)
+            local min_calc = 60 - cur_eq_min
+            min_calc = min_calc + (hour_calc * 60)
+            local real_time = math.floor(min_calc / 20)
+            State.status = "Waiting for EQ Time: " .. tonumber(item.what) .. ":00 (" .. real_time .. " minutes)."
+        end
+    end
+end
+
 return Actions
