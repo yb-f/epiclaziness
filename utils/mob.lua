@@ -336,7 +336,9 @@ function mob.npc_kill(item, class_settings, char_settings, loot)
             return
         end
     end
-    Logger.log_verbose("\aoTargeting \ar%s\ao.", item.npc)
+    State.status = "Killing " .. item.npc .. " (" .. ID .. ")"
+    Logger.log_info("\aoKilling \ag%s \ao(\ag%s\ao).", item.npc, ID)
+    Logger.log_verbose("\aoTargeting \ag%s \ao(\ag%s\ao).", item.npc, ID)
     mq.TLO.Spawn(ID).DoTarget()
     mq.cmd("/squelch /stick")
     mq.delay(100)
