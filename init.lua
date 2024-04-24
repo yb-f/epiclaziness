@@ -470,6 +470,8 @@ local function run_epic(class, choice)
             Actions.wait(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "WAIT_EVENT" then
             Actions.wait_event(task_table[State.step])
+        elseif task_table[State.step].type == "WAIT_FOR" then
+            Actions.wait_for(task_table[State.step])
         elseif task_table[State.step].type == "ZONE_CONTINUE_TRAVEL" then
             travel.zone_travel(task_table[State.step], class_settings.settings, loadsave.SaveState, true)
         elseif task_table[State.step].type == "ZONE_TRAVEL" then
