@@ -433,8 +433,8 @@ function draw_gui.generate_outline_text(item)
         text = "Check if we have " .. item.what .. " pause script of we do not"
     elseif item.type == "FARM_RADIUS" then
         text = "Farm for " .. item.what
-    elseif item.TYPE == "FARM_RADIUS_EVENT" then
-        text = "Farm until event occurs."
+    elseif item.type == "FARM_RADIUS_EVENT" then
+        text = "Farm until event occurs. (#*#All four tasks have been Completed. You should return to Durgin#*#)"
     elseif item.type == "FISH_FARM" then
         text = "Fish for " .. item.what
     elseif item.type == "FISH_ONCE" then
