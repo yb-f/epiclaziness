@@ -380,6 +380,8 @@ local function run_epic(class, choice)
             Actions.ground_spawn(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "GROUND_SPAWN_FARM" then
             Actions.ground_spawn_farm(task_table[State.step], class_settings.settings, loadsave.SaveState)
+        elseif task_table[State.step].type == "GROUP_SIZE_CHECK" then
+            Actions.group_size_check(task_table[State.step])
         elseif task_table[State.step].type == "IGNORE_MOB" then
             Actions.ignore_mob(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "LDON_COUNT_CHECK" then
