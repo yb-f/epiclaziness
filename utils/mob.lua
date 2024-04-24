@@ -169,8 +169,14 @@ function mob.findNearestName(npc, item, class_settings, char_settings)
     local mob_list = create_spawn_list()
     local closest_distance = 25000
     local closest_ID = 0
+    local loopCount = 0
     while closest_ID == 0 do
         local foundCorpse = false
+        loopCount = loopCount + 1
+        if loopCount == 40 then
+            loopCount = 0
+            mob_list = create_spawn_list()
+        end
         mq.delay(50)
         for _, spawn in pairs(mob_list) do
             if mq.TLO.Navigation.PathExists('id ' .. spawn.ID())() then
@@ -212,14 +218,14 @@ function mob.findNearestName(npc, item, class_settings, char_settings)
                     if mq.TLO.Spawn('corpse ' .. item.npc).ID() ~= 0 then
                         Logger.log_warn("\ar%s \aohas already been killed. Advancing to step: \ag%s\ao.", item.npc, item.gotostep)
                         State.step = item.gotostep
-                        return
+                        return nil
                     end
                 end
             end
         end
         if item.type == "NPC_SEARCH" then
             if closest_ID == 0 then
-                Logger.log_info("\ar%s \ao not found. Advancing to next step.", item.npc)
+                Logger.log_debug("\ar%s \ao not found. Advancing to next step.", item.npc)
                 State.step = State.step + 1
                 State.rewound = true
                 State.skip = true
