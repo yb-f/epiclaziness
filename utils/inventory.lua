@@ -153,7 +153,7 @@ function inventory.combine_item(item, class_settings, char_settings, slot)
     local slot2     = 0
     local itemslot  = mq.TLO.FindItem("=" .. item.what).ItemSlot() - 22
     local itemslot2 = mq.TLO.FindItem("=" .. item.what).ItemSlot2() + 1
-    if itemslot - 22 == slot and item.zone == 1 then
+    if itemslot == slot and tonumber(item.zone) == 1 then
         itemslot, itemslot2 = inventory.find_duplicate_item(item.what, slot)
         if itemslot == 0 and itemslot2 == 0 then
             State.status = "Unable to find item for combine (" .. item.what .. ")"
