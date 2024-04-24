@@ -206,7 +206,9 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
         end
         if item.zone == nil then
             if Mob.xtargetCheck(char_settings) then
+                travel.navPause()
                 Mob.clearXtarget(class_settings, char_settings)
+                travel.navUnpause(item)
             end
         end
         if State.pause == true then
@@ -651,7 +653,9 @@ end
 
 function travel.npc_follow(item, class_settings, char_settings)
     if Mob.xtargetCheck(char_settings) then
+        travel.navPause()
         Mob.clearXtarget(class_settings, char_settings)
+        travel.navUnpause(item)
     end
     if char_settings.general.speedForTravel == true then
         local speedChar, speedSkill = travel.speedCheck(class_settings, char_settings)
@@ -732,7 +736,9 @@ function travel.npc_travel(item, class_settings, ignore_path_check, char_setting
     ignore_path_check = ignore_path_check or false
     if item.zone == nil then
         if Mob.xtargetCheck(char_settings) then
+            travel.navPause()
             Mob.clearXtarget(class_settings, char_settings)
+            travel.navUnpause(item)
         end
     end
     if char_settings.general.speedForTravel == true then
@@ -789,7 +795,9 @@ end
 function travel.relocate(item, class_settings, char_settings)
     local currentZone = mq.TLO.Zone.Name()
     if Mob.xtargetCheck(char_settings) then
+        travel.navPause()
         Mob.clearXtarget(class_settings, char_settings)
+        travel.navUnpause(item)
     end
     State.status = "Searching for relocation ability/item that is ready."
     Logger.log_info("\aoSearching for a relocation ability/item that is ready.")
@@ -812,7 +820,9 @@ function travel.relocate(item, class_settings, char_settings)
         mq.cmdf('/dex %s /squelch /relocate %s', State.group_combo[State.group_choice], relocate)
     end
     if Mob.xtargetCheck(char_settings) then
+        travel.navPause()
         Mob.clearXtarget(class_settings, char_settings)
+        travel.navUnpause(item)
     end
     local loopCount = 0
     while mq.TLO.Me.Casting() == nil do
@@ -907,7 +917,9 @@ function travel.zone_travel(item, class_settings, char_settings, continue)
         end
         mq.delay(500)
         if Mob.xtargetCheck(char_settings) then
+            travel.navPause()
             Mob.clearXtarget(class_settings, char_settings)
+            travel.navUnpause(item)
         end
         if State.pause == true then
             travel.navPause()
