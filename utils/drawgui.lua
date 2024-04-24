@@ -449,6 +449,8 @@ function draw_gui.generate_outline_text(item)
         text = "Travel to " .. item.npc
     elseif item.type == "GROUND_SPAWN" then
         text = "Pickup ground spawn at " .. item.whereY .. ", " .. item.whereX .. ", " .. item.whereZ
+    elseif item.type == "GROUP_SIZE_CHECK" then
+        text = "Making sure group has at least " .. item.what .. " players."
     elseif item.type == "IGNORE_MOB" then
         text = "Add " .. item.npc .. " to pull ignore list"
     elseif item.type == "LOC_TRAVEL" then
