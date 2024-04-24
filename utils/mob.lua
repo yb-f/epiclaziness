@@ -342,10 +342,15 @@ function mob.npc_kill(item, class_settings, char_settings, loot)
             return
         end
     end
-    State.status = "Killing " .. item.npc .. " (" .. ID .. ")"
-    Logger.log_info("\aoKilling \ag%s \ao(\ag%s\ao).", item.npc, ID)
-    Logger.log_verbose("\aoTargeting \ag%s \ao(\ag%s\ao).", item.npc, ID)
-    mq.TLO.Spawn(ID).DoTarget()
+    if item.what ~= nil then
+        inv.loot_check(item)
+    end
+    if ID ~= nil then
+        State.status = "Killing " .. item.npc .. " (" .. ID .. ")"
+        Logger.log_info("\aoKilling \ag%s \ao(\ag%s\ao).", item.npc, ID)
+        Logger.log_verbose("\aoTargeting \ag%s \ao(\ag%s\ao).", item.npc, ID)
+        mq.TLO.Spawn(ID).DoTarget()
+    end
     mq.cmd("/squelch /stick")
     mq.delay(100)
     mq.cmd("/squelch /attack on")
@@ -354,9 +359,6 @@ function mob.npc_kill(item, class_settings, char_settings, loot)
     mq.event("cannot_cast", "You cannot cast#*#on#*#", target_invalid_switch)
     while mq.TLO.Spawn(ID).Type() == 'NPC' or mq.TLO.Spawn(ID).Type() == 'Chest' do
         mq.doevents()
-        if item.what ~= nil then
-            inv.loot_check(item)
-        end
         if State.skip == true then
             mq.unevent('cannot_see')
             mq.unevent('cannot_cast')
