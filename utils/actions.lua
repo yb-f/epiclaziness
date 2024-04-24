@@ -184,8 +184,8 @@ function Actions.farm_radius(item, class_settings, char_settings, event)
         Actions.farm_event_triggered = false
         State.status = "Killing mobs in radius" .. item.radius .. "until event."
         Logger.log_info("\aoKilling mobs in radius \ag%s \aountil event.", item.radius)
-        Logger.log_debug("\aoEvent trigger is \ag%s\ao.", item.npc)
-        mq.event('farm_event', item.npc, Actions.farm_event)
+        Logger.log_debug("\aoEvent trigger is \ag%s\ao.", item.what)
+        mq.event('farm_event', item.what, Actions.farm_event)
     end
     travel.loc_travel(item, class_settings, char_settings)
     manage.campGroup(item.radius, class_settings, char_settings)
