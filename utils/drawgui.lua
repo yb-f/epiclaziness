@@ -527,6 +527,8 @@ function draw_gui.generate_outline_text(item)
         text = "Wait for " .. item.what / 1000 .. " seconds"
     elseif item.type == "WAIT_EVENT" then
         text = "Wait for event in chat to continue"
+    elseif item.type == "WAIT_FOR" then
+        text = "Wait until EQ Time: " .. item.what .. ":00."
     elseif item.type == "ZONE_CONTINUE_TRAVEL" then
         text = "Travel to " .. item.zone
     elseif item.type == "ZONE_TRAVEL" then
