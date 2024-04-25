@@ -51,8 +51,16 @@ local function log(logLevel, output, ...)
         mq.cmd(string.format('/mqlog [%s:%s(%s)] <%s> %s', mq.TLO.Me.Name(), fileHeader, fileTracer, now, fileOutput))
     end
 
+    local badMesh = ''
+    for _, zone in pairs(State.badMeshes) do
+        if zone == mq.TLO.Zone.ShortName() then
+            badMesh = 'X'
+        end
+    end
+
     if actions.LogConsole ~= nil then
-        local consoleText = string.format('[%s] [%s%s-%s] %s', logLevels[logLevel].header, mq.TLO.Me.Class.ShortName(), State.epic_list[State.epic_choice], State.step, output)
+        local consoleText = string.format('[%s] [%s%s-%s]%s %s', logLevels[logLevel].header, mq.TLO.Me.Class.ShortName(), State.epic_list[State.epic_choice], State.step, badMesh,
+            output)
         actions.LogConsole:AppendText(consoleText)
     end
 
