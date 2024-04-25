@@ -520,6 +520,8 @@ function travel.speedCheck(class_settings, char_settings)
         end
     end
     local amSpeedy = false
+    local aanums = {}
+    local foundSpeed = false
     if State.group_choice == 1 then
         local class = mq.TLO.Me.Class()
         amSpeedy = travel.gotSpeedyClass(class, class_settings)
@@ -557,13 +559,36 @@ function travel.speedCheck(class_settings, char_settings)
                         if class == 'Druid' then speed_skill = "Spirit of Eagles(Druid)" end
                     end
                     local aaNum = class_settings['speed_to_num'][speed_skill]
-                    return mq.TLO.Group.Member(i).DisplayName(), aaNum
+                    aanums[mq.TLO.Group.Member(i).DisplayName()] = aaNum
+                    foundSpeed = true
+                    --return mq.TLO.Group.Member(i).DisplayName(), aaNum
                 end
             end
         end
-        Logger.log_verbose("\aoWe do not have a travel speed buff to cast.")
-        return 'none', 'none'
+        if foundSpeed == false then
+            Logger.log_verbose("\aoWe do not have a travel speed buff to cast.")
+            return 'none', 'none'
+        else
+            local aaNum = 0
+            local casterName = ''
+            for name, num in pairs(aanums) do
+                if num == 3704 then
+                    aaNum = num
+                    casterName = name
+                    break
+                elseif num == 939 and aaNum ~= 3704 then
+                    aaNum = num
+                    casterName = name
+                elseif (num == 8600 or num == 8601) and aaNum ~= 3704 and aaNum ~= 939 then
+                    aaNum = num
+                    casterName = name
+                end
+            end
+            return casterName, aaNum
+        end
     else
+        local aaNum = 0
+        local casterName = ''
         local class = mq.TLO.Me.Class()
         amSpeedy = travel.gotSpeedyClass(class, class_settings)
         if amSpeedy == true then
@@ -577,28 +602,36 @@ function travel.speedCheck(class_settings, char_settings)
                 if class == 'Ranger' then speed_skill = "Spirit of Eagles(Ranger)" end
                 if class == 'Druid' then speed_skill = "Spirit of Eagles(Druid)" end
             end
-            local aaNum = class_settings['speed_to_num'][speed_skill]
-            return mq.TLO.Me.DisplayName(), aaNum
-        else
-            class = mq.TLO.Group.Member(State.group_combo[State.group_choice]).Class()
-            amSpeedy = travel.gotSpeedyClass(class, class_settings)
-            if amSpeedy == true then
-                local speed_type = {}
-                for word in string.gmatch(class_settings.move_speed[class], '([^|]+)') do
-                    table.insert(speed_type, word)
-                end
-                local speed_skill = speed_type[class_settings.speed[class]]
-                Logger.log_verbose("\ag%s \aocan cast \ag%s\ao.", mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName(), speed_skill)
-                if speed_skill == 'Spirit of Eagles' then
-                    if class == 'Ranger' then speed_skill = "Spirit of Eagles(Ranger)" end
-                    if class == 'Druid' then speed_skill = "Spirit of Eagles(Druid)" end
-                end
-                local aaNum = class_settings['speed_to_num'][speed_skill]
-                return mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName(), aaNum
-            else
-                Logger.log_verbose("\aoWe do not have a travel speed buff to cast.")
-                return 'none', 'none'
+            aaNum = class_settings['speed_to_num'][speed_skill]
+            casterName = mq.TLO.Me.DisplayName()
+            --return mq.TLO.Me.DisplayName(), aaNum
+        end
+        if aaNum == 3704 then
+            return casterName, aaNum
+        end
+        class = mq.TLO.Group.Member(State.group_combo[State.group_choice]).Class()
+        amSpeedy = travel.gotSpeedyClass(class, class_settings)
+        if amSpeedy == true then
+            local speed_type = {}
+            for word in string.gmatch(class_settings.move_speed[class], '([^|]+)') do
+                table.insert(speed_type, word)
             end
+            local speed_skill = speed_type[class_settings.speed[class]]
+            Logger.log_verbose("\ag%s \aocan cast \ag%s\ao.", mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName(), speed_skill)
+            if speed_skill == 'Spirit of Eagles' then
+                if class == 'Ranger' then speed_skill = "Spirit of Eagles(Ranger)" end
+                if class == 'Druid' then speed_skill = "Spirit of Eagles(Druid)" end
+            end
+            if class_settings['speed_to_num'][speed_skill] == 3704 then
+                return mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName(), aaNum
+            end
+            if class_settings['speed_to_num'][speed_skill] == 939 and (aaNum == 8600 or aaNum == 8601) then
+                return mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName(), aaNum
+            end
+            return casterName, aaNum
+        else
+            Logger.log_verbose("\aoWe do not have a travel speed buff to cast.")
+            return 'none', 'none'
         end
     end
 end
