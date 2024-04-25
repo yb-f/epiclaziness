@@ -346,62 +346,85 @@ function travel.invis(class_settings)
     for word in string.gmatch(class_settings.class_invis[mq.TLO.Me.Class()], '([^|]+)') do
         table.insert(invis_type, word)
     end
-    if invis_type[class_settings.invis[mq.TLO.Me.Class()]] == 'Potion' then
-        Logger.log_super_verbose("\aoUsing a cloudy potion.")
-        mq.cmd('/squelch /useitem "Cloudy Potion"')
-    elseif invis_type[class_settings.invis[mq.TLO.Me.Class()]] == 'Circlet of Shadows' then
-        Logger.log_super_verbose("\aoUsing Circlet of Shadows.")
-        mq.cmd('/squelch /useitem "Circlet of Shadows"')
-    elseif invis_type[class_settings.invis[mq.TLO.Me.Class()]] == 'Hide/Sneak' then
-        Logger.log_super_verbose("\aoUsing hide/sneak.")
-        while mq.TLO.Me.Invis() == false do
-            mq.delay(100)
-            if mq.TLO.Me.AbilityReady('Hide')() == true then
-                mq.cmd("/squelch /doability hide")
-            end
-        end
-        if mq.TLO.Me.Sneaking() == false then
-            while mq.TLO.Me.Sneaking() == false do
+    if mq.TLO.Me.Invis() == false then
+        Logger.log_debug("\aoI am using \ag%s \aoto invis myself.", invis_type[class_settings.invis[mq.TLO.Me.Class()]])
+        if invis_type[class_settings.invis[mq.TLO.Me.Class()]] == 'Potion' then
+            Logger.log_super_verbose("\aoUsing a cloudy potion.")
+            mq.cmd('/squelch /useitem "Cloudy Potion"')
+        elseif invis_type[class_settings.invis[mq.TLO.Me.Class()]] == 'Circlet of Shadows' then
+            Logger.log_super_verbose("\aoUsing Circlet of Shadows.")
+            mq.cmd('/squelch /useitem "Circlet of Shadows"')
+        elseif invis_type[class_settings.invis[mq.TLO.Me.Class()]] == 'Hide/Sneak' then
+            Logger.log_super_verbose("\aoUsing hide/sneak.")
+            while mq.TLO.Me.Invis() == false do
                 mq.delay(100)
-                if mq.TLO.Me.AbilityReady('Sneak')() == true then
-                    mq.cmd("/squelch /doability sneak")
+                if mq.TLO.Me.AbilityReady('Hide')() == true then
+                    mq.cmd("/squelch /doability hide")
                 end
             end
-        end
-    else
-        local ID = class_settings['skill_to_num'][invis_type[class_settings.invis[mq.TLO.Me.Class()]]]
-        Logger.log_super_verbose("\aoUsing alt ability \ag%s \ao(\ag%s\ao).", invis_type[class_settings.invis[mq.TLO.Me.Class()]], ID)
-        while mq.TLO.Me.AltAbilityReady(ID)() == false do
-            mq.delay(50)
-        end
-        mq.cmdf('/squelch /alt act %s', ID)
-        mq.delay(500)
-        while mq.TLO.Me.Casting() and mq.TLO.Me.Class() ~= "Bard" do
-            mq.delay(200)
+            if mq.TLO.Me.Sneaking() == false then
+                while mq.TLO.Me.Sneaking() == false do
+                    mq.delay(100)
+                    if mq.TLO.Me.AbilityReady('Sneak')() == true then
+                        mq.cmd("/squelch /doability sneak")
+                    end
+                end
+            end
+        else
+            local ID = class_settings['skill_to_num'][invis_type[class_settings.invis[mq.TLO.Me.Class()]]]
+            Logger.log_super_verbose("\aoUsing alt ability \ag%s \ao(\ag%s\ao).", invis_type[class_settings.invis[mq.TLO.Me.Class()]], ID)
+            while mq.TLO.Me.AltAbilityReady(ID)() == false do
+                mq.delay(50)
+            end
+            mq.cmdf('/squelch /alt act %s', ID)
+            mq.delay(500)
+            while mq.TLO.Me.Casting() and mq.TLO.Me.Class() ~= "Bard" do
+                mq.delay(200)
+            end
         end
     end
     if State.group_choice == 1 then
     elseif State.group_choice == 2 then
         for i = 0, mq.TLO.Group.GroupSize() - 1 do
             if mq.TLO.Group.Member(i).DisplayName() ~= mq.TLO.Me.DisplayName() then
-                local invis_type = {}
-                for word in string.gmatch(class_settings.class_invis[mq.TLO.Group.Member(i).Class()], '([^|]+)') do
-                    table.insert(invis_type, word)
-                end
-                if invis_type[class_settings.invis[mq.TLO.Group.Member(i).Class()]] == 'Potion' then
-                    Logger.log_super_verbose("\aoHaving \ag%s \aouse a cloudy potion.", mq.TLO.Group.Member(i).DisplayName())
-                    mq.cmdf('/dex %s /squelch /useitem "Cloudy Potion"', mq.TLO.Group.Member(i).DisplayName())
-                elseif invis_type[class_settings.invis[mq.TLO.Group.Member(i).Class()]] == 'Hide/Sneak' then
-                    Logger.log_super_verbose("\aoHaving \ag%s \aouse hide/sneak.", mq.TLO.Group.Member(i).DisplayName())
-                    mq.cmdf("/dex %s /squelch /doability hide", mq.TLO.Group.Member(i).DisplayName())
-                    mq.delay(250)
-                    mq.cmdf("/dex %s /squelch /doability sneak", mq.TLO.Group.Member(i).DisplayName())
-                else
-                    local ID = class_settings['skill_to_num'][invis_type[class_settings.invis[mq.TLO.Group.Member(i).Class()]]]
-                    Logger.log_super_verbose("\aoHaving \ag%s \aouse \ag%s \ao(\ag%s\ao).", mq.TLO.Group.Member(i).DisplayName(),
-                        invis_type[class_settings.invis[mq.TLO.Group.Member(i).Class()]], ID)
-                    mq.cmdf('/dex %s /squelch /alt act "%s"', mq.TLO.Group.Member(i).DisplayName(),
-                        ID)
+                if mq.TLO.Group.Member(i).Invis() == false then
+                    local invis_type = {}
+                    for word in string.gmatch(class_settings.class_invis[mq.TLO.Group.Member(i).Class()], '([^|]+)') do
+                        table.insert(invis_type, word)
+                    end
+                    Logger.log_debug("\aoUsing \ag%s \aoon \ag%s \ao to invis them.", invis_type[class_settings.invis[mq.TLO.Group.Member(i).Class()]],
+                        mq.TLO.Group.Member(i).DisplayName())
+                    if invis_type[class_settings.invis[mq.TLO.Group.Member(i).Class()]] == 'Potion' then
+                        Logger.log_super_verbose("\aoHaving \ag%s \aouse a cloudy potion.", mq.TLO.Group.Member(i).DisplayName())
+                        mq.cmdf('/dex %s /squelch /useitem "Cloudy Potion"', mq.TLO.Group.Member(i).DisplayName())
+                    elseif invis_type[class_settings.invis[mq.TLO.Group.Member(i).Class()]] == 'Hide/Sneak' then
+                        Logger.log_super_verbose("\aoHaving \ag%s \aouse hide/sneak.", mq.TLO.Group.Member(i).DisplayName())
+                        mq.cmdf("/dquery %s -q Me.Sneaking", mq.TLO.Group.Member(i).DisplayName())
+                        if mq.TLO.DanNet.Query() == "FALSE" then
+                            mq.cmdf("/dobserve %s -q Me.AbilityReady[Sneak]", mq.TLO.Group.Member(i).DisplayName())
+                            while mq.TLO.DanNet(mq.TLO.Group.Member(i).DisplayName()).Observe("Me.AbilityReady[Sneak]")() == "FALSE" do
+                                mq.delay(50)
+                            end
+                            mq.cmdf("/dex %s /squelch /doability sneak", mq.TLO.Group.Member(i).DisplayName())
+                            mq.cmdf("/dobserve %s -q Me.AbilityReady[Sneak] -drop", mq.TLO.Group.Member(i).DisplayName())
+                        end
+                        if mq.TLO.Group.Member(i).Invis() == false then
+                            mq.cmdf("/dobserve %s -q Me.AbilityReady[Hide]", mq.TLO.Group.Member(i).DisplayName())
+                            while mq.TLO.DanNet(mq.TLO.Group.Member(i).DisplayName()).Observe("Me.AbilityReady[Hide]")() == "FALSE" do
+                                mq.delay(50)
+                            end
+                            mq.cmdf("/dex %s /squelch /doability hide", mq.TLO.Group.Member(i).DisplayName())
+                        end
+                    elseif invis_type[class_settings.invis[mq.TLO.Group.Member(i).Class()]] == 'Circlet of Shadows' then
+                        Logger.log_super_verbose("\aoHaving \ag%s \aouse circlet of shadows.", mq.TLO.Group.Member(i).DisplayName())
+                        mq.cmdf('/dex %s /squelch /useitem "Circlet of Shadows"', mq.TLO.Group.Member(i).DisplayName())
+                    else
+                        local ID = class_settings['skill_to_num'][invis_type[class_settings.invis[mq.TLO.Group.Member(i).Class()]]]
+                        Logger.log_super_verbose("\aoHaving \ag%s \aouse \ag%s \ao(\ag%s\ao).", mq.TLO.Group.Member(i).DisplayName(),
+                            invis_type[class_settings.invis[mq.TLO.Group.Member(i).Class()]], ID)
+                        mq.cmdf('/dex %s /squelch /alt act "%s"', mq.TLO.Group.Member(i).DisplayName(),
+                            ID)
+                    end
                 end
             end
         end
@@ -416,10 +439,22 @@ function travel.invis(class_settings)
             mq.cmdf('/dex %s /squelch /useitem "Cloudy Potion"', mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName())
         elseif invis_type[class_settings.invis[mq.TLO.Group.Member(State.group_combo[State.group_choice]).Class()]] == 'Hide/Sneak' then
             Logger.log_super_verbose("\aoHaving \ag%s \aouse hide/sneak.", mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName())
-            mq.cmdf("/dex %s /squelch /doability hide", mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName())
-            mq.delay(250)
-            mq.cmdf("/dex %s /squelch /doability sneak",
-                mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName())
+            mq.cmdf("/dquery %s -q Me.Sneaking", mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName())
+            if mq.TLO.DanNet.Query() == "FALSE" then
+                mq.cmdf("/dobserve %s -q Me.AbilityReady[Sneak]", mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName())
+                while mq.TLO.DanNet(mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName()).Observe("Me.AbilityReady[Sneak]")() == "FALSE" do
+                    mq.delay(50)
+                end
+                mq.cmdf("/dex %s /squelch /doability sneak", mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName())
+                mq.cmdf("/dobserve %s -q Me.AbilityReady[Sneak] -drop", mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName())
+            end
+            if mq.TLO.Group.Member(State.group_combo[State.group_choice]).Invis() == false then
+                mq.cmdf("/dobserve %s -q Me.AbilityReady[Hide]", mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName())
+                while mq.TLO.DanNet(mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName()).Observe("Me.AbilityReady[Hide]")() == "FALSE" do
+                    mq.delay(50)
+                end
+                mq.cmdf("/dex %s /squelch /doability hide", mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName())
+            end
         else
             local ID = class_settings['skill_to_num'][invis_type[class_settings.invis[mq.TLO.Group.Member(State.group_combo[State.group_choice]).Class()]]]
             Logger.log_super_verbose("\aoHaving \ag%s \aouse \ag%s \ao(\ag%s\ao).", mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName(),
@@ -443,7 +478,7 @@ function travel.invisCheck(char_settings, class_settings, invis)
             for i = 0, mq.TLO.Group.GroupSize() - 1 do
                 if mq.TLO.Group.Member(i).DisplayName() ~= mq.TLO.Me.DisplayName() then
                     if mq.TLO.Group.Member(i).Invis() == false then
-                        Logger.log_super_verbose("\aoYes, \ag%s \aoshould be invis." mq.TLO.Group.Member(i).DisplayName())
+                        Logger.log_super_verbose("\aoYes, \ag%s \aoshould be invis.", mq.TLO.Group.Member(i).DisplayName())
                         return true
                     end
                 end
