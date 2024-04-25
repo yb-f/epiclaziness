@@ -594,7 +594,7 @@ end
 
 function Actions.group_size_check(item)
     Logger.log_super_verbose("\aoChecking group size (\ag%s \aoplayers needed).", item.what)
-    if mq.TLO.Group.GroupSize < tonumber(item.what) then
+    if mq.TLO.Group.GroupSize() < tonumber(item.what) then
         State.status = item.npc
         Logger.log_error("\aoYou will require \ar6 players in your party to progress through this step.")
         State.task_run = false
