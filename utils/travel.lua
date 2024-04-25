@@ -442,16 +442,17 @@ function travel.invisCheck(char_settings, class_settings, invis)
         if State.group_choice == 2 then
             for i = 0, mq.TLO.Group.GroupSize() - 1 do
                 if mq.TLO.Group.Member(i).DisplayName() ~= mq.TLO.Me.DisplayName() then
-                    manage.doAutomation(mq.TLO.Group.Member(i).DisplayName(), mq.TLO.Group.Member(i).Class.ShortName(),
-                        class_settings.class[mq.TLO.Group.Member(i).Class.Name()],
-                        'camp', char_settings)
+                    if mq.TLO.Group.Member(i).Invis() == false then
+                        Logger.log_super_verbose("\aoYes, \ag%s \aoshould be invis." mq.TLO.Group.Member(i).DisplayName())
+                        return true
+                    end
                 end
             end
         else
-            manage.doAutomation(State.group_combo[State.group_choice],
-                mq.TLO.Group.Member(State.group_combo[State.group_choice]).Class.ShortName(),
-                class_settings.class[mq.TLO.Group.Member(State.group_combo[State.group_choice]).Class.Name()], 'camp',
-                char_settings)
+            if mq.TLO.Group.Member(State.group_combo[State.group_choice]).Invis() == false then
+                Logger.log_super_verbose("\aoYes, \ag%s \aoshould be invis.", mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName())
+                return true
+            end
         end
     end
     return false
