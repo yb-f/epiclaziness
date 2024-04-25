@@ -62,7 +62,7 @@ function travel.forward_zone(item, class_settings, char_settings)
             travel.navUnpause(item)
         end
     end
-    if travel.invisCheck(char_settings, item.invis) then
+    if travel.invisCheck(char_settings, class_settings, item.invis) then
         travel.invis(class_settings)
     end
     State.status = "Traveling forward to zone: " .. item.zone
@@ -120,7 +120,7 @@ function travel.no_nav_travel(item, class_settings, char_settings)
             travel.navUnpause(item)
         end
     end
-    if travel.invisCheck(char_settings, item.invis) then
+    if travel.invisCheck(char_settings, class_settings, item.invis) then
         travel.invis(class_settings)
     end
     State.status = "Traveling forward to  " .. y .. ", " .. x .. ", " .. z
@@ -224,7 +224,7 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
                 travel.navUnpause(item)
             end
         end
-        if travel.invisCheck(char_settings, item.invis) then
+        if travel.invisCheck(char_settings, class_settings, item.invis) then
             travel.navPause()
             travel.invis(class_settings)
             travel.navUnpause(item)
@@ -296,7 +296,7 @@ function travel.general_travel(item, class_settings, char_settings, ID)
             travel.navUnpause(item)
         end
     end
-    if travel.invisCheck(char_settings, item.invis) then
+    if travel.invisCheck(char_settings, class_settings, item.invis) then
         travel.invis(class_settings)
     end
     State.status = "Waiting for " .. item.npc
@@ -432,11 +432,27 @@ function travel.invis(class_settings)
     State.status = temp
 end
 
-function travel.invisCheck(char_settings, invis)
+function travel.invisCheck(char_settings, class_settings, invis)
     Logger.log_super_verbose("\aoChecking if we should be invis.")
-    if invis == 1 and char_settings.general.invisForTravel == true and mq.TLO.Me.Invis() == false then
-        Logger.log_super_verbose("\aoYes, we should be invis.")
-        return true
+    if invis == 1 and char_settings.general.invisForTravel == true then
+        if mq.TLO.Me.Invis() == false then
+            Logger.log_super_verbose("\aoYes, we should be invis.")
+            return true
+        end
+        if State.group_choice == 2 then
+            for i = 0, mq.TLO.Group.GroupSize() - 1 do
+                if mq.TLO.Group.Member(i).DisplayName() ~= mq.TLO.Me.DisplayName() then
+                    manage.doAutomation(mq.TLO.Group.Member(i).DisplayName(), mq.TLO.Group.Member(i).Class.ShortName(),
+                        class_settings.class[mq.TLO.Group.Member(i).Class.Name()],
+                        'camp', char_settings)
+                end
+            end
+        else
+            manage.doAutomation(State.group_combo[State.group_choice],
+                mq.TLO.Group.Member(State.group_combo[State.group_choice]).Class.ShortName(),
+                class_settings.class[mq.TLO.Group.Member(State.group_combo[State.group_choice]).Class.Name()], 'camp',
+                char_settings)
+        end
     end
     return false
 end
@@ -665,7 +681,7 @@ function travel.npc_follow(item, class_settings, char_settings)
             travel.navUnpause(item)
         end
     end
-    if travel.invisCheck(char_settings, item.invis) then
+    if travel.invisCheck(char_settings, class_settings, item.invis) then
         travel.invis(class_settings)
     end
     State.status = "Following " .. item.npc
@@ -749,7 +765,7 @@ function travel.npc_travel(item, class_settings, ignore_path_check, char_setting
             travel.navUnpause(item)
         end
     end
-    if travel.invisCheck(char_settings, item.invis) then
+    if travel.invisCheck(char_settings, class_settings, item.invis) then
         travel.invis(class_settings)
     end
     if item.whereX ~= nil then
@@ -887,7 +903,7 @@ function travel.zone_travel(item, class_settings, char_settings, continue)
             travel.navUnpause(item)
         end
     end
-    if travel.invisCheck(char_settings, item.invis) then
+    if travel.invisCheck(char_settings, class_settings, item.invis) then
         travel.navPause()
         travel.invis(class_settings)
     end
@@ -934,7 +950,7 @@ function travel.zone_travel(item, class_settings, char_settings, continue)
                 travel.navUnpause(item)
             end
         end
-        if travel.invisCheck(char_settings, item.invis) then
+        if travel.invisCheck(char_settings, class_settings, item.invis) then
             if travel.invisTranslocatorCheck() == false then
                 travel.navPause()
                 travel.invis(class_settings)

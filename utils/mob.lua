@@ -206,7 +206,7 @@ function mob.findNearestName(npc, item, class_settings, char_settings)
                 travel.doSpeed(speedChar, speedSkill)
             end
         end
-        if travel.invisCheck(char_settings, item.invis) then
+        if travel.invisCheck(char_settings, class_settings, item.invis) then
             travel.invis(class_settings)
         end
         if item.type == "NPC_KILL" then
