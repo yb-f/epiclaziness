@@ -4,7 +4,7 @@ return {
 	['abysmal.navmesh'] = 'd3b6a609349cd25d7d746be1a5d0dfa5',
 	['cazicthule.navmesh'] = 'edbfe9f99f2a61d28ba8b35c0d5565b5',
 	['charasis.navmesh'] = 'fef73b3b65b7c5dd0312c0c69ce992ad',
-	['citymist.navmesh'] = '5bcf64ea0346f130ee8b5055e0140cc9',
+	['citymist.navmesh'] = '848fd9623a9f0dfb077ffb7507b4b350',
 	['dulak.navmesh'] = 'ecf63ad53a4eec334334363b9a6bbd3e',
 	['erudnext.navmesh'] = '8e9d29613098e2e4268ecc8f36b7e5e9',
 	['fieldofbone.navmesh'] = '46130be3719fea40a9e43ceb9115fd01',
