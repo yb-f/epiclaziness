@@ -53,8 +53,6 @@ local function log(logLevel, output, ...)
 
     local badMesh = ''
     for _, zone in pairs(State.badMeshes) do
-        print(zone)
-        print(mq.TLO.Zone.ShortName())
         if zone == mq.TLO.Zone.ShortName() then
             badMesh = 'X'
         end
