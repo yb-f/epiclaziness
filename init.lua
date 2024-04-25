@@ -107,6 +107,7 @@ State.velocity            = 0
 State.estimatedTime       = 0
 State.startDist           = 0
 State.updateTime          = math.floor(mq.gettime() / 1000)
+State.badMeshes           = {}
 
 local hashCheck           = require 'utils/hashcheck'
 
