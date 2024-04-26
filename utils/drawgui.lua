@@ -527,7 +527,7 @@ function draw_gui.generate_outline_text(item)
     elseif item.type == "SEND_YES" then
         text = "Select yes in confirmation box"
     elseif item.type == "WAIT" then
-        text = "Wait for " .. item.ait / 1000 .. " seconds"
+        text = "Wait for " .. item.wait / 1000 .. " seconds"
     elseif item.type == "WAIT_EVENT" then
         text = "Wait for event in chat to continue (" .. item.phrase .. ")"
     elseif item.type == "WAIT_FOR" then
