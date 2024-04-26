@@ -924,7 +924,7 @@ function travel.relocate(item, class_settings, char_settings)
             travel.navUnpause(item)
         end
         if loopCount >= 200 then
-            Logger.log_warn("\aoSpent 2 seconds waiting for relocate to \ar%s \ao to cast. Moving on.", relocate)
+            Logger.log_warn("\aoSpent 2 seconds waiting for relocate to \ar%s \aoto cast. Moving on.", relocate)
             break
         end
     end

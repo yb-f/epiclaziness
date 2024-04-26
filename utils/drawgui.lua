@@ -50,6 +50,7 @@ function draw_gui.full_outline_row(item, step, outlineText)
     ImGui.TableNextColumn()
     if ImGui.Selectable("##d" .. step, false, ImGuiSelectableFlags.None) then
         State.rewound = true
+        State.skip = true
         State.step = step
         Logger.log_info('\aoSetting step to \ar%s', step)
         Logger.log_verbose("\aoStep type: \ar%s", item.type)
@@ -408,7 +409,7 @@ function draw_gui.generate_outline_text(item)
     elseif item.type == "COMBINE_DO" then
         text = "Peform combine"
     elseif item.type == "COMBINE_DONE" then
-        text = "Combine complete, restore item to bag slot 8"
+        text = "Combine complete, restore item to previous bag slot."
     elseif item.type == "COMBINE_ITEM" then
         text = "Add " .. item.what .. " to combine container"
     elseif item.type == "ENVIRO_COMBINE_CONTAINER" then
@@ -434,7 +435,7 @@ function draw_gui.generate_outline_text(item)
     elseif item.type == "FARM_RADIUS" then
         text = "Farm for " .. item.what
     elseif item.type == "FARM_RADIUS_EVENT" then
-        text = "Farm until event occurs. (#*#All four tasks have been Completed. You should return to Durgin#*#)"
+        text = "Farm until event occurs. (" .. item.phrase .. ")"
     elseif item.type == "FISH_FARM" then
         text = "Fish for " .. item.what
     elseif item.type == "FISH_ONCE" then
@@ -462,7 +463,7 @@ function draw_gui.generate_outline_text(item)
     elseif item.type == "NPC_BUY" then
         text = "Purchase " .. item.what .. " from " .. item.npc
     elseif item.type == "NPC_DAMAGE_UNTIL" then
-        text = "Damage " .. item.npc .. " to " .. item.what .. "% health"
+        text = "Damage " .. item.npc .. " to " .. item.damage_pct .. "% health"
     elseif item.type == "NPC_FOLLOW" then
         text = "Follow " .. item.npc
     elseif item.type == "NPC_GIVE" then
@@ -484,13 +485,13 @@ function draw_gui.generate_outline_text(item)
     elseif item.type == "NPC_STOP_FOLLOW" then
         text = "Stop following " .. item.npc
     elseif item.type == "NPC_TALK" then
-        text = "Say " .. item.what .. " to " .. item.npc
+        text = "Say " .. item.phrase .. " to " .. item.npc
     elseif item.type == "NPC_TALK_ALL" then
-        text = "Have all characters say " .. item.what .. " to " .. item.npc
+        text = "Have all characters say " .. item.phrase .. " to " .. item.npc
     elseif item.type == "NPC_TRAVEL" then
         text = "Move to " .. item.npc
     elseif item.type == "NPC_TRAVEL_NO_PATH_CHECK" then
-        text = "Move to " .. item.npc
+        text = "Move to " .. item.npc .. " (ignore path)"
     elseif item.type == "NPC_WAIT" then
         text = "Wait for " .. item.npc .. " to spawn"
     elseif item.type == "NPC_WAIT_DESPAWN" then
@@ -508,7 +509,7 @@ function draw_gui.generate_outline_text(item)
     elseif item.type == "PICK_POCKET" then
         text = "Pickpocket " .. item.what .. " from " .. item.npc
     elseif item.type == "PICKUP_KEY" then
-        text = "Move key from inventory to cursor"
+        text = "Move key (" .. item.what .. ") from inventory to cursor"
     elseif item.type == "PORTAL_SET" then
         text = "Set guild portal location to " .. item.zone
     elseif item.type == "PRE_FARM_CHECK" then
@@ -526,11 +527,11 @@ function draw_gui.generate_outline_text(item)
     elseif item.type == "SEND_YES" then
         text = "Select yes in confirmation box"
     elseif item.type == "WAIT" then
-        text = "Wait for " .. item.what / 1000 .. " seconds"
+        text = "Wait for " .. item.ait / 1000 .. " seconds"
     elseif item.type == "WAIT_EVENT" then
-        text = "Wait for event in chat to continue"
+        text = "Wait for event in chat to continue (" .. item.phrase .. ")"
     elseif item.type == "WAIT_FOR" then
-        text = "Wait until EQ Time: " .. item.what .. ":00."
+        text = "Wait until EQ Time: " .. item.wait .. ":00."
     elseif item.type == "ZONE_CONTINUE_TRAVEL" then
         text = "Travel to " .. item.zone
     elseif item.type == "ZONE_TRAVEL" then

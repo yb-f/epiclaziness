@@ -212,7 +212,7 @@ function mob.findNearestName(npc, item, class_settings, char_settings)
             if item.what ~= nil then
                 inv.loot_check(item)
             end
-            if tonumber(item.zone) == 1 then
+            if item.named == 1 then
                 if closest_ID == 0 then
                     if mq.TLO.Spawn('corpse ' .. item.npc).ID() ~= 0 then
                         Logger.log_warn("\ar%s \aohas already been killed. Advancing to step: \ag%s\ao.", item.npc, item.gotostep)
@@ -262,9 +262,10 @@ function mob.general_search(item, class_settings, char_settings)
             Logger.log_verbose("\aoFound \ag%s \ao(\ag%s\ao) going to step \ar%s\ao.", item.npc, ID, State.step)
             return
         else
+            --Does this ever trigger?
             if item.zone ~= nil then
                 State.rewound = true
-                State.step = tonumber(item.zone)
+                State.step = item.backstep
                 Logger.log_warn("\aoUnable to find \ar%s \aolooping back to step \ar%s\ao.", item.npc, State.step)
             end
             return
@@ -274,8 +275,8 @@ function mob.general_search(item, class_settings, char_settings)
 end
 
 function mob.npc_damage_until(item)
-    State.status = "Damaging " .. item.npc .. " to below " .. item.what .. "% health"
-    Logger.log_info("\aoDamaging \ag%s \ao to below \ag%s%% health\ao.", item.npc, item.what)
+    State.status = "Damaging " .. item.npc .. " to below " .. item.damage_pct .. "% health"
+    Logger.log_info("\aoDamaging \ag%s \ao to below \ag%s%% health\ao.", item.npc, item.damage_pct)
     ID = mq.TLO.Spawn('npc ' .. item.npc).ID()
     if mq.TLO.Spawn(ID).Distance() ~= nil then
         if mq.TLO.Spawn(ID).Distance() > 100 then
@@ -288,8 +289,8 @@ function mob.npc_damage_until(item)
     local weapon1 = ''
     local weapon2 = ''
     if item.zone ~= nil then
-        if mq.TLO.Me.Level() >= tonumber(item.zone) then
-            Logger.log_warn("\aoOur level is \ag%s \aoor higher. Removing weapons before engaging.", item.zone)
+        if mq.TLO.Me.Level() >= item.maxlevel then
+            Logger.log_warn("\aoOur level is \ag%s \aoor higher. Removing weapons before engaging.", item.maxlevel)
             inv.remove_weapons()
         end
     end
@@ -306,20 +307,20 @@ function mob.npc_damage_until(item)
         if mq.TLO.Spawn(ID)() == nil then
             looping = false
         else
-            if mq.TLO.Spawn(ID).PctHPs() < tonumber(item.what) then
+            if mq.TLO.Spawn(ID).PctHPs() < item.damage_pct then
                 looping = false
             end
         end
         mq.delay(50)
     end
     mq.cmd("/squelch /attack off")
-    Logger.log_info("\aoTarget has either despawned or has decreased below \ag%s \aohealth.", item.what)
+    Logger.log_info("\aoTarget has either despawned or has decreased below \ag%s \aohealth.", item.damage_pct)
     while mq.TLO.Spawn(ID)() ~= nil do
-        Logger.log_verbose("\aoWaiting for \aritem.npc \aoto despawn before continuing.", item.what)
+        Logger.log_verbose("\aoWaiting for \aritem.npc \aoto despawn before continuing.", item.damage_pct)
         mq.delay(50)
     end
-    if item.zone ~= nil then
-        if mq.TLO.Me.Level() >= tonumber(item.zone) then
+    if item.maxlevel ~= nil then
+        if mq.TLO.Me.Level() >= item.maxlevel then
             Logger.log_info("\aoReequiping weapons.")
             inv.restore_weapons()
         end
@@ -439,9 +440,9 @@ function mob.npc_kill_all(item, class_settings, char_settings)
             mq.delay(100)
         end
         if item.zone ~= nil then
-            local ID = mq.TLO.Me.AltAbility(item.zone)()
-            mq.cmdf('/squelch /alt act %s', ID)
-            Logger.log_verbose("\aoCasting \ag%s \ao(\ag%s\ao) to pull.", item.zone, ID)
+            local altID = mq.TLO.Me.AltAbility(item.zone)()
+            mq.cmdf('/squelch /alt act %s', altID)
+            Logger.log_verbose("\aoCasting \ag%s \ao(\ag%s\ao) to pull.", item.zone, altID)
             mq.delay("1s")
         end
         local loopCount = 0
@@ -466,9 +467,9 @@ function mob.npc_kill_all(item, class_settings, char_settings)
             if loopCount == 20 then
                 loopCount = 0
                 if item.zone ~= nil then
-                    local ID = mq.TLO.Me.AltAbility(item.zone)()
-                    mq.cmdf('/squelch /alt act %s', ID)
-                    Logger.log_verbose("\aoCasting \ag%s \ao(\ag%s\ao) to pull.", item.zone, ID)
+                    local altID = mq.TLO.Me.AltAbility(item.zone)()
+                    mq.cmdf('/squelch /alt act %s', altID)
+                    Logger.log_verbose("\aoCasting \ag%s \ao(\ag%s\ao) to pull.", item.zone, altID)
                     mq.delay("1s")
                 end
                 if mq.TLO.Me.Combat() == false then

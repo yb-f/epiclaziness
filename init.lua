@@ -440,7 +440,7 @@ local function run_epic(class, choice)
         elseif task_table[State.step].type == "OPEN_DOOR_ALL" then
             manage.openDoorAll()
         elseif task_table[State.step].type == "PAUSE" then
-            State.status = task_table[State.step].npc
+            State.status = task_table[State.step].status
             State.task_run = false
         elseif task_table[State.step].type == "PH_SEARCH" then
             Mob.ph_search(task_table[State.step], class_settings.settings, loadsave.SaveState)
@@ -469,7 +469,7 @@ local function run_epic(class, choice)
         elseif task_table[State.step].type == "SNEAK" then
             Actions.sneak()
         elseif task_table[State.step].type == "WAIT" then
-            State.status = "Pausing for " .. task_table[State.step].what / 1000 .. " seconds"
+            State.status = "Pausing for " .. task_table[State.step].wait / 1000 .. " seconds"
             Actions.wait(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "WAIT_EVENT" then
             Actions.wait_event(task_table[State.step])

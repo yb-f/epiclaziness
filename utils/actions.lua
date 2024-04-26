@@ -115,9 +115,9 @@ function Actions.farm_check(item, class_settings, char_settings)
         State.step = item.gotostep
     else
         --using item.zone as a filler slot for split goto for this function
-        Logger.log_verbose("\aoOne or more items missing. Moving to step \ar%s\ao.", item.zone)
+        Logger.log_verbose("\aoOne or more items missing. Moving to step \ar%s\ao.", item.backstep)
         State.rewound = true
-        State.step = tonumber(item.zone)
+        State.step = item.backstep
     end
 end
 
@@ -160,7 +160,7 @@ function Actions.farm_check_pause(item, class_settings, char_settings)
     --if one or more of the items are not present this will be true, so on false advance to the desired step
     if not_found == true then
         Logger.log_error("\aoMissing \ar%s\ao. Stopping at step: \ar%s\ao.", item.what, State.step)
-        State.status = item.npc
+        State.status = item.status
         State.task_run = false
         mq.cmd('/foreground')
     end
@@ -185,7 +185,7 @@ function Actions.farm_radius(item, class_settings, char_settings, event)
         State.status = "Killing mobs in radius" .. item.radius .. "until event."
         Logger.log_info("\aoKilling mobs in radius \ag%s \aountil event.", item.radius)
         Logger.log_debug("\aoEvent trigger is \ag%s\ao.", item.what)
-        mq.event('farm_event', item.what, Actions.farm_event)
+        mq.event('farm_event', item.phrase, Actions.farm_event)
     end
     travel.loc_travel(item, class_settings, char_settings)
     manage.campGroup(item.radius, class_settings, char_settings)
@@ -593,10 +593,10 @@ function Actions.ground_spawn_farm(item, class_settings, char_settings)
 end
 
 function Actions.group_size_check(item)
-    Logger.log_super_verbose("\aoChecking group size (\ag%s \aoplayers needed).", item.what)
-    if mq.TLO.Group.GroupSize() < tonumber(item.what) then
-        State.status = item.npc
-        Logger.log_error("\aoYou will require \ar6 players in your party to progress through this step.")
+    Logger.log_super_verbose("\aoChecking group size (\ag%s \aoplayers needed).", item.count)
+    if mq.TLO.Group.GroupSize() < item.count then
+        State.status = item.status
+        Logger.log_error("\aoYou will require \ar%s \aoplayers in your party to progress through this step.", item.count)
         State.task_run = false
     end
 end
@@ -813,8 +813,8 @@ end
 
 function Actions.npc_talk(item, class_settings, char_settings)
     manage.removeInvis()
-    State.status = "Talking to " .. item.npc .. " (" .. item.what .. ")"
-    Logger.log_info("\aoSaying \ag%s \aoto \ag%s\ao.", item.what, item.npc)
+    State.status = "Talking to " .. item.npc .. " (" .. item.phrase .. ")"
+    Logger.log_info("\aoSaying \ag%s \aoto \ag%s\ao.", item.phrase, item.npc)
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
         if mq.TLO.Spawn(item.npc).Distance() ~= nil then
             if mq.TLO.Spawn(item.npc).Distance() > 100 then
@@ -828,15 +828,15 @@ function Actions.npc_talk(item, class_settings, char_settings)
         mq.TLO.Spawn(item.npc).DoTarget()
         mq.delay(300)
     end
-    mq.cmdf("/say %s", item.what)
+    mq.cmdf("/say %s", item.phrase)
     mq.delay(750)
 end
 
 function Actions.npc_talk_all(item, class_settings, char_settings)
     manage.removeInvis()
-    State.status = "Talking to " .. item.npc .. " (" .. item.what .. ")"
-    Logger.log_info("\aoHaving all grouped characters say \ag%s \ao to \ag%s\ao.", item.what, item.npc)
-    manage.groupTalk(item.npc, item.what)
+    State.status = "Talking to " .. item.npc .. " (" .. item.phrase .. ")"
+    Logger.log_info("\aoHaving all grouped characters say \ag%s \ao to \ag%s\ao.", item.phrase, item.npc)
+    manage.groupTalk(item.npc, item.phrase)
 end
 
 function Actions.npc_wait(item, class_settings, char_settings)
@@ -1002,13 +1002,13 @@ function Actions.ldon_count_check(item)
         Logger.log_info("\aoCompleted LDON adventure!")
     else
         State.rewound = true
-        State.step = tonumber(item.zone)
+        State.step = item.backstep
         Logger.log_super_verbose("\aoAdventure not yet complete.")
     end
 end
 
 function Actions.wait(item, class_settings, char_settings)
-    Logger.log_info("Waiting for \ag%s \ao seconds.", item.what / 1000)
+    Logger.log_info("Waiting for \ag%s \ao seconds.", item.wait / 1000)
     local waiting = true
     local start_wait = os.clock() * 1000
     local distance = 0
@@ -1029,7 +1029,7 @@ function Actions.wait(item, class_settings, char_settings)
             Actions.pause(State.status)
         end
         mq.delay(200)
-        if os.clock() * 1000 > start_wait + tonumber(item.what) then
+        if os.clock() * 1000 > start_wait + item.wait then
             waiting = false
         end
         loopCount = loopCount + 1
@@ -1060,8 +1060,8 @@ function Actions.wait(item, class_settings, char_settings)
 end
 
 function Actions.wait_event(item)
-    mq.event('wait_event', item.what, event_wait)
-    Logger.log_info("\aoWaiting for event (\ag%s\ao) before continuing.", item.what)
+    mq.event('wait_event', item.phrase, event_wait)
+    Logger.log_info("\aoWaiting for event (\ag%s\ao) before continuing.", item.phrase)
     waiting = true
     while waiting do
         if State.skip == true then
@@ -1079,24 +1079,24 @@ function Actions.wait_for(item)
     local cur_eq_hour = mq.TLO.GameTime.Hour()
     local cur_eq_min  = mq.TLO.GameTime.Minute()
     while looping do
-        if cur_eq_hour == tonumber(item.what) and cur_eq_min == 0 then
+        if cur_eq_hour == item.wait and cur_eq_min == 0 then
             looping = false
         end
         mq.delay(500)
         cur_eq_hour = mq.TLO.GameTime.Hour()
         cur_eq_min  = mq.TLO.GameTime.Minute()
-        if cur_eq_hour < tonumber(item.what) then
-            local hour_calc = tonumber(item.what) - cur_eq_hour
+        if cur_eq_hour < item.wait then
+            local hour_calc = item.wait - cur_eq_hour
             local min_calc = 60 - cur_eq_min
             min_calc = min_calc + (hour_calc * 60)
             local real_time = math.floor(min_calc / 20)
-            State.status = "Waiting for EQ Time: " .. tonumber(item.what) .. ":00 (" .. real_time .. " minutes)."
-        elseif cur_eq_hour >= tonumber(item.what) then
-            local hour_calc = 24 - cur_eq_hour + tonumber(item.what)
+            State.status = "Waiting for EQ Time: " .. item.wait .. ":00 (" .. real_time .. " minutes)."
+        elseif cur_eq_hour >= item.wait then
+            local hour_calc = 24 - cur_eq_hour + item.wait
             local min_calc = 60 - cur_eq_min
             min_calc = min_calc + (hour_calc * 60)
             local real_time = math.floor(min_calc / 20)
-            State.status = "Waiting for EQ Time: " .. tonumber(item.what) .. ":00 (" .. real_time .. " minutes)."
+            State.status = "Waiting for EQ Time: " .. item.wait .. ":00 (" .. real_time .. " minutes)."
         end
     end
 end

@@ -146,7 +146,7 @@ function inventory.combine_item(item, class_settings, char_settings, slot)
     local slot2     = 0
     local itemslot  = mq.TLO.FindItem("=" .. item.what).ItemSlot() - 22
     local itemslot2 = mq.TLO.FindItem("=" .. item.what).ItemSlot2() + 1
-    if itemslot == slot and tonumber(item.zone) == 1 then
+    if itemslot == slot and item.count >= 2 then
         itemslot, itemslot2 = inventory.find_duplicate_item(item.what, slot)
         if itemslot == 0 and itemslot2 == 0 then
             State.status = "Unable to find item for combine (" .. item.what .. ")"
@@ -202,13 +202,13 @@ function inventory.combine_done(class_settings, char_settings)
         Mob.clearXtarget(class_settings, char_settings)
     end
     if State.bagslot1 ~= 0 and State.bagslot2 ~= 0 then
-        State.status = "Moving container back to slot 8"
-        Logger.log_info("\aoRestoring container to slot 8.")
+        State.status = "Moving container back to previous slot"
+        Logger.log_info("\aoRestoring container to previous slot.")
         mq.cmdf("/squelch /nomodkey /shiftkey /itemnotify in pack%s %s leftmouseup", State.bagslot1, State.bagslot2)
         while mq.TLO.Cursor() == nil do
             mq.delay(100)
         end
-        mq.cmd("/squelch /nomodkey /shiftkey /itemnotify pack8 leftmouseup")
+        mq.cmdf("/squelch /nomodkey /shiftkey /itemnotify pack%s leftmouseup", State.combineSlot)
         mq.delay(200)
         mq.cmd("/squelch /autoinv")
         State.bagslot1 = 0
@@ -269,12 +269,12 @@ function inventory.enviro_combine_item(item)
     while mq.TLO.Cursor() == nil do
         mq.delay(100)
     end
-    mq.cmdf("/squelch /itemnotify enviro%s leftmouseup", item.npc)
+    mq.cmdf("/squelch /itemnotify enviro%s leftmouseup", item.enviroslot)
     mq.delay(500)
     while mq.TLO.Cursor() ~= nil do
         mq.delay(100)
     end
-    Logger.log_verbose("\aoSuccessfully moved \ag%s \aoto combine container in slot \ag%s\ao.", item.what, item.npc)
+    Logger.log_verbose("\aoSuccessfully moved \ag%s \aoto combine container in slot \ag%s\ao.", item.what, item.enviroslot)
 end
 
 function inventory.enviro_combine_do()

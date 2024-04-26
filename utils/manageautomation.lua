@@ -212,7 +212,7 @@ function manage.groupTalk(npc, phrase)
     end
     if State.group_choice == 1 then
         if mq.TLO.Target.ID() ~= mq.TLO.Spawn(npc).ID() then
-            Logger.log_verbose("\aoTargeting \ar%s\ao.", item.npc)
+            Logger.log_verbose("\aoTargeting \ar%s\ao.", npc)
             mq.TLO.Spawn(npc).DoTarget()
             mq.delay(300)
         end
