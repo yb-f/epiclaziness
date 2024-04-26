@@ -329,8 +329,8 @@ function draw_gui.settingsTab(themeName, theme, themeID, class_settings, char_se
             char_settings.SaveState.general.speedForTravel = draw_gui.RenderOptionToggle("##speed_setting", "Use travel speed skills", char_settings.SaveState.general
                 .speedForTravel)
             ImGui.PushItemWidth(120)
-            char_settings.SaveState.general.xtargClear = ImGui.InputInt("Number of mobs to clear XTarget list.",
-                char_settings.SaveState.general.xtargClear)
+            char_settings.SaveState.general.xtargClear = ImGui.InputInt("Number of mobs to clear XTarget list.", char_settings.SaveState.general.xtargClear)
+            if char_settings.SaveState.general.xtargClear < 1 then char_settings.SaveState.general.xtargClear = 1 end
             ImGui.PopItemWidth()
             if ImGui.Button("Save") then
                 char_settings.saveState()
