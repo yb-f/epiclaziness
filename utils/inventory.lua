@@ -77,24 +77,17 @@ function inventory.loot_check(item)
     if mq.TLO.AdvLoot.SCount() > 0 then
         for i = 1, mq.TLO.AdvLoot.SCount() do
             if mq.TLO.AdvLoot.SList(i).Name() == item.what then
-                Logger.log_debug("\aoFound \ag%s \aoadvancing to step \ag%s\ao.", item.what, item.gotostep)
-                State.step = item.gotostep
-                State.rewound = true
-                State.skip = true
-                return
+                return true
             end
         end
     elseif mq.TLO.AdvLoot.PCount() > 0 then
         for i = 1, mq.TLO.AdvLoot.PCount() do
             if mq.TLO.AdvLoot.PList(i).Name() == item.what then
-                Logger.log_debug("\aoFound \ag%s \aoadvancing to step \ag%s\ao.", item.what, item.gotostep)
-                State.step = item.gotostep
-                State.rewound = true
-                State.skip = true
-                return
+                return true
             end
         end
     end
+    return false
 end
 
 function inventory.combine_container(item, class_settings, char_settings)
