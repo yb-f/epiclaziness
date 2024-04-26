@@ -51,8 +51,8 @@ function hashCheck.check_meshes()
         if hashCheck.hashes[file] ~= result then
             local zone = file.gsub(file, ".navmesh", "")
             table.insert(State.badMeshes, zone)
-            Logger.log_warn("\aoYour \ar%s \aomesh does not match the tested version. You may experience navigation issues in this zone.", file)
-            Logger.log_warn("\aoDownload the latest version from meshupdater.exe or from \arhttps://github.com/yb-f/meshes \aothank you.")
+            Logger.log_debug("\aoYour \ar%s \aomesh does not match the tested version. You may experience navigation issues in this zone.", file)
+            Logger.log_debug("\aoDownload the latest version from meshupdater.exe or from \arhttps://github.com/yb-f/meshes \aothank you.")
         end
     end
 end
