@@ -169,6 +169,7 @@ function mob.findNearestName(npc, item, class_settings, char_settings)
     local closest_distance = 25000
     local closest_ID = 0
     local loopCount = 0
+    local looted = false
     while closest_ID == 0 do
         local foundCorpse = false
         loopCount = loopCount + 1
@@ -210,7 +211,15 @@ function mob.findNearestName(npc, item, class_settings, char_settings)
         end
         if item.type == "NPC_KILL" then
             if item.what ~= nil then
-                inv.loot_check(item)
+                if inv.loot_check(item) then
+                    looted = inv.loot(item)
+                end
+                if inv.item_check(item) == true and looted == false then
+                    looted = true
+                end
+            end
+            if looted then
+                break
             end
             if item.named == 1 then
                 if closest_ID == 0 then
@@ -327,7 +336,7 @@ function mob.npc_damage_until(item)
     end
 end
 
-function mob.npc_kill(item, class_settings, char_settings, loot)
+function mob.npc_kill(item, class_settings, char_settings)
     manage.removeInvis()
     State.status = "Killing " .. item.npc
     Logger.log_info("\aoKilling \ag%s\ao.", item.npc)
@@ -342,61 +351,73 @@ function mob.npc_kill(item, class_settings, char_settings, loot)
             return
         end
     end
+    local looted = false
     if item.what ~= nil then
-        inv.loot_check(item)
-    end
-    if ID ~= nil then
-        State.status = "Killing " .. item.npc .. " (" .. ID .. ")"
-        Logger.log_info("\aoKilling \ag%s \ao(\ag%s\ao).", item.npc, ID)
-        Logger.log_verbose("\aoTargeting \ag%s \ao(\ag%s\ao).", item.npc, ID)
-        mq.TLO.Spawn(ID).DoTarget()
-    end
-    mq.cmd("/squelch /stick")
-    mq.delay(100)
-    mq.cmd("/squelch /attack on")
-    Logger.log_super_verbose("\aoGenerating events to detect unhittable or bugged target.")
-    mq.event("cannot_see", "You cannot see your target.", target_invalid_switch)
-    mq.event("cannot_cast", "You cannot cast#*#on#*#", target_invalid_switch)
-    while mq.TLO.Spawn(ID).Type() == 'NPC' or mq.TLO.Spawn(ID).Type() == 'Chest' do
-        mq.doevents()
-        if State.skip == true then
-            mq.unevent('cannot_see')
-            mq.unevent('cannot_cast')
-            State.skip = false
-            return
+        if inv.loot_check(item) then
+            looted = inv.loot(item)
         end
-        if State.cannot_count > 9 then
-            State.cannot_count = 0
-            table.insert(State.bad_IDs, ID)
-            State.rewound = true
-            State.step = State.step - 1
-            mq.unevent('cannot_see')
-            mq.unevent('cannot_cast')
-            Logger.log_warn('\aoUnable to hit this target. Adding \ar%s \aoto bad IDs and moving back to step \ar%s\ao.', ID, State.step)
-            return
+        if inv.item_check(item) == true and looted == false then
+            looted = true
         end
-        if mq.TLO.Target.ID() ~= ID then
-            Logger.log_verbose("\aoRetargeting \ag%s\ao.", ID)
+    end
+    if looted == false then
+        if ID ~= nil then
+            State.status = "Killing " .. item.npc .. " (" .. ID .. ")"
+            Logger.log_info("\aoKilling \ag%s \ao(\ag%s\ao).", item.npc, ID)
+            Logger.log_verbose("\aoTargeting \ag%s \ao(\ag%s\ao).", item.npc, ID)
             mq.TLO.Spawn(ID).DoTarget()
         end
-        if mq.TLO.Me.Combat() == false then
-            Logger.log_super_verbose("\aoAttack was off when it should have been on. Turning it back on.")
-            mq.cmd("/squelch /attack on")
+        mq.cmd("/squelch /stick")
+        mq.delay(100)
+        mq.cmd("/squelch /attack on")
+        Logger.log_super_verbose("\aoGenerating events to detect unhittable or bugged target.")
+        mq.event("cannot_see", "You cannot see your target.", target_invalid_switch)
+        mq.event("cannot_cast", "You cannot cast#*#on#*#", target_invalid_switch)
+        while mq.TLO.Spawn(ID).Type() == 'NPC' or mq.TLO.Spawn(ID).Type() == 'Chest' do
+            mq.doevents()
+            if State.skip == true then
+                mq.unevent('cannot_see')
+                mq.unevent('cannot_cast')
+                State.skip = false
+                return
+            end
+            if State.cannot_count > 9 then
+                State.cannot_count = 0
+                table.insert(State.bad_IDs, ID)
+                State.rewound = true
+                State.step = State.step - 1
+                mq.unevent('cannot_see')
+                mq.unevent('cannot_cast')
+                Logger.log_warn('\aoUnable to hit this target. Adding \ar%s \aoto bad IDs and moving back to step \ar%s\ao.', ID, State.step)
+                return
+            end
+            if mq.TLO.Target.ID() ~= ID then
+                Logger.log_verbose("\aoRetargeting \ag%s\ao.", ID)
+                mq.TLO.Spawn(ID).DoTarget()
+            end
+            if mq.TLO.Me.Combat() == false then
+                Logger.log_super_verbose("\aoAttack was off when it should have been on. Turning it back on.")
+                mq.cmd("/squelch /attack on")
+            end
+            mq.delay(200)
+            if item.what ~= nil then
+                if inv.loot_check(item) then
+                    looted = inv.loot(item)
+                end
+                if inv.item_check(item) == true and looted == false then
+                    looted = true
+                end
+            end
+            if looted then
+                break
+            end
         end
-        mq.delay(200)
+        mq.unevent('cannot_see')
+        mq.unevent('cannot_cast')
+        manage.pauseGroup(class_settings)
+        mq.delay("2s")
+        State.cannot_count = 0
     end
-    mq.unevent('cannot_see')
-    mq.unevent('cannot_cast')
-    manage.pauseGroup(class_settings)
-    mq.delay("2s")
-    if mq.TLO.AdvLoot.SCount() > 0 then
-        if loot ~= 'LOOT' then
-            Logger.log_info("\aoIgnoring unneeded loot.")
-        else
-            Logger.log_info("\aoLooting necessary items only.")
-        end
-    end
-    State.cannot_count = 0
     if item.gotostep ~= nil then
         State.rewound = true
         State.step = item.gotostep

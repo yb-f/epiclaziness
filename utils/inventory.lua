@@ -411,12 +411,25 @@ function inventory.find_free_slot(exclude_bag)
     end
 end
 
-function inventory.loot(item, class_settings, char_settings)
-    if Mob.xtargetCheck(char_settings) then
-        Mob.clearXtarget(class_settings, char_settings)
+function inventory.item_check(item)
+    if item.count == nil then
+        Logger.log_super_verbose("\aoChecking inventory for \ag%s\ao.", item.what)
+        if mq.TLO.FindItem("=" .. item.what)() ~= nil then
+            Logger.log_info("\ag%s \aois already looted.", item.what)
+            return true
+        end
+    else
+        Logger.log_super_verbose("\aoChecking inventory for \ag%s\ao(\ag%s\ao).", item.what, item.count)
+        if mq.TLO.FindItemCount("=" .. item.what)() >= item.count then
+            Logger.log_info("\ag%s\ao(\ag%s\ao) \aois already looted.", item.what, item.count)
+            return true
+        end
     end
+    return false
+end
+
+function inventory.loot(item)
     State.status = "Looting " .. item.what
-    mq.delay("2s")
     local looted = false
     if mq.TLO.AdvLoot.SCount() > 0 then
         for i = 1, mq.TLO.AdvLoot.SCount() do
@@ -436,58 +449,39 @@ function inventory.loot(item, class_settings, char_settings)
             end
         end
     end
-    mq.delay("1s")
-    if mq.TLO.Window('ConfirmationDialogBox').Open() then
+    mq.delay("2s")
+    while mq.TLO.Window('ConfirmationDialogBox').Open() do
+        mq.delay(200)
         Logger.log_verbose("\aoNo drop confirmation window open.  Clicking yes.")
         mq.TLO.Window('ConfirmationDialogBox/CD_Yes_Button').LeftMouseUp()
-        mq.delay("1s")
     end
+    mq.delay("1s")
     if mq.TLO.FindItem("=" .. item.what)() ~= nil then
         Logger.log_info("\aoSuccessfully looted \ag%s\ao.", item.what)
-        if item.gotostep ~= nil then
+        --[[ if item.gotostep ~= nil then
             Logger.log_verbose("\aoAdvancing to step \ar%s\ao.", item.gotostep)
             State.rewound = true
             State.step = item.gotostep
-        end
-        return
+        end--]]
+        return true
     else
         if looted == true then
             for i = 1, 10 do
                 mq.delay(200)
                 if mq.TLO.FindItem("=" .. item.what)() ~= nil then
-                    if item.gotostep ~= nil then
+                    Logger.log_info("\aoSuccessfully looted \ag%s\ao.", item.what)
+                    --[[if item.gotostep ~= nil then
                         State.step = item.gotostep - 1
-                    end
-                    return
-                end
-                if mq.TLO.AdvLoot.PCount() > 0 then
-                    for i = 1, mq.TLO.AdvLoot.PCount() do
-                        if mq.TLO.AdvLoot.PList(i).Name() == item.what then
-                            mq.cmdf('/squelch /advloot personal %s loot', i, mq.TLO.Me.DisplayName())
-                            looted = true
-                        end
-                        mq.delay("1s")
-                        if mq.TLO.Window('ConfirmationDialogBox').Open() then
-                            Logger.log_verbose("\aoNo drop confirmation window open.  Clicking yes.")
-                            mq.TLO.Window('ConfirmationDialogBox/CD_Yes_Button').LeftMouseUp()
-                            mq.delay("1s")
-                        end
-                    end
-                end
-                if i == 10 then
-                    State.task_run = false
-                    State.status = "Tried to loot " .. item.what .. "at step " .. State.step .. " but failed!"
-                    Logger.log_error("\aoFailed to loot \ar%s \aoat step \ar%s\ao.", item.what, State.step)
-                    mq.cmd('/foreground')
-                    return
+                    end--]]
+                    return true
                 end
             end
+            --State.task_run = false
+            State.status = "Tried to loot " .. item.what .. "at step " .. State.step .. " but failed!"
+            Logger.log_error("\aoFailed to loot \ar%s \aoat step \ar%s\ao.", item.what, State.step)
+            mq.cmd('/foreground')
+            return false
         end
-    end
-    if item.gotostep ~= nil then
-        State.rewound = true
-        State.step = item.gotostep
-        Logger.log_verbose("\aoAdvancing to step \ar%s\ao.", item.gotostep)
     end
 end
 
