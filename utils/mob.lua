@@ -173,11 +173,11 @@ function mob.findNearestName(npc, item, class_settings, char_settings)
     while closest_ID == 0 do
         local foundCorpse = false
         loopCount = loopCount + 1
-        if loopCount == 40 then
+        if loopCount == 10 then
             loopCount = 0
             mob_list = create_spawn_list()
         end
-        mq.delay(50)
+        mq.delay(200)
         for _, spawn in pairs(mob_list) do
             if mq.TLO.Navigation.PathExists('id ' .. spawn.ID())() then
                 if mq.TLO.Navigation.PathLength('id ' .. spawn.ID())() < closest_distance then
@@ -417,6 +417,14 @@ function mob.npc_kill(item, class_settings, char_settings)
         manage.pauseGroup(class_settings)
         mq.delay("2s")
         State.cannot_count = 0
+    end
+    if item.what ~= nil then
+        if inv.loot_check(item) then
+            looted = inv.loot(item)
+        end
+        if inv.item_check(item) == true and looted == false then
+            looted = true
+        end
     end
     if item.gotostep ~= nil then
         State.rewound = true
