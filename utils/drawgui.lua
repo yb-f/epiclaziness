@@ -522,6 +522,8 @@ function draw_gui.generate_outline_text(item)
         text = "Reequip item"
     elseif item.type == "ROG_GAMBLE" then
         text = "Gamble to 1900 chips"
+    elseif item.type == "SAVE" then
+        text = "Save progress"
     elseif item.type == "START_ADVENTURE" then
         text = "Request LDON adventure from " .. item.npc
     elseif item.type == "SEND_YES" then
