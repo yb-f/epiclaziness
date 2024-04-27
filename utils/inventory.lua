@@ -253,7 +253,7 @@ function inventory.enviro_combine_container(item)
 end
 
 function inventory.enviro_combine_item(item)
-    State.status = "Moving " .. item.what .. " to combine container slot " .. item.npc
+    State.status = "Moving " .. item.what .. " to combine container slot " .. item.enviroslot
     Logger.log_info("\aoMoving \ag%s \aoto combine container.", item.what)
     if mq.TLO.FindItem("=" .. item.what)() == nil then
         State.status = "Unable to find item for combine (" .. item.what .. ")"
