@@ -124,8 +124,8 @@ function manage.doAutomation(character, class, script, action, char_settings)
         if character == mq.TLO.Me.DisplayName() then
             if script == 1 then
                 mq.cmdf('/squelch /%s resetcamp nosave', class)
-                mq.cmdf('/squelch /%s mode HunterTank nosave', class)
                 mq.cmdf('/squelch /%s pause off nosave', class)
+                mq.cmdf('/squelch /%s mode HunterTank nosave', class)
             elseif script == 2 then
                 mq.cmd("/squelch /rgl unpause")
                 mq.cmd("/squelch /rgl set pullmode 3")
