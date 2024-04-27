@@ -462,6 +462,17 @@ local function run_epic(class, choice)
             inv.restore_item()
         elseif task_table[State.step].type == "ROG_GAMBLE" then
             Actions.rog_gamble(task_table[State.step])
+        elseif task_table[State.step].type == "SAVE" then
+            Logger.log_info("\aoSaving step: \ar%s", State.step)
+            loadsave.prepSave(State.step)
+            if State.stop_at_save then
+                Logger.log_warn("\aoStopping at step \ar%s.", State.Step)
+                State.epicstring = ''
+                State.task_run = false
+                State.stop_at_save = false
+                State.status = "Stopped at step " .. State.step
+                return
+            end
         elseif task_table[State.step].type == "START_ADVENTURE" then
             Actions.start_adventure(task_table[State.step])
         elseif task_table[State.step].type == "SEND_YES" then
