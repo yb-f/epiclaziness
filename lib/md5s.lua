@@ -13,6 +13,7 @@ return {
 	['iceclad.navmesh'] = 'd748c233b6cbef2308e34686b602244b',
 	['lfaydark.navmesh'] = 'a53affe8b40a81b7e65821557d85e2eb',
 	['mirc.navmesh'] = '0032510c31b0f92d91f1d1ec91f771a5',
+	['mischiefplane.navmesh'] = 'ca05876740e4001fc42b2baa14de36cc',
 	['necropolis.navmesh'] = '571c376a6e96b3440bb9524c42ae50ff',
 	['poknowledge.navmesh'] = '64a2c1d0714f5d1299fa062d7da619dc',
 	['ponightmare.navmesh'] = '024df0b27cb607416adefe85ed32f6ae',
