@@ -1079,7 +1079,7 @@ function Actions.wait_for(item)
     local cur_eq_hour = mq.TLO.GameTime.Hour()
     local cur_eq_min  = mq.TLO.GameTime.Minute()
     while looping do
-        if cur_eq_hour == item.wait and cur_eq_min == 0 then
+        if cur_eq_hour == item.wait and cur_eq_min >= 0 then
             looping = false
         end
         mq.delay(500)
