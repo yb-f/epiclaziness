@@ -412,6 +412,8 @@ function draw_gui.generate_outline_text(item)
         text = "Combine complete, restore item to previous bag slot."
     elseif item.type == "COMBINE_ITEM" then
         text = "Add " .. item.what .. " to combine container"
+    elseif item.type == "DROP_ADVENTURE" then
+        text = "Leave current adventure."
     elseif item.type == "ENVIRO_COMBINE_CONTAINER" then
         text = "Travel to " .. item.what .. " and prepare combine"
     elseif item.type == "ENVIRO_COMBINE_DO" then
@@ -436,6 +438,8 @@ function draw_gui.generate_outline_text(item)
         text = "Farm for " .. item.what
     elseif item.type == "FARM_RADIUS_EVENT" then
         text = "Farm until event occurs. (" .. item.phrase .. ")"
+    elseif item.type == "FARM_WHILE_NEAR" then
+        text = "Farm until " .. item.npc .. " moves away."
     elseif item.type == "FISH_FARM" then
         text = "Fish for " .. item.what
     elseif item.type == "FISH_ONCE" then
