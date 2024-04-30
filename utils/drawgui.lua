@@ -534,6 +534,8 @@ function draw_gui.generate_outline_text(item)
         text = "Request LDON adventure from " .. item.npc
     elseif item.type == "SEND_YES" then
         text = "Select yes in confirmation box"
+    elseif item.type == "UNIGNORE_MOB" then
+        text = "Remove " .. item.npc .. " from pull ignore list."
     elseif item.type == "WAIT" then
         text = "Wait for " .. item.wait / 1000 .. " seconds"
     elseif item.type == "WAIT_EVENT" then
