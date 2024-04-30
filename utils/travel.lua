@@ -255,6 +255,18 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
         end
         if dist.GetDistance3D(mq.TLO.Me.X(), mq.TLO.Me.Y(), mq.TLO.Me.Z(), State.X, State.Y, State.Z) < 20 then
             loopCount = loopCount + 1
+        elseif dist.GetDistance3D(mq.TLO.Me.X(), mq.TLO.Me.Y(), mq.TLO.Me.Z(), State.X, State.Y, State.Z) > 75 then
+            Logger.log_info("\aoWe seem to have crossed a teleporter, moving to next step.")
+            State.destType = ''
+            State.dest = ''
+            State.traveling = false
+            State.autosize_on = false
+            mq.cmd('/squelch /autosize off')
+            travel.navPause()
+            State.X = mq.TLO.Me.X()
+            State.Y = mq.TLO.Me.Y()
+            State.Z = mq.TLO.Me.Z()
+            return
         else
             State.X = mq.TLO.Me.X()
             State.Y = mq.TLO.Me.Y()
