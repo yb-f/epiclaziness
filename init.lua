@@ -347,6 +347,8 @@ local function run_epic(class, choice)
             inv.combine_done(class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "COMBINE_ITEM" then
             inv.combine_item(task_table[State.step], class_settings.settings, loadsave.SaveState, State.combineSlot)
+        elseif task_table[State.step].type == "DROP_ADVENTURE" then
+            Actions.drop_adventure(task_table[State.step])
         elseif task_table[State.step].type == "ENVIRO_COMBINE_CONTAINER" then
             inv.enviro_combine_container(task_table[State.step])
         elseif task_table[State.step].type == "ENVIRO_COMBINE_DO" then
