@@ -608,6 +608,11 @@ end
 
 function Actions.group_size_check(item)
     Logger.log_super_verbose("\aoChecking group size (\ag%s \aoplayers needed).", item.count)
+    if mq.TLO.Group.GroupSize() == nil then
+        State.status = item.status
+        Logger.log_error("\aoYou will require \ar%s \aoplayers in your party to progress through this step.", item.count)
+        State.task_run = false
+    end
     if mq.TLO.Group.GroupSize() < item.count then
         State.status = item.status
         Logger.log_error("\aoYou will require \ar%s \aoplayers in your party to progress through this step.", item.count)
