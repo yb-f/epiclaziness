@@ -140,6 +140,9 @@ function Actions.drop_adventure(item)
         mq.delay(50)
     end
     mq.TLO.Window('AdventureRequestWnd/AdvRqst_RequestButton').LeftMouseUp()
+    mq.cmd("/dgga /lua parse mq.TLO.Window('AdventureRequestWnd').DoOpen()")
+    mq.delay(200)
+    mq.cmd("/dgga /lua parse mq.TLO.Window('AdventureRequestWnd/AdvRqst_RequestButton').LeftMouseUp()")
     mq.delay("1s")
     State.rewound = true
     State.step = item.gotostep
