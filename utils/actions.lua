@@ -357,7 +357,7 @@ function Actions.farm_while_near(item, class_settings, char_settings)
     manage.campGroup(item.radius, class_settings, char_settings)
     manage.unpauseGroup(class_settings)
     manage.removeInvis()
-    while mq.TLO.Spawn('npc ' .. item.npc).Distance() < item.what do
+    while mq.TLO.Spawn('npc ' .. item.npc).Distance() < tonumber(item.what) do
         mq.delay(200)
     end
     Logger.log_info("\ag%s \aohas moved, proceeding.", item.npc)
