@@ -134,6 +134,17 @@ function Actions.adventure_entrance(item, class_settings, char_settings)
     end
 end
 
+function Actions.drop_adventure(item)
+    while mq.TLO.Window('AdventureRequestWnd').Open() == false do
+        mq.TLO.Window('AdventureRequestWnd').DoOpen()
+        mq.delay(50)
+    end
+    mq.TLO.Window('AdventureRequestWnd/AdvRqst_RequestButton').LeftMouseUp()
+    mq.delay("1s")
+    State.rewound = true
+    State.step = item.gotostep
+end
+
 function Actions.farm_check_pause(item, class_settings, char_settings)
     if Mob.xtargetCheck(char_settings) then
         Mob.clearXtarget(class_settings, char_settings)
