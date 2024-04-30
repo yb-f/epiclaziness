@@ -662,10 +662,10 @@ function Actions.unignore_mob(item, class_settings)
         mq.TLO.Spawn('npc ' .. item.npc).DoTarget()
         mq.delay(200)
         mq.cmd('/squelch /clearignore')
-    elseif class_settings.class[mq.TLO.Me.Class()] == 4 then
+        --[[elseif class_settings.class[mq.TLO.Me.Class()] == 4 then
         mq.cmdf('/squelch /addignore "%s"', item.npc)
     elseif class_settings.class[mq.TLO.Me.Class()] == 5 then
-        mq.cmdf('/squelch /addignore "%s"', item.npc)
+        mq.cmdf('/squelch /addignore "%s"', item.npc)--]]
     end
 end
 
