@@ -350,6 +350,21 @@ function Actions.farm_radius(item, class_settings, char_settings, event)
     manage.pauseGroup(class_settings)
 end
 
+function Actions.farm_while_near(item, class_settings, char_settings)
+    State.status = "Killing nearby mobs until " .. item.npc .. " moves."
+    Logger.log_info("\aoKilling nearby mobs until \ag%s \aomoves.", item.npc)
+    travel.loc_travel(item, class_settings, char_settings)
+    manage.campGroup(item.radius, class_settings, char_settings)
+    manage.unpauseGroup(class_settings)
+    manage.removeInvis()
+    while mq.TLO.Spawn('npc ' .. item.npc).Distance() < item.what do
+        mq.delay(200)
+    end
+    Logger.log_info("\ag%s \aohas moved, proceeding.", item.npc)
+    manage.uncampGroup(class_settings)
+    manage.pauseGroup(class_settings)
+end
+
 function Actions.fish_farm(item, class_settings, char_settings, once)
     once = once or false
     if item.count ~= nil then
