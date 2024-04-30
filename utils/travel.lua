@@ -8,6 +8,7 @@ local dist          = require 'utils/distance'
 local speed_classes = { "Bard", "Druid", "Ranger", "Shaman" }
 local speed_buffs   = { "Selo's Accelerato", "Communion of the Cheetah", "Spirit of Falcons", "Flight of Falcons" }
 local travel        = {}
+travel.looping      = false
 
 function travel.invisTranslocatorCheck()
     Logger.log_verbose('\aoChecking if we are near a translocator npc before invising.')
@@ -751,7 +752,12 @@ function travel.navUnpause(item)
     mq.delay(500)
 end
 
-function travel.npc_follow(item, class_settings, char_settings)
+function travel.follow_event()
+    travel.looping = false
+end
+
+function travel.npc_follow(item, class_settings, char_settings, event)
+    event = event or false
     if Mob.xtargetCheck(char_settings) then
         travel.navPause()
         Mob.clearXtarget(class_settings, char_settings)
@@ -816,6 +822,22 @@ function travel.npc_follow(item, class_settings, char_settings)
         end
         Logger.log_info("\aoWe have reached our destination. Stopping follow.")
         travel.npc_stop_follow()
+    end
+    travel.looping = true
+    if event == true then
+        mq.event('follow_event', item.phrase, travel.follow_event)
+        while travel.looping == true do
+            mq.delay(100)
+            mq.doevents()
+            if Mob.xtargetCheck(char_settings) then
+                mq.cmd('/squelch /afollow off')
+                Mob.clearXtarget(class_settings, char_settings)
+                mq.TLO.Spawn("npc " .. item.npc).DoTarget()
+                mq.delay(300)
+                mq.cmd('/squelch /afollow')
+            end
+        end
+        mq.cmd('/squelch /afollow off')
     end
 end
 

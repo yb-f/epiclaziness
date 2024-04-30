@@ -470,6 +470,8 @@ function draw_gui.generate_outline_text(item)
         text = "Damage " .. item.npc .. " to " .. item.damage_pct .. "% health"
     elseif item.type == "NPC_FOLLOW" then
         text = "Follow " .. item.npc
+    elseif item.type == "NPC_FOLLOW_EVENT" then
+        text = "Follow " .. item.npc .. " until event: " .. item.phrase
     elseif item.type == "NPC_GIVE" then
         text = "Give " .. item.what .. " to " .. item.npc
     elseif item.type == "NPC_GIVE_ADD" then

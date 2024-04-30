@@ -417,6 +417,8 @@ local function run_epic(class, choice)
             Mob.npc_damage_until(task_table[State.step])
         elseif task_table[State.step].type == "NPC_FOLLOW" then
             travel.npc_follow(task_table[State.step], class_settings.settings, loadsave.SaveState)
+        elseif task_table[State.step].type == "NPC_FOLLOW_EVENT" then
+            travel.npc_follow(task_table[State.step], class_settings.settings, loadsave.SaveState, true)
         elseif task_table[State.step].type == "NPC_GIVE" then
             Actions.npc_give(task_table[State.step], class_settings.settings, loadsave.SaveState)
         elseif task_table[State.step].type == "NPC_GIVE_ADD" then
@@ -494,6 +496,8 @@ local function run_epic(class, choice)
             manage.sendYes()
         elseif task_table[State.step].type == "SNEAK" then
             Actions.sneak()
+        elseif task_table[State.step].type == "UNIGNORE_MOB" then
+            Actions.unignore_mob(task_table[State.step], class_settings.settings)
         elseif task_table[State.step].type == "WAIT" then
             State.status = "Pausing for " .. task_table[State.step].wait / 1000 .. " seconds"
             Actions.wait(task_table[State.step], class_settings.settings, loadsave.SaveState)
