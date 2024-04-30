@@ -62,7 +62,7 @@ local quests_requirements = {
         ['pre15'] =
         'No tradeskill or requirements for assistance from other classes. Some of the spawns in this quest are incredibly long so we use the Agent of Change for Plane of Storms and Plane of Hate. You will need to be in a group of 6 in order to do this.',
         ['15']    = '100 Fishing required.  Shaman with 224 Alchemy required for Mist of the Breathless.',
-        ['20']    = ''
+        ['20']    = 'Requires Baking 15, Brewing 226, and a Magician to summon a Quiver of Marr.'
     },
     ['rng'] = {
         ['10']    = '',
@@ -94,7 +94,7 @@ local quests_requirements = {
     ['war'] = {
         ['10']    = '',
         ['pre15'] = 'Requires brewing 100.',
-        ['15']    = '',
+        ['15']    = 'Requires Jewelry Making 100, Blacksmithing 115, and Elder Elvish 100.',
         ['20']    = '',
     },
     ['wiz'] = {
