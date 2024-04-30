@@ -552,7 +552,10 @@ function inventory.npc_buy(item, class_settings, char_settings)
     end
     mq.TLO.Target.RightClick()
     mq.delay("5s", inventory.merchant_window)
-    mq.delay("3s")
+    while mq.TLO.Window('MerchantWnd/MW_ItemList').Items() == 0 do
+        mq.delay(50)
+    end
+    mq.delay("1s")
     mq.TLO.Merchant.SelectItem("=" .. item.what)
     mq.delay("1s")
     if item.count == nil then
