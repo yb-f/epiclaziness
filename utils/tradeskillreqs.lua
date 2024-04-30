@@ -48,6 +48,11 @@ local tradeskill_requirements = {
     ['war'] = {
         ['pre15'] = {
             ['Brewing'] = 100
+        },
+        ['15'] = {
+            ['Jewelry Making'] = 100,
+            ['Blacksmithing'] = 115,
+            ['Elder Elvish'] = 100
         }
     }
 }
