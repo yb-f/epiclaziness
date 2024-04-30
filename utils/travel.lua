@@ -191,6 +191,9 @@ function travel.open_door()
 end
 
 function travel.travelLoop(item, class_settings, char_settings, ID)
+    State.X = mq.TLO.Me.X()
+    State.Y = mq.TLO.Me.Y()
+    State.Z = mq.TLO.Me.Z()
     ID = ID or 0
     local loopCount = 0
     local distance = 0
