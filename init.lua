@@ -235,12 +235,23 @@ local function check_tradeskills(class, choice)
         if tsreqs[class][quest] ~= nil then
             local first = true
             for ts, req in pairs(tsreqs[class][quest]) do
-                if mq.TLO.Me.Skill(ts)() < req then
-                    if first == true then
-                        first = false
-                        return_string = " \ag" .. ts .. " \aorequires \ar" .. req .. " \aoskill. Currently \ar" .. mq.TLO.Me.Skill(ts)() .. "."
-                    else
-                        return_string = return_string .. " \ag" .. ts .. " \aorequires \ar" .. req .. " \aoskill. Currently \ar" .. mq.TLO.Me.Skill(ts)() .. "."
+                if ts == 'Elder Elvish' then
+                    if mq.TLO.Me.LanguageSkill(ts)() < req then
+                        if first == true then
+                            first = false
+                            return_string = " \ag" .. ts .. " \aorequires \ar" .. req .. " \aoskill. Currently \ar" .. mq.TLO.Me.LanguageSkill(ts)() .. "."
+                        else
+                            return_string = return_string .. " \ag" .. ts .. " \aorequires \ar" .. req .. " \aoskill. Currently \ar" .. mq.TLO.Me.LanguageSkill(ts)() .. "."
+                        end
+                    end
+                else
+                    if mq.TLO.Me.Skill(ts)() < req then
+                        if first == true then
+                            first = false
+                            return_string = " \ag" .. ts .. " \aorequires \ar" .. req .. " \aoskill. Currently \ar" .. mq.TLO.Me.Skill(ts)() .. "."
+                        else
+                            return_string = return_string .. " \ag" .. ts .. " \aorequires \ar" .. req .. " \aoskill. Currently \ar" .. mq.TLO.Me.Skill(ts)() .. "."
+                        end
                     end
                 end
             end
