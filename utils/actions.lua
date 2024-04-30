@@ -652,6 +652,23 @@ function Actions.ignore_mob(item, class_settings)
     end
 end
 
+function Actions.unignore_mob(item, class_settings)
+    Logger.log_verbose("\aoRemoving \ag%s\ao from mob ignore list.", item.npc)
+    if class_settings.class[mq.TLO.Me.Class()] == 1 then
+        mq.cmdf('/squelch /%s unignore "%s"', mq.TLO.Me.Class.ShortName(), item.npc)
+    elseif class_settings.class[mq.TLO.Me.Class()] == 2 then
+        mq.cmdf('/squelch /rgl pulldenyrm "%s"', item.npc)
+    elseif class_settings.class[mq.TLO.Me.Class()] == 3 then
+        mq.TLO.Spawn('npc ' .. item.npc).DoTarget()
+        mq.delay(200)
+        mq.cmd('/squelch /clearignore')
+    elseif class_settings.class[mq.TLO.Me.Class()] == 4 then
+        mq.cmdf('/squelch /addignore "%s"', item.npc)
+    elseif class_settings.class[mq.TLO.Me.Class()] == 5 then
+        mq.cmdf('/squelch /addignore "%s"', item.npc)
+    end
+end
+
 function Actions.pause(status)
     State.status = 'Paused'
     Logger.log_info("\aoPausing on step \ar%s\ao.", State.step)
