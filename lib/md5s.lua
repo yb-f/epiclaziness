@@ -27,5 +27,5 @@ return {
 	['sirens.navmesh'] = '8ef779818b2ac82d6b93d56a375c540c',
 	['soldungc.navmesh'] = 'ddfecd111fd15f7b2699ad6ecc072462',
 	['southro.navmesh'] = '30425a2ee40ad65653acc76377367580',
-	['nedaria.nevmesh'] = '68836ddce190b396b2858713a02e2d14',
+	['veksar.navmesh'] = '4bac0c5169a8fb5a1d705d40aa0e6409'
 }
