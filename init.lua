@@ -315,10 +315,18 @@ local function run_epic(class, choice)
     mq.delay("5s")
     manage.pauseGroup(class_settings.settings)
     while State.step < #task_table do
+        if mq.TLO.EverQuest.GameState ~= 'INGAME' then
+            Logger.log_error('\arNot in game, closing.')
+            mq.exit()
+        end
         State.cannot_count = 0
         while State.pause == true do
             State.status = "Paused"
             mq.delay(500)
+            if mq.TLO.EverQuest.GameState ~= 'INGAME' then
+                Logger.log_error('\arNot in game, closing.')
+                mq.exit()
+            end
         end
         State.skip = false
         if State.rewound == false then
@@ -660,6 +668,10 @@ end
 
 local function main()
     while running == true do
+        if mq.TLO.EverQuest.GameState ~= 'INGAME' then
+            Logger.log_error('\arNot in game, closing.')
+            mq.exit()
+        end
         if State.start_run == true then
             State.start_run = false
             State.step = 0

@@ -200,6 +200,10 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
     local distance = 0
     while mq.TLO.Navigation.Active() do
         mq.delay(200)
+        if mq.TLO.EverQuest.GameState ~= 'INGAME' then
+            Logger.log_error('\arNot in game, closing.')
+            mq.exit()
+        end
         if mq.TLO.Navigation.Paused() == true then
             travel.navUnpause(item)
         end
@@ -1039,6 +1043,10 @@ function travel.zone_travel(item, class_settings, char_settings, continue)
     State.Y = mq.TLO.Me.Y()
     State.Z = mq.TLO.Me.Z()
     while mq.TLO.Zone.ShortName() ~= item.zone and mq.TLO.Zone.Name() ~= item.zone do
+        if mq.TLO.EverQuest.GameState ~= 'INGAME' then
+            Logger.log_error('\arNot in game, closing.')
+            mq.exit()
+        end
         if mq.TLO.Navigation.Paused() == true then
             travel.navUnpause(item)
         end
