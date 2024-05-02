@@ -144,7 +144,7 @@ function mob.clearXtarget(class_settings, char_settings)
 end
 
 local function matchFilters(spawn)
-    if string.find(string.lower(spawn.CleanName()), string.lower(searchFilter)) and (spawn.Type() == 'NPC' or spawn.Type() == 'Trigger' or spawn.Type() == 'Chest' or spawn.Type() == 'Corpse') then
+    if string.find(string.lower(spawn.CleanName()), string.lower(searchFilter)) and (spawn.Type() == 'NPC' or spawn.Type() == 'Trigger' or spawn.Type() == 'Chest' or spawn.Type() == 'Corpse' or spawn.Type() == 'Pet') then
         for _, ID in pairs(State.bad_IDs) do
             if spawn.ID() == ID then
                 return false
