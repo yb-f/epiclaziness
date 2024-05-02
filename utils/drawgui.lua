@@ -332,6 +332,7 @@ function draw_gui.settingsTab(themeName, theme, themeID, class_settings, char_se
             ImGui.PushItemWidth(120)
             char_settings.SaveState.general.xtargClear = ImGui.InputInt("Number of mobs to clear XTarget list.", char_settings.SaveState.general.xtargClear)
             if char_settings.SaveState.general.xtargClear < 1 then char_settings.SaveState.general.xtargClear = 1 end
+            if char_settings.SaveState.general.xtargClear > 20 then char_settings.SaveState.general.xtargClear = 21 end
             ImGui.PopItemWidth()
             if ImGui.Button("Save") then
                 char_settings.saveState()
