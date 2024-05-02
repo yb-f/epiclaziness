@@ -185,7 +185,7 @@ function State.step_overview()
         table.insert(task_outline_table, a)
     end
     for _, task in pairs(task_outline_table) do
-        overview_steps[task.Step] = false
+        overview_steps[task.Step] = 0
     end
     Logger.log_super_verbose("\aoSuccessfuly loaded outline.")
 end
@@ -315,6 +315,27 @@ local function run_epic(class, choice)
     mq.delay("5s")
     manage.pauseGroup(class_settings.settings)
     while State.step < #task_table do
+        if overview_steps[State.step] ~= nil then
+            if overview_steps[State.step] == 1 then
+                Logger.log_warn('\aoYou have selected to complete this step (\ag%s\ao) manually. Stopping script.', State.step)
+                mq.cmdf('/squelch /autosize sizeself %s', loadsave.SaveState.general['self_size'])
+                mq.cmd('/squelch /afollow off')
+                mq.cmd('/squelch /nav stop')
+                mq.cmd('/squelch /stick off')
+                State.task_run = false
+                return
+            elseif overview_steps[State.step] == 2 then
+                Logger.log_warn('\aoYou have selected to skip this step (\ag%s\ao). Moving to next step.', State.step)
+                for i, item in pairs(task_outline_table) do
+                    if item.Step == State.step then
+                        State.rewound = true
+                        State.step = task_outline_table[i + 1].Step
+                        Logger.log_info('\aoSetting step to \ar%s', State.step)
+                        break
+                    end
+                end
+            end
+        end
         if mq.TLO.EverQuest.GameState() ~= 'INGAME' then
             Logger.log_error('\arNot in game, closing.')
             mq.exit()
