@@ -625,6 +625,7 @@ function travel.speedCheck(class_settings, char_settings)
         if aaNum == 3704 then
             return casterName, aaNum
         end
+        aanums[mq.TLO.Me.DisplayName()] = aaNum
         class = mq.TLO.Group.Member(State.group_combo[State.group_choice]).Class()
         amSpeedy = travel.gotSpeedyClass(class, class_settings)
         if amSpeedy == true then
@@ -638,11 +639,20 @@ function travel.speedCheck(class_settings, char_settings)
                 if class == 'Ranger' then speed_skill = "Spirit of Eagles(Ranger)" end
                 if class == 'Druid' then speed_skill = "Spirit of Eagles(Druid)" end
             end
-            if class_settings['speed_to_num'][speed_skill] == 3704 then
-                return mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName(), aaNum
-            end
-            if class_settings['speed_to_num'][speed_skill] == 939 and (aaNum == 8600 or aaNum == 8601) then
-                return mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName(), aaNum
+            aaNum = class_settings['speed_to_num'][speed_skill]
+            aanums[mq.TLO.Group.Member(State.group_combo[State.group_choice]).DisplayName()] = aaNum
+            for name, num in pairs(aanums) do
+                if num == 3704 then
+                    aaNum = num
+                    casterName = name
+                    break
+                elseif num == 939 and aaNum ~= 3704 then
+                    aaNum = num
+                    casterName = name
+                elseif (num == 8600 or num == 8601) and aaNum ~= 3704 and aaNum ~= 939 then
+                    aaNum = num
+                    casterName = name
+                end
             end
             return casterName, aaNum
         else
@@ -658,7 +668,7 @@ function travel.doSpeed(name, aaNum)
         Logger.log_verbose("\aoI am using my travel speed skill.")
         mq.cmdf("/alt act %s", aaNum)
     else
-        Logger.log_verbose("\aoHaving \ag%s use their travel speed skill.", name)
+        Logger.log_verbose("\aoHaving \ag%s \aouse their travel speed skill.", name)
         mq.cmdf("/dex %s /alt act %s", name, aaNum)
     end
 end
