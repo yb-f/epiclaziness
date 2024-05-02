@@ -249,10 +249,46 @@ function draw_gui.generalTab(task_table)
     end
 end
 
+function draw_gui.outline_check_box(id, on, step)
+    local toggled = false
+    local state = on
+    ImGui.PushID(id .. "_outline_btn")
+    ImGui.PushStyleColor(ImGuiCol.ButtonActive, 1.0, 1.0, 1.0, 0)
+    ImGui.PushStyleColor(ImGuiCol.ButtonHovered, 1.0, 1.0, 1.0, 0)
+    ImGui.PushStyleColor(ImGuiCol.Button, 1.0, 1.0, 1.0, 0)
+    if step < State.step then
+        ImGui.PushStyleColor(ImGuiCol.Text, 1.0, 0.3, 0.3, 0.8)
+        ImGui.Button(ICONS.FA_SQUARE)
+        toggled = false
+        state = 2
+    elseif state == 0 then
+        ImGui.PushStyleColor(ImGuiCol.Text, 0.3, 1.0, 0.3, 0.9)
+        if ImGui.Button(ICONS.FA_SQUARE_O) then
+            toggled = true
+            state   = 1
+        end
+    elseif state == 1 then
+        ImGui.PushStyleColor(ImGuiCol.Text, 1.0, 1.0, 0.3, 0.9)
+        if ImGui.Button(ICONS.FA_CHECK_SQUARE_O) then
+            toggled = true
+            state   = 2
+        end
+    else
+        ImGui.PushStyleColor(ImGuiCol.Text, 1.0, 0.3, 0.3, 0.8)
+        if ImGui.Button(ICONS.FA_SQUARE) then
+            toggled = false
+            state = 0
+        end
+    end
+    ImGui.PopStyleColor(4)
+    ImGui.PopID()
+    return state, toggled
+end
+
 function draw_gui.outlineRow(overview_steps, task_outline_table, task_table, i)
     ImGui.TableNextRow()
     ImGui.TableNextColumn()
-    overview_steps[task_outline_table[i].Step] = ImGui.Checkbox("##" .. i, overview_steps[task_outline_table[i].Step])
+    overview_steps[task_outline_table[i].Step] = draw_gui.outline_check_box("outline_box_" .. i, overview_steps[task_outline_table[i].Step], task_outline_table[i].Step)
     ImGui.TableNextColumn()
     if ImGui.Selectable("##a" .. i, false, ImGuiSelectableFlags.None) then
         if State.task_run == true then
@@ -561,7 +597,6 @@ function draw_gui.RenderOptionToggle(id, text, on)
     ImGui.PushStyleColor(ImGuiCol.ButtonActive, 1.0, 1.0, 1.0, 0)
     ImGui.PushStyleColor(ImGuiCol.ButtonHovered, 1.0, 1.0, 1.0, 0)
     ImGui.PushStyleColor(ImGuiCol.Button, 1.0, 1.0, 1.0, 0)
-
     if on then
         ImGui.PushStyleColor(ImGuiCol.Text, 0.3, 1.0, 0.3, 0.9)
         if ImGui.Button(ICONS.FA_TOGGLE_ON) then
@@ -579,7 +614,6 @@ function draw_gui.RenderOptionToggle(id, text, on)
     ImGui.PopID()
     ImGui.SameLine()
     ImGui.Text(text)
-
     return state, toggled
 end
 
