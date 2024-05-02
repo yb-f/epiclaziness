@@ -674,7 +674,7 @@ function Actions.pause(status)
     Logger.log_info("\aoPausing on step \ar%s\ao.", State.step)
     while State.pause == true do
         mq.delay(200)
-        if mq.TLO.EverQuest.GameState ~= 'INGAME' then
+        if mq.TLO.EverQuest.GameState() ~= 'INGAME' then
             Logger.log_error('\arNot in game, closing.')
             mq.exit()
         end
