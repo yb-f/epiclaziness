@@ -678,6 +678,9 @@ function Actions.pause(status)
             Logger.log_error('\arNot in game, closing.')
             mq.exit()
         end
+        if State.task_run == false then
+            return
+        end
     end
     State.status = status
     return true
