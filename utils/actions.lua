@@ -569,6 +569,7 @@ function Actions.ground_spawn_farm(item, class_settings, char_settings)
         table.insert(item_list, word)
     end
     while looping == true do
+        loop_check = true
         if State.skip == true then
             travel.navPause()
             manage.uncampGroup(class_settings)
@@ -599,7 +600,6 @@ function Actions.ground_spawn_farm(item, class_settings, char_settings)
         if loop_check then
             looping = false
         end
-
         mq.cmdf('/squelch /itemtarget "%s"', item.npc)
         mq.delay(50)
         if mq.TLO.ItemTarget() ~= nil then
