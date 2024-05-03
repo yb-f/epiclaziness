@@ -134,8 +134,8 @@ function draw_gui.fullOutlineTab(task_table)
 end
 
 function draw_gui.pathUpdate()
-    if math.floor(mq.gettime() / 1000) > State.updateTime then
-        State.updateTime = math.floor(mq.gettime() / 1000) + 1
+    if mq.gettime() > State.updateTime then
+        State.updateTime = mq.gettime() + 100
         if State.destType == 'ZONE' then
             if mq.TLO.Navigation.CurrentPathDistance() ~= nil then
                 State.pathDist      = mq.TLO.Navigation.CurrentPathDistance()
@@ -220,7 +220,7 @@ function draw_gui.generalTab(task_table)
                 end
             end
             ImGui.SameLine()
-            if ImGui.SmallButton(ICONS.FA_STOP) then
+            if ImGui.SmallButton(ICONS.MD_STOP) then
                 State.task_run = false
                 State.skip = true
             end
