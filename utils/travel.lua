@@ -1042,6 +1042,11 @@ function travel.zone_travel(item, class_settings, char_settings, continue)
     State.X = mq.TLO.Me.X()
     State.Y = mq.TLO.Me.Y()
     State.Z = mq.TLO.Me.Z()
+    State.traveling = true
+    State.destType = 'ZONE'
+    if mq.TLO.Navigation.CurrentPathDistance() ~= nil then
+        State.startDist = mq.TLO.Navigation.CurrentPathDistance()
+    end
     while mq.TLO.Zone.ShortName() ~= item.zone and mq.TLO.Zone.Name() ~= item.zone do
         if mq.TLO.EverQuest.GameState() ~= 'INGAME' then
             Logger.log_error('\arNot in game, closing.')
@@ -1056,6 +1061,7 @@ function travel.zone_travel(item, class_settings, char_settings, continue)
             return
         end
         mq.delay(500)
+
         if Mob.xtargetCheck(char_settings) then
             travel.navPause()
             Mob.clearXtarget(class_settings, char_settings)
@@ -1163,7 +1169,11 @@ function travel.zone_travel(item, class_settings, char_settings, continue)
         end
         mq.delay("5s")
     end
+    State.destType = ''
+    State.dest = ''
     State.traveling = false
+    State.autosize_on = false
+    mq.cmd('/squelch /autosize off')
 end
 
 return travel
