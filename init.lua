@@ -348,6 +348,10 @@ local function run_epic(class, choice)
                 Logger.log_error('\arNot in game, closing.')
                 mq.exit()
             end
+            if State.task_run == false then
+                State.pause = false
+                return
+            end
         end
         State.skip = false
         if State.rewound == false then
@@ -553,15 +557,17 @@ local function run_epic(class, choice)
             end
         end
         if task_table[State.step].SaveStep == 1 then
-            Logger.log_info("\aoSaving step: \ar%s", State.step)
-            loadsave.prepSave(State.step)
-            if State.stop_at_save then
-                Logger.log_warn("\aoStopping at step \ar%s.", State.Step)
-                State.epicstring = ''
-                State.task_run = false
-                State.stop_at_save = false
-                State.status = "Stopped at step " .. State.step
-                return
+            if State.task_run == true then
+                Logger.log_info("\aoSaving step: \ar%s", State.step)
+                loadsave.prepSave(State.step)
+                if State.stop_at_save then
+                    Logger.log_warn("\aoStopping at step \ar%s.", State.Step)
+                    State.epicstring = ''
+                    State.task_run = false
+                    State.stop_at_save = false
+                    State.status = "Stopped at step " .. State.step
+                    return
+                end
             end
         end
         if State.task_run == false then
