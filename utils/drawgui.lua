@@ -135,13 +135,24 @@ end
 
 function draw_gui.pathUpdate()
     if math.floor(mq.gettime() / 1000) > State.updateTime then
-        State.updateTime    = math.floor(mq.gettime() / 1000) + 1
-        local path          = string.format("%s %s", State.destType, State.dest)
-        State.pathDist      = mq.TLO.Navigation.PathLength(path)()
-        State.velocity      = mq.TLO.Navigation.Velocity()
-        State.estimatedTime = State.pathDist / State.velocity
-        draw_gui.travelPct  = 1.0 - (State.pathDist / State.startDist)
-        draw_gui.travelText = string.format("Distance: %s Velocity: %s ETA: %s seconds", math.floor(State.pathDist), math.floor(State.velocity), math.floor(State.estimatedTime))
+        State.updateTime = math.floor(mq.gettime() / 1000) + 1
+        if State.destType == 'ZONE' then
+            if mq.TLO.Navigation.CurrentPathDistance() ~= nil then
+                State.pathDist      = mq.TLO.Navigation.CurrentPathDistance()
+                State.velocity      = mq.TLO.Navigation.Velocity()
+                State.estimatedTime = State.pathDist / State.velocity
+                draw_gui.travelPct  = 1.0 - (State.pathDist / State.startDist)
+                draw_gui.travelText = string.format("Distance: %s Velocity: %s ETA: %s seconds", math.floor(State.pathDist), math.floor(State.velocity),
+                    math.floor(State.estimatedTime))
+            end
+        else
+            local path          = string.format("%s %s", State.destType, State.dest)
+            State.pathDist      = mq.TLO.Navigation.PathLength(path)()
+            State.velocity      = mq.TLO.Navigation.Velocity()
+            State.estimatedTime = State.pathDist / State.velocity
+            draw_gui.travelPct  = 1.0 - (State.pathDist / State.startDist)
+            draw_gui.travelText = string.format("Distance: %s Velocity: %s ETA: %s seconds", math.floor(State.pathDist), math.floor(State.velocity), math.floor(State.estimatedTime))
+        end
     end
 end
 
@@ -209,6 +220,14 @@ function draw_gui.generalTab(task_table)
                 end
             end
             ImGui.SameLine()
+            if ImGui.SmallButton(ICONS.FA_STOP) then
+                State.task_run = false
+                State.skip = true
+            end
+            if ImGui.IsItemHovered() then
+                ImGui.SetTooltip("Stop script immedietly.")
+            end
+            ImGui.SameLine()
             if ImGui.SmallButton(ICONS.MD_FAST_FORWARD) then
                 State.skip = true
                 State.step = State.step + 1
@@ -232,13 +251,25 @@ function draw_gui.generalTab(task_table)
         ImGui.SetCursorPosX(ImGui.GetCursorPosX() + (ImGui.GetWindowWidth() / 2) - 60)
         ImGui.Text("Step " .. tostring(State.step) .. " of " .. tostring(#task_table))
         if State.destType ~= '' then
-            draw_gui.pathUpdate()
-            ImGui.PushStyleColor(ImGuiCol.PlotHistogram, IM_COL32(150, 150, 40, 255))
-            ImGui.ProgressBar(draw_gui.travelPct, ImGui.GetWindowWidth(), 17, "##dist")
-            ImGui.PopStyleColor()
-            ImGui.SetCursorPosY(ImGui.GetCursorPosY() - 20)
-            ImGui.SetCursorPosX(ImGui.GetCursorPosX() + (ImGui.GetWindowWidth() / 2) - 115)
-            ImGui.Text(draw_gui.travelText)
+            if State.destType == 'ZONE' then
+                if mq.TLO.Navigation.CurrentPathDistance() ~= nil then
+                    draw_gui.pathUpdate()
+                    ImGui.PushStyleColor(ImGuiCol.PlotHistogram, IM_COL32(150, 150, 40, 255))
+                    ImGui.ProgressBar(draw_gui.travelPct, ImGui.GetWindowWidth(), 17, "##dist")
+                    ImGui.PopStyleColor()
+                    ImGui.SetCursorPosY(ImGui.GetCursorPosY() - 20)
+                    ImGui.SetCursorPosX(ImGui.GetCursorPosX() + (ImGui.GetWindowWidth() / 2) - 115)
+                    ImGui.Text(draw_gui.travelText)
+                end
+            else
+                draw_gui.pathUpdate()
+                ImGui.PushStyleColor(ImGuiCol.PlotHistogram, IM_COL32(150, 150, 40, 255))
+                ImGui.ProgressBar(draw_gui.travelPct, ImGui.GetWindowWidth(), 17, "##dist")
+                ImGui.PopStyleColor()
+                ImGui.SetCursorPosY(ImGui.GetCursorPosY() - 20)
+                ImGui.SetCursorPosX(ImGui.GetCursorPosX() + (ImGui.GetWindowWidth() / 2) - 115)
+                ImGui.Text(draw_gui.travelText)
+            end
         end
         ImGui.TextWrapped(State.status)
         ImGui.NewLine()
