@@ -223,6 +223,8 @@ function draw_gui.generalTab(task_table)
             if ImGui.SmallButton(ICONS.MD_STOP) then
                 State.task_run = false
                 State.skip = true
+                Logger.log_warn("\aoManually stopping script at step: \ar%s", State.step)
+                State.status = "Manually stopped at step " .. State.step
             end
             if ImGui.IsItemHovered() then
                 ImGui.SetTooltip("Stop script immedietly.")
