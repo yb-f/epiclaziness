@@ -793,7 +793,7 @@ function travel.npc_follow(item, class_settings, char_settings, event)
     if mq.TLO.Spawn("npc " .. item.npc).Distance() ~= nil then
         if mq.TLO.Spawn("npc " .. item.npc).Distance() > 100 then
             State.rewound = true
-            State.step = State.step
+            State.step = State.step - 1
             Logger.log_warn("\ar%s \aois over 100 units away. Moving back to step \ar%s\ao.", item.npc, State.step)
             return
         end
