@@ -253,7 +253,7 @@ function draw_gui.generalTab(task_table)
         ImGui.SetCursorPosX(ImGui.GetCursorPosX() + (ImGui.GetWindowWidth() / 2) - 60)
         ImGui.Text("Step " .. tostring(State.step) .. " of " .. tostring(#task_table))
         if State.destType ~= '' then
-            if State.destType == 'ZONE' then
+            --[[if State.destType == 'ZONE' then
                 if mq.TLO.Navigation.CurrentPathDistance() ~= nil then
                     draw_gui.pathUpdate()
                     ImGui.PushStyleColor(ImGuiCol.PlotHistogram, IM_COL32(150, 150, 40, 255))
@@ -263,15 +263,15 @@ function draw_gui.generalTab(task_table)
                     ImGui.SetCursorPosX(ImGui.GetCursorPosX() + (ImGui.GetWindowWidth() / 2) - 115)
                     ImGui.Text(draw_gui.travelText)
                 end
-            else
-                draw_gui.pathUpdate()
-                ImGui.PushStyleColor(ImGuiCol.PlotHistogram, IM_COL32(150, 150, 40, 255))
-                ImGui.ProgressBar(draw_gui.travelPct, ImGui.GetWindowWidth(), 17, "##dist")
-                ImGui.PopStyleColor()
-                ImGui.SetCursorPosY(ImGui.GetCursorPosY() - 20)
-                ImGui.SetCursorPosX(ImGui.GetCursorPosX() + (ImGui.GetWindowWidth() / 2) - 115)
-                ImGui.Text(draw_gui.travelText)
-            end
+            else--]]
+            draw_gui.pathUpdate()
+            ImGui.PushStyleColor(ImGuiCol.PlotHistogram, IM_COL32(150, 150, 40, 255))
+            ImGui.ProgressBar(draw_gui.travelPct, ImGui.GetWindowWidth(), 17, "##dist")
+            ImGui.PopStyleColor()
+            ImGui.SetCursorPosY(ImGui.GetCursorPosY() - 20)
+            ImGui.SetCursorPosX(ImGui.GetCursorPosX() + (ImGui.GetWindowWidth() / 2) - 115)
+            ImGui.Text(draw_gui.travelText)
+            --end
         end
         ImGui.TextWrapped(State.status)
         ImGui.NewLine()
