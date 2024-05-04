@@ -26,7 +26,7 @@ function inventory.merchant_window()
     return mq.TLO.Window('MerchantWnd').Open()
 end
 
-function inventory.auto_inv()
+function inventory.auto_inv(item)
     if mq.TLO.Cursor() ~= nil then
         State.status = "Moving " .. mq.TLO.Cursor() .. " to inventory"
         Logger.log_info("\aoMoving \ag%s\ao to inventory.", mq.TLO.Cursor())
@@ -277,7 +277,7 @@ function inventory.enviro_combine_item(item)
     Logger.log_verbose("\aoSuccessfully moved \ag%s \aoto combine container in slot \ag%s\ao.", item.what, item.enviroslot)
 end
 
-function inventory.enviro_combine_do()
+function inventory.enviro_combine_do(item)
     State.status = "Combining"
     Logger.log_info("\aoPerforming combine in enviromental container.")
     mq.delay("3s")
@@ -315,7 +315,7 @@ function inventory.equip_item(item)
     end
 end
 
-function inventory.restore_item()
+function inventory.restore_item(item)
     Logger.log_info("\aoReequiping \ag%s\ao.", inventory.stored_item)
     mq.delay("1s")
     mq.cmdf("/squelch /itemnotify \"%s\" leftmouseup", inventory.stored_item)
@@ -331,6 +331,10 @@ function inventory.restore_item()
         mq.delay(100)
         mq.cmd('/squelch /autoinv')
     end
+end
+
+function inventory.pickup_key(item)
+    mq.cmdf("/squelch /itemnotify \"%s\" leftmouseup", item.what)
 end
 
 function inventory.remove_weapons()
