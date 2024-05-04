@@ -23,16 +23,16 @@ function travel.invisTranslocatorCheck()
     return false
 end
 
-function travel.face_heading(heading)
-    State.status = "Facing heading " .. heading
-    Logger.log_info("\aoFacing heading: \ag%s\ao.", heading)
+function travel.face_heading(item)
+    State.status = "Facing heading " .. item.what
+    Logger.log_info("\aoFacing heading: \ag%s\ao.", item.what)
     if State.group_choice == 1 then
-        mq.cmdf("/squelch /face heading %s", heading)
+        mq.cmdf("/squelch /face heading %s", item.what)
     elseif State.group_choice == 2 then
-        mq.cmdf("/dgga /squelch /face heading %s", heading)
+        mq.cmdf("/dgga /squelch /face heading %s", item.what)
     else
-        mq.cmdf("/squelch /face heading %s", heading)
-        mq.cmdf("/dex %s /squelch /face heading %s", State.group_combo[State.group_choice], heading)
+        mq.cmdf("/squelch /face heading %s", item.what)
+        mq.cmdf("/dex %s /squelch /face heading %s", State.group_combo[State.group_choice], item.what)
     end
     mq.delay(250)
 end
@@ -175,7 +175,7 @@ function travel.no_nav_travel(item, class_settings, char_settings)
     end
 end
 
-function travel.open_door()
+function travel.open_door(item)
     State.status = "Opening door"
     mq.delay(200)
     mq.cmd("/squelch /doortarget")
@@ -855,7 +855,7 @@ function travel.npc_follow(item, class_settings, char_settings, event)
     end
 end
 
-function travel.npc_stop_follow()
+function travel.npc_stop_follow(item)
     State.status = "Stopping autofollow"
     Logger.log_info("\aoStopping autofollow.")
     if State.group_choice == 1 then

@@ -1015,7 +1015,7 @@ function Actions.rog_gamble(item)
     gamble_done = false
 end
 
-function Actions.sneak()
+function Actions.sneak(item)
     if mq.TLO.Me.Sneaking() == false then
         while mq.TLO.Me.Sneaking() == false do
             mq.delay(100)
@@ -1066,6 +1066,7 @@ function Actions.ldon_count_check(item)
 end
 
 function Actions.wait(item, class_settings, char_settings)
+    State.status = "Waiting for " .. item.wait / 1000 .. " seconds"
     Logger.log_info("Waiting for \ag%s \ao seconds.", item.wait / 1000)
     local waiting = true
     local start_wait = os.clock() * 1000
