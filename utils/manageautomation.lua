@@ -254,7 +254,7 @@ function manage.groupTalk(npc, phrase)
     end
 end
 
-function manage.openDoorAll()
+function manage.openDoorAll(item)
     Logger.log_info("\aoHaving group click door.")
     if State.group_choice == 1 then
         mq.delay(200)
@@ -302,7 +302,7 @@ function manage.pauseGroup(class_settings)
     end
 end
 
-function manage.picklockGroup()
+function manage.picklockGroup(item)
     State.status = "Lockpicking door"
     Logger.log_info("\aoLockpicking door.")
     if State.group_choice == 1 then
@@ -388,7 +388,7 @@ function manage.picklockGroup()
     end
 end
 
-function manage.removeInvis()
+function manage.removeInvis(item)
     local temp = State.status
     State.status = "Removing invis"
     if mq.TLO.Me.Invis() then
@@ -418,7 +418,7 @@ function manage.removeLev()
     end
 end
 
-function manage.sendYes()
+function manage.sendYes(item)
     Logger.log_info("\aoGive me a yes!")
     if State.group_choice == 1 then
         mq.cmd("/squelch /yes")
