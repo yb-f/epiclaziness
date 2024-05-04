@@ -306,8 +306,6 @@ local function execute_task(task)
     if task_info then
         local func = task_info.func
         local params = task_info.params
-        print(task.type)
-        print(func)
         if func then
             func(task, unpack(params))
         else
