@@ -22,7 +22,7 @@ if not ok then
 end
 
 local version_url        = 'https://raw.githubusercontent.com/yb-f/EL-Ver/master/latest_ver'
-local version            = "0.2.14"
+local version            = "0.2.13"
 local window_flags       = bit32.bor(ImGuiWindowFlags.None)
 local openGUI, drawGUI   = true, true
 local myName             = mq.TLO.Me.DisplayName()
@@ -191,8 +191,8 @@ function State.pause(item)
     State.task_run = false
 end
 
-local hashCheck      = require 'utils/hashcheck'
-local task_functions = require 'utils/task_functions'
+local hashCheck = require 'utils/hashcheck'
+Task_Functions  = require 'utils/task_functions'
 
 class_settings.loadSettings()
 loadsave.loadState()
@@ -300,11 +300,9 @@ local function update_general_status()
     end
 end
 
-
-
 local function execute_task(task)
     local task_type = task.type
-    local task_info = task_functions[task_type]
+    local task_info = Task_Functions[task_type]
     if task_info then
         local func = task_info.func
         local params = task_info.params
@@ -323,9 +321,10 @@ local function execute_task(task)
 end
 
 local function run_epic(class, choice)
-    task_table = {}
+    task_table      = {}
     local tablename = ''
-    State.task_run = true
+    State.task_run  = true
+    State.pause     = false
     loadsave.loadState()
     Logger.log_info("Begining quest for %s epic %s", mq.TLO.Me.Class(), State.epic_list[choice])
     if State.epic_list[choice] == "1.0" then
