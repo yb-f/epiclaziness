@@ -1042,11 +1042,11 @@ function travel.zone_travel(item, class_settings, char_settings, continue)
     State.X = mq.TLO.Me.X()
     State.Y = mq.TLO.Me.Y()
     State.Z = mq.TLO.Me.Z()
-    State.traveling = true
+    --[[State.traveling = true
     State.destType = 'ZONE'
     if mq.TLO.Navigation.CurrentPathDistance() ~= nil then
         State.startDist = mq.TLO.Navigation.CurrentPathDistance()
-    end
+    end--]]
     while mq.TLO.Zone.ShortName() ~= item.zone and mq.TLO.Zone.Name() ~= item.zone do
         if mq.TLO.EverQuest.GameState() ~= 'INGAME' then
             Logger.log_error('\arNot in game, closing.')

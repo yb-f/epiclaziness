@@ -253,7 +253,7 @@ function draw_gui.generalTab(task_table)
         ImGui.SetCursorPosX(ImGui.GetCursorPosX() + (ImGui.GetWindowWidth() / 2) - 60)
         ImGui.Text("Step " .. tostring(State.step) .. " of " .. tostring(#task_table))
         if State.destType ~= '' then
-            if State.destType == 'ZONE' then
+            --[[if State.destType == 'ZONE' then
                 if mq.TLO.Navigation.CurrentPathDistance() ~= nil then
                     draw_gui.pathUpdate()
                     ImGui.PushStyleColor(ImGuiCol.PlotHistogram, IM_COL32(150, 150, 40, 255))
@@ -263,15 +263,15 @@ function draw_gui.generalTab(task_table)
                     ImGui.SetCursorPosX(ImGui.GetCursorPosX() + (ImGui.GetWindowWidth() / 2) - 115)
                     ImGui.Text(draw_gui.travelText)
                 end
-            else
-                draw_gui.pathUpdate()
-                ImGui.PushStyleColor(ImGuiCol.PlotHistogram, IM_COL32(150, 150, 40, 255))
-                ImGui.ProgressBar(draw_gui.travelPct, ImGui.GetWindowWidth(), 17, "##dist")
-                ImGui.PopStyleColor()
-                ImGui.SetCursorPosY(ImGui.GetCursorPosY() - 20)
-                ImGui.SetCursorPosX(ImGui.GetCursorPosX() + (ImGui.GetWindowWidth() / 2) - 115)
-                ImGui.Text(draw_gui.travelText)
-            end
+            else--]]
+            draw_gui.pathUpdate()
+            ImGui.PushStyleColor(ImGuiCol.PlotHistogram, IM_COL32(150, 150, 40, 255))
+            ImGui.ProgressBar(draw_gui.travelPct, ImGui.GetWindowWidth(), 17, "##dist")
+            ImGui.PopStyleColor()
+            ImGui.SetCursorPosY(ImGui.GetCursorPosY() - 20)
+            ImGui.SetCursorPosX(ImGui.GetCursorPosX() + (ImGui.GetWindowWidth() / 2) - 115)
+            ImGui.Text(draw_gui.travelText)
+            --end
         end
         ImGui.TextWrapped(State.status)
         ImGui.NewLine()
@@ -465,163 +465,17 @@ end
 --- @return string
 function draw_gui.generate_outline_text(item)
     local step = item.step
-    local text = ''
-    if item.type == 'ADVENTURE_ENTRANCE' then
-        text = 'Determine which LDON entrance to use.'
-    elseif item.type == "AUTO_INV" then
-        text = "Move item on cursor to inventory"
-    elseif item.type == "BACKSTAB" then
-        text = "Backstab " .. item.npc
-    elseif item.type == "CAST_ALT" then
-        text = "Cast alt ability " .. item.what
-    elseif item.type == "COMBINE_CONTAINER" then
-        text = "Prepare to combine items in " .. item.what
-    elseif item.type == "COMBINE_DO" then
-        text = "Peform combine"
-    elseif item.type == "COMBINE_DONE" then
-        text = "Combine complete, restore item to previous bag slot."
-    elseif item.type == "COMBINE_ITEM" then
-        text = "Add " .. item.what .. " to combine container"
-    elseif item.type == "DROP_ADVENTURE" then
-        text = "Leave current adventure."
-    elseif item.type == "ENVIRO_COMBINE_CONTAINER" then
-        text = "Travel to " .. item.what .. " and prepare combine"
-    elseif item.type == "ENVIRO_COMBINE_DO" then
-        text = "Perform combine in enviromental container"
-    elseif item.type == "ENVIRO_COMBINE_ITEM" then
-        text = "Add " .. item.what .. " to enviromental combine container"
-    elseif item.type == "EQUIP_ITEM" then
-        text = "Equip " .. item.what
-    elseif item.type == "EXCLUDE_NPC" then
-        text = "Exclude " .. item.npc .. " from pull list"
-    elseif item.type == "EXECUTE_COMMAND" then
-        text = "Execute command: " .. item.what
-    elseif item.type == "FACE_HEADING" then
-        text = "Face the heading " .. item.what
-    elseif item.type == "FACE_LOC" then
-        text = "Face location " .. item.whereY .. ", " .. item.whereX .. ", " .. item.whereZ
-    elseif item.type == "FARM_CHECK" then
-        text = "Check if we have the items we need: " .. item.what
-    elseif item.type == "FARM_CHECK_PAUSE" then
-        text = "Check if we have " .. item.what .. " pause script of we do not"
-    elseif item.type == "FARM_RADIUS" then
-        text = "Farm for " .. item.what
-    elseif item.type == "FARM_RADIUS_EVENT" then
-        text = "Farm until event occurs. (" .. item.phrase .. ")"
-    elseif item.type == "FARM_WHILE_NEAR" then
-        text = "Farm until " .. item.npc .. " moves away."
-    elseif item.type == "FISH_FARM" then
-        text = "Fish for " .. item.what
-    elseif item.type == "FISH_ONCE" then
-        text = "Fish for one cast"
-    elseif item.type == "FORAGE_FARM" then
-        text = "Forage for " .. item.what
-    elseif item.type == "FORWARD_ZONE" then
-        text = "Move forward to zone into " .. item.zone
-    elseif item.type == "GENERAL_SEARCH" then
-        text = "Searching for " .. item.npc
-    elseif item.type == "GENERAL_TRAVEL" then
-        text = "Travel to " .. item.npc
-    elseif item.type == "GROUND_SPAWN" then
-        text = "Pickup ground spawn at " .. item.whereY .. ", " .. item.whereX .. ", " .. item.whereZ
-    elseif item.type == "GROUND_SPAWN_FARM" then
-        text = "Pickup ground spawns until we obtain " .. item.what
-    elseif item.type == "GROUP_SIZE_CHECK" then
-        text = "Making sure group has at least " .. item.count .. " players."
-    elseif item.type == "IGNORE_MOB" then
-        text = "Add " .. item.npc .. " to pull ignore list"
-    elseif item.type == "LOC_TRAVEL" then
-        text = "Travel to " .. item.whereY .. ", " .. item.whereX .. ", " .. item.whereZ
-    elseif item.type == "LOOT" then
-        text = "Attempt to loot " .. item.what
-    elseif item.type == "NO_NAV_TRAVEL" then
-        text = "Travel without using MQ2Nav to " .. item.whereY .. ", " .. item.whereX .. ", " .. item.whereZ
-    elseif item.type == "NPC_BUY" then
-        text = "Purchase " .. item.what .. " from " .. item.npc
-    elseif item.type == "NPC_DAMAGE_UNTIL" then
-        text = "Damage " .. item.npc .. " to " .. item.damage_pct .. "% health"
-    elseif item.type == "NPC_FOLLOW" then
-        text = "Follow " .. item.npc
-    elseif item.type == "NPC_FOLLOW_EVENT" then
-        text = "Follow " .. item.npc .. " until event: " .. item.phrase
-    elseif item.type == "NPC_GIVE" then
-        text = "Give " .. item.what .. " to " .. item.npc
-    elseif item.type == "NPC_GIVE_ADD" then
-        text = "Add " .. item.what .. " to give window with " .. item.npc
-    elseif item.type == "NPC_GIVE_CLICK" then
-        text = "Click give button"
-    elseif item.type == "NPC_GIVE_MONEY" then
-        text = "Give money (" .. item.what .. ") to " .. item.npc
-    elseif item.type == "NPC_HAIL" then
-        text = "Hail " .. item.npc
-    elseif item.type == "NPC_KILL" then
-        text = "Kill " .. item.npc
-    elseif item.type == "NPC_KILL_ALL" then
-        text = "Kill all " .. item.npc
-    elseif item.type == "NPC_SEARCH" then
-        text = "Look for " .. item.npc
-    elseif item.type == "NPC_STOP_FOLLOW" then
-        text = "Stop following " .. item.npc
-    elseif item.type == "NPC_TALK" then
-        text = "Say " .. item.phrase .. " to " .. item.npc
-    elseif item.type == "NPC_TALK_ALL" then
-        text = "Have all characters say " .. item.phrase .. " to " .. item.npc
-    elseif item.type == "NPC_TRAVEL" then
-        text = "Move to " .. item.npc
-    elseif item.type == "NPC_TRAVEL_NO_PATH_CHECK" then
-        text = "Move to " .. item.npc .. " (ignore path)"
-    elseif item.type == "NPC_WAIT" then
-        text = "Wait for " .. item.npc .. " to spawn"
-    elseif item.type == "NPC_WAIT_DESPAWN" then
-        text = "Wait for " .. item.npc .. " to despawn"
-    elseif item.type == "OPEN_DOOR" then
-        text = "Open door"
-    elseif item.type == "OPEN_DOOR_ALL" then
-        text = "Group click door"
-    elseif item.type == "PAUSE" then
-        text = "Pause the script."
-    elseif item.type == "PH_SEARCH" then
-        text = "Search for PH " .. item.npc
-    elseif item.type == "PICK_DOOR" then
-        text = "Attempt to lockpick door"
-    elseif item.type == "PICK_POCKET" then
-        text = "Pickpocket " .. item.what .. " from " .. item.npc
-    elseif item.type == "PICKUP_KEY" then
-        text = "Move key (" .. item.what .. ") from inventory to cursor"
-    elseif item.type == "PORTAL_SET" then
-        text = "Set guild portal location to " .. item.zone
-    elseif item.type == "PRE_FARM_CHECK" then
-        text = "Check if we have the items to skip the next steps"
-    elseif item.type == "RELOCATE" then
-        text = "Relocate to " .. item.what
-    elseif item.type == "REMOVE_INVIS" then
-        text = "Remove invisibility"
-    elseif item.type == "RESTORE_ITEM" then
-        text = "Reequip item"
-    elseif item.type == "ROG_GAMBLE" then
-        text = "Gamble to 1900 chips"
-    elseif item.type == "SAVE" then
-        text = "Save progress"
-    elseif item.type == "START_ADVENTURE" then
-        text = "Request LDON adventure from " .. item.npc
-    elseif item.type == "SEND_YES" then
-        text = "Select yes in confirmation box"
-    elseif item.type == "UNIGNORE_MOB" then
-        text = "Remove " .. item.npc .. " from pull ignore list."
-    elseif item.type == "WAIT" then
-        text = "Wait for " .. item.wait / 1000 .. " seconds"
-    elseif item.type == "WAIT_EVENT" then
-        text = "Wait for event in chat to continue (" .. item.phrase .. ")"
-    elseif item.type == "WAIT_FOR" then
-        text = "Wait until EQ Time: " .. item.wait .. ":00."
-    elseif item.type == "ZONE_CONTINUE_TRAVEL" then
-        text = "Travel to " .. item.zone
-    elseif item.type == "ZONE_TRAVEL" then
-        text = "Travel to " .. item.zone
+    local task_type = item.type
+    local text_generator = Task_Functions[task_type].desc
+    if text_generator then
+        if type(text_generator) == "function" then
+            return step, text_generator(item)
+        else
+            return step, text_generator
+        end
     else
-        text = "Unknown step"
+        return step, "Unknown step."
     end
-    return step, text
 end
 
 function draw_gui.RenderOptionToggle(id, text, on)
