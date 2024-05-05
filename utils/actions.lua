@@ -4,6 +4,7 @@ local manage                 = require('utils/manageautomation')
 local travel                 = require('utils/travel')
 local logger                 = require('utils/logger')
 
+local DESIRED_CHIPS          = 1900
 local actions                = {}
 
 actions.farm_event_triggered = false
@@ -14,7 +15,7 @@ local fishing_trash          = { 'Fish Scales', 'Tattered Cloth Sandal', 'Rusty 
     "Deep Sea Urchin", "Fresh Fish", "Gunthak Mackerel", "Saltwater Seaweed", "Dark Fish's Scales" }
 
 local function gamble_event(line, arg1)
-    if arg1 == '1900' then
+    if arg1 == tostring(DESIRED_CHIPS) then
         logger.log_info("\aoGambling has reached the desired number of chips. Moving on.")
         gamble_done = true
     end
