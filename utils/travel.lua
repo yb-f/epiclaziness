@@ -227,7 +227,7 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
         end
         if _G.State.is_paused == true then
             travel.navPause()
-            _G.Actions.pause(_G.State:readStatusText())
+            _G.Actions.pauseTask(_G.State:readStatusText())
             travel.navUnpause(item)
         end
         if char_settings.general.speedForTravel == true then
@@ -336,7 +336,7 @@ function travel.general_travel(item, class_settings, char_settings, ID)
         end
         if _G.State.is_paused == true then
             travel.navPause()
-            _G.Actions.pause(_G.State:readStatusText())
+            _G.Actions.pauseTask(_G.State:readStatusText())
             travel.navUnpause(item)
         end
         ID = _G.Mob.findNearestName(item.npc, item, class_settings, char_settings)
@@ -973,7 +973,7 @@ function travel.relocate(item, class_settings, char_settings)
         end
         if _G.State.is_paused == true then
             travel.navPause()
-            _G.Actions.pause(_G.State:readStatusText())
+            _G.Actions.pauseTask(_G.State:readStatusText())
             travel.navUnpause(item)
         end
         if loopCount >= 200 then
@@ -992,7 +992,7 @@ function travel.relocate(item, class_settings, char_settings)
         end
         if _G.State.is_paused == true then
             travel.navPause()
-            _G.Actions.pause(_G.State:readStatusText())
+            _G.Actions.pauseTask(_G.State:readStatusText())
             travel.navUnpause(item)
         end
         --[[if loopCount >= 33 then
@@ -1071,7 +1071,7 @@ function travel.zone_travel(item, class_settings, char_settings, continue)
         end
         if _G.State.is_paused == true then
             travel.navPause()
-            _G.Actions.pause(_G.State:readStatusText())
+            _G.Actions.pauseTask(_G.State:readStatusText())
             travel.navUnpause(item)
         end
         if char_settings.general.speedForTravel == true then

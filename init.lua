@@ -213,7 +213,7 @@ function _G.State.execute_command(item)
     mq.cmdf("%s", item.what)
 end
 
-function _G.State.pause(item)
+function _G.State.pauseTask(item)
     _G.State:setStatusText(item.status)
     _G.State.is_task_running = false
 end

@@ -235,7 +235,7 @@ function actions.farm_radius(item, class_settings, char_settings, event)
                 end
                 if _G.State.is_paused then
                     manage.pauseGroup(class_settings)
-                    actions.pause(_G.State:readStatusText())
+                    actions.pauseTask(_G.State:readStatusText())
                     manage.unpauseGroup(class_settings)
                 end
                 item_status = ''
@@ -296,7 +296,7 @@ function actions.farm_radius(item, class_settings, char_settings, event)
                 end
                 if _G.State.is_paused then
                     manage.pauseGroup(class_settings)
-                    actions.pause(_G.State:readStatusText())
+                    actions.pauseTask(_G.State:readStatusText())
                     manage.unpauseGroup(class_settings)
                 end
                 if mq.TLO.AdvLoot.SCount() > 0 then
@@ -336,7 +336,7 @@ function actions.farm_radius(item, class_settings, char_settings, event)
             end
             if _G.State.is_paused then
                 manage.pauseGroup(class_settings)
-                actions.pause(_G.State:readStatusText())
+                actions.pauseTask(_G.State:readStatusText())
                 manage.unpauseGroup(class_settings)
             end
             mq.delay(250)
@@ -410,7 +410,7 @@ function actions.fish_farm(item, class_settings, char_settings, once)
                 return
             end
             if _G.State.is_paused == true then
-                actions.pause(_G.State:readStatusText())
+                actions.pauseTask(_G.State:readStatusText())
             end
             if _G.Mob.xtargetCheck(char_settings) then
                 _G.Mob.clearXtarget(class_settings, char_settings)
@@ -496,7 +496,7 @@ function actions.forage_farm(item, class_settings, char_settings)
                 return
             end
             if _G.State.is_paused == true then
-                actions.pause(_G.State:readStatusText())
+                actions.pauseTask(_G.State:readStatusText())
             end
             if _G.Mob.xtargetCheck(char_settings) then
                 _G.Mob.clearXtarget(class_settings, char_settings)
@@ -583,7 +583,7 @@ function actions.ground_spawn_farm(item, class_settings, char_settings)
         end
         if _G.State.is_paused == true then
             manage.pauseGroup(class_settings)
-            actions.pause(_G.State:readStatusText())
+            actions.pauseTask(_G.State:readStatusText())
             manage.unpauseGroup(class_settings)
         end
         item_status = ''
@@ -675,7 +675,7 @@ function actions.unignore_mob(item, class_settings)
     end
 end
 
-function actions.pause(status)
+function actions.pauseTask(status)
     _G.State:setStatusText('Paused.')
     logger.log_info("\aoPausing on step \ar%s\ao.", _G.State.current_step)
     while _G.State.is_paused == true do
@@ -915,7 +915,7 @@ function actions.npc_wait(item, class_settings, char_settings)
             return
         end
         if _G.State.is_paused == true then
-            actions.pause(_G.State:readStatusText())
+            actions.pauseTask(_G.State:readStatusText())
         end
         mq.delay(200)
     end
@@ -934,7 +934,7 @@ function actions.npc_wait_despawn(item, class_settings, char_settings)
             return
         end
         if _G.State.is_paused == true then
-            actions.pause(_G.State:readStatusText())
+            actions.pauseTask(_G.State:readStatusText())
         end
         mq.delay(200)
     end
@@ -1091,7 +1091,7 @@ function actions.wait(item, class_settings, char_settings)
             return
         end
         if _G.State.is_paused == true then
-            actions.pause(_G.State:readStatusText())
+            actions.pauseTask(_G.State:readStatusText())
         end
         mq.delay(200)
         if os.clock() * 1000 > start_wait + item.wait then

@@ -295,7 +295,7 @@ local task_functions = {
         desc   = 'Group click door'
     },
     PAUSE                    = {
-        func   = _G.State.pause,
+        func   = _G.State.pauseTask,
         params = {},
         desc   = 'Pause the script.'
     },
