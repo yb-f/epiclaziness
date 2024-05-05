@@ -44,6 +44,8 @@ local themeID             = 5
 local theme               = {}
 local FIRST_WINDOW_WIDTH  = 415
 local FIRST_WINDOW_HEIGHT = 475
+local AUTOSIZE_SIZES      = { 1, 2, 5, 10, 20 }
+local AUTOSIZE_CHOICE     = 3
 
 local function File_Exists(name)
     local f = io.open(name, "r")
@@ -104,8 +106,8 @@ _G.State = {
     cannot_count    = 0,
     traveling       = false,
     autosize        = false,
-    autosize_sizes  = { 1, 2, 5, 10, 20 },
-    autosize_choice = 3,
+    autosize_sizes  = AUTOSIZE_SIZES,
+    autosize_choice = AUTOSIZE_CHOICE,
     autosize_self   = false,
     autosize_on     = false,
     combineSlot     = 0,
