@@ -165,7 +165,7 @@ local task_functions = {
         desc   = function(item) return 'Making sure group has at least ' .. item.count .. ' players.' end
     },
     IGNORE_MOB               = {
-        func   = _G.Actions.group_size_check,
+        func   = _G.Actions.ignore_mob,
         params = { class_settings.settings },
         desc   = function(item) return 'Add ' .. item.npc .. ' to pull ignore list' end
     },
