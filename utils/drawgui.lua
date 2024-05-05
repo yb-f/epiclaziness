@@ -89,7 +89,6 @@ local function gate_needed(class, choice)
     return invis_travel[class_epic].gate
 end
 
-
 function draw_gui.consoleTab(class_settings)
     if ImGui.BeginTabItem("Console") then
         local changed
