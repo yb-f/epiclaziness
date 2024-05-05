@@ -1,7 +1,8 @@
-local mq     = require('mq')
-local logger = require('utils/logger')
+local mq           = require('mq')
+local logger       = require('utils/logger')
 
-local manage = {}
+local MAX_DISTANCE = 100
+local manage       = {}
 
 function manage.campGroup(radius, class_settings, char_settings)
     logger.log_info("\aoSetting camp mode with radius \ag%s\ao.", radius)
@@ -203,10 +204,10 @@ end
 
 function manage.groupTalk(npc, phrase)
     if mq.TLO.Spawn(npc).Distance() ~= nil then
-        if mq.TLO.Spawn(npc).Distance() > 100 then
+        if mq.TLO.Spawn(npc).Distance() > MAX_DISTANCE then
             _G.State.rewound = true
             _G.State.step = _G.State.step - 1
-            logger.log_warn("\ar%s \aois over 100 units away. Moving back to step \ar%s\ao.", npc, _G.State.step)
+            logger.log_warn("\ar%s \aois over %s units away. Moving back to step \ar%s\ao.", npc, MAX_DISTANCE, _G.State.step)
             return
         end
     end
