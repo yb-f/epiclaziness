@@ -32,11 +32,7 @@ function draw_gui.full_outline_row(item, step, outlineText)
     ImGui.TableNextRow()
     ImGui.TableNextColumn()
     if ImGui.Selectable("##c" .. step, false, ImGuiSelectableFlags.None) then
-        _G.State.is_rewound = true
-        _G.State.should_skip = true
-        _G.State.current_step = step
-        logger.log_info('\aoSetting step to \ar%s', _G.State.current_step)
-        logger.log_verbose("\aoStep type: \ar%s", item.type)
+        _G.State:handle_step_change(step)
     end
     ImGui.SameLine()
     local color = IM_COL32(0, 0, 0, 0)
@@ -51,11 +47,7 @@ function draw_gui.full_outline_row(item, step, outlineText)
     ImGui.TextColored(color, tostring(step))
     ImGui.TableNextColumn()
     if ImGui.Selectable("##d" .. step, false, ImGuiSelectableFlags.None) then
-        _G.State.is_rewound = true
-        _G.State.should_skip = true
-        _G.State.current_step = step
-        logger.log_info('\aoSetting step to \ar%s', step)
-        logger.log_verbose("\aoStep type: \ar%s", item.type)
+        _G.State:handle_step_change(step)
     end
     ImGui.SameLine()
     ImGui.TextWrapped(outlineText)
@@ -194,11 +186,7 @@ function draw_gui.generalTab(task_table)
         end
         if _G.State.is_task_running == true then
             if ImGui.SmallButton(ICONS.MD_FAST_REWIND) then
-                _G.State.should_skip = true
-                _G.State.is_rewound = true
-                _G.State.current_step = _G.State.current_step - 1
-                logger.log_info("\aoMoving to previous step \ar%s", _G.State.current_step)
-                logger.log_verbose("\aoStep type: \ar%s", task_table[_G.State.current_step].type)
+                _G.State:handle_step_change(_G.State.current_step - 1)
             end
             if ImGui.IsItemHovered() then
                 ImGui.SetTooltip("Move to previous step.")
@@ -233,11 +221,7 @@ function draw_gui.generalTab(task_table)
             end
             ImGui.SameLine()
             if ImGui.SmallButton(ICONS.MD_FAST_FORWARD) then
-                _G.State.should_skip = true
-                _G.State.current_step = _G.State.current_step + 1
-                _G.State.is_rewound = true
-                logger.log_info("\aoMoving to next step \ar%s", _G.State.current_step)
-                logger.log_verbose("\aoStep type: \ar%s", task_table[_G.State.current_step].type)
+                _G.State:handle_step_change(_G.State.current_step + 1)
             end
             if ImGui.IsItemHovered() then
                 ImGui.SetTooltip("Skip to next step.")
@@ -327,11 +311,7 @@ function draw_gui.outlineRow(overview_steps, task_outline_table, task_table, i)
     ImGui.TableNextColumn()
     if ImGui.Selectable("##a" .. i, false, ImGuiSelectableFlags.None) then
         if _G.State.is_task_running == true then
-            _G.State.is_rewound = true
-            _G.State.should_skip = true
-            _G.State.current_step = task_outline_table[i].Step
-            logger.log_info('\aoSetting step to \ar%s', _G.State.current_step)
-            logger.log_verbose("\aoStep type: \ar%s", task_table[_G.State.current_step].type)
+            _G.State:handle_step_change(task_outline_table[i].Step)
         end
     end
     ImGui.SameLine()
@@ -339,11 +319,7 @@ function draw_gui.outlineRow(overview_steps, task_outline_table, task_table, i)
     ImGui.TableNextColumn()
     if ImGui.Selectable("##b" .. i, false, ImGuiSelectableFlags.None) then
         if _G.State.is_task_running == true then
-            _G.State.is_rewound = true
-            _G.State.should_skip = true
-            _G.State.current_step = task_outline_table[i].Step
-            logger.log_info('\aoSetting step to \ar%s', _G.State.current_step)
-            logger.log_verbose("\aoStep type: \ar%s", task_table[_G.State.current_step].type)
+            _G.State:handle_step_change(task_outline_table[i].Step)
         end
     end
     ImGui.SameLine()

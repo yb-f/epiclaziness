@@ -17,9 +17,8 @@ function mob.backstab(item, class_settings, char_settings)
     local ID = mob.findNearestName(item.npc, item, class_settings, char_settings)
     if mq.TLO.Spawn(item.npc).Distance() ~= nil then
         if mq.TLO.Spawn(item.npc).Distance() > MAX_DISTANCE then
-            _G.State.is_rewound = true
-            _G.State.current_step = _G.State.current_step - 1
             logger.log_warn("\ar%s \aois over %s units away. Moving back to step \ar%s\ao.", item.npc, MAX_DISTANCE, _G.State.current_step)
+            _G.State:handle_step_change(_G.State.current_step - 1)
             return
         end
     end
@@ -61,9 +60,8 @@ function mob.ph_search(item, class_settings, char_settings)
     local spawn_search = "npc loc " ..
         item.whereX .. " " .. item.whereY .. " " .. item.whereZ .. " radius " .. item.radius
     if mq.TLO.Spawn(spawn_search).ID() ~= 0 then
-        _G.State.is_rewound = true
-        _G.State.current_step = item.gotostep
         logger.log_info("\aoPH found. Moving to step: \ar%s\ao.", _G.State.current_step)
+        _G.State:handle_step_change(item.gotostep)
     end
     mq.delay(500)
 end
@@ -229,7 +227,7 @@ function mob.findNearestName(npc, item, class_settings, char_settings)
                 if closest_ID == 0 then
                     if mq.TLO.Spawn('corpse ' .. item.npc).ID() ~= 0 then
                         logger.log_warn("\ar%s \aohas already been killed. Advancing to step: \ag%s\ao.", item.npc, item.gotostep)
-                        _G.State.current_step = item.gotostep
+                        _G.State:handle_step_change(item.gotostep)
                         return nil
                     end
                 end
@@ -238,9 +236,7 @@ function mob.findNearestName(npc, item, class_settings, char_settings)
         if item.type == "NPC_SEARCH" then
             if closest_ID == 0 then
                 logger.log_debug("\ar%s \ao not found. Advancing to next step.", item.npc)
-                _G.State.current_step = _G.State.current_step + 1
-                _G.State.is_rewound = true
-                _G.State.should_skip = true
+                _G.State:handle_step_change(_G.State.current_step + 1)
                 return nil
             end
         end
@@ -270,15 +266,13 @@ function mob.general_search(item, class_settings, char_settings)
         end
         local ID = mob.findNearestName(item.npc, item, class_settings, char_settings)
         if ID ~= nil then
-            _G.State.is_rewound = true
-            _G.State.current_step = item.gotostep
             logger.log_verbose("\aoFound \ag%s \ao(\ag%s\ao) going to step \ar%s\ao.", item.npc, ID, _G.State.current_step)
+            _G.State:handle_step_change(item.gotostep)
             return
         else
             --Does this ever trigger?
             if item.zone ~= nil then
-                _G.State.is_rewound = true
-                _G.State.current_step = item.backstep
+                _G.State:handle_step_change(item.backstep)
                 logger.log_warn("\aoUnable to find \ar%s \aolooping back to step \ar%s\ao.", item.npc, _G.State.current_step)
             end
             return
@@ -293,9 +287,8 @@ function mob.npc_damage_until(item)
     ID = mq.TLO.Spawn('npc ' .. item.npc).ID()
     if mq.TLO.Spawn(ID).Distance() ~= nil then
         if mq.TLO.Spawn(ID).Distance() > MAX_DISTANCE then
-            _G.State.is_rewound = false
-            _G.State.current_step = _G.State.current_step - 1
             logger.log_warn("\ar%s \aois over %s units away. Moving back to step \ar%s\ao.", item.npc, MAX_DISTANCE, _G.State.current_step)
+            _G.State:handle_step_change(_G.State.current_step - 1)
             return
         end
     end
@@ -349,9 +342,8 @@ function mob.npc_kill(item, class_settings, char_settings)
     local ID = mob.findNearestName(item.npc, item, class_settings, char_settings)
     if mq.TLO.Spawn(ID).Distance() ~= nil then
         if mq.TLO.Spawn(ID).Distance() > MAX_DISTANCE then
-            _G.State.is_rewound = true
-            _G.State.current_step = _G.State.current_step - 1
             logger.log_warn("\ar%s \aois over %s units away. Moving back to step \ar%s\ao.", item.npc, MAX_DISTANCE, _G.State.current_step)
+            _G.State:handle_step_change(_G.State.current_step - 1)
             return
         end
     end
@@ -388,11 +380,10 @@ function mob.npc_kill(item, class_settings, char_settings)
             if _G.State.cannot_count > 9 then
                 _G.State.cannot_count = 0
                 table.insert(_G.State.bad_IDs, ID)
-                _G.State.is_rewound = true
-                _G.State.current_step = _G.State.current_step - 1
                 mq.unevent('cannot_see')
                 mq.unevent('cannot_cast')
                 logger.log_warn('\aoUnable to hit this target. Adding \ar%s \aoto bad IDs and moving back to step \ar%s\ao.', ID, _G.State.current_step)
+                _G.State:handle_step_change(_G.State.current_step - 1)
                 return
             end
             if mq.TLO.Target.ID() ~= ID then
@@ -431,9 +422,7 @@ function mob.npc_kill(item, class_settings, char_settings)
         end
     end
     if item.gotostep ~= nil then
-        _G.State.is_rewound = true
-        _G.State.current_step = item.gotostep
-        logger.log_info("\aoSetting step to \ar%s\ao.", _G.State.current_step)
+        _G.State:handle_step_change(item.gotostep)
     end
 end
 
@@ -459,8 +448,8 @@ function mob.npc_kill_all(item, class_settings, char_settings)
         travel.general_travel(item, class_settings, char_settings, ID)
         if mq.TLO.Spawn(ID).Distance() ~= nil then
             if mq.TLO.Spawn(ID).Distance() > MAX_DISTANCE then
-                _G.State.current_step = _G.State.current_step
                 logger.log_warn("\ar%s \aois over %s units away. Moving closer.", item.npc, MAX_DISTANCE)
+                _G.State:handle_step_change(_G.State.current_step)
                 return
             end
         end
@@ -488,9 +477,8 @@ function mob.npc_kill_all(item, class_settings, char_settings)
             mq.delay(200)
             if mq.TLO.Spawn(ID).Distance() ~= nil then
                 if mq.TLO.Spawn(ID).Distance() > MAX_DISTANCE then
-                    _G.State.is_rewound = true
-                    _G.State.current_step = _G.State.current_step
                     logger.log_warn("\ar%s \aois over %s units away. Moving closer.", item.npc, MAX_DISTANCE)
+                    _G.State:handle_step_change(_G.State.current_step)
                     return
                 end
             end

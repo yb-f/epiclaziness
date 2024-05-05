@@ -205,9 +205,8 @@ end
 function manage.groupTalk(npc, phrase)
     if mq.TLO.Spawn(npc).Distance() ~= nil then
         if mq.TLO.Spawn(npc).Distance() > MAX_DISTANCE then
-            _G.State.is_rewound = true
-            _G.State.current_step = _G.State.current_step - 1
             logger.log_warn("\ar%s \aois over %s units away. Moving back to step \ar%s\ao.", npc, MAX_DISTANCE, _G.State.current_step)
+            _G.State:handle_step_change(_G.State.current_step - 1)
             return
         end
     end

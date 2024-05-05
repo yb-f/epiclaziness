@@ -465,9 +465,7 @@ function inventory.loot(item)
     if mq.TLO.FindItem("=" .. item.what)() ~= nil then
         logger.log_info("\aoSuccessfully looted \ag%s\ao.", item.what)
         --[[ if item.gotostep ~= nil then
-            logger.log_verbose("\aoAdvancing to step \ar%s\ao.", item.gotostep)
-            _G.State.is_rewound = true
-            _G.State.current_step = item.gotostep
+            _G.State:handle_step_change(item.gotostep)
         end--]]
         return true
     else
@@ -477,7 +475,7 @@ function inventory.loot(item)
                 if mq.TLO.FindItem("=" .. item.what)() ~= nil then
                     logger.log_info("\aoSuccessfully looted \ag%s\ao.", item.what)
                     --[[if item.gotostep ~= nil then
-                        _G.State.current_step = item.gotostep - 1
+                        _G.State:handle_step_change(item.gotostep - 1)
                     end--]]
                     return true
                 end
@@ -519,9 +517,7 @@ function inventory.move_combine_container(slot, container)
     mq.delay(250)
     if string.lower(mq.TLO.Me.Inventory(slot + 22).Name()) ~= string.lower(container) then
         logger.log_warn("\ar%s \aodid not move to slot \ar%s\ao. Trying again.", container, slot)
-        _G.State.is_rewound = true
-        _G.State.should_skip = true
-        _G.State.current_step = _G.State.current_step
+        _G.State:handle_step_change(_G.State.current_step)
         return
     end
     mq.cmdf("/squelch /nomodkey /ctrl /itemnotify %s rightmouseup", slot + 22)
@@ -546,9 +542,8 @@ function inventory.npc_buy(item, class_settings, char_settings)
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
         if mq.TLO.Spawn(item.npc).Distance() ~= nil then
             if mq.TLO.Spawn(item.npc).Distance() > MAX_DISTANCE then
-                _G.State.is_rewound = true
-                _G.State.current_step = _G.State.current_step - 1
                 logger.log_warn("\ar%s \aois over %s units away. Moving back to step \ar%s\ao.", item.npc, MAX_DISTANCE, _G.State.current_step)
+                _G.State:handle_step_change(_G.State.current_step - 1)
                 return
             end
         end

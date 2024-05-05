@@ -298,9 +298,7 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
     end
     if distance > 30 and item.radius == nil then
         logger.log_warn("\aoStopped before reaching our destination. Attempting to restart navigation.")
-        _G.State.current_step = _G.State.current_step
-        _G.State.is_rewound = true
-        _G.State.should_skip = true
+        _G.State:handle_step_change(_G.State.current_step)
     end
     logger.log_verbose("\aoWe have reached our destination.")
     _G.State.destType = ''
@@ -799,9 +797,8 @@ function travel.npc_follow(item, class_settings, char_settings, event)
     logger.log_info("\aoFollowing \ag%s\ao.", item.npc)
     if mq.TLO.Spawn("npc " .. item.npc).Distance() ~= nil then
         if mq.TLO.Spawn("npc " .. item.npc).Distance() > 100 then
-            _G.State.is_rewound = true
-            _G.State.current_step = _G.State.current_step - 1
             logger.log_warn("\ar%s \aois over 100 units away. Moving back to step \ar%s\ao.", item.npc, _G.State.current_step)
+            _G.State:handle_step_change(_G.State.current_step - 1)
             return
         end
     end
@@ -1008,8 +1005,7 @@ function travel.relocate(item, class_settings, char_settings)
     mq.delay("2s")
     if currentZone == mq.TLO.Zone.Name() then
         logger.log_warn("\aoWe are still in \ag%s \aoattempting to relocate again.", currentZone)
-        _G.State.is_rewound = true
-        _G.State.current_step = _G.State.current_step
+        _G.State:handle_step_change(_G.State.current_step)
         return
     end
 end

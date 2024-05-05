@@ -111,6 +111,14 @@ _G.State = {
     badMeshes           = {},
 }
 
+function _G.State:handle_step_change(step)
+    self.is_rewound = true
+    self.should_skip = true
+    self.current_step = step
+    logger.log_info('\aoSetting step to: \ar%s\ao.', self.current_step)
+    logger.log_verbose("\aoStep type: \ar%s\ao.", task_table[self.current_step].type)
+end
+
 function _G.State:setStatusText(text)
     self.status = text
 end
@@ -397,9 +405,7 @@ local function run_epic(class, choice)
                 logger.log_warn('\aoYou have selected to skip this step (\ag%s\ao). Moving to next step.', _G.State.current_step)
                 for i, item in pairs(task_outline_table) do
                     if item.Step == _G.State.current_step then
-                        _G.State.is_rewound = true
-                        _G.State.current_step = task_outline_table[i + 1].Step
-                        logger.log_info('\aoSetting step to \ar%s', _G.State.current_step)
+                        _G.State:handle_step_change(task_outline_table[i + 1].Step)
                         break
                     end
                 end
