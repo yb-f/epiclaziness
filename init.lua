@@ -13,6 +13,7 @@ local class_settings     = require('utils/class_settings')
 local quests_done        = require('utils/questsdone')
 local reqs               = require('utils/questrequirements')
 local tsreqs             = require('utils/tradeskillreqs')
+local v                  = require('lib/semver')
 local PackageMan         = require('mq/PackageMan')
 local sqlite3            = PackageMan.Require('lsqlite3')
 local http               = PackageMan.Require('luasocket', 'socket.http')
@@ -23,12 +24,13 @@ local ssl                = PackageMan.Require('luasec', 'ssl')
 --end
 
 local version_url        = 'https://raw.githubusercontent.com/yb-f/EL-Ver/master/latest_ver'
-local version            = "0.3.2"
+local version            = v("0.3.2")
 local window_flags       = bit32.bor(ImGuiWindowFlags.None)
 local openGUI, drawGUI   = true, true
 local myName             = mq.TLO.Me.DisplayName()
 local dbn                = sqlite3.open(mq.luaDir .. '\\epiclaziness\\epiclaziness.db')
 local db_outline         = sqlite3.open(mq.luaDir .. '\\epiclaziness\\epiclaziness_outline.db')
+local plugins            = { 'MQ2Nav', 'MQ2EasyFind', 'MQ2Relocate', 'MQ2PortalSetter', }
 local task_table         = {}
 local task_outline_table = {}
 local running            = true
@@ -476,24 +478,13 @@ local function displayGUI()
 end
 
 local function version_check()
-    local response = http.request(version_url)
-    local version_table = {}
-    local response_table = {}
-    local new_version_available = false
-    response = string.gsub(response, "\n", "")
-    for word in string.gmatch(version, '([^.]+)') do
-        table.insert(version_table, tonumber(word))
+    local success, response = pcall(http.request, version_url)
+    if not success then
+        logger.log_error("\aoFailed to fetch version information: %s", response)
+        return
     end
-    for word in string.gmatch(response, '([^.]+)') do
-        table.insert(response_table, tonumber(word))
-    end
-    for i = 1, 3 do
-        if response_table[i] > version_table[i] then
-            new_version_available = true
-            break
-        end
-    end
-    if new_version_available then
+    local latest_version = v(response)
+    if latest_version > version then
         logger.log_error("\aoA new version is available (\arv%s\ao) please download it and try again.", response)
         mq.exit()
     end
@@ -545,7 +536,7 @@ local function init()
     mq.imgui.init('displayGUI', displayGUI)
     version_check()
     logger.log_warn("If you encounter any nav mesh issues please ensure you are using the latest mesh from \arhttps://github.com/yb-f/meshes")
-    for plugin in ipairs({ 'MQ2Nav', 'MQ2EasyFind', 'MQ2Relocate', 'MQ2PortalSetter', }) do
+    for plugin in ipairs(plugins) do
         if mq.TLO.Plugin(plugin)() == nil then
             logger.log_error("\ar%s \aois required for this script.", plugin)
             logger.log_error("\aoPlease load it with the command \ar/plugin %s \aoand rerun this script.", plugin)
