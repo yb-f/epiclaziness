@@ -53,7 +53,7 @@ function mob.ph_search(item, class_settings, char_settings)
     if mob.xtargetCheck(char_settings) then
         mob.clearXtarget(class_settings, char_settings)
     end
-    _G.State.status = 'Searching for PH for ' .. item.npc
+    _G.State.setStatusText(string.format("Searching for PH for %s.", item.npc))
     logger.log_info("\aoSearching for PH for \ag%s\ao.", item.npc)
     local spawn_search = "npc loc " ..
         item.whereX .. " " .. item.whereY .. " " .. item.whereZ .. " radius " .. item.radius
@@ -84,7 +84,7 @@ function mob.clearXtarget(class_settings, char_settings)
                         logger.log_verbose("\aoTargeting XTarget #\ag%s\ao.", i)
                         mq.TLO.Me.XTarget(i).DoTarget()
                         ID = mq.TLO.Me.XTarget(i).ID()
-                        _G.State.status = "Clearing XTarget " .. i .. ": " .. mq.TLO.Me.XTarget(i)() .. "(" .. ID .. ")"
+                        _G.State.setStatusText(string.format("Clearing XTarget %s: %s (%s).", i, mq.TLO.Me.XTarget(i)(), ID))
                         logger.log_info("\aoClearing XTarget \ag%s \ao: \ag%s \ao(\ag%s\ao).", i, mq.TLO.Me.XTarget(i)(), ID)
                         manage.unpauseGroup(class_settings)
                         mq.cmd("/squelch /stick")
@@ -141,7 +141,7 @@ function mob.clearXtarget(class_settings, char_settings)
     if mq.TLO.Stick.Active() == true then
         mq.cmd('/squelch /stick off')
     end
-    _G.State.status = temp
+    _G.State.setStatusText(temp)
 end
 
 local function matchFilters(spawn)
@@ -163,7 +163,7 @@ local function create_spawn_list()
 end
 
 function mob.findNearestName(npc, item, class_settings, char_settings)
-    _G.State.status = "Searching for nearest " .. npc
+    _G.State.setStatusText(string.format("Searching for nearest %s.", npc))
     searchFilter = npc
     logger.log_info("\aoSearching for nearest \ag%s\ao.", npc)
     local mob_list = create_spawn_list()
@@ -256,7 +256,7 @@ function mob.general_search(item, class_settings, char_settings)
             mob.clearXtarget(class_settings, char_settings)
         end
     end
-    _G.State.status = "Searching for " .. item.npc
+    _G.State.setStatusText(string.format("Searching for %s.", item.npc))
     logger.log_info("\aoSearching for \ag%s\ao.", item.npc)
     local looping = true
     local i = 1
@@ -285,7 +285,7 @@ function mob.general_search(item, class_settings, char_settings)
 end
 
 function mob.npc_damage_until(item)
-    _G.State.status = "Damaging " .. item.npc .. " to below " .. item.damage_pct .. "% health"
+    _G.State.setStatusText(string.format("Damaging %s to below %s% health.", item.npc, item.damage_pct))
     logger.log_info("\aoDamaging \ag%s \ao to below \ag%s%% health\ao.", item.npc, item.damage_pct)
     ID = mq.TLO.Spawn('npc ' .. item.npc).ID()
     if mq.TLO.Spawn(ID).Distance() ~= nil then
@@ -339,7 +339,7 @@ end
 
 function mob.npc_kill(item, class_settings, char_settings)
     manage.removeInvis()
-    _G.State.status = "Killing " .. item.npc
+    _G.State.setStatusText(string.format("Killing %s.", item.npc))
     logger.log_info("\aoKilling \ag%s\ao.", item.npc)
     manage.unpauseGroup(class_settings)
     mq.delay(200)
@@ -363,7 +363,7 @@ function mob.npc_kill(item, class_settings, char_settings)
     end
     if looted == false then
         if ID ~= nil then
-            _G.State.status = "Killing " .. item.npc .. " (" .. ID .. ")"
+            _G.State.setStatusText(string.format("Killing %s (%s).", item.npc, ID))
             logger.log_info("\aoKilling \ag%s \ao(\ag%s\ao).", item.npc, ID)
             logger.log_verbose("\aoTargeting \ag%s \ao(\ag%s\ao).", item.npc, ID)
             mq.TLO.Spawn(ID).DoTarget()
@@ -436,7 +436,7 @@ end
 
 function mob.npc_kill_all(item, class_settings, char_settings)
     manage.removeInvis()
-    _G.State.status = "Killing All " .. item.npc
+    _G.State.setStatusText(string.format("Killing all %s.", item.npc))
     logger.log_info("\aoKilling all \ag%s\ao.", item.npc)
     manage.unpauseGroup(class_settings)
     while true do
@@ -510,7 +510,7 @@ function mob.npc_kill_all(item, class_settings, char_settings)
         end
         if mq.TLO.FindItem("=" .. item.what)() == nil then
             inv.loot(item)
-            _G.State.status = "Killing All " .. item.npc
+            _G.State.setStatusText(string.format("Killing all %s.", item.npc))
         end
     end
 end

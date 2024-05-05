@@ -29,7 +29,7 @@ end
 
 function inventory.auto_inv(item)
     if mq.TLO.Cursor() ~= nil then
-        _G.State.status = "Moving " .. mq.TLO.Cursor() .. " to inventory"
+        _G.State.setStatusText(string.format("Moving %s to inventory.", mq.TLO.Cursor()))
         logger.log_info("\aoMoving \ag%s\ao to inventory.", mq.TLO.Cursor())
     else
         return
@@ -95,7 +95,7 @@ function inventory.combine_container(item, class_settings, char_settings)
     if _G.Mob.xtargetCheck(char_settings) then
         _G.Mob.clearXtarget(class_settings, char_settings)
     end
-    _G.State.status = "Preparing combine container (" .. item.what .. ")"
+    _G.State.setStatusText(string.format("Preparing combine container (%s).", item.what))
     logger.log_info("\aoPreparing combine container (\ag%s\ao) for use.", item.what)
     local mySlot = inventory.find_best_bag_slot(item)
     logger.log_debug("\aoSlot \ag%s \aochosen.", mySlot)
@@ -135,10 +135,10 @@ function inventory.combine_item(item, class_settings, char_settings, slot)
     if _G.Mob.xtargetCheck(char_settings) then
         _G.Mob.clearXtarget(class_settings, char_settings)
     end
-    _G.State.status = "Moving " .. item.what .. " to combine container"
+    _G.State.setStatusText(string.format("Moving %s to combine container.", item.what))
     logger.log_info("\aoMoving \ag%s \aoto combine container.", item.what)
     if mq.TLO.FindItem("=" .. item.what)() == nil then
-        _G.State.status = "Unable to find item for combine (" .. item.what .. ")"
+        _G.State.setStatusText(string.format("Unable to find item for combine (%s)", item.what))
         logger.log_error("\aoUnable to find \ar%s \aofor combine.", item.what)
         _G.State.task_run = false
         mq.cmd('/foreground')
@@ -150,7 +150,7 @@ function inventory.combine_item(item, class_settings, char_settings, slot)
     if itemslot == slot and item.count >= 2 then
         itemslot, itemslot2 = inventory.find_duplicate_item(item.what, slot)
         if itemslot == 0 and itemslot2 == 0 then
-            _G.State.status = "Unable to find item for combine (" .. item.what .. ")"
+            _G.State.setStatusText(string.format("Unable to find item for combine (%s).", item.what))
             logger.log_error("\aoUnable to find \ar%s \aofor combine.", item.what)
             _G.State.task_run = false
             mq.cmd('/foreground')
@@ -184,7 +184,7 @@ function inventory.combine_do(class_settings, char_settings, slot)
     if _G.Mob.xtargetCheck(char_settings) then
         _G.Mob.clearXtarget(class_settings, char_settings)
     end
-    _G.State.status = "Performing combine"
+    _G.State.setStatusText("Performing combine.")
     logger.log_info("\aoPerforming combine in container in slot \ag%s\ao.", slot)
     mq.cmdf("/squelch /combine pack%s", slot)
     while mq.TLO.Cursor() == nil do
@@ -203,7 +203,7 @@ function inventory.combine_done(class_settings, char_settings)
         _G.Mob.clearXtarget(class_settings, char_settings)
     end
     if _G.State.bagslot1 ~= 0 and _G.State.bagslot2 ~= 0 then
-        _G.State.status = "Moving container back to previous slot"
+        _G.State.setStatusText("Moving container back to previous slot.")
         logger.log_info("\aoRestoring container to previous slot.")
         mq.cmdf("/squelch /nomodkey /shiftkey /itemnotify in pack%s %s leftmouseup", _G.State.bagslot1, _G.State.bagslot2)
         while mq.TLO.Cursor() == nil do
@@ -218,12 +218,12 @@ function inventory.combine_done(class_settings, char_settings)
 end
 
 function inventory.enviro_combine_container(item)
-    _G.State.status = "Moving to " .. item.what
+    _G.State.setStatusText(string.format("Moving to %s.", item.what))
     logger.log_info("\aoMoving to \ag%s \aoto perform combine.", item.what)
     mq.cmdf("/squelch /itemtarget %s", item.what)
     if mq.TLO.ItemTarget.DisplayName() ~= item.what then
         _G.State.task_run = false
-        _G.State.status = "Could not find item: " .. item.what
+        _G.State.setStatusText(string.format("Could not find item: %s.", item.what))
         mq.cmd('/foreground')
         logger.log_error("\aoCould not find item \ar%s\ao.", item.what)
         return
@@ -240,7 +240,7 @@ function inventory.enviro_combine_container(item)
     while mq.TLO.Navigation.Active() do
         mq.delay(500)
     end
-    _G.State.status = "Opening " .. item.what .. " window"
+    _G.State.setStatusText(string.format("Opening %s window.", item.what))
     logger.log_info("\aoOpening \ag%s \aowindow.", item.what)
     mq.cmd("/squelch /click left item")
     mq.delay("5s", inventory.tradeskill_window)
@@ -254,10 +254,10 @@ function inventory.enviro_combine_container(item)
 end
 
 function inventory.enviro_combine_item(item)
-    _G.State.status = "Moving " .. item.what .. " to combine container slot " .. item.enviroslot
+    _G.State.setStatusText(string.format("Moving %s to combine container slot %s.", item.what, item.enviroslot))
     logger.log_info("\aoMoving \ag%s \aoto combine container.", item.what)
     if mq.TLO.FindItem("=" .. item.what)() == nil then
-        _G.State.status = "Unable to find item for combine (" .. item.what .. ")"
+        _G.State.setStatusText(string.format("Unable to find item for combine (%s).", item.what))
         logger.log_error("\aoUnable to find \ar%s \aofor combine.", item.what)
         _G.State.task_run = false
         mq.cmd('/foreground')
@@ -279,7 +279,7 @@ function inventory.enviro_combine_item(item)
 end
 
 function inventory.enviro_combine_do(item)
-    _G.State.status = "Combining"
+    _G.State.setStatusText("Combining.")
     logger.log_info("\aoPerforming combine in enviromental container.")
     mq.delay("3s")
     mq.TLO.Window("ContainerWindow/Container_Combine").LeftMouseUp()
@@ -287,7 +287,7 @@ function inventory.enviro_combine_do(item)
     local i = 0
     while mq.TLO.Cursor() == nil do
         i = i + 1
-        _G.State.status = "Combining " .. i
+        _G.State.setStatusText(string.format("Combining %s.", i))
         mq.delay(100)
         mq.TLO.Window("ContainerWindow/Container_Combine").LeftMouseUp()
     end
@@ -295,11 +295,11 @@ function inventory.enviro_combine_do(item)
 end
 
 function inventory.equip_item(item)
-    _G.State.status = "Equiping " .. item.what
+    _G.State.setStatusText(string.format("Equiping %s.", item.what))
     logger.log_info('\aoEquiping \ag%s\ao.', item.what)
     mq.delay("1s")
     inventory.slot = mq.TLO.FindItem('=' .. item.what).WornSlot(1).Slot()
-    inventory.stored_item = mq.TLO.Me.Inventory(inventory.slot).Name()
+    inventory.stored_item = mq.TLO.Me.Inventory(inventory.slot)()
     logger.log_verbose("\aoUnequiping \ag%s\ao.", inventory.stored_item)
     mq.cmdf("/squelch /itemnotify \"%s\" leftmouseup", item.what)
     while mq.TLO.Cursor() == nil do
@@ -434,7 +434,7 @@ function inventory.item_check(item)
 end
 
 function inventory.loot(item)
-    _G.State.status = "Looting " .. item.what
+    _G.State.setStatusText(string.format("Looting %s.", item.what))
     local looted = false
     if mq.TLO.AdvLoot.SCount() > 0 then
         for i = 1, mq.TLO.AdvLoot.SCount() do
@@ -482,7 +482,7 @@ function inventory.loot(item)
                 end
             end
             --_G.State.task_run = false
-            _G.State.status = "Tried to loot " .. item.what .. "at step " .. _G.State.step .. " but failed!"
+            _G.State.setStatusText(string.format("Tried to loot %s at step %s but failed!", item.what, _G.State.step))
             logger.log_error("\aoFailed to loot \ar%s \aoat step \ar%s\ao.", item.what, _G.State.step)
             mq.cmd('/foreground')
             return false
@@ -492,7 +492,7 @@ end
 
 function inventory.move_combine_container(slot, container)
     if mq.TLO.FindItem("=" .. container)() == nil then
-        _G.State.status = "Unable to find combine container (" .. container .. ")"
+        _G.State.setStatusText(string.format("Unable to find combine container (%s).", container))
         logger.log_error("\aoUnable to find combine container (\ar%s\ao).", container)
         _G.State.task_run = false
         mq.cmd('/foreground')
@@ -540,7 +540,7 @@ end
 
 function inventory.npc_buy(item, class_settings, char_settings)
     manage.removeInvis()
-    _G.State.status = "Buying " .. item.what .. " from " .. item.npc
+    _G.State.setStatusText(string.format("Buying %s from %s.", item.what, item.npc))
     logger.log_info("\aoBuying \ag%s \ao from \ag%s\ao.", item.what, item.npc)
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
         if mq.TLO.Spawn(item.npc).Distance() ~= nil then

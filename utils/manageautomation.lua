@@ -303,7 +303,7 @@ function manage.pauseGroup(class_settings)
 end
 
 function manage.picklockGroup(item)
-    _G.State.status = "Lockpicking door"
+    _G.State.setStatusText("Lockpicking door.")
     logger.log_info("\aoLockpicking door.")
     if _G.State.group_choice == 1 then
         if mq.TLO.Me.Class.ShortName() == 'BRD' or mq.TLO.Me.Class.ShortName() == 'ROG' then
@@ -317,7 +317,7 @@ function manage.picklockGroup(item)
             mq.cmd("/squelch /autoinv")
         else
             logger.log_error("\aoI am not a class that is able to pick locks. Stopping script at step \ar%s \ao.", _G.State.step)
-            _G.State.status = "I require a lockpicker to proceed. (" .. _G.State.step .. ")"
+            _G.State.setStatusText(string.format("I require a lockpicker to proceed. (%s).", _G.State.step))
             _G.State.task_run = false
             mq.cmd('/foreground')
             return
@@ -351,7 +351,7 @@ function manage.picklockGroup(item)
             end
         end
         if pickerFound == false then
-            _G.State.status = "I require a lockpicker to proceed. (" .. _G.State.step .. ")"
+            _G.State.setStatusText(string.format("I require a lockpicker to proceed. (%s).", _G.State.step))
             logger.log_error("\aoNo one in my group is a class that is able to pick locks. Stopping script at step \ar%s \ao.", _G.State.step)
             _G.State.task_run = false
             mq.cmd('/foreground')
@@ -378,7 +378,7 @@ function manage.picklockGroup(item)
             mq.delay(200)
             mq.cmd("/squelch /autoinv")
         else
-            _G.State.status = "I require a lockpicker to proceed. (" .. _G.State.step .. ")"
+            _G.State.setStatusText(string.format("I require a lockpicker to proceed. (%s).", _G.State.step))
             logger.log_error("\aoI am not a class that is able to pick locks, nor is \ag%s\ao. Stopping script at step \ar%s \ao.", mq.TLO.Group.Member(name).DisplayName(),
                 _G.State.step)
             _G.State.task_run = false
@@ -390,7 +390,7 @@ end
 
 function manage.removeInvis(item)
     local temp = _G.State.status
-    _G.State.status = "Removing invis"
+    _G.State.setStatusText("Removing invis.")
     if mq.TLO.Me.Invis() then
         logger.log_info("\aoRemoving invisibility.")
         if _G.State.group_choice == 1 then
@@ -402,11 +402,11 @@ function manage.removeInvis(item)
             mq.cmdf("/dex %s /squelch /makemevis", _G.State.group_combo[_G.State.group_choice])
         end
     end
-    _G.State.status = temp
+    _G.State.setStatusText(temp)
 end
 
 function manage.removeLev()
-    _G.State.status = "Removing levitate"
+    _G.State.setStatusText("Removing levitate.")
     logger.log_info("\aoRemoving levitate.")
     if _G.State.group_choice == 1 then
         mq.cmd("/squelch /removelev")
