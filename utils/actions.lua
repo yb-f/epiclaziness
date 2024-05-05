@@ -115,13 +115,11 @@ function actions.farm_check(item, class_settings, char_settings)
     --if one or more of the items are not present this will be true, so on false advance to the desired step
     if not_found == false then
         logger.log_verbose("\aoAll items found. Moving to step \ag%s\ao.", item.gotostep)
-        _G.State.is_rewound = true
-        _G.State.current_step = item.gotostep
+        _G.State:handle_step_change(item.gotostep)
     else
         --using item.zone as a filler slot for split goto for this function
         logger.log_verbose("\aoOne or more items missing. Moving to step \ar%s\ao.", item.backstep)
-        _G.State.is_rewound = true
-        _G.State.stcurrent_stepep = item.backstep
+        _G.State:handle_step_change(item.backstep)
     end
 end
 
@@ -133,8 +131,7 @@ function actions.adventure_entrance(item, class_settings, char_settings)
     if string.find(mq.TLO.Window('AdventureRequestWnd/AdvRqst_NPCText').Text(), item.what) then
         mq.delay(50)
         travel.loc_travel(item, class_settings, char_settings)
-        _G.State.current_step = item.gotostep
-        _G.State.is_rewound = true
+        _G.State:handle_step_change(item.gotostep)
     end
 end
 
@@ -148,8 +145,7 @@ function actions.drop_adventure(item)
     mq.delay(200)
     mq.cmd("/dgga /invoke ${Window[AdventureRequestWnd/AdvRqst_RequestButton].LeftMouseUp}")
     mq.delay("1s")
-    _G.State.is_rewound = true
-    _G.State.current_step = item.gotostep
+    _G.State:handle_step_change(item.gotostep)
 end
 
 function actions.farm_check_pause(item, class_settings, char_settings)
@@ -699,9 +695,8 @@ function actions.npc_give(item, class_settings, char_settings)
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
         if mq.TLO.Spawn(item.npc).Distance() ~= nil then
             if mq.TLO.Spawn(item.npc).Distance() > MAX_DISTANCE then
-                _G.State.is_rewound = true
-                _G.State.current_step = _G.State.current_step - 1
                 logger.log_warn("\ar%s \aois over %s units away. Moving back to step \ar%s\ao.", item.npc, MAX_DISTANCE, _G.State.current_step)
+                _G.State:handle_step_change(_G.State.current_step - 1)
                 return
             end
         end
@@ -765,9 +760,8 @@ function actions.npc_give_add(item, class_settings, char_settings)
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
         if mq.TLO.Spawn(item.npc).Distance() ~= nil then
             if mq.TLO.Spawn(item.npc).Distance() > MAX_DISTANCE then
-                _G.State.is_rewound = true
-                _G.State.current_step = _G.State.current_step - 1
                 logger.log_warn("\ar%s \aois over %s units away. Moving back to step \ar%s\ao.", item.npc, MAX_DISTANCE, _G.State.current_step)
+                _G.State:handle_step_change(_G.State.current_step - 1)
                 return
             end
         end
@@ -819,8 +813,7 @@ function actions.npc_give_money(item, class_settings, char_settings)
         if mq.TLO.Spawn(item.npc).Distance() ~= nil then
             if mq.TLO.Spawn(item.npc).Distance() > MAX_DISTANCE then
                 logger.log_warn("\ar%s \aois over %s units away. Moving back to step \ar%s\ao.", item.npc, MAX_DISTANCE, _G.State.current_step)
-                _G.State.is_rewound = true
-                _G.State.current_step = _G.State.current_step - 1
+                _G.State:handle_step_change(_G.State.current_step - 1)
                 return
             end
         end
@@ -861,9 +854,8 @@ function actions.npc_hail(item, class_settings, char_settings)
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
         if mq.TLO.Spawn(item.npc).Distance() ~= nil then
             if mq.TLO.Spawn(item.npc).Distance() > MAX_DISTANCE then
-                _G.State.is_rewound = true
-                _G.State.current_step = _G.State.current_step - 1
                 logger.log_warn("\ar%s \aois over %s units away. Moving back to step \ar%s\ao.", item.npc, MAX_DISTANCE, _G.State.current_step)
+                _G.State:handle_step_change(_G.State.current_step - 1)
                 return
             end
         end
@@ -882,9 +874,8 @@ function actions.npc_talk(item, class_settings, char_settings)
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
         if mq.TLO.Spawn(item.npc).Distance() ~= nil then
             if mq.TLO.Spawn(item.npc).Distance() > MAX_DISTANCE then
-                _G.State.is_rewound = true
-                _G.State.current_step = _G.State.current_step - 1
                 logger.log_warn("\ar%s \aois over %s units away. Moving back to step \ar%s\ao.", item.npc, MAX_DISTANCE, _G.State.current_step)
+                _G.State:handle_step_change(_G.State.current_step - 1)
                 return
             end
         end
@@ -945,9 +936,8 @@ function actions.pickpocket(item)
     logger.log_info("\aoPickpocketing \ag%s \aofrom \ag%s\ao.", item.what, item.npc)
     if mq.TLO.Spawn(item.npc).Distance() ~= nil then
         if mq.TLO.Spawn(item.npc).Distance() > MAX_DISTANCE then
-            _G.State.is_rewound = true
-            _G.State.current_step = _G.State.current_step - 1
             logger.log_warn("\ar%s \aois over %s units away. Moving back to step \ar%s\ao.", item.npc, MAX_DISTANCE, _G.State.current_step)
+            _G.State:handle_step_change(_G.State.current_step - 1)
             return
         end
     end
@@ -1001,8 +991,7 @@ function actions.pre_farm_check(item, class_settings, char_settings)
     --if one or more of the items are not present this will be true, so on false advance to the desired step
     if not_found == false then
         logger.log_info("\aoAll necessary items found. Moving to step \ar%s\ao.", item.gotostep)
-        _G.State.is_rewound = true
-        _G.State.current_step = item.gotostep
+        _G.State:handle_step_change(item.gotostep)
     end
 end
 
@@ -1061,13 +1050,11 @@ function actions.ldon_count_check(item)
     local timeString = mq.TLO.Window("AdventureRequestWnd/AdvRqst_CompleteTimeLeftLabel").Text()
     local progressString = mq.TLO.Window("AdventureRequestWnd/AdvRqst_ProgressTextLabel").Text()
     if timeString == '' and progressString == '' then
-        _G.State.is_rewound = true
-        _G.State.current_step = item.gotostep
         logger.log_info("\aoCompleted LDON adventure!")
+        _G.State:handle_step_change(item.gotostep)
     else
-        _G.State.is_rewound = true
-        _G.State.current_step = item.backstep
         logger.log_super_verbose("\aoAdventure not yet complete.")
+        _G.State:handle_step_change(item.backstep)
     end
 end
 
@@ -1104,9 +1091,8 @@ function actions.wait(item, class_settings, char_settings)
                     logger.log_info("\aoWe have reached our destination. Stopping paused state early.")
                     break
                 end
-                _G.State.is_rewound = true
-                _G.State.current_step = _G.State.current_step - 2
                 logger.log_warn("\aoWe should be moving on the z-axis and we are not. Backing up to step \ar%s\ao.", _G.State.current_step)
+                _G.State:handle_step_change(_G.State.current_step - 2)
                 return
             else
                 distance = math.abs(mq.TLO.Me.Z() - item.whereZ)
@@ -1119,8 +1105,7 @@ function actions.wait(item, class_settings, char_settings)
         end
     end
     if item.gotostep ~= nil then
-        _G.State.is_rewound = true
-        _G.State.current_step = item.gotostep
+        _G.State:handle_step_change(item.gotostep)
     end
 end
 
