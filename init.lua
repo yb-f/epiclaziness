@@ -351,7 +351,7 @@ local function execute_task(task)
     end
 end
 
-local function run_epic(class, choice)
+local function init_epic(class, choice)
     task_table               = {}
     local tablename          = ''
     _G.State.is_task_running = true
@@ -373,7 +373,6 @@ local function run_epic(class, choice)
         return
     end
     local ts_return = check_tradeskills(class, choice)
-    print(type(ts_return))
     if ts_return then
         if loadsave.SaveState.general.stopTS == true then
             logger.log_error("\aoPlease raise your tradeskills to continue, or turn off the \"\agStop if tradeskill requirements are unmet\ao\" setting.")
@@ -388,6 +387,9 @@ local function run_epic(class, choice)
     for a in dbn:nrows(sql) do
         table.insert(task_table, a)
     end
+end
+
+local function run_epic(class, choice)
     manage.startGroup(class_settings.settings, loadsave.SaveState)
     mq.delay("5s")
     manage.pauseGroup(class_settings.settings)
@@ -580,6 +582,7 @@ local function main()
         if _G.State.start_run == true then
             _G.State.start_run = false
             _G.State.current_step = 0
+            init_epic(string.lower(mq.TLO.Me.Class.ShortName()), _G.State.epic_choice)
             run_epic(string.lower(mq.TLO.Me.Class.ShortName()), _G.State.epic_choice)
         end
         mq.delay(200)
