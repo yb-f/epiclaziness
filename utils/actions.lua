@@ -158,7 +158,7 @@ function actions.farm_check_pause(item, class_settings, char_settings)
     _G.State.setStatusText(string.format("Checking for %s.", item.what))
     local check_list = {}
     local not_found = false
-    if item.count ~= nil then
+    if item.count then
         logger.log_verbose("\aoChecking if we have \ag%s \aoof \ag%s\ao. Pausing if not present.", item.count, item.what)
         if mq.TLO.FindItemCount("=" .. item.what)() < item.count then
             not_found = true
@@ -168,7 +168,7 @@ function actions.farm_check_pause(item, class_settings, char_settings)
         for word in string.gmatch(item.what, '([^|]+)') do
             table.insert(check_list, word)
             for _, check in pairs(check_list) do
-                if mq.TLO.FindItem("=" .. check)() == nil then
+                if not mq.TLO.FindItem("=" .. check)() then
                     not_found = true
                 end
             end
