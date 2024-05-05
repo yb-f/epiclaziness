@@ -4,6 +4,7 @@ local inv          = require('utils/inventory')
 local travel       = require('utils/travel')
 local logger       = require('utils/logger')
 
+local MAX_DISTANCE = 100
 local mob          = {}
 local searchFilter = ''
 
@@ -15,10 +16,10 @@ function mob.backstab(item, class_settings, char_settings)
     logger.log_info("\aoBackstabbing \ag%s\ao.", item.npc)
     local ID = mob.findNearestName(item.npc, item, class_settings, char_settings)
     if mq.TLO.Spawn(item.npc).Distance() ~= nil then
-        if mq.TLO.Spawn(item.npc).Distance() > 100 then
+        if mq.TLO.Spawn(item.npc).Distance() > MAX_DISTANCE then
             _G.State.rewound = true
             _G.State.step = _G.State.step - 1
-            logger.log_warn("\ar%s \aois over 100 units away. Moving back to step \ar%s\ao.", item.npc, _G.State.step)
+            logger.log_warn("\ar%s \aois over %s units away. Moving back to step \ar%s\ao.", item.npc, MAX_DISTANCE, _G.State.step)
             return
         end
     end
@@ -289,10 +290,10 @@ function mob.npc_damage_until(item)
     logger.log_info("\aoDamaging \ag%s \ao to below \ag%s%% health\ao.", item.npc, item.damage_pct)
     ID = mq.TLO.Spawn('npc ' .. item.npc).ID()
     if mq.TLO.Spawn(ID).Distance() ~= nil then
-        if mq.TLO.Spawn(ID).Distance() > 100 then
+        if mq.TLO.Spawn(ID).Distance() > MAX_DISTANCE then
             _G.State.rewound = false
             _G.State.step = _G.State.step - 1
-            logger.log_warn("\ar%s \aois over 100 units away. Moving back to step \ar%s\ao.", item.npc, _G.State.step)
+            logger.log_warn("\ar%s \aois over %s units away. Moving back to step \ar%s\ao.", item.npc, MAX_DISTANCE, _G.State.step)
             return
         end
     end
@@ -345,10 +346,10 @@ function mob.npc_kill(item, class_settings, char_settings)
     mq.delay(200)
     local ID = mob.findNearestName(item.npc, item, class_settings, char_settings)
     if mq.TLO.Spawn(ID).Distance() ~= nil then
-        if mq.TLO.Spawn(ID).Distance() > 100 then
+        if mq.TLO.Spawn(ID).Distance() > MAX_DISTANCE then
             _G.State.rewound = true
             _G.State.step = _G.State.step - 1
-            logger.log_warn("\ar%s \aois over 100 units away. Moving back to step \ar%s\ao.", item.npc, _G.State.step)
+            logger.log_warn("\ar%s \aois over %s units away. Moving back to step \ar%s\ao.", item.npc, MAX_DISTANCE, _G.State.step)
             return
         end
     end
@@ -455,9 +456,9 @@ function mob.npc_kill_all(item, class_settings, char_settings)
         local ID = mob.findNearestName(item.npc, item, class_settings, char_settings)
         travel.general_travel(item, class_settings, char_settings, ID)
         if mq.TLO.Spawn(ID).Distance() ~= nil then
-            if mq.TLO.Spawn(ID).Distance() > 100 then
+            if mq.TLO.Spawn(ID).Distance() > MAX_DISTANCE then
                 _G.State.step = _G.State.step
-                logger.log_warn("\ar%s \aois over 100 units away. Moving closer.", item.npc)
+                logger.log_warn("\ar%s \aois over %s units away. Moving closer.", item.npc, MAX_DISTANCE)
                 return
             end
         end
@@ -484,10 +485,10 @@ function mob.npc_kill_all(item, class_settings, char_settings)
             end
             mq.delay(200)
             if mq.TLO.Spawn(ID).Distance() ~= nil then
-                if mq.TLO.Spawn(ID).Distance() > 100 then
+                if mq.TLO.Spawn(ID).Distance() > MAX_DISTANCE then
                     _G.State.rewound = true
                     _G.State.step = _G.State.step
-                    logger.log_warn("\ar%s \aois over 100 units away. Moving closer.", item.npc)
+                    logger.log_warn("\ar%s \aois over %s units away. Moving closer.", item.npc, MAX_DISTANCE)
                     return
                 end
             end

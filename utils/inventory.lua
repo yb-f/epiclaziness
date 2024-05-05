@@ -2,6 +2,7 @@ local mq              = require('mq')
 local manage          = require('utils/manageautomation')
 local logger          = require('utils/logger')
 
+local MAX_DISTANCE    = 100
 local inventory       = {}
 
 --- @type number
@@ -544,10 +545,10 @@ function inventory.npc_buy(item, class_settings, char_settings)
     logger.log_info("\aoBuying \ag%s \ao from \ag%s\ao.", item.what, item.npc)
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
         if mq.TLO.Spawn(item.npc).Distance() ~= nil then
-            if mq.TLO.Spawn(item.npc).Distance() > 100 then
+            if mq.TLO.Spawn(item.npc).Distance() > MAX_DISTANCE then
                 _G.State.rewound = true
                 _G.State.step = _G.State.step - 1
-                logger.log_warn("\ar%s \aois over 100 units away. Moving back to step \ar%s\ao.", item.npc, _G.State.step)
+                logger.log_warn("\ar%s \aois over %s units away. Moving back to step \ar%s\ao.", item.npc, MAX_DISTANCE, _G.State.step)
                 return
             end
         end
