@@ -111,6 +111,16 @@ _G.State = {
     badMeshes           = {},
 }
 
+function _G.State:readLocation()
+    return self.Location.X, self.Location.Y, self.Location.Z
+end
+
+function _G.State:setLocation(x, y, z)
+    self.Location.X = x
+    self.Location.Y = y
+    self.Location.Z = z
+end
+
 function _G.State:handle_step_change(step)
     self.is_rewound = true
     self.should_skip = true

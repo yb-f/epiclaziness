@@ -196,9 +196,8 @@ function travel.open_door(item)
 end
 
 function travel.travelLoop(item, class_settings, char_settings, ID)
-    _G.State.Location.X = mq.TLO.Me.X()
-    _G.State.Location.Y = mq.TLO.Me.Y()
-    _G.State.Location.Z = mq.TLO.Me.Z()
+    local me = mq.TLO.Me
+    _G.State:setLocation(me.X(), me.Y(), me.Z())
     ID = ID or 0
     local loopCount = 0
     local distance = 0
@@ -265,9 +264,9 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
             loopCount = 0
             _G.State:setStatusText(temp)
         end
-        if dist.GetDistance3D(mq.TLO.Me.X(), mq.TLO.Me.Y(), mq.TLO.Me.Z(), _G.State.Location.X, _G.State.Location.Y, _G.State.Location.Z) < 20 then
+        if dist.GetDistance3D(me.X(), me.Y(), me.Z(), _G.State:readLocation()) < 20 then
             loopCount = loopCount + 1
-        elseif dist.GetDistance3D(mq.TLO.Me.X(), mq.TLO.Me.Y(), mq.TLO.Me.Z(), _G.State.Location.X, _G.State.Location.Y, _G.State.Location.Z) > 75 then
+        elseif dist.GetDistance3D(me.X(), me.Y(), me.Z(), _G.State:readLocation()) > 75 then
             logger.log_info("\aoWe seem to have crossed a teleporter, moving to next step.")
             _G.State.destType = ''
             _G.State.dest = ''
@@ -275,14 +274,10 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
             _G.State.autosize_on = false
             mq.cmd('/squelch /autosize off')
             travel.navPause()
-            _G.State.Location.X = mq.TLO.Me.X()
-            _G.State.Location.Y = mq.TLO.Me.Y()
-            _G.State.Location.Z = mq.TLO.Me.Z()
+            _G.State:setLocation(me.X(), me.Y(), me.Z())
             return
         else
-            _G.State.Location.X = mq.TLO.Me.X()
-            _G.State.Location.Y = mq.TLO.Me.Y()
-            _G.State.Location.Z = mq.TLO.Me.Z()
+            _G.State:setLocation(me.X(), me.Y(), me.Z())
             loopCount = 0
             if _G.State.autosize_on == true then
                 _G.State.autosize_on = false
@@ -292,9 +287,9 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
     end
     if ID ~= 0 then
         local spawn = mq.TLO.Spawn(ID)
-        distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), spawn.X(), spawn.Y())
+        distance = dist.GetDistance(me.X(), me.Y(), spawn.X(), spawn.Y())
     elseif item.whereX ~= 0 then
-        distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), item.whereX, item.whereY)
+        distance = dist.GetDistance(me.X(), me.Y(), item.whereX, item.whereY)
     end
     if distance > 30 and item.radius == nil then
         logger.log_warn("\aoStopped before reaching our destination. Attempting to restart navigation.")
@@ -1042,9 +1037,7 @@ function travel.zone_travel(item, class_settings, char_settings, continue)
         mq.cmdf('/dex %s /squelch /travelto %s', _G.State.group_combo[_G.State.group_choice], item.zone)
     end
     local loopCount = 0
-    _G.State.Location.X = mq.TLO.Me.X()
-    _G.State.Location.Y = mq.TLO.Me.Y()
-    _G.State.Location.Z = mq.TLO.Me.Z()
+    _G.State:setLocation(mq.TLO.Me.X(), mq.TLO.Me.Y(), mq.TLO.Me.Z())
     --[[_G.State.is_traveling = true
     _G.State.destType = 'ZONE'
     if mq.TLO.Navigation.CurrentPathDistance() ~= nil then
@@ -1136,12 +1129,10 @@ function travel.zone_travel(item, class_settings, char_settings, continue)
                 loopCount = 0
                 _G.State:setStatusText(temp)
             end
-            if dist.GetDistance3D(mq.TLO.Me.X(), mq.TLO.Me.Y(), mq.TLO.Me.Z(), _G.State.Location.X, _G.State.Location.Y, _G.State.Location.Z) < 20 then
+            if dist.GetDistance3D(mq.TLO.Me.X(), mq.TLO.Me.Y(), mq.TLO.Me.Z(), _G.State:readLocation()) < 20 then
                 loopCount = loopCount + 1
             else
-                _G.State.Location.X = mq.TLO.Me.X()
-                _G.State.Location.Y = mq.TLO.Me.Y()
-                _G.State.Location.Z = mq.TLO.Me.Z()
+                _G.State:setLocation(mq.TLO.Me.X(), mq.TLO.Me.Y(), mq.TLO.Me.Z())
                 loopCount = 0
                 if _G.State.autosize_on == true then
                     _G.State.autosize_on = false
