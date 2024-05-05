@@ -205,9 +205,9 @@ end
 function manage.groupTalk(npc, phrase)
     if mq.TLO.Spawn(npc).Distance() ~= nil then
         if mq.TLO.Spawn(npc).Distance() > MAX_DISTANCE then
-            _G.State.rewound = true
-            _G.State.step = _G.State.step - 1
-            logger.log_warn("\ar%s \aois over %s units away. Moving back to step \ar%s\ao.", npc, MAX_DISTANCE, _G.State.step)
+            _G.State.is_rewound = true
+            _G.State.current_step = _G.State.current_step - 1
+            logger.log_warn("\ar%s \aois over %s units away. Moving back to step \ar%s\ao.", npc, MAX_DISTANCE, _G.State.current_step)
             return
         end
     end
@@ -317,9 +317,9 @@ function manage.picklockGroup(item)
             mq.delay(200)
             mq.cmd("/squelch /autoinv")
         else
-            logger.log_error("\aoI am not a class that is able to pick locks. Stopping script at step \ar%s \ao.", _G.State.step)
-            _G.State:setStatusText(string.format("I require a lockpicker to proceed. (%s).", _G.State.step))
-            _G.State.task_run = false
+            logger.log_error("\aoI am not a class that is able to pick locks. Stopping script at step \ar%s \ao.", _G.State.current_step)
+            _G.State:setStatusText(string.format("I require a lockpicker to proceed. (%s).", _G.State.current_step))
+            _G.State.is_task_running = false
             mq.cmd('/foreground')
             return
         end
@@ -352,9 +352,9 @@ function manage.picklockGroup(item)
             end
         end
         if pickerFound == false then
-            _G.State:setStatusText(string.format("I require a lockpicker to proceed. (%s).", _G.State.step))
-            logger.log_error("\aoNo one in my group is a class that is able to pick locks. Stopping script at step \ar%s \ao.", _G.State.step)
-            _G.State.task_run = false
+            _G.State:setStatusText(string.format("I require a lockpicker to proceed. (%s).", _G.State.current_step))
+            logger.log_error("\aoNo one in my group is a class that is able to pick locks. Stopping script at step \ar%s \ao.", _G.State.current_step)
+            _G.State.is_task_running = false
             mq.cmd('/foreground')
             return
         end
@@ -379,10 +379,10 @@ function manage.picklockGroup(item)
             mq.delay(200)
             mq.cmd("/squelch /autoinv")
         else
-            _G.State:setStatusText(string.format("I require a lockpicker to proceed. (%s).", _G.State.step))
+            _G.State:setStatusText(string.format("I require a lockpicker to proceed. (%s).", _G.State.current_step))
             logger.log_error("\aoI am not a class that is able to pick locks, nor is \ag%s\ao. Stopping script at step \ar%s \ao.", mq.TLO.Group.Member(name).DisplayName(),
-                _G.State.step)
-            _G.State.task_run = false
+                _G.State.current_step)
+            _G.State.is_task_running = false
             mq.cmd('/foreground')
             return
         end
@@ -390,7 +390,7 @@ function manage.picklockGroup(item)
 end
 
 function manage.removeInvis(item)
-    local temp = _G.State.status
+    local temp = _G.State:readStatusText()
     _G.State:setStatusText("Removing invis.")
     if mq.TLO.Me.Invis() then
         logger.log_info("\aoRemoving invisibility.")

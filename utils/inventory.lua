@@ -141,7 +141,7 @@ function inventory.combine_item(item, class_settings, char_settings, slot)
     if mq.TLO.FindItem("=" .. item.what)() == nil then
         _G.State:setStatusText(string.format("Unable to find item for combine (%s)", item.what))
         logger.log_error("\aoUnable to find \ar%s \aofor combine.", item.what)
-        _G.State.task_run = false
+        _G.State.is_task_running = false
         mq.cmd('/foreground')
         return
     end
@@ -153,7 +153,7 @@ function inventory.combine_item(item, class_settings, char_settings, slot)
         if itemslot == 0 and itemslot2 == 0 then
             _G.State:setStatusText(string.format("Unable to find item for combine (%s).", item.what))
             logger.log_error("\aoUnable to find \ar%s \aofor combine.", item.what)
-            _G.State.task_run = false
+            _G.State.is_task_running = false
             mq.cmd('/foreground')
             return
         end
@@ -223,7 +223,7 @@ function inventory.enviro_combine_container(item)
     logger.log_info("\aoMoving to \ag%s \aoto perform combine.", item.what)
     mq.cmdf("/squelch /itemtarget %s", item.what)
     if mq.TLO.ItemTarget.DisplayName() ~= item.what then
-        _G.State.task_run = false
+        _G.State.is_task_running = false
         _G.State:setStatusText(string.format("Could not find item: %s.", item.what))
         mq.cmd('/foreground')
         logger.log_error("\aoCould not find item \ar%s\ao.", item.what)
@@ -260,7 +260,7 @@ function inventory.enviro_combine_item(item)
     if mq.TLO.FindItem("=" .. item.what)() == nil then
         _G.State:setStatusText(string.format("Unable to find item for combine (%s).", item.what))
         logger.log_error("\aoUnable to find \ar%s \aofor combine.", item.what)
-        _G.State.task_run = false
+        _G.State.is_task_running = false
         mq.cmd('/foreground')
         return
     end
@@ -466,8 +466,8 @@ function inventory.loot(item)
         logger.log_info("\aoSuccessfully looted \ag%s\ao.", item.what)
         --[[ if item.gotostep ~= nil then
             logger.log_verbose("\aoAdvancing to step \ar%s\ao.", item.gotostep)
-            _G.State.rewound = true
-            _G.State.step = item.gotostep
+            _G.State.is_rewound = true
+            _G.State.current_step = item.gotostep
         end--]]
         return true
     else
@@ -477,14 +477,14 @@ function inventory.loot(item)
                 if mq.TLO.FindItem("=" .. item.what)() ~= nil then
                     logger.log_info("\aoSuccessfully looted \ag%s\ao.", item.what)
                     --[[if item.gotostep ~= nil then
-                        _G.State.step = item.gotostep - 1
+                        _G.State.current_step = item.gotostep - 1
                     end--]]
                     return true
                 end
             end
-            --_G.State.task_run = false
-            _G.State:setStatusText(string.format("Tried to loot %s at step %s but failed!", item.what, _G.State.step))
-            logger.log_error("\aoFailed to loot \ar%s \aoat step \ar%s\ao.", item.what, _G.State.step)
+            --_G.State.is_task_running = false
+            _G.State:setStatusText(string.format("Tried to loot %s at step %s but failed!", item.what, _G.State.current_step))
+            logger.log_error("\aoFailed to loot \ar%s \aoat step \ar%s\ao.", item.what, _G.State.current_step)
             mq.cmd('/foreground')
             return false
         end
@@ -495,7 +495,7 @@ function inventory.move_combine_container(slot, container)
     if mq.TLO.FindItem("=" .. container)() == nil then
         _G.State:setStatusText(string.format("Unable to find combine container (%s).", container))
         logger.log_error("\aoUnable to find combine container (\ar%s\ao).", container)
-        _G.State.task_run = false
+        _G.State.is_task_running = false
         mq.cmd('/foreground')
         return
     end
@@ -519,9 +519,9 @@ function inventory.move_combine_container(slot, container)
     mq.delay(250)
     if string.lower(mq.TLO.Me.Inventory(slot + 22).Name()) ~= string.lower(container) then
         logger.log_warn("\ar%s \aodid not move to slot \ar%s\ao. Trying again.", container, slot)
-        _G.State.rewound = true
-        _G.State.skip = true
-        _G.State.step = _G.State.step
+        _G.State.is_rewound = true
+        _G.State.should_skip = true
+        _G.State.current_step = _G.State.current_step
         return
     end
     mq.cmdf("/squelch /nomodkey /ctrl /itemnotify %s rightmouseup", slot + 22)
@@ -546,9 +546,9 @@ function inventory.npc_buy(item, class_settings, char_settings)
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
         if mq.TLO.Spawn(item.npc).Distance() ~= nil then
             if mq.TLO.Spawn(item.npc).Distance() > MAX_DISTANCE then
-                _G.State.rewound = true
-                _G.State.step = _G.State.step - 1
-                logger.log_warn("\ar%s \aois over %s units away. Moving back to step \ar%s\ao.", item.npc, MAX_DISTANCE, _G.State.step)
+                _G.State.is_rewound = true
+                _G.State.current_step = _G.State.current_step - 1
+                logger.log_warn("\ar%s \aois over %s units away. Moving back to step \ar%s\ao.", item.npc, MAX_DISTANCE, _G.State.current_step)
                 return
             end
         end

@@ -59,14 +59,15 @@ local function log(logLevel, output, ...)
     end
 
     if actions.LogConsole ~= nil then
-        local consoleText = string.format('[%s] [%s%s-%s%s] %s', logLevels[logLevel].header, mq.TLO.Me.Class.ShortName(), _G.State.epic_list[_G.State.epic_choice], _G.State.step,
+        local consoleText = string.format('[%s] [%s%s-%s%s] %s', logLevels[logLevel].header, mq.TLO.Me.Class.ShortName(), _G.State.epic_list[_G.State.epic_choice],
+            _G.State.current_step,
             badMesh,
             output)
         actions.LogConsole:AppendText(consoleText)
     end
 
     printf('%s\aw:%s \aw<\at%s\aw> \aw(\ag%s%s-%s\ar%s\aw) \aw(%s\aw)%s \ax%s', elHeaderStart, logLevels[logLevel].header, now, mq.TLO.Me.Class.ShortName(),
-        _G.State.epic_list[_G.State.epic_choice], _G.State.step, badMesh, callerTracer, elHeaderEnd,
+        _G.State.epic_list[_G.State.epic_choice], _G.State.current_step, badMesh, callerTracer, elHeaderEnd,
         output)
 end
 

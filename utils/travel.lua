@@ -140,8 +140,8 @@ function travel.no_nav_travel(item, class_settings, char_settings)
             mq.delay(10)
             distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
             logger.log_super_verbose("\aoDistance: \ag%s\ao.", distance)
-            if _G.State.skip == true then
-                _G.State.skip = false
+            if _G.State.should_skip == true then
+                _G.State.should_skip = false
                 return
             end
         end
@@ -155,8 +155,8 @@ function travel.no_nav_travel(item, class_settings, char_settings)
             mq.delay(10)
             distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
             logger.log_super_verbose("\aoDistance: \ag%s\ao.", distance)
-            if _G.State.skip == true then
-                _G.State.skip = false
+            if _G.State.should_skip == true then
+                _G.State.should_skip = false
                 return
             end
         end
@@ -171,8 +171,8 @@ function travel.no_nav_travel(item, class_settings, char_settings)
             mq.delay(10)
             distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
             logger.log_super_verbose("\aoDistance: \ag%s\ao.", distance)
-            if _G.State.skip == true then
-                _G.State.skip = false
+            if _G.State.should_skip == true then
+                _G.State.should_skip = false
                 return
             end
         end
@@ -198,9 +198,9 @@ function travel.open_door(item)
 end
 
 function travel.travelLoop(item, class_settings, char_settings, ID)
-    _G.State.X = mq.TLO.Me.X()
-    _G.State.Y = mq.TLO.Me.Y()
-    _G.State.Z = mq.TLO.Me.Z()
+    _G.State.Location.X = mq.TLO.Me.X()
+    _G.State.Location.Y = mq.TLO.Me.Y()
+    _G.State.Location.Z = mq.TLO.Me.Z()
     ID = ID or 0
     local loopCount = 0
     local distance = 0
@@ -213,9 +213,9 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
         if mq.TLO.Navigation.Paused() == true then
             travel.navUnpause(item)
         end
-        if _G.State.skip == true then
+        if _G.State.should_skip == true then
             travel.navPause()
-            _G.State.skip = false
+            _G.State.should_skip = false
             return
         end
         if item.zone == nil then
@@ -225,9 +225,9 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
                 travel.navUnpause(item)
             end
         end
-        if _G.State.pause == true then
+        if _G.State.is_paused == true then
             travel.navPause()
-            _G.Actions.pause(_G.State.status)
+            _G.Actions.pause(_G.State:readStatusText())
             travel.navUnpause(item)
         end
         if char_settings.general.speedForTravel == true then
@@ -247,7 +247,7 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
             if item.radius == 1 then
                 return
             end
-            local temp = _G.State.status
+            local temp = _G.State:readStatusText()
             local door = travel.open_door()
             if door == false and _G.State.autosize == true then
                 if _G.State.autosize_self == false then
@@ -267,24 +267,24 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
             loopCount = 0
             _G.State:setStatusText(temp)
         end
-        if dist.GetDistance3D(mq.TLO.Me.X(), mq.TLO.Me.Y(), mq.TLO.Me.Z(), _G.State.X, _G.State.Y, _G.State.Z) < 20 then
+        if dist.GetDistance3D(mq.TLO.Me.X(), mq.TLO.Me.Y(), mq.TLO.Me.Z(), _G.State.Location.X, _G.State.Location.Y, _G.State.Location.Z) < 20 then
             loopCount = loopCount + 1
-        elseif dist.GetDistance3D(mq.TLO.Me.X(), mq.TLO.Me.Y(), mq.TLO.Me.Z(), _G.State.X, _G.State.Y, _G.State.Z) > 75 then
+        elseif dist.GetDistance3D(mq.TLO.Me.X(), mq.TLO.Me.Y(), mq.TLO.Me.Z(), _G.State.Location.X, _G.State.Location.Y, _G.State.Location.Z) > 75 then
             logger.log_info("\aoWe seem to have crossed a teleporter, moving to next step.")
             _G.State.destType = ''
             _G.State.dest = ''
-            _G.State.traveling = false
+            _G.State.is_traveling = false
             _G.State.autosize_on = false
             mq.cmd('/squelch /autosize off')
             travel.navPause()
-            _G.State.X = mq.TLO.Me.X()
-            _G.State.Y = mq.TLO.Me.Y()
-            _G.State.Z = mq.TLO.Me.Z()
+            _G.State.Location.X = mq.TLO.Me.X()
+            _G.State.Location.Y = mq.TLO.Me.Y()
+            _G.State.Location.Z = mq.TLO.Me.Z()
             return
         else
-            _G.State.X = mq.TLO.Me.X()
-            _G.State.Y = mq.TLO.Me.Y()
-            _G.State.Z = mq.TLO.Me.Z()
+            _G.State.Location.X = mq.TLO.Me.X()
+            _G.State.Location.Y = mq.TLO.Me.Y()
+            _G.State.Location.Z = mq.TLO.Me.Z()
             loopCount = 0
             if _G.State.autosize_on == true then
                 _G.State.autosize_on = false
@@ -300,14 +300,14 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
     end
     if distance > 30 and item.radius == nil then
         logger.log_warn("\aoStopped before reaching our destination. Attempting to restart navigation.")
-        _G.State.step = _G.State.step
-        _G.State.rewound = true
-        _G.State.skip = true
+        _G.State.current_step = _G.State.current_step
+        _G.State.is_rewound = true
+        _G.State.should_skip = true
     end
     logger.log_verbose("\aoWe have reached our destination.")
     _G.State.destType = ''
     _G.State.dest = ''
-    _G.State.traveling = false
+    _G.State.is_traveling = false
     _G.State.autosize_on = false
     mq.cmd('/squelch /autosize off')
 end
@@ -329,14 +329,14 @@ function travel.general_travel(item, class_settings, char_settings, ID)
     logger.log_info("\aoLooking for \ag%s\ao.", item.npc)
     while ID == 0 or ID == nil do
         mq.delay(500)
-        if _G.State.skip == true then
+        if _G.State.should_skip == true then
             travel.navPause()
-            _G.State.skip = false
+            _G.State.should_skip = false
             return
         end
-        if _G.State.pause == true then
+        if _G.State.is_paused == true then
             travel.navPause()
-            _G.Actions.pause(_G.State.status)
+            _G.Actions.pause(_G.State:readStatusText())
             travel.navUnpause(item)
         end
         ID = _G.Mob.findNearestName(item.npc, item, class_settings, char_settings)
@@ -362,7 +362,7 @@ function travel.general_travel(item, class_settings, char_settings, ID)
 end
 
 function travel.invis(class_settings)
-    local temp = _G.State.status
+    local temp = _G.State:readStatusText()
     _G.State:setStatusText("Using invis.")
     logger.log_info("\aoUsing invisibility.")
     local invis_type = {}
@@ -688,11 +688,11 @@ function travel.loc_travel(item, class_settings, char_settings)
     if mq.TLO.Navigation.PathExists('loc ' .. y .. ' ' .. x .. ' ' .. z) == false then
         _G.State:setStatusText(string.format("No path exists to location: %s %s %s.", y, x, z))
         logger.log_error("\aoNo path found to location \ag%s, %s, %s\ao.", y, x, z)
-        _G.State.task_run = false
+        _G.State.is_task_running = false
         mq.cmd('/foreground')
         return
     end
-    _G.State.traveling = true
+    _G.State.is_traveling = true
     if _G.State.group_choice == 1 then
         mq.cmdf("/squelch /nav loc %s %s %s", y, x, z)
     elseif _G.State.group_choice == 2 then
@@ -794,9 +794,9 @@ function travel.npc_follow(item, class_settings, char_settings, event)
     logger.log_info("\aoFollowing \ag%s\ao.", item.npc)
     if mq.TLO.Spawn("npc " .. item.npc).Distance() ~= nil then
         if mq.TLO.Spawn("npc " .. item.npc).Distance() > 100 then
-            _G.State.rewound = true
-            _G.State.step = _G.State.step - 1
-            logger.log_warn("\ar%s \aois over 100 units away. Moving back to step \ar%s\ao.", item.npc, _G.State.step)
+            _G.State.is_rewound = true
+            _G.State.current_step = _G.State.current_step - 1
+            logger.log_warn("\ar%s \aois over 100 units away. Moving back to step \ar%s\ao.", item.npc, _G.State.current_step)
             return
         end
     end
@@ -819,14 +819,14 @@ function travel.npc_follow(item, class_settings, char_settings, event)
     if item.whereX ~= nil then
         local distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), item.whereX, item.whereY)
         while distance > 50 do
-            if _G.State.skip == true then
+            if _G.State.should_skip == true then
                 if _G.State.group_choice == 1 then
                     mq.cmd('/squelch /afollow off')
-                    _G.State.skip = false
+                    _G.State.should_skip = false
                     return
                 elseif _G.State.group_choice == 2 then
                     mq.cmd('/dgga /squelch /afollow off')
-                    _G.State.skip = false
+                    _G.State.should_skip = false
                     return
                 else
                     mq.cmd('/squelch /afollow off')
@@ -966,14 +966,14 @@ function travel.relocate(item, class_settings, char_settings)
     while mq.TLO.Me.Casting() == nil do
         loopCount = loopCount + 1
         mq.delay(10)
-        if _G.State.skip == true then
+        if _G.State.should_skip == true then
             travel.navPause()
-            _G.State.skip = false
+            _G.State.should_skip = false
             return
         end
-        if _G.State.pause == true then
+        if _G.State.is_paused == true then
             travel.navPause()
-            _G.Actions.pause(_G.State.status)
+            _G.Actions.pause(_G.State:readStatusText())
             travel.navUnpause(item)
         end
         if loopCount >= 200 then
@@ -985,14 +985,14 @@ function travel.relocate(item, class_settings, char_settings)
     while mq.TLO.Me.Casting() ~= nil do
         loopCount = loopCount + 1
         mq.delay(500)
-        if _G.State.skip == true then
+        if _G.State.should_skip == true then
             travel.navPause()
-            _G.State.skip = false
+            _G.State.should_skip = false
             return
         end
-        if _G.State.pause == true then
+        if _G.State.is_paused == true then
             travel.navPause()
-            _G.Actions.pause(_G.State.status)
+            _G.Actions.pause(_G.State:readStatusText())
             travel.navUnpause(item)
         end
         --[[if loopCount >= 33 then
@@ -1003,8 +1003,8 @@ function travel.relocate(item, class_settings, char_settings)
     mq.delay("2s")
     if currentZone == mq.TLO.Zone.Name() then
         logger.log_warn("\aoWe are still in \ag%s \aoattempting to relocate again.", currentZone)
-        _G.State.rewound = true
-        _G.State.step = _G.State.step
+        _G.State.is_rewound = true
+        _G.State.current_step = _G.State.current_step
         return
     end
 end
@@ -1031,7 +1031,7 @@ function travel.zone_travel(item, class_settings, char_settings, continue)
     end
     _G.State:setStatusText(string.format("Traveling to %s.", item.zone))
     logger.log_info("\aoTraveling to \ag%s\ao.", item.zone)
-    _G.State.traveling = true
+    _G.State.is_traveling = true
     if _G.State.group_choice == 1 then
         mq.cmdf("/squelch /travelto %s", item.zone)
     elseif _G.State.group_choice == 2 then
@@ -1041,10 +1041,10 @@ function travel.zone_travel(item, class_settings, char_settings, continue)
         mq.cmdf('/dex %s /squelch /travelto %s', _G.State.group_combo[_G.State.group_choice], item.zone)
     end
     local loopCount = 0
-    _G.State.X = mq.TLO.Me.X()
-    _G.State.Y = mq.TLO.Me.Y()
-    _G.State.Z = mq.TLO.Me.Z()
-    --[[_G.State.traveling = true
+    _G.State.Location.X = mq.TLO.Me.X()
+    _G.State.Location.Y = mq.TLO.Me.Y()
+    _G.State.Location.Z = mq.TLO.Me.Z()
+    --[[_G.State.is_traveling = true
     _G.State.destType = 'ZONE'
     if mq.TLO.Navigation.CurrentPathDistance() ~= nil then
         _G.State.startDist = mq.TLO.Navigation.CurrentPathDistance()
@@ -1057,9 +1057,9 @@ function travel.zone_travel(item, class_settings, char_settings, continue)
         if mq.TLO.Navigation.Paused() == true then
             travel.navUnpause(item)
         end
-        if _G.State.skip == true then
+        if _G.State.should_skip == true then
             travel.navPause()
-            _G.State.skip = false
+            _G.State.should_skip = false
             return
         end
         mq.delay(500)
@@ -1069,9 +1069,9 @@ function travel.zone_travel(item, class_settings, char_settings, continue)
             _G.Mob.clearXtarget(class_settings, char_settings)
             travel.navUnpause(item)
         end
-        if _G.State.pause == true then
+        if _G.State.is_paused == true then
             travel.navPause()
-            _G.Actions.pause(_G.State.status)
+            _G.Actions.pause(_G.State:readStatusText())
             travel.navUnpause(item)
         end
         if char_settings.general.speedForTravel == true then
@@ -1115,7 +1115,7 @@ function travel.zone_travel(item, class_settings, char_settings, continue)
                 if item.radius == 1 then
                     return
                 end
-                local temp = _G.State.status
+                local temp = _G.State:readStatusText()
                 local door = travel.open_door()
                 if door == false and _G.State.autosize == true then
                     if _G.State.autosize_self == false then
@@ -1135,12 +1135,12 @@ function travel.zone_travel(item, class_settings, char_settings, continue)
                 loopCount = 0
                 _G.State:setStatusText(temp)
             end
-            if dist.GetDistance3D(mq.TLO.Me.X(), mq.TLO.Me.Y(), mq.TLO.Me.Z(), _G.State.X, _G.State.Y, _G.State.Z) < 20 then
+            if dist.GetDistance3D(mq.TLO.Me.X(), mq.TLO.Me.Y(), mq.TLO.Me.Z(), _G.State.Location.X, _G.State.Location.Y, _G.State.Location.Z) < 20 then
                 loopCount = loopCount + 1
             else
-                _G.State.X = mq.TLO.Me.X()
-                _G.State.Y = mq.TLO.Me.Y()
-                _G.State.Z = mq.TLO.Me.Z()
+                _G.State.Location.X = mq.TLO.Me.X()
+                _G.State.Location.Y = mq.TLO.Me.Y()
+                _G.State.Location.Z = mq.TLO.Me.Z()
                 loopCount = 0
                 if _G.State.autosize_on == true then
                     _G.State.autosize_on = false
@@ -1153,8 +1153,8 @@ function travel.zone_travel(item, class_settings, char_settings, continue)
         logger.log_info("\aoWaiting for group members to arrive before continuing.")
         while mq.TLO.Group.AnyoneMissing() do
             mq.delay(500)
-            if _G.State.skip == true then
-                _G.State.skip = false
+            if _G.State.should_skip == true then
+                _G.State.should_skip = false
                 return
             end
         end
@@ -1164,8 +1164,8 @@ function travel.zone_travel(item, class_settings, char_settings, continue)
         logger.log_info("\aoWaiting for \ag%s to arrive before continuing.", _G.State.group_combo[_G.State.group_choice])
         while mq.TLO.Group.Member(_G.State.group_combo[_G.State.group_choice]).OtherZone() do
             mq.delay(500)
-            if _G.State.skip == true then
-                _G.State.skip = false
+            if _G.State.should_skip == true then
+                _G.State.should_skip = false
                 return
             end
         end
@@ -1173,7 +1173,7 @@ function travel.zone_travel(item, class_settings, char_settings, continue)
     end
     _G.State.destType = ''
     _G.State.dest = ''
-    _G.State.traveling = false
+    _G.State.is_traveling = false
     _G.State.autosize_on = false
     mq.cmd('/squelch /autosize off')
 end
