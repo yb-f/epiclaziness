@@ -1,47 +1,50 @@
-local mq                 = require('mq')
-local ImGui              = require 'ImGui'
-local logger             = require('utils/logger')
-_G.Actions               = require('utils/actions')
-_G.Mob                   = require('utils/mob')
+local mq                  = require('mq')
+local ImGui               = require 'ImGui'
+local logger              = require('utils/logger')
+_G.Actions                = require('utils/actions')
+_G.Mob                    = require('utils/mob')
 --local dist               = require 'utils/distance'
 --local inv                = require 'utils/inventory'
 --local travel             = require 'utils/travel'
-local draw_gui           = require('utils/drawgui')
-local manage             = require('utils/manageautomation')
-local loadsave           = require('utils/loadsave')
-local class_settings     = require('utils/class_settings')
-local quests_done        = require('utils/questsdone')
-local reqs               = require('utils/questrequirements')
-local tsreqs             = require('utils/tradeskillreqs')
-local v                  = require('lib/semver')
-local PackageMan         = require('mq/PackageMan')
-local sqlite3            = PackageMan.Require('lsqlite3')
-local http               = PackageMan.Require('luasocket', 'socket.http')
-local ssl                = PackageMan.Require('luasec', 'ssl')
+local draw_gui            = require('utils/drawgui')
+local manage              = require('utils/manageautomation')
+local loadsave            = require('utils/loadsave')
+local class_settings      = require('utils/class_settings')
+local quests_done         = require('utils/questsdone')
+local reqs                = require('utils/questrequirements')
+local tsreqs              = require('utils/tradeskillreqs')
+local v                   = require('lib/semver')
+local PackageMan          = require('mq/PackageMan')
+local sqlite3             = PackageMan.Require('lsqlite3')
+local http                = PackageMan.Require('luasocket', 'socket.http')
+local ssl                 = PackageMan.Require('luasec', 'ssl')
 --local ok, _          = pcall(require, 'ssl')
 --if not ok then
 --   PackageMan.Install('luasec')
 --end
 
-local version_url        = 'https://raw.githubusercontent.com/yb-f/EL-Ver/master/latest_ver'
-local version            = v("0.3.2")
-local window_flags       = bit32.bor(ImGuiWindowFlags.None)
-local openGUI, drawGUI   = true, true
-local myName             = mq.TLO.Me.DisplayName()
-local dbn                = sqlite3.open(mq.luaDir .. '\\epiclaziness\\epiclaziness.db')
-local db_outline         = sqlite3.open(mq.luaDir .. '\\epiclaziness\\epiclaziness_outline.db')
-local plugins            = { 'MQ2Nav', 'MQ2EasyFind', 'MQ2Relocate', 'MQ2PortalSetter', }
-local task_table         = {}
-local task_outline_table = {}
-local running            = true
-local exclude_list       = {}
-local exclude_name       = ''
-local overview_steps     = {}
-local LoadTheme          = require('lib.theme_loader')
-local themeFile          = string.format('%s/MyThemeZ.lua', mq.configDir)
-local themeName          = 'Default'
-local themeID            = 5
-local theme              = {}
+local version_url         = 'https://raw.githubusercontent.com/yb-f/EL-Ver/master/latest_ver'
+local version             = v("0.3.2")
+local window_flags        = bit32.bor(ImGuiWindowFlags.None)
+local openGUI, drawGUI    = true, true
+local myName              = mq.TLO.Me.DisplayName()
+local dbn                 = sqlite3.open(mq.luaDir .. '\\epiclaziness\\epiclaziness.db')
+local db_outline          = sqlite3.open(mq.luaDir .. '\\epiclaziness\\epiclaziness_outline.db')
+local plugins             = { 'MQ2Nav', 'MQ2EasyFind', 'MQ2Relocate', 'MQ2PortalSetter', }
+local task_table          = {}
+local task_outline_table  = {}
+local running             = true
+local exclude_list        = {}
+local exclude_name        = ''
+local overview_steps      = {}
+local LoadTheme           = require('lib.theme_loader')
+local themeFile           = string.format('%s/MyThemeZ.lua', mq.configDir)
+local themeName           = 'Default'
+local themeID             = 5
+local theme               = {}
+local FIRST_WINDOW_WIDTH  = 415
+local FIRST_WINDOW_HEIGHT = 475
+
 local function File_Exists(name)
     local f = io.open(name, "r")
     if f ~= nil then
@@ -328,20 +331,16 @@ local function run_epic(class, choice)
     _G.State.pause    = false
     loadsave.loadState()
     logger.log_info("Begining quest for %s epic %s", mq.TLO.Me.Class(), _G.State.epic_list[choice])
-    if _G.State.epic_list[choice] == "1.0" then
-        tablename = class .. "_10"
-        _G.State.epicstring = "1.0"
-    elseif _G.State.epic_list[choice] == "Pre-1.5" then
-        tablename = class .. "_pre15"
-        _G.State.epicstring = "Pre-1.5"
-    elseif _G.State.epic_list[choice] == "1.5" then
-        tablename = class .. "_15"
-        _G.State.epicstring = "1.5"
-    elseif _G.State.epic_list[choice] == "2.0" then
-        tablename = class .. "_20"
-        _G.State.epicstring = "2.0"
-    end
-    if tablename == '' then
+    local epic_list = {
+        ["1.0"]     = class .. "_10",
+        ["Pre-1.5"] = class .. "_pre15",
+        ["1.5"]     = class .. "_15",
+        ["2.0"]     = class .. "_20",
+    }
+    if epic_list[_G.State.epic_list[choice]] then
+        tablename = epic_list[_G.State.epic_list[choice]]
+        _G.State.epicstring = _G.State.epic_list[choice]
+    else
         logger.log_error("\aoThis class and quest has not yet been implemented.")
         _G.State.task_run = false
         return
@@ -459,7 +458,7 @@ local function displayGUI()
         logger.LogConsole.maxBufferLines = 100
         logger.LogConsole.autoScroll = true
     end
-    ImGui.SetNextWindowSize(ImVec2(415, 475), ImGuiCond.FirstUseEver)
+    ImGui.SetNextWindowSize(ImVec2(FIRST_WINDOW_WIDTH, FIRST_WINDOW_HEIGHT), ImGuiCond.FirstUseEver)
     local ColorCount, StyleCount = LoadTheme.StartTheme(theme.Theme[themeID])
     openGUI, drawGUI = ImGui.Begin("Epic Laziness##" .. myName, openGUI, window_flags)
     if drawGUI then
