@@ -192,7 +192,7 @@ function _G.State.save(item)
         _G.State.epicstring = ''
         _G.State.task_run = false
         _G.State.stop_at_save = false
-        _G.State.status = string.format("Stopped at step: %s", _G.State.step)
+        _G.State.setStatusText(string.format("Stopped at step: %s", _G.State.step))
         return
     end
 end
@@ -208,7 +208,7 @@ function _G.State.execute_command(item)
 end
 
 function _G.State.pause(item)
-    _G.State.status = item.status
+    _G.State.setStatusText(item.status)
     _G.State.task_run = false
 end
 
@@ -330,7 +330,7 @@ local function execute_task(task)
         else
             if task_type == '' then type = 'none' end
             logger.log_error("\aoUnknown Type: \ar%s!", type)
-            _G.State.status = "Unknown type: " .. task_type .. " -- Step: " .. _G.State.step
+            _G.State.setStatusText(string.format("Unknown type: %s -- Step: %s", task_type, _G.State.step))
             _G.State.task_run = false
             return
         end
@@ -404,7 +404,7 @@ local function run_epic(class, choice)
         end
         _G.State.cannot_count = 0
         while _G.State.pause == true do
-            _G.State.status = "Paused"
+            _G.State.setStatusText("Paused")
             mq.delay(500)
             if mq.TLO.EverQuest.GameState() ~= 'INGAME' then
                 logger.log_error('\arNot in game, closing.')
@@ -441,7 +441,7 @@ local function run_epic(class, choice)
                     _G.State.epicstring = ''
                     _G.State.task_run = false
                     _G.State.stop_at_save = false
-                    _G.State.status = "Stopped at step " .. _G.State.step
+                    _G.State.setStatusText(string.format("Stopped at step %s", _G.State.step))
                     return
                 end
             end
@@ -454,7 +454,7 @@ local function run_epic(class, choice)
             return
         end
     end
-    _G.State.status = "Completed " .. mq.TLO.Me.Class() .. ": " .. _G.State.epicstring
+    _G.State.setStatusText(string.format("Completed %s: %s", mq.TLO.Me.Class(), _G.State.epicstring))
     _G.State.epicstring = ''
     _G.State.task_run = false
     logger.log_info("\aoCompleted \ay%s \ao- \ar%s!", mq.TLO.Me.Class(), _G.State.epicstring)
