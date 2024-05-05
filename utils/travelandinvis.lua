@@ -1,5 +1,3 @@
-local mq = require('mq')
-
 local travel = {
     ['brd_pre15'] = {
         ['gate']  = 5,

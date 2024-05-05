@@ -1,5 +1,3 @@
-local mq                  = require('mq')
-
 local quests_requirements = {
     ['brd'] = {
         ['10']    = '',

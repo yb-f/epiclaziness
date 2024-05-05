@@ -1,25 +1,26 @@
-local mq             = require('mq')
-local ImGui          = require 'ImGui'
-Logger               = require('utils/logger')
-local dist           = require 'utils/distance'
-Actions              = require 'utils/actions'
-local inv            = require 'utils/inventory'
-Mob                  = require 'utils/mob'
-local draw_gui       = require 'utils/drawgui'
-local travel         = require 'utils/travel'
-local manage         = require 'utils/manageautomation'
-local loadsave       = require 'utils/loadsave'
-local class_settings = require 'utils/class_settings'
-local quests_done    = require 'utils/questsdone'
-local reqs           = require 'utils/questrequirements'
-local tsreqs         = require 'utils/tradeskillreqs'
-local PackageMan     = require('mq/PackageMan')
-local sqlite3        = PackageMan.Require('lsqlite3')
-local http           = PackageMan.Require('luasocket', 'socket.http')
-local ok, _          = pcall(require, 'ssl')
-if not ok then
-    PackageMan.Install('luasec')
-end
+local mq                 = require('mq')
+local ImGui              = require 'ImGui'
+local logger             = require('utils/logger')
+_G.Actions               = require('utils/actions')
+_G.Mob                   = require('utils/mob')
+--local dist               = require 'utils/distance'
+--local inv                = require 'utils/inventory'
+--local travel             = require 'utils/travel'
+local draw_gui           = require('utils/drawgui')
+local manage             = require('utils/manageautomation')
+local loadsave           = require('utils/loadsave')
+local class_settings     = require('utils/class_settings')
+local quests_done        = require('utils/questsdone')
+local reqs               = require('utils/questrequirements')
+local tsreqs             = require('utils/tradeskillreqs')
+local PackageMan         = require('mq/PackageMan')
+local sqlite3            = PackageMan.Require('lsqlite3')
+local http               = PackageMan.Require('luasocket', 'socket.http')
+local ssl                = PackageMan.Require('luasec', 'ssl')
+--local ok, _          = pcall(require, 'ssl')
+--if not ok then
+--   PackageMan.Install('luasec')
+--end
 
 local version_url        = 'https://raw.githubusercontent.com/yb-f/EL-Ver/master/latest_ver'
 local version            = "0.3.2"
@@ -65,78 +66,78 @@ local function loadTheme()
     end
 end
 
-State                     = {}
+_G.State                           = {}
 
-State.pause               = false
-State.bind_travel         = false
-State.task_run            = false
-State.start_run           = false
-State.stop_at_save        = false
-State.step                = 0
-State.status              = ''
-State.status2             = ''
-State.reqs                = ''
-State.bagslot1            = 0
-State.bagslot2            = 0
-State.group_combo         = {}
-State.group_choice        = 1
-State.use_cwtn            = false
-State.use_ka              = false
-State.use_rgl             = false
-State.epic_list           = quests_done[string.lower(mq.TLO.Me.Class.ShortName())]
-State.epic_choice         = 1
-State.farming             = false
-State.nextmob             = false
-State.epicstring          = ''
-State.X, State.Y, State.Z = 0, 0, 0
-State.skip                = false
-State.rewound             = false
-State.bad_IDs             = {}
-State.cannot_count        = 0
-State.traveling           = false
-State.autosize            = false
-State.autosize_sizes      = { 1, 2, 5, 10, 20 }
-State.autosize_choice     = 3
-State.autosize_self       = false
-State.autosize_on         = false
-State.combineSlot         = 0
-State.destType            = ''
-State.dest                = ''
-State.pathDist            = 0
-State.velocity            = 0
-State.estimatedTime       = 0
-State.startDist           = 0
-State.updateTime          = math.floor(mq.gettime() / 1000)
-State.badMeshes           = {}
+_G.State.pause                     = false
+_G.State.bind_travel               = false
+_G.State.task_run                  = false
+_G.State.start_run                 = false
+_G.State.stop_at_save              = false
+_G.State.step                      = 0
+_G.State.status                    = ''
+_G.State.status2                   = ''
+_G.State.reqs                      = ''
+_G.State.bagslot1                  = 0
+_G.State.bagslot2                  = 0
+_G.State.group_combo               = {}
+_G.State.group_choice              = 1
+_G.State.use_cwtn                  = false
+_G.State.use_ka                    = false
+_G.State.use_rgl                   = false
+_G.State.epic_list                 = quests_done[string.lower(mq.TLO.Me.Class.ShortName())]
+_G.State.epic_choice               = 1
+_G.State.farming                   = false
+_G.State.nextmob                   = false
+_G.State.epicstring                = ''
+_G.State.X, _G.State.Y, _G.State.Z = 0, 0, 0
+_G.State.skip                      = false
+_G.State.rewound                   = false
+_G.State.bad_IDs                   = {}
+_G.State.cannot_count              = 0
+_G.State.traveling                 = false
+_G.State.autosize                  = false
+_G.State.autosize_sizes            = { 1, 2, 5, 10, 20 }
+_G.State.autosize_choice           = 3
+_G.State.autosize_self             = false
+_G.State.autosize_on               = false
+_G.State.combineSlot               = 0
+_G.State.destType                  = ''
+_G.State.dest                      = ''
+_G.State.pathDist                  = 0
+_G.State.velocity                  = 0
+_G.State.estimatedTime             = 0
+_G.State.startDist                 = 0
+_G.State.updateTime                = math.floor(mq.gettime() / 1000)
+_G.State.badMeshes                 = {}
 
-function State.step_overview()
+function _G.State.step_overview()
     task_outline_table = {}
     local class = string.lower(mq.TLO.Me.Class.ShortName())
-    local choice = State.epic_choice
+    local choice = _G.State.epic_choice
     local tablename = ''
     local quest = ''
-    Logger.log_super_verbose("\aoLoading step outline for %s - %s.", mq.TLO.Me.Class(), State.epic_list[choice])
-    if State.epic_list[choice] == "1.0" then
+    logger.log_super_verbose("\aoLoading step outline for %s - %s.", mq.TLO.Me.Class(), _G.State.epic_list[choice])
+    if _G.State.epic_list[choice] == "1.0" then
         tablename = class .. "_10"
         quest = '10'
-        State.epicstring = "1.0"
-    elseif State.epic_list[choice] == "Pre-1.5" then
+        _G.State.epicstring = "1.0"
+    elseif _G.State.epic_list[choice] == "Pre-1.5" then
         tablename = class .. "_pre15"
         quest = 'pre15'
-        State.epicstring = "Pre-1.5"
-    elseif State.epic_list[choice] == "1.5" then
+        _G.State.epicstring = "Pre-1.5"
+    elseif _G.State.epic_list[choice] == "1.5" then
         tablename = class .. "_15"
         quest = '15'
-        State.epicstring = "1.5"
-    elseif State.epic_list[choice] == "2.0" then
+        _G.State.epicstring = "1.5"
+    elseif _G.State.epic_list[choice] == "2.0" then
         tablename = class .. "_20"
         quest = '20'
-        State.epicstring = "2.0"
+        _G.State.epicstring = "2.0"
     end
-    State.reqs = reqs[class][quest]
+    _G.State.reqs = reqs[class][quest]
     if tablename == '' then
-        Logger.log_error("\aoThis class and quest has not yet been implemented.")
-        State.task_run = false
+        logger.log_error("\aoThis class and quest has not yet been implemented.")
+        _G.State.task_run = false
         return
     end
     local sql = "SELECT * FROM " .. tablename
@@ -146,7 +147,7 @@ function State.step_overview()
     for _, task in pairs(task_outline_table) do
         overview_steps[task.Step] = 0
     end
-    Logger.log_super_verbose("\aoSuccessfuly loaded outline.")
+    logger.log_super_verbose("\aoSuccessfuly loaded outline.")
 end
 
 local function matchFilters(spawn)
@@ -159,40 +160,40 @@ end
 local function create_spawn_list()
     exclude_list = mq.getFilteredSpawns(matchFilters)
     for _, spawn in pairs(exclude_list) do
-        Logger.log_verbose("\aoInserting \ar%s (%s) \aointo list of bad IDs.", spawn.DisplayName(), spawn.ID())
-        table.insert(State.bad_IDs, spawn.ID())
+        logger.log_verbose("\aoInserting \ar%s (%s) \aointo list of bad IDs.", spawn.DisplayName(), spawn.ID())
+        table.insert(_G.State.bad_IDs, spawn.ID())
     end
 end
 
-function State.save(item)
-    Logger.log_info("\aoSaving step: \ar%s", State.step)
-    loadsave.prepSave(State.step)
-    if State.stop_at_save then
-        Logger.log_warn("\aoStopping at step \ar%s.", State.Step)
-        State.epicstring = ''
-        State.task_run = false
-        State.stop_at_save = false
-        State.status = "Stopped at step " .. State.step
+function _G.State.save(item)
+    logger.log_info("\aoSaving step: \ar%s", _G.State.step)
+    loadsave.prepSave(_G.State.step)
+    if _G.State.stop_at_save then
+        logger.log_warn("\aoStopping at step \ar%s.", _G.State.Step)
+        _G.State.epicstring = ''
+        _G.State.task_run = false
+        _G.State.stop_at_save = false
+        _G.State.status = "Stopped at step " .. _G.State.step
         return
     end
 end
 
-function State.exclude_npc(item)
+function _G.State.exclude_npc(item)
     exclude_name = item.npc
     create_spawn_list()
 end
 
-function State.execute_command(item)
+function _G.State.execute_command(item)
     mq.cmdf("%s", item.what)
 end
 
-function State.pause(item)
-    State.status = item.status
-    State.task_run = false
+function _G.State.pause(item)
+    _G.State.status = item.status
+    _G.State.task_run = false
 end
 
-local hashCheck = require 'utils/hashcheck'
-Task_Functions  = require 'utils/task_functions'
+local hashCheck   = require('utils/hashcheck')
+_G.Task_Functions = require('utils/task_functions')
 
 class_settings.loadSettings()
 loadsave.loadState()
@@ -215,8 +216,8 @@ if class_settings.settings['logger'] == nil then
     class_settings.saveSettings()
 end
 
-Logger.set_log_level(class_settings.settings.logger.LogLevel)
-Logger.set_log_to_file(class_settings.settings.logger.LogToFile)
+logger.set_log_level(class_settings.settings.logger.LogLevel)
+logger.set_log_to_file(class_settings.settings.logger.LogToFile)
 
 if loadsave.SaveState['general'] == nil then
     loadsave.SaveState['general'] = {
@@ -233,31 +234,31 @@ if loadsave.SaveState.general['speedForTravel'] == nil then
     loadsave.saveState()
 end
 
-function State.populate_group_combo()
-    State.group_combo = {}
-    table.insert(State.group_combo, "None")
+function _G.State.populate_group_combo()
+    _G.State.group_combo = {}
+    table.insert(_G.State.group_combo, "None")
     if mq.TLO.Me.Grouped() == true then
-        table.insert(State.group_combo, "Group")
+        table.insert(_G.State.group_combo, "Group")
         for i = 0, mq.TLO.Group() do
             if mq.TLO.Group.Member(i).DisplayName() ~= mq.TLO.Me.DisplayName() then
-                table.insert(State.group_combo, mq.TLO.Group.Member(i).DisplayName())
+                table.insert(_G.State.group_combo, mq.TLO.Group.Member(i).DisplayName())
             end
         end
     end
-    Logger.log_super_verbose("\aoPopulating group combo box with characters in your current zone.")
+    logger.log_super_verbose("\aoPopulating group combo box with characters in your current zone.")
 end
 
 local function check_tradeskills(class, choice)
     if tsreqs[class] ~= nil then
         local return_string = ''
         local quest = ''
-        if State.epic_list[choice] == "1.0" then
+        if _G.State.epic_list[choice] == "1.0" then
             quest = '10'
-        elseif State.epic_list[choice] == "Pre-1.5" then
+        elseif _G.State.epic_list[choice] == "Pre-1.5" then
             quest = 'pre15'
-        elseif State.epic_list[choice] == "1.5" then
+        elseif _G.State.epic_list[choice] == "1.5" then
             quest = '15'
-        elseif State.epic_list[choice] == "2.0" then
+        elseif _G.State.epic_list[choice] == "2.0" then
             quest = '20'
         end
         if tsreqs[class][quest] ~= nil then
@@ -294,15 +295,15 @@ end
 
 local function update_general_status()
     for i = 1, #task_outline_table do
-        if task_outline_table[i].Step == State.step then
-            State.status2 = task_outline_table[i].Description
+        if task_outline_table[i].Step == _G.State.step then
+            _G.State.status2 = task_outline_table[i].Description
         end
     end
 end
 
 local function execute_task(task)
     local task_type = task.type
-    local task_info = Task_Functions[task_type]
+    local task_info = _G.Task_Functions[task_type]
     if task_info then
         local func = task_info.func
         local params = task_info.params
@@ -310,48 +311,48 @@ local function execute_task(task)
             func(task, unpack(params))
         else
             if task_type == '' then type = 'none' end
-            Logger.log_error("\aoUnknown Type: \ar%s!", type)
-            State.status = "Unknown type: " .. task_type .. " -- Step: " .. State.step
-            State.task_run = false
+            logger.log_error("\aoUnknown Type: \ar%s!", type)
+            _G.State.status = "Unknown type: " .. task_type .. " -- Step: " .. _G.State.step
+            _G.State.task_run = false
             return
         end
     end
 end
 
 local function run_epic(class, choice)
-    task_table      = {}
-    local tablename = ''
-    State.task_run  = true
-    State.pause     = false
+    task_table        = {}
+    local tablename   = ''
+    _G.State.task_run = true
+    _G.State.pause    = false
     loadsave.loadState()
-    Logger.log_info("Begining quest for %s epic %s", mq.TLO.Me.Class(), State.epic_list[choice])
-    if State.epic_list[choice] == "1.0" then
+    logger.log_info("Begining quest for %s epic %s", mq.TLO.Me.Class(), _G.State.epic_list[choice])
+    if _G.State.epic_list[choice] == "1.0" then
         tablename = class .. "_10"
-        State.epicstring = "1.0"
-    elseif State.epic_list[choice] == "Pre-1.5" then
+        _G.State.epicstring = "1.0"
+    elseif _G.State.epic_list[choice] == "Pre-1.5" then
         tablename = class .. "_pre15"
-        State.epicstring = "Pre-1.5"
-    elseif State.epic_list[choice] == "1.5" then
+        _G.State.epicstring = "Pre-1.5"
+    elseif _G.State.epic_list[choice] == "1.5" then
         tablename = class .. "_15"
-        State.epicstring = "1.5"
-    elseif State.epic_list[choice] == "2.0" then
+        _G.State.epicstring = "1.5"
+    elseif _G.State.epic_list[choice] == "2.0" then
         tablename = class .. "_20"
-        State.epicstring = "2.0"
+        _G.State.epicstring = "2.0"
     end
     if tablename == '' then
-        Logger.log_error("\aoThis class and quest has not yet been implemented.")
-        State.task_run = false
+        logger.log_error("\aoThis class and quest has not yet been implemented.")
+        _G.State.task_run = false
         return
     end
     local ts_return = check_tradeskills(class, choice)
     if ts_return then
         if loadsave.SaveState.general.stopTS == true then
-            Logger.log_error("\aoPlease raise your tradeskills to continue, or turn off the \"\agStop if tradeskill requirements are unmet\ao\" setting.")
-            Logger.log_error(ts_return)
-            State.task_run = false
+            logger.log_error("\aoPlease raise your tradeskills to continue, or turn off the \"\agStop if tradeskill requirements are unmet\ao\" setting.")
+            logger.log_error(ts_return)
+            _G.State.task_run = false
             return
         else
-            Logger.log_warn("\aoYour tradeskills do not meet requirements for this quest but you have opted to start the quest anyways.")
+            logger.log_warn("\aoYour tradeskills do not meet requirements for this quest but you have opted to start the quest anyways.")
         end
     end
     local sql = "SELECT * FROM " .. tablename
@@ -361,77 +362,77 @@ local function run_epic(class, choice)
     manage.startGroup(class_settings.settings, loadsave.SaveState)
     mq.delay("5s")
     manage.pauseGroup(class_settings.settings)
-    while State.step < #task_table do
-        if overview_steps[State.step] ~= nil then
-            if overview_steps[State.step] == 1 then
-                Logger.log_warn('\aoYou have selected to complete this step (\ag%s\ao) manually. Stopping script.', State.step)
+    while _G.State.step < #task_table do
+        if overview_steps[_G.State.step] ~= nil then
+            if overview_steps[_G.State.step] == 1 then
+                logger.log_warn('\aoYou have selected to complete this step (\ag%s\ao) manually. Stopping script.', _G.State.step)
                 mq.cmdf('/squelch /autosize sizeself %s', loadsave.SaveState.general['self_size'])
                 mq.cmd('/squelch /afollow off')
                 mq.cmd('/squelch /nav stop')
                 mq.cmd('/squelch /stick off')
-                State.task_run = false
+                _G.State.task_run = false
                 return
-            elseif overview_steps[State.step] == 2 then
-                Logger.log_warn('\aoYou have selected to skip this step (\ag%s\ao). Moving to next step.', State.step)
+            elseif overview_steps[_G.State.step] == 2 then
+                logger.log_warn('\aoYou have selected to skip this step (\ag%s\ao). Moving to next step.', _G.State.step)
                 for i, item in pairs(task_outline_table) do
-                    if item.Step == State.step then
-                        State.rewound = true
-                        State.step = task_outline_table[i + 1].Step
-                        Logger.log_info('\aoSetting step to \ar%s', State.step)
+                    if item.Step == _G.State.step then
+                        _G.State.rewound = true
+                        _G.State.step = task_outline_table[i + 1].Step
+                        logger.log_info('\aoSetting step to \ar%s', _G.State.step)
                         break
                     end
                 end
             end
         end
         if mq.TLO.EverQuest.GameState() ~= 'INGAME' then
-            Logger.log_error('\arNot in game, closing.')
+            logger.log_error('\arNot in game, closing.')
             mq.exit()
         end
-        State.cannot_count = 0
-        while State.pause == true do
-            State.status = "Paused"
+        _G.State.cannot_count = 0
+        while _G.State.pause == true do
+            _G.State.status = "Paused"
             mq.delay(500)
             if mq.TLO.EverQuest.GameState() ~= 'INGAME' then
-                Logger.log_error('\arNot in game, closing.')
+                logger.log_error('\arNot in game, closing.')
                 mq.exit()
             end
-            if State.task_run == false then
-                State.pause = false
+            if _G.State.task_run == false then
+                _G.State.pause = false
                 return
             end
         end
-        State.skip = false
-        if State.rewound == false then
-            State.step = State.step + 1
+        _G.State.skip = false
+        if _G.State.rewound == false then
+            _G.State.step = _G.State.step + 1
         else
-            State.rewound = false
+            _G.State.rewound = false
         end
         if mq.TLO.Me.Combat() == true then
             mq.cmd('/attack off')
         end
         update_general_status()
         mq.doevents()
-        execute_task(task_table[State.step])
+        execute_task(task_table[_G.State.step])
         if mq.TLO.Me.Levitating() then
-            if task_table[State.step].belev == nil then
+            if task_table[_G.State.step].belev == nil then
                 manage.removeLev()
             end
         end
-        if task_table[State.step].SaveStep == 1 then
-            if State.task_run == true then
-                Logger.log_info("\aoSaving step: \ar%s", State.step)
-                loadsave.prepSave(State.step)
-                if State.stop_at_save then
-                    Logger.log_warn("\aoStopping at step \ar%s.", State.Step)
-                    State.epicstring = ''
-                    State.task_run = false
-                    State.stop_at_save = false
-                    State.status = "Stopped at step " .. State.step
+        if task_table[_G.State.step].SaveStep == 1 then
+            if _G.State.task_run == true then
+                logger.log_info("\aoSaving step: \ar%s", _G.State.step)
+                loadsave.prepSave(_G.State.step)
+                if _G.State.stop_at_save then
+                    logger.log_warn("\aoStopping at step \ar%s.", _G.State.Step)
+                    _G.State.epicstring = ''
+                    _G.State.task_run = false
+                    _G.State.stop_at_save = false
+                    _G.State.status = "Stopped at step " .. _G.State.step
                     return
                 end
             end
         end
-        if State.task_run == false then
+        if _G.State.task_run == false then
             mq.cmdf('/squelch /autosize sizeself %s', loadsave.SaveState.general['self_size'])
             mq.cmd('/squelch /afollow off')
             mq.cmd('/squelch /nav stop')
@@ -439,10 +440,10 @@ local function run_epic(class, choice)
             return
         end
     end
-    State.status = "Completed " .. mq.TLO.Me.Class() .. ": " .. State.epicstring
-    State.epicstring = ''
-    State.task_run = false
-    Logger.log_info("\aoCompleted \ay%s \ao- \ar%s!", mq.TLO.Me.Class(), State.epicstring)
+    _G.State.status = "Completed " .. mq.TLO.Me.Class() .. ": " .. _G.State.epicstring
+    _G.State.epicstring = ''
+    _G.State.task_run = false
+    logger.log_info("\aoCompleted \ay%s \ao- \ar%s!", mq.TLO.Me.Class(), _G.State.epicstring)
 end
 
 local function displayGUI()
@@ -451,10 +452,10 @@ local function displayGUI()
         mq.exit()
         return
     end
-    if Logger.LogConsole == nil then
-        Logger.LogConsole = ImGui.ConsoleWidget.new("##ELConsole")
-        Logger.LogConsole.maxBufferLines = 100
-        Logger.LogConsole.autoScroll = true
+    if logger.LogConsole == nil then
+        logger.LogConsole = ImGui.ConsoleWidget.new("##ELConsole")
+        logger.LogConsole.maxBufferLines = 100
+        logger.LogConsole.autoScroll = true
     end
     ImGui.SetNextWindowSize(ImVec2(415, 475), ImGuiCond.FirstUseEver)
     local ColorCount, StyleCount = LoadTheme.StartTheme(theme.Theme[themeID])
@@ -464,7 +465,7 @@ local function displayGUI()
         draw_gui.generalTab(task_table)
         theme.LoadTheme, themeName, themeID, class_settings.settings.LoadTheme = draw_gui.settingsTab(themeName, theme, themeID, class_settings, loadsave)
         draw_gui.outlineTab(task_outline_table, overview_steps, task_table)
-        if State.task_run == true then
+        if _G.State.task_run == true then
             draw_gui.fullOutlineTab(task_table)
         end
         draw_gui.consoleTab(class_settings)
@@ -493,16 +494,16 @@ local function version_check()
         end
     end
     if new_version_available then
-        Logger.log_error("\aoA new version is available (\arv%s\ao) please download it and try again.", response)
+        logger.log_error("\aoA new version is available (\arv%s\ao) please download it and try again.", response)
         mq.exit()
     end
 end
 
 local function autosize_self_event(line, arg1)
     if arg1 == "disabled" then
-        State.autosize_self = false
+        _G.State.autosize_self = false
     else
-        State.autosize_self = true
+        _G.State.autosize_self = true
     end
 end
 
@@ -513,16 +514,16 @@ end
 
 local function init_autosize()
     if mq.TLO.Plugin('MQ2Autosize')() == nil then
-        Logger.log_warn(
+        logger.log_warn(
             "\aoThe \agMQ2Autosize \aoplugin is not loaded. This is not required for the script to run, but may help if you are frequently becoming stuck while navigating.")
-        Logger.log_warn("\aoIf you would like the script to make use of it please run the command \ar/plugin autosize \aoand restart Epic Laziness.")
-        State.autosize = false
+        logger.log_warn("\aoIf you would like the script to make use of it please run the command \ar/plugin autosize \aoand restart Epic Laziness.")
+        _G.State.autosize = false
     else
         mq.event('auto_self_on', 'MQ2AutoSize:: Option (Self) now #1#', autosize_self_event)
         mq.cmd('/autosize self')
         mq.delay(30)
         mq.doevents()
-        if State.autosize_self == false then
+        if _G.State.autosize_self == false then
             mq.cmd('/squelch /autosize self')
         end
         mq.cmd('/squelch /autosize off')
@@ -533,21 +534,21 @@ local function init_autosize()
             mq.doevents()
             mq.unevent('autosize_self_size')
         end
-        State.autosize_on = false
-        State.autosize = true
+        _G.State.autosize_on = false
+        _G.State.autosize = true
     end
 end
 
 local function init()
-    State.populate_group_combo()
-    State.step_overview()
+    _G.State.populate_group_combo()
+    _G.State.step_overview()
     mq.imgui.init('displayGUI', displayGUI)
     version_check()
-    Logger.log_warn("If you encounter any nav mesh issues please ensure you are using the latest mesh from \arhttps://github.com/yb-f/meshes")
+    logger.log_warn("If you encounter any nav mesh issues please ensure you are using the latest mesh from \arhttps://github.com/yb-f/meshes")
     for plugin in ipairs({ 'MQ2Nav', 'MQ2EasyFind', 'MQ2Relocate', 'MQ2PortalSetter', }) do
         if mq.TLO.Plugin(plugin)() == nil then
-            Logger.log_error("\ar%s \aois required for this script.", plugin)
-            Logger.log_error("\aoPlease load it with the command \ar/plugin %s \aoand rerun this script.", plugin)
+            logger.log_error("\ar%s \aois required for this script.", plugin)
+            logger.log_error("\aoPlease load it with the command \ar/plugin %s \aoand rerun this script.", plugin)
             mq.exit()
         end
     end
@@ -557,13 +558,13 @@ end
 local function main()
     while running == true do
         if mq.TLO.EverQuest.GameState() ~= 'INGAME' then
-            Logger.log_error('\arNot in game, closing.')
+            logger.log_error('\arNot in game, closing.')
             mq.exit()
         end
-        if State.start_run == true then
-            State.start_run = false
-            State.step = 0
-            run_epic(string.lower(mq.TLO.Me.Class.ShortName()), State.epic_choice)
+        if _G.State.start_run == true then
+            _G.State.start_run = false
+            _G.State.step = 0
+            run_epic(string.lower(mq.TLO.Me.Class.ShortName()), _G.State.epic_choice)
         end
         mq.delay(200)
     end

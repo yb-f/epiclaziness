@@ -1,5 +1,3 @@
-local mq = require('mq')
-
 local Utils = {}
 
 ---@param x1 number

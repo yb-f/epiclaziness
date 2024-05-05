@@ -1,3 +1,4 @@
+---@diagnostic disable: deprecated, unbalanced-assignments, duplicate-index, undefined-global, redundant-parameter, param-type-mismatch, cast-local-type, need-check-nil, assign-type-mismatch
 --------------------------------------------------------------------------------------------------------------------------
 -- sha2.lua
 --------------------------------------------------------------------------------------------------------------------------
@@ -77,7 +78,7 @@ local function get_precision(one)
         if k > 256 or n - (n - 1) ~= 1 or m - (m - 1) ~= 1 or n == m then
             return k, false -- floating point datatype
         elseif n == prev_n then
-            return k, true -- integer datatype
+            return k, true  -- integer datatype
         end
     end
 end
@@ -119,11 +120,11 @@ assert(Lua_has_int64 or Lua_has_int32 or not Lua_has_integers, "Lua integers mus
 
 -- Check for LuaJIT and 32-bit bitwise libraries
 local is_LuaJIT = ({ false, [1] = true })[1] and _VERSION ~= "Luau" and
-(type(jit) ~= "table" or jit.version_num >= 20000)                                                                       -- LuaJIT 1.x.x and Luau are treated as vanilla Lua 5.1/5.2
-local is_LuaJIT_21                                                                                                       -- LuaJIT 2.1+
+    (type(jit) ~= "table" or jit.version_num >= 20000) -- LuaJIT 1.x.x and Luau are treated as vanilla Lua 5.1/5.2
+local is_LuaJIT_21                                 -- LuaJIT 2.1+
 local LuaJIT_arch
-local ffi                                                                                                                -- LuaJIT FFI library (as a table)
-local b                                                                                                                  -- 32-bit bitwise library (as a table)
+local ffi                                          -- LuaJIT FFI library (as a table)
+local b                                            -- 32-bit bitwise library (as a table)
 local library_name
 
 if is_LuaJIT then
@@ -163,7 +164,7 @@ if print_debug_messages then
     -- Printing list of abilities of your system
     print("Abilities:")
     print("   Lua version:               " ..
-    (is_LuaJIT and "LuaJIT " .. (is_LuaJIT_21 and "2.1 " or "2.0 ") .. (LuaJIT_arch or "") .. (ffi and " with FFI" or " without FFI") or _VERSION))
+        (is_LuaJIT and "LuaJIT " .. (is_LuaJIT_21 and "2.1 " or "2.0 ") .. (LuaJIT_arch or "") .. (ffi and " with FFI" or " without FFI") or _VERSION))
     print("   Integer bitwise operators: " .. (Lua_has_int64 and "int64" or Lua_has_int32 and "int32" or "no"))
     print("   32-bit bitwise library:    " .. (library_name or "not found"))
 end
@@ -210,18 +211,18 @@ local AND, OR, XOR, SHL, SHR, ROL, ROR, NOT, NORM, HEX, XOR_BYTE
 if branch == "FFI" or branch == "LJ" or branch == "LIB32" then
     -- Your system has 32-bit bitwise library (either "bit" or "bit32")
 
-    AND  = b.band            -- 2 arguments
-    OR   = b.bor             -- 2 arguments
-    XOR  = b.bxor            -- 2..5 arguments
-    SHL  = b.lshift          -- second argument is integer 0..31
-    SHR  = b.rshift          -- second argument is integer 0..31
+    AND  = b.band             -- 2 arguments
+    OR   = b.bor              -- 2 arguments
+    XOR  = b.bxor             -- 2..5 arguments
+    SHL  = b.lshift           -- second argument is integer 0..31
+    SHR  = b.rshift           -- second argument is integer 0..31
     ROL  = b.rol or b.lrotate -- second argument is integer 0..31
     ROR  = b.ror or b.rrotate -- second argument is integer 0..31
-    NOT  = b.bnot            -- only for LuaJIT
-    NORM = b.tobit           -- only for LuaJIT
-    HEX  = b.tohex           -- returns string of 8 lowercase hexadecimal digits
+    NOT  = b.bnot             -- only for LuaJIT
+    NORM = b.tobit            -- only for LuaJIT
+    HEX  = b.tohex            -- returns string of 8 lowercase hexadecimal digits
     assert(AND and OR and XOR and SHL and SHR and ROL and ROR and NOT, "Library '" .. library_name .. "' is incomplete")
-    XOR_BYTE = XOR           -- XOR of two bytes (0..255)
+    XOR_BYTE = XOR            -- XOR of two bytes (0..255)
 elseif branch == "EMUL" then
     -- Emulating 32-bit bitwise operations using 53-bit floating point arithmetic
 
@@ -312,11 +313,11 @@ end
 HEX = HEX
     or
     pcall(string_format, "%x", 2 ^ 31) and
-    function(x)    -- returns string of 8 lowercase hexadecimal digits
+    function(x) -- returns string of 8 lowercase hexadecimal digits
         return string_format("%08x", x % 4294967296)
     end
     or
-    function(x)    -- for OpenWrt's dialect of Lua
+    function(x) -- for OpenWrt's dialect of Lua
         return string_format("%08x", (x + 2 ^ 31) % 2 ^ 32 - 2 ^ 31)
     end
 
@@ -438,10 +439,10 @@ if branch == "FFI" then
     local uint32 = ffi.typeof "uint32_t"
     hi_factor = int64(2 ^ 32)
 
-    if is_LuaJIT_21 then                                          -- LuaJIT 2.1 supports bitwise 64-bit operations
+    if is_LuaJIT_21 then                                            -- LuaJIT 2.1 supports bitwise 64-bit operations
         local AND64, OR64, XOR64, NOT64, SHL64, SHR64, ROL64, ROR64 -- introducing synonyms for better code readability
-                                                                                                                         = AND, OR, XOR, NOT, SHL, SHR, ROL, ROR
-        HEX64                                                                                                            = HEX
+                                                                                                                        = AND, OR, XOR, NOT, SHL, SHR, ROL, ROR
+        HEX64                                                                                                           = HEX
 
 
         -- BLAKE2b implementation for "LuaJIT 2.1 + FFI" branch
@@ -479,7 +480,7 @@ if branch == "FFI" then
                     bytes_compressed = bytes_compressed + (last_block_size or 128)
                     v[0xC] = XOR64(sha2_H_lo[5], bytes_compressed) -- t0 = low_8_bytes(bytes_compressed)
                     -- t1 = high_8_bytes(bytes_compressed) = 0,  message length is always below 2^53 bytes
-                    if last_block_size then                   -- flag f0
+                    if last_block_size then                        -- flag f0
                         v[0xE] = NOT64(v[0xE])
                     end
                     if is_last_node then -- flag f1
@@ -864,7 +865,7 @@ if branch == "FFI" then
                     bytes_compressed = bytes_compressed + (last_block_size or 128)
                     v[0xC] = XOR64(sha2_H_lo[5], bytes_compressed) -- t0 = low_8_bytes(bytes_compressed)
                     -- t1 = high_8_bytes(bytes_compressed) = 0,  message length is always below 2^53 bytes
-                    if last_block_size then                   -- flag f0
+                    if last_block_size then                        -- flag f0
                         v[0xE] = -1 - v[0xE]
                     end
                     if is_last_node then -- flag f1
@@ -1023,7 +1024,7 @@ if branch == "FFI" and not is_LuaJIT_21 or branch == "LJ" then
                 local D_lo = XOR(lanes_lo[26], SHL(lanes_lo[28], 1), SHR(lanes_hi[28], 31))
                 local D_hi = XOR(lanes_hi[26], SHL(lanes_hi[28], 1), SHR(lanes_lo[28], 31))
                 lanes_lo[2], lanes_hi[2], lanes_lo[7], lanes_hi[7], lanes_lo[12], lanes_hi[12], lanes_lo[17], lanes_hi[17] =
-                XOR(SHR(XOR(D_lo, lanes_lo[7]), 20), SHL(XOR(D_hi, lanes_hi[7]), 12)), XOR(SHR(XOR(D_hi, lanes_hi[7]), 20), SHL(XOR(D_lo, lanes_lo[7]), 12)),
+                    XOR(SHR(XOR(D_lo, lanes_lo[7]), 20), SHL(XOR(D_hi, lanes_hi[7]), 12)), XOR(SHR(XOR(D_hi, lanes_hi[7]), 20), SHL(XOR(D_lo, lanes_lo[7]), 12)),
                     XOR(SHR(XOR(D_lo, lanes_lo[17]), 19), SHL(XOR(D_hi, lanes_hi[17]), 13)), XOR(SHR(XOR(D_hi, lanes_hi[17]), 19), SHL(XOR(D_lo, lanes_lo[17]), 13)),
                     XOR(SHL(XOR(D_lo, lanes_lo[2]), 1), SHR(XOR(D_hi, lanes_hi[2]), 31)), XOR(SHL(XOR(D_hi, lanes_hi[2]), 1), SHR(XOR(D_lo, lanes_lo[2]), 31)),
                     XOR(SHL(XOR(D_lo, lanes_lo[12]), 10), SHR(XOR(D_hi, lanes_hi[12]), 22)), XOR(SHL(XOR(D_hi, lanes_hi[12]), 10), SHR(XOR(D_lo, lanes_lo[12]), 22))
@@ -1032,7 +1033,7 @@ if branch == "FFI" and not is_LuaJIT_21 or branch == "LJ" then
                 D_lo = XOR(lanes_lo[27], SHL(lanes_lo[29], 1), SHR(lanes_hi[29], 31))
                 D_hi = XOR(lanes_hi[27], SHL(lanes_hi[29], 1), SHR(lanes_lo[29], 31))
                 lanes_lo[3], lanes_hi[3], lanes_lo[8], lanes_hi[8], lanes_lo[13], lanes_hi[13], lanes_lo[23], lanes_hi[23] =
-                XOR(SHR(XOR(D_lo, lanes_lo[13]), 21), SHL(XOR(D_hi, lanes_hi[13]), 11)), XOR(SHR(XOR(D_hi, lanes_hi[13]), 21), SHL(XOR(D_lo, lanes_lo[13]), 11)),
+                    XOR(SHR(XOR(D_lo, lanes_lo[13]), 21), SHL(XOR(D_hi, lanes_hi[13]), 11)), XOR(SHR(XOR(D_hi, lanes_hi[13]), 21), SHL(XOR(D_lo, lanes_lo[13]), 11)),
                     XOR(SHR(XOR(D_lo, lanes_lo[23]), 3), SHL(XOR(D_hi, lanes_hi[23]), 29)), XOR(SHR(XOR(D_hi, lanes_hi[23]), 3), SHL(XOR(D_lo, lanes_lo[23]), 29)),
                     XOR(SHL(XOR(D_lo, lanes_lo[8]), 6), SHR(XOR(D_hi, lanes_hi[8]), 26)), XOR(SHL(XOR(D_hi, lanes_hi[8]), 6), SHR(XOR(D_lo, lanes_lo[8]), 26)),
                     XOR(SHR(XOR(D_lo, lanes_lo[3]), 2), SHL(XOR(D_hi, lanes_hi[3]), 30)), XOR(SHR(XOR(D_hi, lanes_hi[3]), 2), SHL(XOR(D_lo, lanes_lo[3]), 30))
@@ -1041,7 +1042,7 @@ if branch == "FFI" and not is_LuaJIT_21 or branch == "LJ" then
                 D_lo = XOR(lanes_lo[28], SHL(lanes_lo[30], 1), SHR(lanes_hi[30], 31))
                 D_hi = XOR(lanes_hi[28], SHL(lanes_hi[30], 1), SHR(lanes_lo[30], 31))
                 lanes_lo[4], lanes_hi[4], lanes_lo[9], lanes_hi[9], lanes_lo[19], lanes_hi[19], lanes_lo[24], lanes_hi[24] =
-                XOR(SHL(XOR(D_lo, lanes_lo[19]), 21), SHR(XOR(D_hi, lanes_hi[19]), 11)), XOR(SHL(XOR(D_hi, lanes_hi[19]), 21), SHR(XOR(D_lo, lanes_lo[19]), 11)),
+                    XOR(SHL(XOR(D_lo, lanes_lo[19]), 21), SHR(XOR(D_hi, lanes_hi[19]), 11)), XOR(SHL(XOR(D_hi, lanes_hi[19]), 21), SHR(XOR(D_lo, lanes_lo[19]), 11)),
                     XOR(SHL(XOR(D_lo, lanes_lo[4]), 28), SHR(XOR(D_hi, lanes_hi[4]), 4)), XOR(SHL(XOR(D_hi, lanes_hi[4]), 28), SHR(XOR(D_lo, lanes_lo[4]), 4)),
                     XOR(SHR(XOR(D_lo, lanes_lo[24]), 8), SHL(XOR(D_hi, lanes_hi[24]), 24)), XOR(SHR(XOR(D_hi, lanes_hi[24]), 8), SHL(XOR(D_lo, lanes_lo[24]), 24)),
                     XOR(SHR(XOR(D_lo, lanes_lo[9]), 9), SHL(XOR(D_hi, lanes_hi[9]), 23)), XOR(SHR(XOR(D_hi, lanes_hi[9]), 9), SHL(XOR(D_lo, lanes_lo[9]), 23))
@@ -1050,7 +1051,7 @@ if branch == "FFI" and not is_LuaJIT_21 or branch == "LJ" then
                 D_lo = XOR(lanes_lo[29], SHL(lanes_lo[26], 1), SHR(lanes_hi[26], 31))
                 D_hi = XOR(lanes_hi[29], SHL(lanes_hi[26], 1), SHR(lanes_lo[26], 31))
                 lanes_lo[5], lanes_hi[5], lanes_lo[15], lanes_hi[15], lanes_lo[20], lanes_hi[20], lanes_lo[25], lanes_hi[25] =
-                XOR(SHL(XOR(D_lo, lanes_lo[25]), 14), SHR(XOR(D_hi, lanes_hi[25]), 18)), XOR(SHL(XOR(D_hi, lanes_hi[25]), 14), SHR(XOR(D_lo, lanes_lo[25]), 18)),
+                    XOR(SHL(XOR(D_lo, lanes_lo[25]), 14), SHR(XOR(D_hi, lanes_hi[25]), 18)), XOR(SHL(XOR(D_hi, lanes_hi[25]), 14), SHR(XOR(D_lo, lanes_lo[25]), 18)),
                     XOR(SHL(XOR(D_lo, lanes_lo[20]), 8), SHR(XOR(D_hi, lanes_hi[20]), 24)), XOR(SHL(XOR(D_hi, lanes_hi[20]), 8), SHR(XOR(D_lo, lanes_lo[20]), 24)),
                     XOR(SHL(XOR(D_lo, lanes_lo[5]), 27), SHR(XOR(D_hi, lanes_hi[5]), 5)), XOR(SHL(XOR(D_hi, lanes_hi[5]), 27), SHR(XOR(D_lo, lanes_lo[5]), 5)),
                     XOR(SHR(XOR(D_lo, lanes_lo[15]), 25), SHL(XOR(D_hi, lanes_hi[15]), 7)), XOR(SHR(XOR(D_hi, lanes_hi[15]), 25), SHL(XOR(D_lo, lanes_lo[15]), 7))
@@ -1059,7 +1060,7 @@ if branch == "FFI" and not is_LuaJIT_21 or branch == "LJ" then
                 D_lo = XOR(lanes_lo[30], SHL(lanes_lo[27], 1), SHR(lanes_hi[27], 31))
                 D_hi = XOR(lanes_hi[30], SHL(lanes_hi[27], 1), SHR(lanes_lo[27], 31))
                 lanes_lo[6], lanes_hi[6], lanes_lo[11], lanes_hi[11], lanes_lo[16], lanes_hi[16], lanes_lo[21], lanes_hi[21] =
-                XOR(SHL(XOR(D_lo, lanes_lo[11]), 3), SHR(XOR(D_hi, lanes_hi[11]), 29)), XOR(SHL(XOR(D_hi, lanes_hi[11]), 3), SHR(XOR(D_lo, lanes_lo[11]), 29)),
+                    XOR(SHL(XOR(D_lo, lanes_lo[11]), 3), SHR(XOR(D_hi, lanes_hi[11]), 29)), XOR(SHL(XOR(D_hi, lanes_hi[11]), 3), SHR(XOR(D_lo, lanes_lo[11]), 29)),
                     XOR(SHL(XOR(D_lo, lanes_lo[21]), 18), SHR(XOR(D_hi, lanes_hi[21]), 14)), XOR(SHL(XOR(D_hi, lanes_hi[21]), 18), SHR(XOR(D_lo, lanes_lo[21]), 14)),
                     XOR(SHR(XOR(D_lo, lanes_lo[6]), 28), SHL(XOR(D_hi, lanes_hi[6]), 4)), XOR(SHR(XOR(D_hi, lanes_hi[6]), 28), SHL(XOR(D_lo, lanes_lo[6]), 4)),
                     XOR(SHR(XOR(D_lo, lanes_lo[16]), 23), SHL(XOR(D_hi, lanes_hi[16]), 9)), XOR(SHR(XOR(D_hi, lanes_hi[16]), 23), SHL(XOR(D_lo, lanes_lo[16]), 9))
@@ -1497,7 +1498,7 @@ if branch == "FFI" or branch == "LJ" then
                 local t1 = floor(bytes_compressed / 2 ^ 32)
                 v[0xC] = XOR(sha2_H_hi[5], t0) -- t0 = low_4_bytes(bytes_compressed)
                 v[0xD] = XOR(sha2_H_hi[6], t1) -- t1 = high_4_bytes(bytes_compressed
-                if last_block_size then    -- flag f0
+                if last_block_size then        -- flag f0
                     v[0xE] = NOT(v[0xE])
                 end
                 if is_last_node then -- flag f1
@@ -1542,7 +1543,7 @@ if branch == "FFI" or branch == "LJ" then
                 end
                 v[0x0], v[0x1], v[0x2], v[0x3], v[0x4], v[0x5], v[0x6], v[0x7] = h1, h2, h3, h4, h5, h6, h7, h8
                 v[0x8], v[0x9], v[0xA], v[0xB] = NORM(sha2_H_hi[1]), NORM(sha2_H_hi[2]), NORM(sha2_H_hi[3]), NORM(sha2_H_hi[4])
-                v[0xC] = NORM(chunk_index % 2 ^ 32) -- t0 = low_4_bytes(chunk_index)
+                v[0xC] = NORM(chunk_index % 2 ^ 32)  -- t0 = low_4_bytes(chunk_index)
                 v[0xD] = floor(chunk_index / 2 ^ 32) -- t1 = high_4_bytes(chunk_index)
                 v[0xE], v[0xF] = block_length, flags
                 for j = 1, 7 do
@@ -3731,8 +3732,8 @@ if branch == "LIB32" or branch == "EMUL" then
             bytes_compressed = bytes_compressed + (last_block_size or 64)
             local t0 = bytes_compressed % 2 ^ 32
             local t1 = (bytes_compressed - t0) / 2 ^ 32
-            vC = XOR(vC, t0)     -- t0 = low_4_bytes(bytes_compressed)
-            vD = XOR(vD, t1)     -- t1 = high_4_bytes(bytes_compressed)
+            vC = XOR(vC, t0)        -- t0 = low_4_bytes(bytes_compressed)
+            vD = XOR(vD, t1)        -- t1 = high_4_bytes(bytes_compressed)
             if last_block_size then -- flag f0
                 vE = -1 - vE
             end
@@ -4117,7 +4118,7 @@ if branch == "LIB32" or branch == "EMUL" then
             end
             local v0, v1, v2, v3, v4, v5, v6, v7 = h1, h2, h3, h4, h5, h6, h7, h8
             local v8, v9, vA, vB = sha2_H_hi[1], sha2_H_hi[2], sha2_H_hi[3], sha2_H_hi[4]
-            local vC = chunk_index % 2 ^ 32   -- t0 = low_4_bytes(chunk_index)
+            local vC = chunk_index % 2 ^ 32        -- t0 = low_4_bytes(chunk_index)
             local vD = (chunk_index - vC) / 2 ^ 32 -- t1 = high_4_bytes(chunk_index)
             local vE, vF = block_length, flags
             for j = 1, 7 do
@@ -5297,8 +5298,8 @@ local function blake2x(inner_func, inner_func_letter, common_W_blake2, block_siz
         XOF_digest_length = floor(digest_size_in_bytes)
         if XOF_digest_length >= XOF_digest_length_limit then
             error(
-            "Requested digest is too long.  BLAKE2X" ..
-            inner_func_letter .. " finite digest is limited by (2^" .. floor(block_size / 2) .. ")-2 bytes.  Hint: you can generate infinite digest.", 2)
+                "Requested digest is too long.  BLAKE2X" ..
+                inner_func_letter .. " finite digest is limited by (2^" .. floor(block_size / 2) .. ")-2 bytes.  Hint: you can generate infinite digest.", 2)
         end
     end
     salt = salt or ""
@@ -5444,11 +5445,11 @@ local function blake3(message, key, digest_size_in_bytes, message_flags, K, retu
         while size > 0 do
             local part_size_in_blocks, block_flags, H_in = 1, 0, H
             if blocks_in_chunk == 0 then
-                block_flags = 1         -- flag:CHUNK_START
+                block_flags = 1             -- flag:CHUNK_START
                 H_in, final_H_in = K, H
                 final_compression_flags = 2 -- flag:CHUNK_END
             elseif blocks_in_chunk == 15 then
-                block_flags = 2         -- flag:CHUNK_END
+                block_flags = 2             -- flag:CHUNK_END
                 final_compression_flags = 3 -- flags:CHUNK_START,CHUNK_END
                 final_H_in = K
             else
@@ -5547,7 +5548,7 @@ local function blake3(message, key, digest_size_in_bytes, message_flags, K, retu
                 end
                 final_compression_flags = message_flags + final_compression_flags + 8 -- flag:ROOT
                 if digest_size_in_bytes < 0 then
-                    if digest_size_in_bytes == -1 then                            -- infinite digest
+                    if digest_size_in_bytes == -1 then                                -- infinite digest
                         digest_size_in_bytes = math_huge
                     else
                         digest_size_in_bytes = -1.0 * digest_size_in_bytes
@@ -5622,44 +5623,44 @@ local function blake3_derive_key(key_material, context_string, derived_key_size_
     if type(context_string) ~= "string" then
         error("'context_string' parameter must be a Lua string", 2)
     end
-    local K = blake3(context_string, nil, nil, 32, nil, true)         -- flag:DERIVE_KEY_CONTEXT
+    local K = blake3(context_string, nil, nil, 32, nil, true)          -- flag:DERIVE_KEY_CONTEXT
     return blake3(key_material, nil, derived_key_size_in_bytes, 64, K) -- flag:DERIVE_KEY_MATERIAL
 end
 
 
 
 local sha = {
-    md5               = md5,                                                                                                           -- MD5
-    sha1              = sha1,                                                                                                          -- SHA-1
+    md5               = md5,                                                                                                                  -- MD5
+    sha1              = sha1,                                                                                                                 -- SHA-1
     -- SHA-2 hash functions:
-    sha224            = function(message) return sha256ext(224, message) end,                                                          -- SHA-224
-    sha256            = function(message) return sha256ext(256, message) end,                                                          -- SHA-256
-    sha512_224        = function(message) return sha512ext(224, message) end,                                                          -- SHA-512/224
-    sha512_256        = function(message) return sha512ext(256, message) end,                                                          -- SHA-512/256
-    sha384            = function(message) return sha512ext(384, message) end,                                                          -- SHA-384
-    sha512            = function(message) return sha512ext(512, message) end,                                                          -- SHA-512
+    sha224            = function(message) return sha256ext(224, message) end,                                                                 -- SHA-224
+    sha256            = function(message) return sha256ext(256, message) end,                                                                 -- SHA-256
+    sha512_224        = function(message) return sha512ext(224, message) end,                                                                 -- SHA-512/224
+    sha512_256        = function(message) return sha512ext(256, message) end,                                                                 -- SHA-512/256
+    sha384            = function(message) return sha512ext(384, message) end,                                                                 -- SHA-384
+    sha512            = function(message) return sha512ext(512, message) end,                                                                 -- SHA-512
     -- SHA-3 hash functions:
-    sha3_224          = function(message) return keccak((1600 - 2 * 224) / 8, 224 / 8, false, message) end,                            -- SHA3-224
-    sha3_256          = function(message) return keccak((1600 - 2 * 256) / 8, 256 / 8, false, message) end,                            -- SHA3-256
-    sha3_384          = function(message) return keccak((1600 - 2 * 384) / 8, 384 / 8, false, message) end,                            -- SHA3-384
-    sha3_512          = function(message) return keccak((1600 - 2 * 512) / 8, 512 / 8, false, message) end,                            -- SHA3-512
+    sha3_224          = function(message) return keccak((1600 - 2 * 224) / 8, 224 / 8, false, message) end,                                   -- SHA3-224
+    sha3_256          = function(message) return keccak((1600 - 2 * 256) / 8, 256 / 8, false, message) end,                                   -- SHA3-256
+    sha3_384          = function(message) return keccak((1600 - 2 * 384) / 8, 384 / 8, false, message) end,                                   -- SHA3-384
+    sha3_512          = function(message) return keccak((1600 - 2 * 512) / 8, 512 / 8, false, message) end,                                   -- SHA3-512
     shake128          = function(digest_size_in_bytes, message) return keccak((1600 - 2 * 128) / 8, digest_size_in_bytes, true, message) end, -- SHAKE128
     shake256          = function(digest_size_in_bytes, message) return keccak((1600 - 2 * 256) / 8, digest_size_in_bytes, true, message) end, -- SHAKE256
     -- HMAC:
-    hmac              = hmac,                                                                                                          -- HMAC(hash_func, key, message) is applicable to any hash function from this module except SHAKE* and BLAKE*
+    hmac              = hmac,                                                                                                                 -- HMAC(hash_func, key, message) is applicable to any hash function from this module except SHAKE* and BLAKE*
     -- misc utilities:
-    hex_to_bin        = hex_to_bin,                                                                                                    -- converts hexadecimal representation to binary string
-    bin_to_hex        = bin_to_hex,                                                                                                    -- converts binary string to hexadecimal representation
-    base64_to_bin     = base64_to_bin,                                                                                                 -- converts base64 representation to binary string
-    bin_to_base64     = bin_to_base64,                                                                                                 -- converts binary string to base64 representation
+    hex_to_bin        = hex_to_bin,                                                                                                           -- converts hexadecimal representation to binary string
+    bin_to_hex        = bin_to_hex,                                                                                                           -- converts binary string to hexadecimal representation
+    base64_to_bin     = base64_to_bin,                                                                                                        -- converts base64 representation to binary string
+    bin_to_base64     = bin_to_base64,                                                                                                        -- converts binary string to base64 representation
     -- old style names for backward compatibility:
     hex2bin           = hex_to_bin,
     bin2hex           = bin_to_hex,
     base642bin        = base64_to_bin,
     bin2base64        = bin_to_base64,
     -- BLAKE2 hash functions:
-    blake2b           = blake2b, -- BLAKE2b (message, key, salt, digest_size_in_bytes)
-    blake2s           = blake2s, -- BLAKE2s (message, key, salt, digest_size_in_bytes)
+    blake2b           = blake2b,  -- BLAKE2b (message, key, salt, digest_size_in_bytes)
+    blake2s           = blake2s,  -- BLAKE2s (message, key, salt, digest_size_in_bytes)
     blake2bp          = blake2bp, -- BLAKE2bp(message, key, salt, digest_size_in_bytes)
     blake2sp          = blake2sp, -- BLAKE2sp(message, key, salt, digest_size_in_bytes)
     blake2xb          = blake2xb, -- BLAKE2Xb(digest_size_in_bytes, message, key, salt)
@@ -5669,14 +5670,14 @@ local sha = {
     blake2b_160       = function(message, key, salt) return blake2b(message, key, salt, 20) end, -- BLAKE2b-160
     blake2b_256       = function(message, key, salt) return blake2b(message, key, salt, 32) end, -- BLAKE2b-256
     blake2b_384       = function(message, key, salt) return blake2b(message, key, salt, 48) end, -- BLAKE2b-384
-    blake2b_512       = blake2b,                                                           -- 64       -- BLAKE2b-512
+    blake2b_512       = blake2b,                                                                 -- 64       -- BLAKE2b-512
     blake2s_128       = function(message, key, salt) return blake2s(message, key, salt, 16) end, -- BLAKE2s-128
     blake2s_160       = function(message, key, salt) return blake2s(message, key, salt, 20) end, -- BLAKE2s-160
     blake2s_224       = function(message, key, salt) return blake2s(message, key, salt, 28) end, -- BLAKE2s-224
-    blake2s_256       = blake2s,                                                           -- 32       -- BLAKE2s-256
+    blake2s_256       = blake2s,                                                                 -- 32       -- BLAKE2s-256
     -- BLAKE3 hash function
-    blake3            = blake3,                                                            -- BLAKE3    (message, key, digest_size_in_bytes)
-    blake3_derive_key = blake3_derive_key,                                                 -- BLAKE3_KDF(key_material, context_string, derived_key_size_in_bytes)
+    blake3            = blake3,                                                                  -- BLAKE3    (message, key, digest_size_in_bytes)
+    blake3_derive_key = blake3_derive_key,                                                       -- BLAKE3_KDF(key_material, context_string, derived_key_size_in_bytes)
 }
 
 
@@ -5692,7 +5693,7 @@ block_size_for_HMAC = {
     [sha.sha3_224]   = 144, -- (1600 - 2 * 224) / 8
     [sha.sha3_256]   = 136, -- (1600 - 2 * 256) / 8
     [sha.sha3_384]   = 104, -- (1600 - 2 * 384) / 8
-    [sha.sha3_512]   = 72, -- (1600 - 2 * 512) / 8
+    [sha.sha3_512]   = 72,  -- (1600 - 2 * 512) / 8
 }
 
 

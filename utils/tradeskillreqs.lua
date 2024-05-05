@@ -1,5 +1,3 @@
-local mq = require('mq')
-
 local tradeskill_requirements = {
     ['bst'] = {
         ['pre15'] = {

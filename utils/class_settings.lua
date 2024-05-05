@@ -1,4 +1,5 @@
 local mq                  = require('mq')
+local logger              = require('utils/logger')
 
 local class_settings      = {}
 class_settings.configPath = mq.configDir .. '/epiclaziness/epiclaziness_class_settings.lua'
@@ -150,11 +151,11 @@ function class_settings.createSettings()
         }
     }
     class_settings.saveSettings()
-    Logger.log_warn("\aoCreated default settings. Please set them appropriately for your use.")
+    logger.log_warn("\aoCreated default settings. Please set them appropriately for your use.")
 end
 
 function class_settings.saveSettings()
-    Logger.log_info("\aoGeneral settings saved.")
+    logger.log_info("\aoGeneral settings saved.")
     mq.pickle(class_settings.configPath, class_settings.settings)
 end
 

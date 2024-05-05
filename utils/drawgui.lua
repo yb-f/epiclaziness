@@ -1,6 +1,8 @@
 local mq                   = require('mq')
 local ICONS                = require('mq.Icons')
-local invis_travel         = require 'utils/travelandinvis'
+local invis_travel         = require('utils/travelandinvis')
+local ImGui                = require('ImGui')
+local logger               = require('utils/logger')
 
 local LogLevels            = {
     "Errors",
@@ -30,30 +32,30 @@ function draw_gui.full_outline_row(item, step, outlineText)
     ImGui.TableNextRow()
     ImGui.TableNextColumn()
     if ImGui.Selectable("##c" .. step, false, ImGuiSelectableFlags.None) then
-        State.rewound = true
-        State.skip = true
-        State.step = step
-        Logger.log_info('\aoSetting step to \ar%s', State.step)
-        Logger.log_verbose("\aoStep type: \ar%s", item.type)
+        _G.State.rewound = true
+        _G.State.skip = true
+        _G.State.step = step
+        logger.log_info('\aoSetting step to \ar%s', _G.State.step)
+        logger.log_verbose("\aoStep type: \ar%s", item.type)
     end
     ImGui.SameLine()
     local color = IM_COL32(0, 0, 0, 0)
-    if step == State.step then
+    if step == _G.State.step then
         color = IM_COL32(255, 255, 255, 255)
-    elseif step < State.step then
+    elseif step < _G.State.step then
         color = IM_COL32(255, 0, 0, 255)
-    elseif step > State.step then
+    elseif step > _G.State.step then
         color = IM_COL32(0, 255, 0, 255)
     end
-    --Logger.log_super_verbose("\aoProcessing step \ag%s\ao.", step)
+    --logger.log_super_verbose("\aoProcessing step \ag%s\ao.", step)
     ImGui.TextColored(color, tostring(step))
     ImGui.TableNextColumn()
     if ImGui.Selectable("##d" .. step, false, ImGuiSelectableFlags.None) then
-        State.rewound = true
-        State.skip = true
-        State.step = step
-        Logger.log_info('\aoSetting step to \ar%s', step)
-        Logger.log_verbose("\aoStep type: \ar%s", item.type)
+        _G.State.rewound = true
+        _G.State.skip = true
+        _G.State.step = step
+        logger.log_info('\aoSetting step to \ar%s', step)
+        logger.log_verbose("\aoStep type: \ar%s", item.type)
     end
     ImGui.SameLine()
     ImGui.TextWrapped(outlineText)
@@ -94,7 +96,7 @@ function draw_gui.consoleTab(class_settings)
         ImGui.SetNextItemWidth(120)
         class_settings.settings.logger.LogLevel, changed = ImGui.Combo("Debug Levels", class_settings.settings.logger.LogLevel, LogLevels, #LogLevels)
         if changed then
-            Logger.set_log_level(class_settings.settings.logger.LogLevel)
+            logger.set_log_level(class_settings.settings.logger.LogLevel)
             class_settings.saveSettings()
         end
 
@@ -106,7 +108,7 @@ function draw_gui.consoleTab(class_settings)
 
         local cur_x, cur_y = ImGui.GetCursorPos()
         local contentSizeX, contentSizeY = ImGui.GetContentRegionAvail()
-        Logger.LogConsole:Render(ImVec2(contentSizeX, math.max(200, (contentSizeY - 10))))
+        logger.LogConsole:Render(ImVec2(contentSizeX, math.max(200, (contentSizeY - 10))))
         ImGui.EndTabItem()
     end
 end
@@ -134,86 +136,87 @@ function draw_gui.fullOutlineTab(task_table)
 end
 
 function draw_gui.pathUpdate()
-    if mq.gettime() > State.updateTime then
-        State.updateTime = mq.gettime() + 100
-        if State.destType == 'ZONE' then
+    if mq.gettime() > _G.State.updateTime then
+        _G.State.updateTime = mq.gettime() + 100
+        --[[if _G.State.destType == 'ZONE' then
             if mq.TLO.Navigation.CurrentPathDistance() ~= nil then
-                State.pathDist      = mq.TLO.Navigation.CurrentPathDistance()
-                State.velocity      = mq.TLO.Navigation.Velocity()
-                State.estimatedTime = State.pathDist / State.velocity
-                draw_gui.travelPct  = 1.0 - (State.pathDist / State.startDist)
-                draw_gui.travelText = string.format("Distance: %s Velocity: %s ETA: %s seconds", math.floor(State.pathDist), math.floor(State.velocity),
-                    math.floor(State.estimatedTime))
+                _G.State.pathDist      = mq.TLO.Navigation.CurrentPathDistance()
+                _G.State.velocity      = mq.TLO.Navigation.Velocity()
+                _G.State.estimatedTime = _G.State.pathDist / _G.State.velocity
+                draw_gui.travelPct     = 1.0 - (_G.State.pathDist / _G.State.startDist)
+                draw_gui.travelText    = string.format("Distance: %s Velocity: %s ETA: %s seconds", math.floor(_G.State.pathDist), math.floor(_G.State.velocity),
+                    math.floor(_G.State.estimatedTime))
             end
-        else
-            local path          = string.format("%s %s", State.destType, State.dest)
-            State.pathDist      = mq.TLO.Navigation.PathLength(path)()
-            State.velocity      = mq.TLO.Navigation.Velocity()
-            State.estimatedTime = State.pathDist / State.velocity
-            draw_gui.travelPct  = 1.0 - (State.pathDist / State.startDist)
-            draw_gui.travelText = string.format("Distance: %s Velocity: %s ETA: %s seconds", math.floor(State.pathDist), math.floor(State.velocity), math.floor(State.estimatedTime))
-        end
+        else--]]
+        local path             = string.format("%s %s", _G.State.destType, _G.State.dest)
+        _G.State.pathDist      = mq.TLO.Navigation.PathLength(path)()
+        _G.State.velocity      = mq.TLO.Navigation.Velocity()
+        _G.State.estimatedTime = _G.State.pathDist / _G.State.velocity
+        draw_gui.travelPct     = 1.0 - (_G.State.pathDist / _G.State.startDist)
+        draw_gui.travelText    = string.format("Distance: %s Velocity: %s ETA: %s seconds", math.floor(_G.State.pathDist), math.floor(_G.State.velocity),
+            math.floor(_G.State.estimatedTime))
+        --end
     end
 end
 
 function draw_gui.generalTab(task_table)
     if ImGui.BeginTabItem("General") then
-        ImGui.Text("Class: " .. myClass .. " " .. State.epicstring)
-        if State.task_run == false then
-            State.epic_choice, changed = ImGui.Combo('##Combo', State.epic_choice, State.epic_list, #State.epic_list, #State.epic_list)
+        ImGui.Text("Class: " .. myClass .. " " .. _G.State.epicstring)
+        if _G.State.task_run == false then
+            _G.State.epic_choice, changed = ImGui.Combo('##Combo', _G.State.epic_choice, _G.State.epic_list, #_G.State.epic_list, #_G.State.epic_list)
             if ImGui.IsItemHovered() then
                 ImGui.SetTooltip('Which epic to run.')
             end
             if changed == true then
-                State.step_overview()
+                _G.State.step_overview()
             end
         end
         if mq.TLO.Me.Grouped() == true then
-            State.group_choice = ImGui.Combo('##Group_Combo', State.group_choice, State.group_combo)
+            _G.State.group_choice = ImGui.Combo('##Group_Combo', _G.State.group_choice, _G.State.group_combo)
             if ImGui.IsItemHovered() then
                 ImGui.SetTooltip('Who should come with you (None. Full group. Individual group member.)')
             end
             ImGui.SameLine()
             if ImGui.SmallButton(ICONS.MD_REFRESH) then
-                State.populate_group_combo()
+                _G.State.populate_group_combo()
             end
         end
-        if State.task_run == false then
+        if _G.State.task_run == false then
             if ImGui.Button("Begin") then
-                State.start_run = true
+                _G.State.start_run = true
             end
             if ImGui.IsItemHovered() then
-                local invis_num = invis_needed(mq.TLO.Me.Class.ShortName(), State.epic_choice)
-                local gate_num = gate_needed(mq.TLO.Me.Class.ShortName(), State.epic_choice)
+                local invis_num = invis_needed(mq.TLO.Me.Class.ShortName(), _G.State.epic_choice)
+                local gate_num = gate_needed(mq.TLO.Me.Class.ShortName(), _G.State.epic_choice)
                 local tooltip = "Begin/resume epic quest\nThis may require at least " ..
                     invis_num .. " invis potions.\nThis may require at least " .. gate_num .. " gate potions."
                 ImGui.SetTooltip(tooltip)
             end
         end
-        if State.task_run == true then
+        if _G.State.task_run == true then
             if ImGui.SmallButton(ICONS.MD_FAST_REWIND) then
-                State.skip = true
-                State.rewound = true
-                State.step = State.step - 1
-                Logger.log_info("\aoMoving to previous step \ar%s", State.step)
-                Logger.log_verbose("\aoStep type: \ar%s", task_table[State.step].type)
+                _G.State.skip = true
+                _G.State.rewound = true
+                _G.State.step = _G.State.step - 1
+                logger.log_info("\aoMoving to previous step \ar%s", _G.State.step)
+                logger.log_verbose("\aoStep type: \ar%s", task_table[_G.State.step].type)
             end
             if ImGui.IsItemHovered() then
                 ImGui.SetTooltip("Move to previous step.")
             end
             ImGui.SameLine()
-            if State.pause == false then
+            if _G.State.pause == false then
                 if ImGui.SmallButton(ICONS.MD_PAUSE) then
-                    Logger.log_info("\aoPausing script.")
-                    State.pause = true
+                    logger.log_info("\aoPausing script.")
+                    _G.State.pause = true
                 end
                 if ImGui.IsItemHovered() then
                     ImGui.SetTooltip("Pause script.")
                 end
             else
                 if ImGui.SmallButton(ICONS.FA_PLAY) then
-                    State.pause = false
-                    Logger.log_info("\aoResuming script.")
+                    _G.State.pause = false
+                    logger.log_info("\aoResuming script.")
                 end
                 if ImGui.IsItemHovered() then
                     ImGui.SetTooltip("Resume script.")
@@ -221,39 +224,39 @@ function draw_gui.generalTab(task_table)
             end
             ImGui.SameLine()
             if ImGui.SmallButton(ICONS.MD_STOP) then
-                State.task_run = false
-                State.skip = true
-                Logger.log_warn("\aoManually stopping script at step: \ar%s", State.step)
-                State.status = "Manually stopped at step " .. State.step
+                _G.State.task_run = false
+                _G.State.skip = true
+                logger.log_warn("\aoManually stopping script at step: \ar%s", _G.State.step)
+                _G.State.status = "Manually stopped at step " .. _G.State.step
             end
             if ImGui.IsItemHovered() then
                 ImGui.SetTooltip("Stop script immedietly.")
             end
             ImGui.SameLine()
             if ImGui.SmallButton(ICONS.MD_FAST_FORWARD) then
-                State.skip = true
-                State.step = State.step + 1
-                State.rewound = true
-                Logger.log_info("\aoMoving to next step \ar%s", State.step)
-                Logger.log_verbose("\aoStep type: \ar%s", task_table[State.step].type)
+                _G.State.skip = true
+                _G.State.step = _G.State.step + 1
+                _G.State.rewound = true
+                logger.log_info("\aoMoving to next step \ar%s", _G.State.step)
+                logger.log_verbose("\aoStep type: \ar%s", task_table[_G.State.step].type)
             end
             if ImGui.IsItemHovered() then
                 ImGui.SetTooltip("Skip to next step.")
             end
             if ImGui.Button("Stop @ Next Save") then
-                Logger.log_info("\aoStopping at next save point.")
-                State.stop_at_save = true
+                logger.log_info("\aoStopping at next save point.")
+                _G.State.stop_at_save = true
             end
         end
         ImGui.Separator()
         ImGui.PushStyleColor(ImGuiCol.PlotHistogram, IM_COL32(40, 150, 40, 255))
-        ImGui.ProgressBar(State.step / #task_table, ImGui.GetWindowWidth(), 17, "##prog")
+        ImGui.ProgressBar(_G.State.step / #task_table, ImGui.GetWindowWidth(), 17, "##prog")
         ImGui.PopStyleColor()
         ImGui.SetCursorPosY(ImGui.GetCursorPosY() - 20)
         ImGui.SetCursorPosX(ImGui.GetCursorPosX() + (ImGui.GetWindowWidth() / 2) - 60)
-        ImGui.Text("Step " .. tostring(State.step) .. " of " .. tostring(#task_table))
-        if State.destType ~= '' then
-            --[[if State.destType == 'ZONE' then
+        ImGui.Text("Step " .. tostring(_G.State.step) .. " of " .. tostring(#task_table))
+        if _G.State.destType ~= '' then
+            --[[if _G.State.destType == 'ZONE' then
                 if mq.TLO.Navigation.CurrentPathDistance() ~= nil then
                     draw_gui.pathUpdate()
                     ImGui.PushStyleColor(ImGuiCol.PlotHistogram, IM_COL32(150, 150, 40, 255))
@@ -273,11 +276,11 @@ function draw_gui.generalTab(task_table)
             ImGui.Text(draw_gui.travelText)
             --end
         end
-        ImGui.TextWrapped(State.status)
+        ImGui.TextWrapped(_G.State.status)
         ImGui.NewLine()
-        ImGui.TextWrapped(State.status2)
+        ImGui.TextWrapped(_G.State.status2)
         ImGui.NewLine()
-        ImGui.TextWrapped(State.reqs)
+        ImGui.TextWrapped(_G.State.reqs)
         ImGui.EndTabItem()
     end
 end
@@ -289,7 +292,7 @@ function draw_gui.outline_check_box(id, on, step)
     ImGui.PushStyleColor(ImGuiCol.ButtonActive, 1.0, 1.0, 1.0, 0)
     ImGui.PushStyleColor(ImGuiCol.ButtonHovered, 1.0, 1.0, 1.0, 0)
     ImGui.PushStyleColor(ImGuiCol.Button, 1.0, 1.0, 1.0, 0)
-    if step < State.step then
+    if step < _G.State.step then
         ImGui.PushStyleColor(ImGuiCol.Text, 1.0, 0.3, 0.3, 0.8)
         ImGui.Button(ICONS.FA_SQUARE)
         toggled = false
@@ -324,24 +327,24 @@ function draw_gui.outlineRow(overview_steps, task_outline_table, task_table, i)
     overview_steps[task_outline_table[i].Step] = draw_gui.outline_check_box("outline_box_" .. i, overview_steps[task_outline_table[i].Step], task_outline_table[i].Step)
     ImGui.TableNextColumn()
     if ImGui.Selectable("##a" .. i, false, ImGuiSelectableFlags.None) then
-        if State.task_run == true then
-            State.rewound = true
-            State.skip = true
-            State.step = task_outline_table[i].Step
-            Logger.log_info('\aoSetting step to \ar%s', State.step)
-            Logger.log_verbose("\aoStep type: \ar%s", task_table[State.step].type)
+        if _G.State.task_run == true then
+            _G.State.rewound = true
+            _G.State.skip = true
+            _G.State.step = task_outline_table[i].Step
+            logger.log_info('\aoSetting step to \ar%s', _G.State.step)
+            logger.log_verbose("\aoStep type: \ar%s", task_table[_G.State.step].type)
         end
     end
     ImGui.SameLine()
     ImGui.TextColored(IM_COL32(0, 255, 0, 255), task_outline_table[i].Step)
     ImGui.TableNextColumn()
     if ImGui.Selectable("##b" .. i, false, ImGuiSelectableFlags.None) then
-        if State.task_run == true then
-            State.rewound = true
-            State.skip = true
-            State.step = task_outline_table[i].Step
-            Logger.log_info('\aoSetting step to \ar%s', State.step)
-            Logger.log_verbose("\aoStep type: \ar%s", task_table[State.step].type)
+        if _G.State.task_run == true then
+            _G.State.rewound = true
+            _G.State.skip = true
+            _G.State.step = task_outline_table[i].Step
+            logger.log_info('\aoSetting step to \ar%s', _G.State.step)
+            logger.log_verbose("\aoStep type: \ar%s", task_table[_G.State.step].type)
         end
     end
     ImGui.SameLine()
@@ -466,7 +469,7 @@ end
 function draw_gui.generate_outline_text(item)
     local step = item.step
     local task_type = item.type
-    local text_generator = Task_Functions[task_type].desc
+    local text_generator = _G.Task_Functions[task_type].desc
     if text_generator then
         if type(text_generator) == "function" then
             return step, text_generator(item)

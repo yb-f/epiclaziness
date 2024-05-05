@@ -52,20 +52,21 @@ local function log(logLevel, output, ...)
     end
 
     local badMesh = ''
-    for _, zone in pairs(State.badMeshes) do
+    for _, zone in pairs(_G.State.badMeshes) do
         if zone == mq.TLO.Zone.ShortName() then
             badMesh = 'X'
         end
     end
 
     if actions.LogConsole ~= nil then
-        local consoleText = string.format('[%s] [%s%s-%s%s] %s', logLevels[logLevel].header, mq.TLO.Me.Class.ShortName(), State.epic_list[State.epic_choice], State.step, badMesh,
+        local consoleText = string.format('[%s] [%s%s-%s%s] %s', logLevels[logLevel].header, mq.TLO.Me.Class.ShortName(), _G.State.epic_list[_G.State.epic_choice], _G.State.step,
+            badMesh,
             output)
         actions.LogConsole:AppendText(consoleText)
     end
 
     printf('%s\aw:%s \aw<\at%s\aw> \aw(\ag%s%s-%s\ar%s\aw) \aw(%s\aw)%s \ax%s', elHeaderStart, logLevels[logLevel].header, now, mq.TLO.Me.Class.ShortName(),
-        State.epic_list[State.epic_choice], State.step, badMesh, callerTracer, elHeaderEnd,
+        _G.State.epic_list[_G.State.epic_choice], _G.State.step, badMesh, callerTracer, elHeaderEnd,
         output)
 end
 

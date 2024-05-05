@@ -1,18 +1,18 @@
 local mq     = require('mq')
-local dist   = require 'utils/distance'
+local logger = require('utils/logger')
 
 local manage = {}
 
 function manage.campGroup(radius, class_settings, char_settings)
-    Logger.log_info("\aoSetting camp mode with radius \ag%s\ao.", radius)
+    logger.log_info("\aoSetting camp mode with radius \ag%s\ao.", radius)
     manage.doAutomation(mq.TLO.Me.DisplayName(), mq.TLO.Me.Class.ShortName(),
         class_settings.class[mq.TLO.Me.Class.Name()],
         'camp', char_settings)
     manage.setRadius(mq.TLO.Me.DisplayName(), mq.TLO.Me.Class.ShortName(), class_settings.class[mq.TLO.Me.Class.Name()],
         radius, char_settings)
-    if State.group_choice == 1 then
+    if _G.State.group_choice == 1 then
         return
-    elseif State.group_choice == 2 then
+    elseif _G.State.group_choice == 2 then
         for i = 0, mq.TLO.Group.GroupSize() - 1 do
             if mq.TLO.Group.Member(i).DisplayName() ~= mq.TLO.Me.DisplayName() then
                 manage.doAutomation(mq.TLO.Group.Member(i).DisplayName(), mq.TLO.Group.Member(i).Class.ShortName(),
@@ -21,9 +21,9 @@ function manage.campGroup(radius, class_settings, char_settings)
             end
         end
     else
-        manage.doAutomation(State.group_combo[State.group_choice],
-            mq.TLO.Group.Member(State.group_combo[State.group_choice]).Class.ShortName(),
-            class_settings.class[mq.TLO.Group.Member(State.group_combo[State.group_choice]).Class.Name()], 'camp',
+        manage.doAutomation(_G.State.group_combo[_G.State.group_choice],
+            mq.TLO.Group.Member(_G.State.group_combo[_G.State.group_choice]).Class.ShortName(),
+            class_settings.class[mq.TLO.Group.Member(_G.State.group_combo[_G.State.group_choice]).Class.Name()], 'camp',
             char_settings)
     end
 end
@@ -204,21 +204,21 @@ end
 function manage.groupTalk(npc, phrase)
     if mq.TLO.Spawn(npc).Distance() ~= nil then
         if mq.TLO.Spawn(npc).Distance() > 100 then
-            State.rewound = true
-            State.step = State.step - 1
-            Logger.log_warn("\ar%s \aois over 100 units away. Moving back to step \ar%s\ao.", npc, State.step)
+            _G.State.rewound = true
+            _G.State.step = _G.State.step - 1
+            logger.log_warn("\ar%s \aois over 100 units away. Moving back to step \ar%s\ao.", npc, _G.State.step)
             return
         end
     end
-    if State.group_choice == 1 then
+    if _G.State.group_choice == 1 then
         if mq.TLO.Target.ID() ~= mq.TLO.Spawn(npc).ID() then
-            Logger.log_verbose("\aoTargeting \ar%s\ao.", npc)
+            logger.log_verbose("\aoTargeting \ar%s\ao.", npc)
             mq.TLO.Spawn(npc).DoTarget()
             mq.delay(300)
         end
         mq.cmdf("/say %s", phrase)
         mq.delay(750)
-    elseif State.group_choice == 2 then
+    elseif _G.State.group_choice == 2 then
         for i = 0, mq.TLO.Group.GroupSize() - 1 do
             if mq.TLO.Group.Member(i).DisplayName() ~= mq.TLO.Me.DisplayName() then
                 mq.cmdf("/dex %s /squelch /target id %s", mq.TLO.Group.Member(i).DisplayName(), mq.TLO.Spawn(npc).ID())
@@ -239,9 +239,9 @@ function manage.groupTalk(npc, phrase)
         mq.cmdf("/say %s", phrase)
         mq.delay(750)
     else
-        mq.cmdf("/dex %s /squelch /target id %s", State.group_combo[State.group_choice], mq.TLO.Spawn(npc).ID())
+        mq.cmdf("/dex %s /squelch /target id %s", _G.State.group_combo[_G.State.group_choice], mq.TLO.Spawn(npc).ID())
         mq.delay(300)
-        mq.cmdf("/dex %s /say %s", State.group_combo[State.group_choice], phrase)
+        mq.cmdf("/dex %s /say %s", _G.State.group_combo[_G.State.group_choice], phrase)
         math.randomseed(os.time())
         local wait = math.random(4000, 10000)
         mq.delay(wait)
@@ -255,21 +255,21 @@ function manage.groupTalk(npc, phrase)
 end
 
 function manage.openDoorAll(item)
-    Logger.log_info("\aoHaving group click door.")
-    if State.group_choice == 1 then
+    logger.log_info("\aoHaving group click door.")
+    if _G.State.group_choice == 1 then
         mq.delay(200)
         mq.cmd("/squelch /doortarget")
         mq.delay(200)
         mq.cmd("/squelch /click left door")
         mq.delay(1000)
-    elseif State.group_choice == 2 then
+    elseif _G.State.group_choice == 2 then
         mq.delay(200)
         mq.cmd("/dgga /squelch /doortarget")
         mq.delay(200)
         mq.cmd("/dgga /squelch /click left door")
         mq.delay(1000)
     else
-        local name = State.group_combo[State.group_choice]
+        local name = _G.State.group_combo[_G.State.group_choice]
         mq.delay(200)
         mq.cmd("/squelch /doortarget")
         mq.cmdf("/dex %s /squelch /doortarget", name)
@@ -281,13 +281,13 @@ function manage.openDoorAll(item)
 end
 
 function manage.pauseGroup(class_settings)
-    Logger.log_info("\aoPausing class automation for all group members.")
+    logger.log_info("\aoPausing class automation for all group members.")
     manage.doAutomation(mq.TLO.Me.DisplayName(), mq.TLO.Me.Class.ShortName(),
         class_settings.class[mq.TLO.Me.Class.Name()],
         'pause')
-    if State.group_choice == 1 then
+    if _G.State.group_choice == 1 then
         return
-    elseif State.group_choice == 2 then
+    elseif _G.State.group_choice == 2 then
         for i = 0, mq.TLO.Group.GroupSize() - 1 do
             if mq.TLO.Group.Member(i).DisplayName() ~= mq.TLO.Me.DisplayName() then
                 manage.doAutomation(mq.TLO.Group.Member(i).DisplayName(), mq.TLO.Group.Member(i).Class.ShortName(),
@@ -296,18 +296,18 @@ function manage.pauseGroup(class_settings)
             end
         end
     else
-        manage.doAutomation(State.group_combo[State.group_choice],
-            mq.TLO.Group.Member(State.group_combo[State.group_choice]).Class.ShortName(),
-            class_settings.class[mq.TLO.Group.Member(State.group_combo[State.group_choice]).Class.Name()], 'pause')
+        manage.doAutomation(_G.State.group_combo[_G.State.group_choice],
+            mq.TLO.Group.Member(_G.State.group_combo[_G.State.group_choice]).Class.ShortName(),
+            class_settings.class[mq.TLO.Group.Member(_G.State.group_combo[_G.State.group_choice]).Class.Name()], 'pause')
     end
 end
 
 function manage.picklockGroup(item)
-    State.status = "Lockpicking door"
-    Logger.log_info("\aoLockpicking door.")
-    if State.group_choice == 1 then
+    _G.State.status = "Lockpicking door"
+    logger.log_info("\aoLockpicking door.")
+    if _G.State.group_choice == 1 then
         if mq.TLO.Me.Class.ShortName() == 'BRD' or mq.TLO.Me.Class.ShortName() == 'ROG' then
-            Logger.log_verbose("\aoI am able to pick locks, doing so now.")
+            logger.log_verbose("\aoI am able to pick locks, doing so now.")
             mq.cmd("/squelch /itemnotify lockpicks leftmouseup")
             mq.delay(200)
             mq.cmd("/squelch /doortarget")
@@ -316,16 +316,16 @@ function manage.picklockGroup(item)
             mq.delay(200)
             mq.cmd("/squelch /autoinv")
         else
-            Logger.log_error("\aoI am not a class that is able to pick locks. Stopping script at step \ar%s \ao.", State.step)
-            State.status = "I require a lockpicker to proceed. (" .. State.step .. ")"
-            State.task_run = false
+            logger.log_error("\aoI am not a class that is able to pick locks. Stopping script at step \ar%s \ao.", _G.State.step)
+            _G.State.status = "I require a lockpicker to proceed. (" .. _G.State.step .. ")"
+            _G.State.task_run = false
             mq.cmd('/foreground')
             return
         end
-    elseif State.group_choice == 2 then
+    elseif _G.State.group_choice == 2 then
         local pickerFound = false
         if mq.TLO.Me.Class.ShortName() == 'BRD' or mq.TLO.Me.Class.ShortName() == 'ROG' then
-            Logger.log_verbose("\aoI am able to pick locks, doing so now.")
+            logger.log_verbose("\aoI am able to pick locks, doing so now.")
             mq.cmd("/squelch /itemnotify lockpicks leftmouseup")
             mq.delay(200)
             mq.cmd("/squelch /doortarget")
@@ -337,7 +337,7 @@ function manage.picklockGroup(item)
         else
             for i = 0, mq.TLO.Group.GroupSize() - 1 do
                 if mq.TLO.Group.Member(i).Class.ShortName() == 'BRD' or mq.TLO.Group.Member(i).Class.ShortName() == 'ROG' then
-                    Logger.log_verbose("\ag%s \aois able to pick locks. Having them do so.", mq.TLO.Group.Member(i).DisplayName())
+                    logger.log_verbose("\ag%s \aois able to pick locks. Having them do so.", mq.TLO.Group.Member(i).DisplayName())
                     mq.cmdf("/dex %s /squelch /itemnotify lockpicks leftmouseup", mq.TLO.Group.Member(i).DisplayName())
                     mq.delay(200)
                     mq.cmdf("/dex %s /squelch /doortarget", mq.TLO.Group.Member(i).DisplayName())
@@ -351,16 +351,16 @@ function manage.picklockGroup(item)
             end
         end
         if pickerFound == false then
-            State.status = "I require a lockpicker to proceed. (" .. State.step .. ")"
-            Logger.log_error("\aoNo one in my group is a class that is able to pick locks. Stopping script at step \ar%s \ao.", State.step)
-            State.task_run = false
+            _G.State.status = "I require a lockpicker to proceed. (" .. _G.State.step .. ")"
+            logger.log_error("\aoNo one in my group is a class that is able to pick locks. Stopping script at step \ar%s \ao.", _G.State.step)
+            _G.State.task_run = false
             mq.cmd('/foreground')
             return
         end
     else
-        local name = State.group_combo[State.group_choice]
+        local name = _G.State.group_combo[_G.State.group_choice]
         if mq.TLO.Group.Member(name).Class.ShortName() == 'BRD' or mq.TLO.Group.Member(name).Class.ShortName() == 'ROG' then
-            Logger.log_verbose("\ag%s \aois able to pick locks. Having them do so.", mq.TLO.Group.Member(name).DisplayName())
+            logger.log_verbose("\ag%s \aois able to pick locks. Having them do so.", mq.TLO.Group.Member(name).DisplayName())
             mq.cmdf("/dex %s /squelch /itemnotify lockpicks leftmouseup", name)
             mq.delay(200)
             mq.cmdf("/dex %s /squelch /doortarget", name)
@@ -369,7 +369,7 @@ function manage.picklockGroup(item)
             mq.delay(200)
             mq.cmdf("/dex %s /squelch /autoinv", name)
         elseif mq.TLO.Me.Class.ShortName() == 'BRD' or mq.TLO.Me.Class.ShortName() == 'ROG' then
-            Logger.log_verbose("\aoI am able to pick locks, doing so now.")
+            logger.log_verbose("\aoI am able to pick locks, doing so now.")
             mq.cmd("/squelch /itemnotify lockpicks leftmouseup")
             mq.delay(200)
             mq.cmd("/squelch /doortarget")
@@ -378,10 +378,10 @@ function manage.picklockGroup(item)
             mq.delay(200)
             mq.cmd("/squelch /autoinv")
         else
-            State.status = "I require a lockpicker to proceed. (" .. State.step .. ")"
-            Logger.log_error("\aoI am not a class that is able to pick locks, nor is \ag%s\ao. Stopping script at step \ar%s \ao.", mq.TLO.Group.Member(name).DisplayName(),
-                State.step)
-            State.task_run = false
+            _G.State.status = "I require a lockpicker to proceed. (" .. _G.State.step .. ")"
+            logger.log_error("\aoI am not a class that is able to pick locks, nor is \ag%s\ao. Stopping script at step \ar%s \ao.", mq.TLO.Group.Member(name).DisplayName(),
+                _G.State.step)
+            _G.State.task_run = false
             mq.cmd('/foreground')
             return
         end
@@ -389,49 +389,49 @@ function manage.picklockGroup(item)
 end
 
 function manage.removeInvis(item)
-    local temp = State.status
-    State.status = "Removing invis"
+    local temp = _G.State.status
+    _G.State.status = "Removing invis"
     if mq.TLO.Me.Invis() then
-        Logger.log_info("\aoRemoving invisibility.")
-        if State.group_choice == 1 then
+        logger.log_info("\aoRemoving invisibility.")
+        if _G.State.group_choice == 1 then
             mq.cmd("/squelch /makemevis")
-        elseif State.group_choice == 2 then
+        elseif _G.State.group_choice == 2 then
             mq.cmd("/dgga /squelch /makemevis")
         else
             mq.cmdf("/squelch /makemevis")
-            mq.cmdf("/dex %s /squelch /makemevis", State.group_combo[State.group_choice])
+            mq.cmdf("/dex %s /squelch /makemevis", _G.State.group_combo[_G.State.group_choice])
         end
     end
-    State.status = temp
+    _G.State.status = temp
 end
 
 function manage.removeLev()
-    State.status = "Removing levitate"
-    Logger.log_info("\aoRemoving levitate.")
-    if State.group_choice == 1 then
+    _G.State.status = "Removing levitate"
+    logger.log_info("\aoRemoving levitate.")
+    if _G.State.group_choice == 1 then
         mq.cmd("/squelch /removelev")
-    elseif State.group_choice == 2 then
+    elseif _G.State.group_choice == 2 then
         mq.cmd("/dgga /squelch /removelev")
     else
         mq.cmdf("/squelch /removelev")
-        mq.cmdf("/dex %s /squelch /removelev", State.group_combo[State.group_choice])
+        mq.cmdf("/dex %s /squelch /removelev", _G.State.group_combo[_G.State.group_choice])
     end
 end
 
 function manage.sendYes(item)
-    Logger.log_info("\aoGive me a yes!")
-    if State.group_choice == 1 then
+    logger.log_info("\aoGive me a yes!")
+    if _G.State.group_choice == 1 then
         mq.cmd("/squelch /yes")
-    elseif State.group_choice == 2 then
+    elseif _G.State.group_choice == 2 then
         mq.cmd("/dgga /squelch /yes")
     else
         mq.cmdf("/squelch /yes")
-        mq.cmdf("/dex %s /squelch /yes", State.group_combo[State.group_choice])
+        mq.cmdf("/dex %s /squelch /yes", _G.State.group_combo[_G.State.group_choice])
     end
 end
 
 function manage.setRadius(character, class, script, radius, char_settings)
-    Logger.log_verbose("\aoSetting radius to \ag%s\ao.", radius)
+    logger.log_verbose("\aoSetting radius to \ag%s\ao.", radius)
     if script == 1 then
         mq.cmdf('/squelch /%s pullradius %s nosave', class, radius)
     elseif script == 2 then
@@ -446,9 +446,9 @@ function manage.setRadius(character, class, script, radius, char_settings)
 end
 
 function manage.startGroup(class_settings, char_settings)
-    Logger.log_verbose("\aoStarting class automation for group and setting group roles.")
+    logger.log_verbose("\aoStarting class automation for group and setting group roles.")
     if mq.TLO.Me.Grouped() == true and mq.TLO.Group.Leader() == mq.TLO.Me.DisplayName() then
-        Logger.log_super_verbose("\aoSetting self to MA and MT.")
+        logger.log_super_verbose("\aoSetting self to MA and MT.")
         mq.cmdf("/squelch /grouprole set %s 1", mq.TLO.Me.DisplayName())
         mq.cmdf("/squelch /grouprole set %s 2", mq.TLO.Me.DisplayName())
         --mq.cmdf("/grouprole set %s 3", mq.TLO.Me.DisplayName())
@@ -456,9 +456,9 @@ function manage.startGroup(class_settings, char_settings)
     manage.doAutomation(mq.TLO.Me.DisplayName(), mq.TLO.Me.Class.ShortName(),
         class_settings.class[mq.TLO.Me.Class.Name()],
         'start', char_settings)
-    if State.group_choice == 1 then
+    if _G.State.group_choice == 1 then
         return
-    elseif State.group_choice == 2 then
+    elseif _G.State.group_choice == 2 then
         for i = 0, mq.TLO.Group.GroupSize() - 1 do
             if mq.TLO.Group.Member(i).DisplayName() ~= mq.TLO.Me.DisplayName() then
                 manage.doAutomation(mq.TLO.Group.Member(i).DisplayName(), mq.TLO.Group.Member(i).Class.ShortName(),
@@ -467,21 +467,21 @@ function manage.startGroup(class_settings, char_settings)
             end
         end
     else
-        manage.doAutomation(State.group_combo[State.group_choice],
-            mq.TLO.Group.Member(State.group_combo[State.group_choice]).Class.ShortName(),
-            class_settings.class[mq.TLO.Group.Member(State.group_combo[State.group_choice]).Class.Name()], 'start',
+        manage.doAutomation(_G.State.group_combo[_G.State.group_choice],
+            mq.TLO.Group.Member(_G.State.group_combo[_G.State.group_choice]).Class.ShortName(),
+            class_settings.class[mq.TLO.Group.Member(_G.State.group_combo[_G.State.group_choice]).Class.Name()], 'start',
             char_settings)
     end
 end
 
 function manage.uncampGroup(class_settings)
-    Logger.log_info("\aoEnding camp mode.")
+    logger.log_info("\aoEnding camp mode.")
     manage.doAutomation(mq.TLO.Me.DisplayName(), mq.TLO.Me.Class.ShortName(),
         class_settings.class[mq.TLO.Me.Class.Name()],
         'uncamp')
-    if State.group_choice == 1 then
+    if _G.State.group_choice == 1 then
         return
-    elseif State.group_choice == 2 then
+    elseif _G.State.group_choice == 2 then
         for i = 0, mq.TLO.Group.GroupSize() - 1 do
             if mq.TLO.Group.Member(i).DisplayName() ~= mq.TLO.Me.DisplayName() then
                 manage.doAutomation(mq.TLO.Group.Member(i).DisplayName(), mq.TLO.Group.Member(i).Class.ShortName(),
@@ -490,19 +490,19 @@ function manage.uncampGroup(class_settings)
             end
         end
     else
-        manage.doAutomation(State.group_combo[State.group_choice],
-            mq.TLO.Group.Member(State.group_combo[State.group_choice]).Class.ShortName(),
-            class_settings.class[mq.TLO.Group.Member(State.group_combo[State.group_choice]).Class.Name()], 'uncamp')
+        manage.doAutomation(_G.State.group_combo[_G.State.group_choice],
+            mq.TLO.Group.Member(_G.State.group_combo[_G.State.group_choice]).Class.ShortName(),
+            class_settings.class[mq.TLO.Group.Member(_G.State.group_combo[_G.State.group_choice]).Class.Name()], 'uncamp')
     end
 end
 
 function manage.unpauseGroup(class_settings)
-    Logger.log_info("\aoUnpausing class automation for group.")
+    logger.log_info("\aoUnpausing class automation for group.")
     manage.doAutomation(mq.TLO.Me.DisplayName(), mq.TLO.Me.Class.ShortName(),
         class_settings.class[mq.TLO.Me.Class.Name()], 'unpause')
-    if State.group_choice == 1 then
+    if _G.State.group_choice == 1 then
         return
-    elseif State.group_choice == 2 then
+    elseif _G.State.group_choice == 2 then
         local groupSize = 1
         if mq.TLO.Group.GroupSize() ~= nil then
             groupSize = mq.TLO.Group.GroupSize()
@@ -515,9 +515,9 @@ function manage.unpauseGroup(class_settings)
             end
         end
     else
-        manage.doAutomation(State.group_combo[State.group_choice],
-            mq.TLO.Group.Member(State.group_combo[State.group_choice]).Class.ShortName(),
-            class_settings.class[mq.TLO.Group.Member(State.group_combo[State.group_choice]).Class.Name()], 'unpause')
+        manage.doAutomation(_G.State.group_combo[_G.State.group_choice],
+            mq.TLO.Group.Member(_G.State.group_combo[_G.State.group_choice]).Class.ShortName(),
+            class_settings.class[mq.TLO.Group.Member(_G.State.group_combo[_G.State.group_choice]).Class.Name()], 'unpause')
     end
 end
 
