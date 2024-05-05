@@ -5,6 +5,7 @@ local travel                 = require('utils/travel')
 local logger                 = require('utils/logger')
 
 local DESIRED_CHIPS          = 1900
+local MAX_DISTANCE           = 100
 local actions                = {}
 
 actions.farm_event_triggered = false
@@ -697,10 +698,10 @@ function actions.npc_give(item, class_settings, char_settings)
     logger.log_info("\aoGiving \ag%s\ao to \ag%s\ao.", item.what, item.npc)
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
         if mq.TLO.Spawn(item.npc).Distance() ~= nil then
-            if mq.TLO.Spawn(item.npc).Distance() > 100 then
+            if mq.TLO.Spawn(item.npc).Distance() > MAX_DISTANCE then
                 _G.State.rewound = true
                 _G.State.step = _G.State.step - 1
-                logger.log_warn("\ar%s \aois over 100 units away. Moving back to step \ar%s\ao.", item.npc, _G.State.step)
+                logger.log_warn("\ar%s \aois over %s units away. Moving back to step \ar%s\ao.", item.npc, MAX_DISTANCE, _G.State.step)
                 return
             end
         end
@@ -763,10 +764,10 @@ function actions.npc_give_add(item, class_settings, char_settings)
     logger.log_info("\aoAdding \ag%s\ao to give window with \ag%s\ao.", item.what, item.npc)
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
         if mq.TLO.Spawn(item.npc).Distance() ~= nil then
-            if mq.TLO.Spawn(item.npc).Distance() > 100 then
+            if mq.TLO.Spawn(item.npc).Distance() > MAX_DISTANCE then
                 _G.State.rewound = true
                 _G.State.step = _G.State.step - 1
-                logger.log_warn("\ar%s \aois over 100 units away. Moving back to step \ar%s\ao.", item.npc, _G.State.step)
+                logger.log_warn("\ar%s \aois over %s units away. Moving back to step \ar%s\ao.", item.npc, MAX_DISTANCE, _G.State.step)
                 return
             end
         end
@@ -816,8 +817,8 @@ function actions.npc_give_money(item, class_settings, char_settings)
     logger.log_info("\aoGiving \ag%s\ao platinum to \ag%s\ao.", item.what, item.npc)
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
         if mq.TLO.Spawn(item.npc).Distance() ~= nil then
-            if mq.TLO.Spawn(item.npc).Distance() > 100 then
-                logger.log_warn("\ar%s \aois over 100 units away. Moving back to step \ar%s\ao.", item.npc, _G.State.step)
+            if mq.TLO.Spawn(item.npc).Distance() > MAX_DISTANCE then
+                logger.log_warn("\ar%s \aois over %s units away. Moving back to step \ar%s\ao.", item.npc, MAX_DISTANCE, _G.State.step)
                 _G.State.rewound = true
                 _G.State.step = _G.State.step - 1
                 return
@@ -859,10 +860,10 @@ function actions.npc_hail(item, class_settings, char_settings)
     logger.log_info("\aoHailing \ag%s\ao.", item.npc)
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
         if mq.TLO.Spawn(item.npc).Distance() ~= nil then
-            if mq.TLO.Spawn(item.npc).Distance() > 100 then
+            if mq.TLO.Spawn(item.npc).Distance() > MAX_DISTANCE then
                 _G.State.rewound = true
                 _G.State.step = _G.State.step - 1
-                logger.log_warn("\ar%s \aois over 100 units away. Moving back to step \ar%s\ao.", item.npc, _G.State.step)
+                logger.log_warn("\ar%s \aois over %s units away. Moving back to step \ar%s\ao.", item.npc, MAX_DISTANCE, _G.State.step)
                 return
             end
         end
@@ -880,10 +881,10 @@ function actions.npc_talk(item, class_settings, char_settings)
     logger.log_info("\aoSaying \ag%s \aoto \ag%s\ao.", item.phrase, item.npc)
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
         if mq.TLO.Spawn(item.npc).Distance() ~= nil then
-            if mq.TLO.Spawn(item.npc).Distance() > 100 then
+            if mq.TLO.Spawn(item.npc).Distance() > MAX_DISTANCE then
                 _G.State.rewound = true
                 _G.State.step = _G.State.step - 1
-                logger.log_warn("\ar%s \aois over 100 units away. Moving back to step \ar%s\ao.", item.npc, _G.State.step)
+                logger.log_warn("\ar%s \aois over %s units away. Moving back to step \ar%s\ao.", item.npc, MAX_DISTANCE, _G.State.step)
                 return
             end
         end
@@ -943,10 +944,10 @@ function actions.pickpocket(item)
     _G.State.setStatusText(string.format("Pickpocketing %s from %s.", item.what, item.npc))
     logger.log_info("\aoPickpocketing \ag%s \aofrom \ag%s\ao.", item.what, item.npc)
     if mq.TLO.Spawn(item.npc).Distance() ~= nil then
-        if mq.TLO.Spawn(item.npc).Distance() > 100 then
+        if mq.TLO.Spawn(item.npc).Distance() > MAX_DISTANCE then
             _G.State.rewound = true
             _G.State.step = _G.State.step - 1
-            logger.log_warn("\ar%s \aois over 100 units away. Moving back to step \ar%s\ao.", item.npc, _G.State.step)
+            logger.log_warn("\ar%s \aois over %s units away. Moving back to step \ar%s\ao.", item.npc, MAX_DISTANCE, _G.State.step)
             return
         end
     end
