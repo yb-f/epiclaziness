@@ -52,7 +52,7 @@ local function log(logLevel, output, ...)
     end
 
     local badMesh = ''
-    for _, zone in pairs(_G.State.badMeshes) do
+    for _, zone in ipairs(_G.State.badMeshes) do
         if zone == mq.TLO.Zone.ShortName() then
             badMesh = 'X'
         end
