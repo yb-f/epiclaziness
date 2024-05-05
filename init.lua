@@ -18,10 +18,6 @@ local PackageMan          = require('mq/PackageMan')
 local sqlite3             = PackageMan.Require('lsqlite3')
 local http                = PackageMan.Require('luasocket', 'socket.http')
 local ssl                 = PackageMan.Require('luasec', 'ssl')
---local ok, _          = pcall(require, 'ssl')
---if not ok then
---   PackageMan.Install('luasec')
---end
 
 local version_url         = 'https://raw.githubusercontent.com/yb-f/EL-Ver/master/latest_ver'
 local version             = v("0.3.2")
@@ -74,53 +70,45 @@ local function loadTheme()
 end
 
 _G.State = {
-    pause           = false,
-    bind_travel     = false,
-    task_run        = false,
-    start_run       = false,
-    stop_at_save    = false,
-    step            = 0,
-    status          = '',
-    status2         = '',
-    reqs            = '',
-    bagslot1        = 0,
-    bagslot2        = 0,
-    group_combo     = {},
-    group_choice    = 1,
-    use_cwtn        = false,
-    use_ka          = false,
-    use_rgl         = false,
-    epic_list       = quests_done[string.lower(mq.TLO.Me.Class.ShortName())],
-    epic_choice     = 1,
-    farming         = false,
-    nextmob         = false,
-    epicstring      = '',
-    Location        = {
+    is_paused           = false,
+    is_task_running     = false,
+    do_start_run        = false,
+    should_stop_at_save = false,
+    current_step        = 0,
+    status              = '', --
+    status2             = '', --
+    requirements        = '', --
+    bagslot1            = 0,
+    bagslot2            = 0,
+    group_combo         = {},
+    group_choice        = 1,
+    epic_list           = quests_done[string.lower(mq.TLO.Me.Class.ShortName())],
+    epic_choice         = 1,
+    epicstring          = '',
+    Location            = {
         X = 0,
         Y = 0,
         Z = 0,
     },
-    skip            = false,
-    rewound         = false,
-    bad_IDs         = {},
-    cannot_count    = 0,
-    traveling       = false,
-    autosize        = false,
-    autosize_sizes  = AUTOSIZE_SIZES,
-    autosize_choice = AUTOSIZE_CHOICE,
-    autosize_self   = false,
-    autosize_on     = false,
-    combineSlot     = 0,
-    destType        = '',
-    dest            = '',
-    pathDist        = 0,
-    velocity        = 0,
-    estimatedTime   = 0,
-    startDist       = 0,
-    updateTime      = math.floor(mq.gettime() / 1000),
-    badMeshes       = {},
-
-
+    should_skip         = false,
+    is_rewound          = false,
+    bad_IDs             = {},
+    cannot_count        = 0,
+    is_traveling        = false,
+    autosize            = false,
+    autosize_sizes      = AUTOSIZE_SIZES,
+    autosize_choice     = AUTOSIZE_CHOICE,
+    autosize_self       = false,
+    autosize_on         = false,
+    combineSlot         = 0,
+    destType            = '',
+    dest                = '',
+    pathDist            = 0,
+    velocity            = 0,
+    estimatedTime       = 0,
+    startDist           = 0,
+    updateTime          = mq.gettime(),
+    badMeshes           = {},
 }
 
 function _G.State:setStatusText(text)
@@ -137,6 +125,14 @@ end
 
 function _G.State:readStatusTwoText()
     return self.status2
+end
+
+function _G.State:setReqsText(text)
+    self.requirements = text
+end
+
+function _G.State:readReqsText()
+    return self.requirements
 end
 
 function _G.State.step_overview()
@@ -163,10 +159,10 @@ function _G.State.step_overview()
         quest = '20'
         _G.State.epicstring = "2.0"
     end
-    _G.State.reqs = reqs[class][quest]
+    _G.State:setReqsText(reqs[class][quest])
     if tablename == '' then
         logger.log_error("\aoThis class and quest has not yet been implemented.")
-        _G.State.task_run = false
+        _G.State.is_task_running = false
         return
     end
     local sql = "SELECT * FROM " .. tablename
@@ -195,14 +191,14 @@ local function create_spawn_list()
 end
 
 function _G.State.save(item)
-    logger.log_info("\aoSaving step: \ar%s", _G.State.step)
-    loadsave.prepSave(_G.State.step)
-    if _G.State.stop_at_save then
-        logger.log_warn("\aoStopping at step: \ar%s\ao.", _G.State.Step)
+    logger.log_info("\aoSaving step: \ar%s", _G.State.current_step)
+    loadsave.prepSave(_G.State.scurrent_steptep)
+    if _G.State.should_stop_at_save then
+        logger.log_warn("\aoStopping at step: \ar%s\ao.", _G.State.current_step)
         _G.State.epicstring = ''
-        _G.State.task_run = false
-        _G.State.stop_at_save = false
-        _G.State:setStatusText(string.format("Stopped at step: %s", _G.State.step))
+        _G.State.is_task_running = false
+        _G.State.should_stop_at_save = false
+        _G.State:setStatusText(string.format("Stopped at step: %s", _G.State.current_step))
         return
     end
 end
@@ -219,7 +215,7 @@ end
 
 function _G.State.pause(item)
     _G.State:setStatusText(item.status)
-    _G.State.task_run = false
+    _G.State.is_task_running = false
 end
 
 local hashCheck   = require('utils/hashcheck')
@@ -323,7 +319,7 @@ end
 
 local function update_general_status()
     for i = 1, #task_outline_table do
-        if task_outline_table[i].Step == _G.State.step then
+        if task_outline_table[i].Step == _G.State.current_step then
             _G.State:setStatusTwoText(task_outline_table[i].Description)
         end
     end
@@ -340,18 +336,18 @@ local function execute_task(task)
         else
             if task_type == '' then type = 'none' end
             logger.log_error("\aoUnknown Type: \ar%s!", type)
-            _G.State:setStatusText(string.format("Unknown type: %s -- Step: %s", task_type, _G.State.step))
-            _G.State.task_run = false
+            _G.State:setStatusText(string.format("Unknown type: %s -- Step: %s", task_type, _G.State.current_step))
+            _G.State.is_task_running = false
             return
         end
     end
 end
 
 local function run_epic(class, choice)
-    task_table        = {}
-    local tablename   = ''
-    _G.State.task_run = true
-    _G.State.pause    = false
+    task_table               = {}
+    local tablename          = ''
+    _G.State.is_task_running = true
+    _G.State.is_paused       = false
     loadsave.loadState()
     logger.log_info("Begining quest for %s epic %s", mq.TLO.Me.Class(), _G.State.epic_list[choice])
     local epic_list = {
@@ -365,7 +361,7 @@ local function run_epic(class, choice)
         _G.State.epicstring = _G.State.epic_list[choice]
     else
         logger.log_error("\aoThis class and quest has not yet been implemented.")
-        _G.State.task_run = false
+        _G.State.is_task_running = false
         return
     end
     local ts_return = check_tradeskills(class, choice)
@@ -373,7 +369,7 @@ local function run_epic(class, choice)
         if loadsave.SaveState.general.stopTS == true then
             logger.log_error("\aoPlease raise your tradeskills to continue, or turn off the \"\agStop if tradeskill requirements are unmet\ao\" setting.")
             logger.log_error(ts_return)
-            _G.State.task_run = false
+            _G.State.is_task_running = false
             return
         else
             logger.log_warn("\aoYour tradeskills do not meet requirements for this quest but you have opted to start the quest anyways.")
@@ -386,23 +382,23 @@ local function run_epic(class, choice)
     manage.startGroup(class_settings.settings, loadsave.SaveState)
     mq.delay("5s")
     manage.pauseGroup(class_settings.settings)
-    while _G.State.step < #task_table do
-        if overview_steps[_G.State.step] ~= nil then
-            if overview_steps[_G.State.step] == 1 then
-                logger.log_warn('\aoYou have selected to complete this step (\ag%s\ao) manually. Stopping script.', _G.State.step)
+    while _G.State.current_step < #task_table do
+        if overview_steps[_G.State.current_step] ~= nil then
+            if overview_steps[_G.State.current_step] == 1 then
+                logger.log_warn('\aoYou have selected to complete this step (\ag%s\ao) manually. Stopping script.', _G.State.current_step)
                 mq.cmdf('/squelch /autosize sizeself %s', loadsave.SaveState.general['self_size'])
                 mq.cmd('/squelch /afollow off')
                 mq.cmd('/squelch /nav stop')
                 mq.cmd('/squelch /stick off')
-                _G.State.task_run = false
+                _G.State.is_task_running = false
                 return
-            elseif overview_steps[_G.State.step] == 2 then
-                logger.log_warn('\aoYou have selected to skip this step (\ag%s\ao). Moving to next step.', _G.State.step)
+            elseif overview_steps[_G.State.current_step] == 2 then
+                logger.log_warn('\aoYou have selected to skip this step (\ag%s\ao). Moving to next step.', _G.State.current_step)
                 for i, item in pairs(task_outline_table) do
-                    if item.Step == _G.State.step then
-                        _G.State.rewound = true
-                        _G.State.step = task_outline_table[i + 1].Step
-                        logger.log_info('\aoSetting step to \ar%s', _G.State.step)
+                    if item.Step == _G.State.current_step then
+                        _G.State.is_rewound = true
+                        _G.State.current_step = task_outline_table[i + 1].Step
+                        logger.log_info('\aoSetting step to \ar%s', _G.State.current_step)
                         break
                     end
                 end
@@ -413,50 +409,50 @@ local function run_epic(class, choice)
             mq.exit()
         end
         _G.State.cannot_count = 0
-        while _G.State.pause == true do
+        while _G.State.is_paused == true do
             _G.State:setStatusText("Paused")
             mq.delay(500)
             if mq.TLO.EverQuest.GameState() ~= 'INGAME' then
                 logger.log_error('\arNot in game, closing.')
                 mq.exit()
             end
-            if _G.State.task_run == false then
-                _G.State.pause = false
+            if _G.State.is_task_running == false then
+                _G.State.is_paused = false
                 return
             end
         end
-        _G.State.skip = false
-        if _G.State.rewound == false then
-            _G.State.step = _G.State.step + 1
+        _G.State.should_skip = false
+        if _G.State.is_rewound == false then
+            _G.State.current_step = _G.State.current_step + 1
         else
-            _G.State.rewound = false
+            _G.State.is_rewound = false
         end
         if mq.TLO.Me.Combat() == true then
             mq.cmd('/attack off')
         end
         update_general_status()
         mq.doevents()
-        execute_task(task_table[_G.State.step])
+        execute_task(task_table[_G.State.current_step])
         if mq.TLO.Me.Levitating() then
-            if task_table[_G.State.step].belev == nil then
+            if task_table[_G.State.current_step].belev == nil then
                 manage.removeLev()
             end
         end
-        if task_table[_G.State.step].SaveStep == 1 then
-            if _G.State.task_run == true then
-                logger.log_info("\aoSaving step: \ar%s", _G.State.step)
-                loadsave.prepSave(_G.State.step)
-                if _G.State.stop_at_save then
-                    logger.log_warn("\aoStopping at step \ar%s.", _G.State.Step)
+        if task_table[_G.State.current_step].SaveStep == 1 then
+            if _G.State.is_task_running == true then
+                logger.log_info("\aoSaving step: \ar%s", _G.State.current_step)
+                loadsave.prepSave(_G.State.current_step)
+                if _G.State.should_stop_at_save then
+                    logger.log_warn("\aoStopping at step \ar%s.", _G.State.current_step)
                     _G.State.epicstring = ''
-                    _G.State.task_run = false
-                    _G.State.stop_at_save = false
-                    _G.State:setStatusText(string.format("Stopped at step %s", _G.State.step))
+                    _G.State.is_task_running = false
+                    _G.State.should_stop_at_save = false
+                    _G.State:setStatusText(string.format("Stopped at step %s", _G.State.current_step))
                     return
                 end
             end
         end
-        if _G.State.task_run == false then
+        if _G.State.is_task_running == false then
             mq.cmdf('/squelch /autosize sizeself %s', loadsave.SaveState.general['self_size'])
             mq.cmd('/squelch /afollow off')
             mq.cmd('/squelch /nav stop')
@@ -466,7 +462,7 @@ local function run_epic(class, choice)
     end
     _G.State:setStatusText(string.format("Completed %s: %s", mq.TLO.Me.Class(), _G.State.epicstring))
     _G.State.epicstring = ''
-    _G.State.task_run = false
+    _G.State.is_task_running = false
     logger.log_info("\aoCompleted \ay%s \ao- \ar%s!", mq.TLO.Me.Class(), _G.State.epicstring)
 end
 
@@ -489,7 +485,7 @@ local function displayGUI()
         draw_gui.generalTab(task_table)
         theme.LoadTheme, themeName, themeID, class_settings.settings.LoadTheme = draw_gui.settingsTab(themeName, theme, themeID, class_settings, loadsave)
         draw_gui.outlineTab(task_outline_table, overview_steps, task_table)
-        if _G.State.task_run == true then
+        if _G.State.is_task_running == true then
             draw_gui.fullOutlineTab(task_table)
         end
         draw_gui.consoleTab(class_settings)
@@ -576,7 +572,7 @@ local function main()
         end
         if _G.State.start_run == true then
             _G.State.start_run = false
-            _G.State.step = 0
+            _G.State.current_step = 0
             run_epic(string.lower(mq.TLO.Me.Class.ShortName()), _G.State.epic_choice)
         end
         mq.delay(200)

@@ -52,11 +52,11 @@ function loadsave.loadState()
                 if loadsave.SaveState[class].Last_Ran == nil then
                     loadsave.SaveState[class].Last_Ran = 1
                 end
-                if _G.State.task_run == false then
+                if _G.State.is_task_running == false then
                     _G.State.epic_choice = loadsave.SaveState[class].Last_Ran
                 else
-                    _G.State.step = loadsave.SaveState[class][_G.State.epic_choice].Step
-                    logger.log_info("\aoStarting on step: \ar%s\ao.", _G.State.step)
+                    _G.State.current_step = loadsave.SaveState[class][_G.State.epic_choice].Step
+                    logger.log_info("\aoStarting on step: \ar%s\ao.", _G.State.current_step)
                 end
             else
                 loadsave.addConfig()

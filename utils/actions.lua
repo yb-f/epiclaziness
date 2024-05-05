@@ -115,13 +115,13 @@ function actions.farm_check(item, class_settings, char_settings)
     --if one or more of the items are not present this will be true, so on false advance to the desired step
     if not_found == false then
         logger.log_verbose("\aoAll items found. Moving to step \ag%s\ao.", item.gotostep)
-        _G.State.rewound = true
-        _G.State.step = item.gotostep
+        _G.State.is_rewound = true
+        _G.State.current_step = item.gotostep
     else
         --using item.zone as a filler slot for split goto for this function
         logger.log_verbose("\aoOne or more items missing. Moving to step \ar%s\ao.", item.backstep)
-        _G.State.rewound = true
-        _G.State.step = item.backstep
+        _G.State.is_rewound = true
+        _G.State.stcurrent_stepep = item.backstep
     end
 end
 
@@ -133,8 +133,8 @@ function actions.adventure_entrance(item, class_settings, char_settings)
     if string.find(mq.TLO.Window('AdventureRequestWnd/AdvRqst_NPCText').Text(), item.what) then
         mq.delay(50)
         travel.loc_travel(item, class_settings, char_settings)
-        _G.State.step = item.gotostep
-        _G.State.rewound = true
+        _G.State.current_step = item.gotostep
+        _G.State.is_rewound = true
     end
 end
 
@@ -148,8 +148,8 @@ function actions.drop_adventure(item)
     mq.delay(200)
     mq.cmd("/dgga /invoke ${Window[AdventureRequestWnd/AdvRqst_RequestButton].LeftMouseUp}")
     mq.delay("1s")
-    _G.State.rewound = true
-    _G.State.step = item.gotostep
+    _G.State.is_rewound = true
+    _G.State.current_step = item.gotostep
 end
 
 function actions.farm_check_pause(item, class_settings, char_settings)
@@ -177,9 +177,9 @@ function actions.farm_check_pause(item, class_settings, char_settings)
     end
     --if one or more of the items are not present this will be true, so on false advance to the desired step
     if not_found == true then
-        logger.log_error("\aoMissing \ar%s\ao. Stopping at step: \ar%s\ao.", item.what, _G.State.step)
+        logger.log_error("\aoMissing \ar%s\ao. Stopping at step: \ar%s\ao.", item.what, _G.State.current_step)
         _G.State:setStatusText(item.status)
-        _G.State.task_run = false
+        _G.State.is_task_running = false
         mq.cmd('/foreground')
     end
 end
@@ -226,16 +226,16 @@ function actions.farm_radius(item, class_settings, char_settings, event)
     if not event then
         if not item.count then
             while looping do
-                if _G.State.skip then
+                if _G.State.should_skip then
                     travel.navPause()
                     manage.uncampGroup(class_settings)
                     manage.pauseGroup(class_settings)
-                    _G.State.skip = false
+                    _G.State.should_skip = false
                     return
                 end
-                if _G.State.pause then
+                if _G.State.is_paused then
                     manage.pauseGroup(class_settings)
-                    actions.pause(_G.State.status)
+                    actions.pause(_G.State:readStatusText())
                     manage.unpauseGroup(class_settings)
                 end
                 item_status = ''
@@ -287,16 +287,16 @@ function actions.farm_radius(item, class_settings, char_settings, event)
             end
         else
             while mq.TLO.FindItemCount("=" .. item.what)() < item.count do
-                if _G.State.skip then
+                if _G.State.should_skip then
                     travel.navPause()
                     manage.uncampGroup(class_settings)
                     manage.pauseGroup(class_settings)
-                    _G.State.skip = false
+                    _G.State.should_skip = false
                     return
                 end
-                if _G.State.pause then
+                if _G.State.is_paused then
                     manage.pauseGroup(class_settings)
-                    actions.pause(_G.State.status)
+                    actions.pause(_G.State:readStatusText())
                     manage.unpauseGroup(class_settings)
                 end
                 if mq.TLO.AdvLoot.SCount() > 0 then
@@ -327,16 +327,16 @@ function actions.farm_radius(item, class_settings, char_settings, event)
         end
     else
         while looping do
-            if _G.State.skip then
+            if _G.State.should_skip then
                 travel.navPause()
                 manage.uncampGroup(class_settings)
                 manage.pauseGroup(class_settings)
-                _G.State.skip = false
+                _G.State.should_skip = false
                 return
             end
-            if _G.State.pause then
+            if _G.State.is_paused then
                 manage.pauseGroup(class_settings)
-                actions.pause(_G.State.status)
+                actions.pause(_G.State:readStatusText())
                 manage.unpauseGroup(class_settings)
             end
             mq.delay(250)
@@ -405,12 +405,12 @@ function actions.fish_farm(item, class_settings, char_settings, once)
         end
         while looping do
             mq.delay(200)
-            if _G.State.skip == true then
-                _G.State.skip = false
+            if _G.State.should_skip == true then
+                _G.State.should_skip = false
                 return
             end
-            if _G.State.pause == true then
-                actions.pause(_G.State.status)
+            if _G.State.is_paused == true then
+                actions.pause(_G.State:readStatusText())
             end
             if _G.Mob.xtargetCheck(char_settings) then
                 _G.Mob.clearXtarget(class_settings, char_settings)
@@ -491,12 +491,12 @@ function actions.forage_farm(item, class_settings, char_settings)
         end
         while looping do
             mq.delay(200)
-            if _G.State.skip == true then
-                _G.State.skip = false
+            if _G.State.should_skip == true then
+                _G.State.should_skip = false
                 return
             end
-            if _G.State.pause == true then
-                actions.pause(_G.State.status)
+            if _G.State.is_paused == true then
+                actions.pause(_G.State:readStatusText())
             end
             if _G.Mob.xtargetCheck(char_settings) then
                 _G.Mob.clearXtarget(class_settings, char_settings)
@@ -550,8 +550,8 @@ function actions.ground_spawn(item, class_settings, char_settings)
     mq.cmd("/squelch /click left itemtarget")
     logger.log_info("\aoPicking up \ag%s\ao.", item.what)
     while mq.TLO.Cursor.Name() ~= item.what do
-        if _G.State.skip == true then
-            _G.State.skip = false
+        if _G.State.should_skip == true then
+            _G.State.should_skip = false
             return
         end
         mq.delay(200)
@@ -574,16 +574,16 @@ function actions.ground_spawn_farm(item, class_settings, char_settings)
     end
     while looping == true do
         loop_check = true
-        if _G.State.skip == true then
+        if _G.State.should_skip == true then
             travel.navPause()
             manage.uncampGroup(class_settings)
             manage.pauseGroup(class_settings)
-            _G.State.skip = false
+            _G.State.should_skip = false
             return
         end
-        if _G.State.pause == true then
+        if _G.State.is_paused == true then
             manage.pauseGroup(class_settings)
-            actions.pause(_G.State.status)
+            actions.pause(_G.State:readStatusText())
             manage.unpauseGroup(class_settings)
         end
         item_status = ''
@@ -630,13 +630,13 @@ function actions.group_size_check(item)
     if not mq.TLO.Group.GroupSize() then
         _G.State:setStatusText(item.status)
         logger.log_error("\aoYou will require \ar%s \aoplayers in your party to progress through this step.", item.count)
-        _G.State.task_run = false
+        _G.State.is_task_running = false
         return
     end
     if mq.TLO.Group.GroupSize() < item.count then
         _G.State:setStatusText(item.status)
         logger.log_error("\aoYou will require \ar%s \aoplayers in your party to progress through this step.", item.count)
-        _G.State.task_run = false
+        _G.State.is_task_running = false
         return
     end
 end
@@ -677,14 +677,14 @@ end
 
 function actions.pause(status)
     _G.State:setStatusText('Paused.')
-    logger.log_info("\aoPausing on step \ar%s\ao.", _G.State.step)
-    while _G.State.pause == true do
+    logger.log_info("\aoPausing on step \ar%s\ao.", _G.State.current_step)
+    while _G.State.is_paused == true do
         mq.delay(200)
         if mq.TLO.EverQuest.GameState() ~= 'INGAME' then
             logger.log_error('\arNot in game, closing.')
             mq.exit()
         end
-        if _G.State.task_run == false then
+        if _G.State.is_task_running == false then
             return
         end
     end
@@ -699,9 +699,9 @@ function actions.npc_give(item, class_settings, char_settings)
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
         if mq.TLO.Spawn(item.npc).Distance() ~= nil then
             if mq.TLO.Spawn(item.npc).Distance() > MAX_DISTANCE then
-                _G.State.rewound = true
-                _G.State.step = _G.State.step - 1
-                logger.log_warn("\ar%s \aois over %s units away. Moving back to step \ar%s\ao.", item.npc, MAX_DISTANCE, _G.State.step)
+                _G.State.is_rewound = true
+                _G.State.current_step = _G.State.current_step - 1
+                logger.log_warn("\ar%s \aois over %s units away. Moving back to step \ar%s\ao.", item.npc, MAX_DISTANCE, _G.State.current_step)
                 return
             end
         end
@@ -712,7 +712,7 @@ function actions.npc_give(item, class_settings, char_settings)
     if mq.TLO.FindItem('=' .. item.what) == nil then
         logger.log_error("\ar%s \aowas not found in inventory.", item.what)
         _G.State:setStatusText(string.format("%s should be handed to %s but is not found in inventory.", item.what, item.npc))
-        _G.State.task_run = false
+        _G.State.is_task_running = false
         mq.cmd('/foreground')
         return
     end
@@ -732,14 +732,14 @@ function actions.npc_give(item, class_settings, char_settings)
                 looping = false
             end
         end
-        if _G.State.skip == true then
-            _G.State.skip = false
+        if _G.State.should_skip == true then
+            _G.State.should_skip = false
             return
         end
         if loopCount == 10 then
-            logger.log_error("\aoFailed to give \ar%s \ao to \ar%s \aoon step \ar%s\ao.", item.what, item.npc, _G.State.step)
-            _G.State:setStatusText(string.format("Failed to give %s to %s on step %s.", item.what, item.npc, _G.State.step))
-            _G.State.task_run = false
+            logger.log_error("\aoFailed to give \ar%s \ao to \ar%s \aoon step \ar%s\ao.", item.what, item.npc, _G.State.current_step)
+            _G.State:setStatusText(string.format("Failed to give %s to %s on step %s.", item.what, item.npc, _G.State.current_step))
+            _G.State.is_task_running = false
             mq.cmd('/foreground')
             return
         end
@@ -749,8 +749,8 @@ function actions.npc_give(item, class_settings, char_settings)
     while mq.TLO.Window('GiveWnd').Open() do
         mq.delay(250)
         mq.TLO.Window('GiveWnd').Child('GVW_Give_Button').LeftMouseUp()
-        if _G.State.skip == true then
-            _G.State.skip = false
+        if _G.State.should_skip == true then
+            _G.State.should_skip = false
             return
         end
     end
@@ -765,9 +765,9 @@ function actions.npc_give_add(item, class_settings, char_settings)
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
         if mq.TLO.Spawn(item.npc).Distance() ~= nil then
             if mq.TLO.Spawn(item.npc).Distance() > MAX_DISTANCE then
-                _G.State.rewound = true
-                _G.State.step = _G.State.step - 1
-                logger.log_warn("\ar%s \aois over %s units away. Moving back to step \ar%s\ao.", item.npc, MAX_DISTANCE, _G.State.step)
+                _G.State.is_rewound = true
+                _G.State.current_step = _G.State.current_step - 1
+                logger.log_warn("\ar%s \aois over %s units away. Moving back to step \ar%s\ao.", item.npc, MAX_DISTANCE, _G.State.current_step)
                 return
             end
         end
@@ -788,8 +788,8 @@ function actions.npc_give_add(item, class_settings, char_settings)
                 looping = false
             end
         end
-        if _G.State.skip == true then
-            _G.State.skip = false
+        if _G.State.should_skip == true then
+            _G.State.should_skip = false
             return
         end
     end
@@ -803,8 +803,8 @@ function actions.npc_give_click(item, class_settings, char_settings)
     logger.log_info("\aoClicking give button.")
     while mq.TLO.Window('GiveWnd').Open() do
         mq.delay(100)
-        if _G.State.skip == true then
-            _G.State.skip = false
+        if _G.State.should_skip == true then
+            _G.State.should_skip = false
             return
         end
     end
@@ -818,9 +818,9 @@ function actions.npc_give_money(item, class_settings, char_settings)
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
         if mq.TLO.Spawn(item.npc).Distance() ~= nil then
             if mq.TLO.Spawn(item.npc).Distance() > MAX_DISTANCE then
-                logger.log_warn("\ar%s \aois over %s units away. Moving back to step \ar%s\ao.", item.npc, MAX_DISTANCE, _G.State.step)
-                _G.State.rewound = true
-                _G.State.step = _G.State.step - 1
+                logger.log_warn("\ar%s \aois over %s units away. Moving back to step \ar%s\ao.", item.npc, MAX_DISTANCE, _G.State.current_step)
+                _G.State.is_rewound = true
+                _G.State.current_step = _G.State.current_step - 1
                 return
             end
         end
@@ -844,8 +844,8 @@ function actions.npc_give_money(item, class_settings, char_settings)
     mq.delay(100)
     while mq.TLO.Window('GiveWnd').Open() do
         mq.delay(100)
-        if _G.State.skip == true then
-            _G.State.skip = false
+        if _G.State.should_skip == true then
+            _G.State.should_skip = false
             return
         end
     end
@@ -861,9 +861,9 @@ function actions.npc_hail(item, class_settings, char_settings)
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
         if mq.TLO.Spawn(item.npc).Distance() ~= nil then
             if mq.TLO.Spawn(item.npc).Distance() > MAX_DISTANCE then
-                _G.State.rewound = true
-                _G.State.step = _G.State.step - 1
-                logger.log_warn("\ar%s \aois over %s units away. Moving back to step \ar%s\ao.", item.npc, MAX_DISTANCE, _G.State.step)
+                _G.State.is_rewound = true
+                _G.State.current_step = _G.State.current_step - 1
+                logger.log_warn("\ar%s \aois over %s units away. Moving back to step \ar%s\ao.", item.npc, MAX_DISTANCE, _G.State.current_step)
                 return
             end
         end
@@ -882,9 +882,9 @@ function actions.npc_talk(item, class_settings, char_settings)
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
         if mq.TLO.Spawn(item.npc).Distance() ~= nil then
             if mq.TLO.Spawn(item.npc).Distance() > MAX_DISTANCE then
-                _G.State.rewound = true
-                _G.State.step = _G.State.step - 1
-                logger.log_warn("\ar%s \aois over %s units away. Moving back to step \ar%s\ao.", item.npc, MAX_DISTANCE, _G.State.step)
+                _G.State.is_rewound = true
+                _G.State.current_step = _G.State.current_step - 1
+                logger.log_warn("\ar%s \aois over %s units away. Moving back to step \ar%s\ao.", item.npc, MAX_DISTANCE, _G.State.current_step)
                 return
             end
         end
@@ -910,12 +910,12 @@ function actions.npc_wait(item, class_settings, char_settings)
         if _G.Mob.xtargetCheck(char_settings) then
             _G.Mob.clearXtarget(class_settings, char_settings)
         end
-        if _G.State.skip == true then
-            _G.State.skip = false
+        if _G.State.should_skip == true then
+            _G.State.should_skip = false
             return
         end
-        if _G.State.pause == true then
-            actions.pause(_G.State.status)
+        if _G.State.is_paused == true then
+            actions.pause(_G.State:readStatusText())
         end
         mq.delay(200)
     end
@@ -929,12 +929,12 @@ function actions.npc_wait_despawn(item, class_settings, char_settings)
         if _G.Mob.xtargetCheck(char_settings) then
             _G.Mob.clearXtarget(class_settings, char_settings)
         end
-        if _G.State.skip == true then
-            _G.State.skip = false
+        if _G.State.should_skip == true then
+            _G.State.should_skip = false
             return
         end
-        if _G.State.pause == true then
-            actions.pause(_G.State.status)
+        if _G.State.is_paused == true then
+            actions.pause(_G.State:readStatusText())
         end
         mq.delay(200)
     end
@@ -945,9 +945,9 @@ function actions.pickpocket(item)
     logger.log_info("\aoPickpocketing \ag%s \aofrom \ag%s\ao.", item.what, item.npc)
     if mq.TLO.Spawn(item.npc).Distance() ~= nil then
         if mq.TLO.Spawn(item.npc).Distance() > MAX_DISTANCE then
-            _G.State.rewound = true
-            _G.State.step = _G.State.step - 1
-            logger.log_warn("\ar%s \aois over %s units away. Moving back to step \ar%s\ao.", item.npc, MAX_DISTANCE, _G.State.step)
+            _G.State.is_rewound = true
+            _G.State.current_step = _G.State.current_step - 1
+            logger.log_warn("\ar%s \aois over %s units away. Moving back to step \ar%s\ao.", item.npc, MAX_DISTANCE, _G.State.current_step)
             return
         end
     end
@@ -955,8 +955,8 @@ function actions.pickpocket(item)
     mq.TLO.NearestSpawn("npc " .. item.npc).DoTarget()
     local looping = true
     while looping do
-        if _G.State.skip == true then
-            _G.State.skip = false
+        if _G.State.should_skip == true then
+            _G.State.should_skip = false
             return
         end
         if mq.TLO.Me.AbilityReady('Pick Pockets')() then
@@ -1001,8 +1001,8 @@ function actions.pre_farm_check(item, class_settings, char_settings)
     --if one or more of the items are not present this will be true, so on false advance to the desired step
     if not_found == false then
         logger.log_info("\aoAll necessary items found. Moving to step \ar%s\ao.", item.gotostep)
-        _G.State.rewound = true
-        _G.State.step = item.gotostep
+        _G.State.is_rewound = true
+        _G.State.current_step = item.gotostep
     end
 end
 
@@ -1010,8 +1010,8 @@ function actions.rog_gamble(item)
     logger.log_verbose("\aoCreating rogue gambling event.")
     mq.event('chips', "#*#You now have #1# chips#*#", gamble_event)
     while gamble_done == false do
-        if _G.State.skip == true then
-            _G.State.skip = false
+        if _G.State.should_skip == true then
+            _G.State.should_skip = false
             return
         end
         actions.npc_talk(item)
@@ -1036,7 +1036,7 @@ function actions.start_adventure(item)
     if mq.TLO.Me.Grouped() == false then
         logger.log_error("\aoYou must be in a group with 3 members to request an LDON adventure.")
         _G.State:setStatusText("Please be a part of a group to continue.")
-        _G.State.task_run = false
+        _G.State.is_task_running = false
         mq.cmd('/foreground')
         return
     end
@@ -1061,12 +1061,12 @@ function actions.ldon_count_check(item)
     local timeString = mq.TLO.Window("AdventureRequestWnd/AdvRqst_CompleteTimeLeftLabel").Text()
     local progressString = mq.TLO.Window("AdventureRequestWnd/AdvRqst_ProgressTextLabel").Text()
     if timeString == '' and progressString == '' then
-        _G.State.rewound = true
-        _G.State.step = item.gotostep
+        _G.State.is_rewound = true
+        _G.State.current_step = item.gotostep
         logger.log_info("\aoCompleted LDON adventure!")
     else
-        _G.State.rewound = true
-        _G.State.step = item.backstep
+        _G.State.is_rewound = true
+        _G.State.current_step = item.backstep
         logger.log_super_verbose("\aoAdventure not yet complete.")
     end
 end
@@ -1086,12 +1086,12 @@ function actions.wait(item, class_settings, char_settings)
         if _G.Mob.xtargetCheck(char_settings) then
             _G.Mob.clearXtarget(class_settings, char_settings)
         end
-        if _G.State.skip == true then
-            _G.State.skip = false
+        if _G.State.should_skip == true then
+            _G.State.should_skip = false
             return
         end
-        if _G.State.pause == true then
-            actions.pause(_G.State.status)
+        if _G.State.is_paused == true then
+            actions.pause(_G.State:readStatusText())
         end
         mq.delay(200)
         if os.clock() * 1000 > start_wait + item.wait then
@@ -1104,9 +1104,9 @@ function actions.wait(item, class_settings, char_settings)
                     logger.log_info("\aoWe have reached our destination. Stopping paused state early.")
                     break
                 end
-                _G.State.rewound = true
-                _G.State.step = _G.State.step - 2
-                logger.log_warn("\aoWe should be moving on the z-axis and we are not. Backing up to step \ar%s\ao.", _G.State.step)
+                _G.State.is_rewound = true
+                _G.State.current_step = _G.State.current_step - 2
+                logger.log_warn("\aoWe should be moving on the z-axis and we are not. Backing up to step \ar%s\ao.", _G.State.current_step)
                 return
             else
                 distance = math.abs(mq.TLO.Me.Z() - item.whereZ)
@@ -1119,8 +1119,8 @@ function actions.wait(item, class_settings, char_settings)
         end
     end
     if item.gotostep ~= nil then
-        _G.State.rewound = true
-        _G.State.step = item.gotostep
+        _G.State.is_rewound = true
+        _G.State.current_step = item.gotostep
     end
 end
 
@@ -1129,9 +1129,9 @@ function actions.wait_event(item)
     logger.log_info("\aoWaiting for event (\ag%s\ao) before continuing.", item.phrase)
     waiting = true
     while waiting do
-        if _G.State.skip == true then
+        if _G.State.should_skip == true then
             mq.unevent('wait_event')
-            _G.State.skip = false
+            _G.State.should_skip = false
             return
         end
         mq.delay(200)
