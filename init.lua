@@ -121,6 +121,14 @@ _G.State = {
     badMeshes       = {},
 }
 
+function _G.State.setStatusText(text)
+    _G.State.status = text
+end
+
+function _G.State.readStatusText()
+    return _G.State.status
+end
+
 function _G.State.step_overview()
     task_outline_table = {}
     local class = string.lower(mq.TLO.Me.Class.ShortName())
