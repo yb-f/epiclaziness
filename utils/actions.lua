@@ -75,7 +75,7 @@ end
 
 function actions.cast_alt(item)
     manage.removeInvis()
-    _G.State.setStatusText(string.format("Casting %s", item.what))
+    _G.State:setStatusText(string.format("Casting %s", item.what))
     local ID = mq.TLO.Me.AltAbility(item.what)()
     logger.log_info('\aoCasting alternate ability: %s (%s)', item.what, ID)
     mq.cmdf('/squelch /alt act %s', ID)
@@ -95,13 +95,13 @@ function actions.farm_check(item, class_settings, char_settings)
     local not_found = false
     if item.count ~= nil then
         logger.log_verbose("\aoChecking if we have \ag%s \aoof \ag%s\ao.", item.count, item.what)
-        _G.State.setStatusText(string.format("Checking if we have %s of %s.", item.count, item.what))
+        _G.State:setStatusText(string.format("Checking if we have %s of %s.", item.count, item.what))
         if mq.TLO.FindItemCount("=" .. item.what)() < item.count then
             logger.log_super_verbose("\aoWe do not have \ar%s \aoof \aar%s\ao.", item.count, item.what)
             not_found = true
         end
     else
-        _G.State.setStatusText(string.format("Checking if we have %s.", item.what))
+        _G.State:setStatusText(string.format("Checking if we have %s.", item.what))
         logger.log_verbose("\aoChecking if we have \ag%s\ao.", item.what)
         for word in string.gmatch(item.what, '([^|]+)') do
             table.insert(check_list, word)
@@ -156,7 +156,7 @@ function actions.farm_check_pause(item, class_settings, char_settings)
     if _G.Mob.xtargetCheck(char_settings) then
         _G.Mob.clearXtarget(class_settings, char_settings)
     end
-    _G.State.setStatusText(string.format("Checking for %s.", item.what))
+    _G.State:setStatusText(string.format("Checking for %s.", item.what))
     local check_list = {}
     local not_found = false
     if item.count then
@@ -178,7 +178,7 @@ function actions.farm_check_pause(item, class_settings, char_settings)
     --if one or more of the items are not present this will be true, so on false advance to the desired step
     if not_found == true then
         logger.log_error("\aoMissing \ar%s\ao. Stopping at step: \ar%s\ao.", item.what, _G.State.step)
-        _G.State.setStatusText(item.status)
+        _G.State:setStatusText(item.status)
         _G.State.task_run = false
         mq.cmd('/foreground')
     end
@@ -192,15 +192,15 @@ function actions.farm_radius(item, class_settings, char_settings, event)
     event = event or false
     if not event then
         if item.count then
-            _G.State.setStatusText(string.format("Farming for %s (%s).", item.what, item.count))
+            _G.State:setStatusText(string.format("Farming for %s (%s).", item.what, item.count))
             logger.log_info("\aoFarming for \ag%s \ao(\ag%s\ao).", item.what, item.count)
         else
-            _G.State.setStatusText(string.format("Farming for %s.", item.what))
+            _G.State:setStatusText(string.format("Farming for %s.", item.what))
             logger.log_info("\aoFarming for \ag%s\ao.", item.what)
         end
     else
         actions.farm_event_triggered = false
-        _G.State.setStatusText(string.format("Killing mobs in radius %s until event.", item.radius))
+        _G.State:setStatusText(string.format("Killing mobs in radius %s until event.", item.radius))
         logger.log_info("\aoKilling mobs in radius \ag%s \aountil event.", item.radius)
         logger.log_debug("\aoEvent trigger is \ag%s\ao.", item.what)
         mq.event('farm_event', item.phrase, actions.farm_event)
@@ -214,9 +214,9 @@ function actions.farm_radius(item, class_settings, char_settings, event)
     local loop_check = true
     if not event then
         if item.count then
-            _G.State.setStatusText(string.format("Farming for %s (%s).", item.what, item.count))
+            _G.State:setStatusText(string.format("Farming for %s (%s).", item.what, item.count))
         else
-            _G.State.setStatusText(string.format("Farming for %s.", item.what))
+            _G.State:setStatusText(string.format("Farming for %s.", item.what))
         end
         for word in string.gmatch(item.what, '([^|]+)') do
             table.insert(item_list, word)
@@ -253,7 +253,7 @@ function actions.farm_radius(item, class_settings, char_settings, event)
                 if item_remove > 0 then
                     table.remove(item_list, item_remove)
                 end
-                _G.State.setStatusText(string.format("Farming for %s.", item_status))
+                _G.State:setStatusText(string.format("Farming for %s.", item_status))
                 if loop_check then
                     looping = false
                 end
@@ -342,7 +342,7 @@ function actions.farm_radius(item, class_settings, char_settings, event)
             mq.delay(250)
             mq.doevents()
             if actions.farm_event_triggered then
-                _G.State.setStatusText("Event triggered. Moving on.")
+                _G.State:setStatusText("Event triggered. Moving on.")
                 logger.log_info("\aoEvent triggered, moving on.")
                 logger.log_verbose("Removing farm_event trigger")
                 mq.unevent('farm_event')
@@ -355,7 +355,7 @@ function actions.farm_radius(item, class_settings, char_settings, event)
 end
 
 function actions.farm_while_near(item, class_settings, char_settings)
-    _G.State.setStatusText(string.format("Killing nearby mobs until %s moves.", item.npc))
+    _G.State:setStatusText(string.format("Killing nearby mobs until %s moves.", item.npc))
     logger.log_info("\aoKilling nearby mobs until \ag%s \aomoves.", item.npc)
     travel.loc_travel(item, class_settings, char_settings)
     manage.campGroup(item.radius, class_settings, char_settings)
@@ -372,10 +372,10 @@ end
 function actions.fish_farm(item, class_settings, char_settings, once)
     once = once or false
     if item.count ~= nil then
-        _G.State.setStatusText(string.format("Fishing for %s (%s).", item.what, item.count))
+        _G.State:setStatusText(string.format("Fishing for %s (%s).", item.what, item.count))
         logger.log_info("\aoFishing for \ag%s \ao(\ag%s\ao).", item.what, item.count)
     else
-        _G.State.setStatusText(string.format("Fishing for %s.", item.what))
+        _G.State:setStatusText(string.format("Fishing for %s.", item.what))
         logger.log_info("\aoFishing for \ag%s\ao.", item.what)
     end
     local weapon1 = mq.TLO.InvSlot('13').Item.Name()
@@ -429,7 +429,7 @@ function actions.fish_farm(item, class_settings, char_settings, once)
             if item_remove > 0 then
                 table.remove(item_list, item_remove)
             end
-            _G.State.setStatusText(string.format("Fishing for %s.", item_status))
+            _G.State:setStatusText(string.format("Fishing for %s.", item_status))
             if loop_check then
                 looping = false
             end
@@ -479,7 +479,7 @@ end
 
 function actions.forage_farm(item, class_settings, char_settings)
     if item.count == nil then
-        _G.State.setStatusText(string.format("Foraging for %s.", item.what))
+        _G.State:setStatusText(string.format("Foraging for %s.", item.what))
         logger.log_info("\aoForaging for \ag%s\ao.", item.what)
         local item_list = {}
         local item_status = ''
@@ -516,7 +516,7 @@ function actions.forage_farm(item, class_settings, char_settings)
             if item_remove > 0 then
                 table.remove(item_list, item_remove)
             end
-            _G.State.setStatusText(string.format("Foraging for %s.", item_status))
+            _G.State:setStatusText(string.format("Foraging for %s.", item_status))
             if loop_check then
                 looping = false
             end
@@ -537,14 +537,14 @@ function actions.forage_farm(item, class_settings, char_settings)
             end
         end
     else
-        _G.State.setStatusText(string.format("Foraging for %s (%s).", item.what, item.count))
+        _G.State:setStatusText(string.format("Foraging for %s (%s).", item.what, item.count))
     end
 end
 
 function actions.ground_spawn(item, class_settings, char_settings)
-    _G.State.setStatusText(string.format("Traveling to ground spawn @ %s %s %s.", item.whereX, item.whereY, item.whereZ))
+    _G.State:setStatusText(string.format("Traveling to ground spawn @ %s %s %s.", item.whereX, item.whereY, item.whereZ))
     travel.loc_travel(item, class_settings, char_settings)
-    _G.State.setStatusText(string.format("Picking up ground spawn %s.", item.what))
+    _G.State:setStatusText(string.format("Picking up ground spawn %s.", item.what))
     mq.cmd("/squelch /itemtarget")
     mq.delay(200)
     mq.cmd("/squelch /click left itemtarget")
@@ -563,7 +563,7 @@ function actions.ground_spawn(item, class_settings, char_settings)
 end
 
 function actions.ground_spawn_farm(item, class_settings, char_settings)
-    _G.State.setStatusText(string.format("Farming for ground spawns: %s.", item.what))
+    _G.State:setStatusText(string.format("Farming for ground spawns: %s.", item.what))
     logger.log_info("\aoFarming for \ag%s", item.what)
     local item_list = {}
     local item_status = ''
@@ -600,7 +600,7 @@ function actions.ground_spawn_farm(item, class_settings, char_settings)
         if item_remove > 0 then
             table.remove(item_list, item_remove)
         end
-        _G.State.setStatusText(string.format("Farming for %s.", item_status))
+        _G.State:setStatusText(string.format("Farming for %s.", item_status))
         if loop_check then
             looping = false
         end
@@ -628,13 +628,13 @@ end
 function actions.group_size_check(item)
     logger.log_super_verbose("\aoChecking group size (\ag%s \aoplayers needed).", item.count)
     if not mq.TLO.Group.GroupSize() then
-        _G.State.setStatusText(item.status)
+        _G.State:setStatusText(item.status)
         logger.log_error("\aoYou will require \ar%s \aoplayers in your party to progress through this step.", item.count)
         _G.State.task_run = false
         return
     end
     if mq.TLO.Group.GroupSize() < item.count then
-        _G.State.setStatusText(item.status)
+        _G.State:setStatusText(item.status)
         logger.log_error("\aoYou will require \ar%s \aoplayers in your party to progress through this step.", item.count)
         _G.State.task_run = false
         return
@@ -676,7 +676,7 @@ function actions.unignore_mob(item, class_settings)
 end
 
 function actions.pause(status)
-    _G.State.setStatusText('Paused.')
+    _G.State:setStatusText('Paused.')
     logger.log_info("\aoPausing on step \ar%s\ao.", _G.State.step)
     while _G.State.pause == true do
         mq.delay(200)
@@ -688,13 +688,13 @@ function actions.pause(status)
             return
         end
     end
-    _G.State.setStatusText(status)
+    _G.State:setStatusText(status)
     return true
 end
 
 function actions.npc_give(item, class_settings, char_settings)
     manage.removeInvis()
-    _G.State.setStatusText(string.format("Giving %s to %s.", item.what, item.npc))
+    _G.State:setStatusText(string.format("Giving %s to %s.", item.what, item.npc))
     logger.log_info("\aoGiving \ag%s\ao to \ag%s\ao.", item.what, item.npc)
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
         if mq.TLO.Spawn(item.npc).Distance() ~= nil then
@@ -711,7 +711,7 @@ function actions.npc_give(item, class_settings, char_settings)
     end
     if mq.TLO.FindItem('=' .. item.what) == nil then
         logger.log_error("\ar%s \aowas not found in inventory.", item.what)
-        _G.State.setStatusText(string.format("%s should be handed to %s but is not found in inventory.", item.what, item.npc))
+        _G.State:setStatusText(string.format("%s should be handed to %s but is not found in inventory.", item.what, item.npc))
         _G.State.task_run = false
         mq.cmd('/foreground')
         return
@@ -738,7 +738,7 @@ function actions.npc_give(item, class_settings, char_settings)
         end
         if loopCount == 10 then
             logger.log_error("\aoFailed to give \ar%s \ao to \ar%s \aoon step \ar%s\ao.", item.what, item.npc, _G.State.step)
-            _G.State.setStatusText(string.format("Failed to give %s to %s on step %s.", item.what, item.npc, _G.State.step))
+            _G.State:setStatusText(string.format("Failed to give %s to %s on step %s.", item.what, item.npc, _G.State.step))
             _G.State.task_run = false
             mq.cmd('/foreground')
             return
@@ -760,7 +760,7 @@ end
 
 function actions.npc_give_add(item, class_settings, char_settings)
     manage.removeInvis()
-    _G.State.setStatusText(string.format("Giving %s to %s.", item.what, item.npc))
+    _G.State:setStatusText(string.format("Giving %s to %s.", item.what, item.npc))
     logger.log_info("\aoAdding \ag%s\ao to give window with \ag%s\ao.", item.what, item.npc)
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
         if mq.TLO.Spawn(item.npc).Distance() ~= nil then
@@ -797,7 +797,7 @@ end
 
 function actions.npc_give_click(item, class_settings, char_settings)
     manage.removeInvis()
-    _G.State.setStatusText("Giving items.")
+    _G.State:setStatusText("Giving items.")
     mq.TLO.Window('GiveWnd').Child('GVW_Give_Button').LeftMouseUp()
     mq.delay(100)
     logger.log_info("\aoClicking give button.")
@@ -813,7 +813,7 @@ end
 
 function actions.npc_give_money(item, class_settings, char_settings)
     manage.removeInvis()
-    _G.State.setStatusText(string.format("Giving %spp to %s.", item.what, item.npc))
+    _G.State:setStatusText(string.format("Giving %spp to %s.", item.what, item.npc))
     logger.log_info("\aoGiving \ag%s\ao platinum to \ag%s\ao.", item.what, item.npc)
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
         if mq.TLO.Spawn(item.npc).Distance() ~= nil then
@@ -856,7 +856,7 @@ end
 
 function actions.npc_hail(item, class_settings, char_settings)
     manage.removeInvis()
-    _G.State.setStatusText(string.format("Hailing %s.", item.npc))
+    _G.State:setStatusText(string.format("Hailing %s.", item.npc))
     logger.log_info("\aoHailing \ag%s\ao.", item.npc)
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
         if mq.TLO.Spawn(item.npc).Distance() ~= nil then
@@ -877,7 +877,7 @@ end
 
 function actions.npc_talk(item, class_settings, char_settings)
     manage.removeInvis()
-    _G.State.setStatusText(string.format("Talking to %s (%s).", item.npc, item.phrase))
+    _G.State:setStatusText(string.format("Talking to %s (%s).", item.npc, item.phrase))
     logger.log_info("\aoSaying \ag%s \aoto \ag%s\ao.", item.phrase, item.npc)
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
         if mq.TLO.Spawn(item.npc).Distance() ~= nil then
@@ -898,13 +898,13 @@ end
 
 function actions.npc_talk_all(item, class_settings, char_settings)
     manage.removeInvis()
-    _G.State.setStatusText(string.format("Talking to %s (%s).", item.npc, item.phrase))
+    _G.State:setStatusText(string.format("Talking to %s (%s).", item.npc, item.phrase))
     logger.log_info("\aoHaving all grouped characters say \ag%s \ao to \ag%s\ao.", item.phrase, item.npc)
     manage.groupTalk(item.npc, item.phrase)
 end
 
 function actions.npc_wait(item, class_settings, char_settings)
-    _G.State.setStatusText(string.format("Waiting for %s (%s).", item.npc, item.waittime))
+    _G.State:setStatusText(string.format("Waiting for %s (%s).", item.npc, item.waittime))
     logger.log_info("\aoWaiting for \ag%s\ao. This may take \ag%s\ao.", item.npc, item.waittime)
     while mq.TLO.Spawn("npc " .. item.npc).ID() == 0 do
         if _G.Mob.xtargetCheck(char_settings) then
@@ -922,7 +922,7 @@ function actions.npc_wait(item, class_settings, char_settings)
 end
 
 function actions.npc_wait_despawn(item, class_settings, char_settings)
-    _G.State.setStatusText(string.format("Waiting for %s to despawn (%s).", item.npc, item.waittime))
+    _G.State:setStatusText(string.format("Waiting for %s to despawn (%s).", item.npc, item.waittime))
     logger.log_info("\aoWaiting for \ag%s\ao to despawn. This may take \ag%s\ao.", item.npc, item.waittime)
     local unpause_automation = false
     while mq.TLO.Spawn("npc " .. item.npc).ID() ~= 0 do
@@ -941,7 +941,7 @@ function actions.npc_wait_despawn(item, class_settings, char_settings)
 end
 
 function actions.pickpocket(item)
-    _G.State.setStatusText(string.format("Pickpocketing %s from %s.", item.what, item.npc))
+    _G.State:setStatusText(string.format("Pickpocketing %s from %s.", item.what, item.npc))
     logger.log_info("\aoPickpocketing \ag%s \aofrom \ag%s\ao.", item.what, item.npc)
     if mq.TLO.Spawn(item.npc).Distance() ~= nil then
         if mq.TLO.Spawn(item.npc).Distance() > MAX_DISTANCE then
@@ -979,7 +979,7 @@ function actions.pre_farm_check(item, class_settings, char_settings)
     if _G.Mob.xtargetCheck(char_settings) then
         _G.Mob.clearXtarget(class_settings, char_settings)
     end
-    _G.State.setStatusText(string.format("Checking for pre-farmable items (%s).", item.what))
+    _G.State:setStatusText(string.format("Checking for pre-farmable items (%s).", item.what))
     logger.log_info("\aoChecking for prefarmable items (\ag%s\ao).", item.what)
     mq.delay("1s")
     local check_list = {}
@@ -1035,12 +1035,12 @@ end
 function actions.start_adventure(item)
     if mq.TLO.Me.Grouped() == false then
         logger.log_error("\aoYou must be in a group with 3 members to request an LDON adventure.")
-        _G.State.setStatusText("Please be a part of a group to continue.")
+        _G.State:setStatusText("Please be a part of a group to continue.")
         _G.State.task_run = false
         mq.cmd('/foreground')
         return
     end
-    _G.State.setStatusText(string.format("Requesting adventure from %s.", item.npc))
+    _G.State:setStatusText(string.format("Requesting adventure from %s.", item.npc))
     logger.log_info("\aoRequesting adventure from \ag%s\ao.", item.npc)
     mq.TLO.Spawn('npc ' .. item.npc).DoTarget()
     mq.delay(200)
@@ -1072,7 +1072,7 @@ function actions.ldon_count_check(item)
 end
 
 function actions.wait(item, class_settings, char_settings)
-    _G.State.setStatusText(string.format("Waiting for %s seconds.", item.wait / 1000))
+    _G.State:setStatusText(string.format("Waiting for %s seconds.", item.wait / 1000))
     logger.log_info("Waiting for \ag%s \ao seconds.", item.wait / 1000)
     local waiting = true
     local start_wait = os.clock() * 1000
@@ -1155,13 +1155,13 @@ function actions.wait_for(item)
             local min_calc = 60 - cur_eq_min
             min_calc = min_calc + (hour_calc * 60)
             local real_time = math.floor(min_calc / 20)
-            _G.State.setStatusText(string.format("Waiting for EQ Time: %s:00 (%s minutes).", item.wait, real_time))
+            _G.State:setStatusText(string.format("Waiting for EQ Time: %s:00 (%s minutes).", item.wait, real_time))
         elseif cur_eq_hour >= item.wait then
             local hour_calc = 24 - cur_eq_hour + item.wait
             local min_calc = 60 - cur_eq_min
             min_calc = min_calc + (hour_calc * 60)
             local real_time = math.floor(min_calc / 20)
-            _G.State.setStatusText(string.format("Waiting for EQ Time: %s:00 (%s minutes).", item.wait, real_time))
+            _G.State:setStatusText(string.format("Waiting for EQ Time: %s:00 (%s minutes).", item.wait, real_time))
         end
     end
 end
