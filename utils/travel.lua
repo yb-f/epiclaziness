@@ -6,10 +6,15 @@ local translocators = { "Magus", "Translocator", "Priest of Discord", "Nexus Sci
 
 local dist          = require 'utils/distance'
 
-local speed_classes = { "Bard", "Druid", "Ranger", "Shaman" }
-local speed_buffs   = { "Selo's Accelerato", "Communion of the Cheetah", "Spirit of Falcons", "Flight of Falcons" }
-local travel        = {}
-travel.looping      = false
+
+local SELOS_BUFF          = 3704
+local CHEETAH_BUFF        = 939
+local SPIRIT_FALCONS_BUFf = 8600
+local FLIGHT_FALCONS_BUFF = 8601
+local speed_classes       = { "Bard", "Druid", "Ranger", "Shaman" }
+local speed_buffs         = { "Selo's Accelerato", "Communion of the Cheetah", "Spirit of Falcons", "Flight of Falcons" }
+local travel              = {}
+travel.looping            = false
 
 function travel.invisTranslocatorCheck()
     logger.log_verbose('\aoChecking if we are near a translocator npc before invising.')
@@ -515,18 +520,14 @@ function travel.invisCheck(char_settings, class_settings, invis)
 end
 
 function travel.gotSpeedyClass(class, class_settings)
-    for i, speedy in pairs(speed_classes) do
+    for i, speedy in ipairs(speed_classes) do
         if class == speedy then
             local speed_type = {}
             for word in string.gmatch(class_settings.move_speed[class], '([^|]+)') do
                 table.insert(speed_type, word)
             end
             local speed_skill = speed_type[class_settings.speed[class]]
-            if speed_skill == 'None' then
-                return false
-            else
-                return true
-            end
+            return speed_skill ~= 'None'
         end
     end
     return false
@@ -534,7 +535,7 @@ end
 
 function travel.speedCheck(class_settings, char_settings)
     logger.log_super_verbose("\aoChecking if we are missing travel speed buff.")
-    for i, buff in pairs(speed_buffs) do
+    for i, buff in ipairs(speed_buffs) do
         if mq.TLO.Me.Buff(buff)() then
             logger.log_super_verbose("\aoWe currently have a travel speed buff active: \ag%s\ao.", buff)
             return 'none', 'none'
@@ -593,14 +594,14 @@ function travel.speedCheck(class_settings, char_settings)
             local aaNum = 0
             local casterName = ''
             for name, num in pairs(aanums) do
-                if num == 3704 then
+                if num == SELOS_BUFF then
                     aaNum = num
                     casterName = name
                     break
-                elseif num == 939 and aaNum ~= 3704 then
+                elseif num == CHEETAH_BUFF and aaNum ~= SELOS_BUFF then
                     aaNum = num
                     casterName = name
-                elseif (num == 8600 or num == 8601) and aaNum ~= 3704 and aaNum ~= 939 then
+                elseif (num == SPIRIT_FALCONS_BUFf or num == FLIGHT_FALCONS_BUFF) and aaNum ~= SELOS_BUFF and aaNum ~= CHEETAH_BUFF then
                     aaNum = num
                     casterName = name
                 end
@@ -627,7 +628,7 @@ function travel.speedCheck(class_settings, char_settings)
             casterName = mq.TLO.Me.DisplayName()
             --return mq.TLO.Me.DisplayName(), aaNum
         end
-        if aaNum == 3704 then
+        if aaNum == SELOS_BUFF then
             return casterName, aaNum
         end
         aanums[mq.TLO.Me.DisplayName()] = aaNum
@@ -647,14 +648,14 @@ function travel.speedCheck(class_settings, char_settings)
             aaNum = class_settings['speed_to_num'][speed_skill]
             aanums[mq.TLO.Group.Member(_G.State.group_combo[_G.State.group_choice]).DisplayName()] = aaNum
             for name, num in pairs(aanums) do
-                if num == 3704 then
+                if num == SELOS_BUFF then
                     aaNum = num
                     casterName = name
                     break
-                elseif num == 939 and aaNum ~= 3704 then
+                elseif num == CHEETAH_BUFF and aaNum ~= SELOS_BUFF then
                     aaNum = num
                     casterName = name
-                elseif (num == 8600 or num == 8601) and aaNum ~= 3704 and aaNum ~= 939 then
+                elseif (num == SPIRIT_FALCONS_BUFf or num == FLIGHT_FALCONS_BUFF) and aaNum ~= SELOS_BUFF and aaNum ~= CHEETAH_BUFF then
                     aaNum = num
                     casterName = name
                 end
