@@ -71,49 +71,53 @@ local function loadTheme()
     end
 end
 
-_G.State                           = {}
-
-_G.State.pause                     = false
-_G.State.bind_travel               = false
-_G.State.task_run                  = false
-_G.State.start_run                 = false
-_G.State.stop_at_save              = false
-_G.State.step                      = 0
-_G.State.status                    = ''
-_G.State.status2                   = ''
-_G.State.reqs                      = ''
-_G.State.bagslot1                  = 0
-_G.State.bagslot2                  = 0
-_G.State.group_combo               = {}
-_G.State.group_choice              = 1
-_G.State.use_cwtn                  = false
-_G.State.use_ka                    = false
-_G.State.use_rgl                   = false
-_G.State.epic_list                 = quests_done[string.lower(mq.TLO.Me.Class.ShortName())]
-_G.State.epic_choice               = 1
-_G.State.farming                   = false
-_G.State.nextmob                   = false
-_G.State.epicstring                = ''
-_G.State.X, _G.State.Y, _G.State.Z = 0, 0, 0
-_G.State.skip                      = false
-_G.State.rewound                   = false
-_G.State.bad_IDs                   = {}
-_G.State.cannot_count              = 0
-_G.State.traveling                 = false
-_G.State.autosize                  = false
-_G.State.autosize_sizes            = { 1, 2, 5, 10, 20 }
-_G.State.autosize_choice           = 3
-_G.State.autosize_self             = false
-_G.State.autosize_on               = false
-_G.State.combineSlot               = 0
-_G.State.destType                  = ''
-_G.State.dest                      = ''
-_G.State.pathDist                  = 0
-_G.State.velocity                  = 0
-_G.State.estimatedTime             = 0
-_G.State.startDist                 = 0
-_G.State.updateTime                = math.floor(mq.gettime() / 1000)
-_G.State.badMeshes                 = {}
+_G.State = {
+    pause           = false,
+    bind_travel     = false,
+    task_run        = false,
+    start_run       = false,
+    stop_at_save    = false,
+    step            = 0,
+    status          = '',
+    status2         = '',
+    reqs            = '',
+    bagslot1        = 0,
+    bagslot2        = 0,
+    group_combo     = {},
+    group_choice    = 1,
+    use_cwtn        = false,
+    use_ka          = false,
+    use_rgl         = false,
+    epic_list       = quests_done[string.lower(mq.TLO.Me.Class.ShortName())],
+    epic_choice     = 1,
+    farming         = false,
+    nextmob         = false,
+    epicstring      = '',
+    Location        = {
+        X = 0,
+        Y = 0,
+        Z = 0,
+    },
+    skip            = false,
+    rewound         = false,
+    bad_IDs         = {},
+    cannot_count    = 0,
+    traveling       = false,
+    autosize        = false,
+    autosize_sizes  = { 1, 2, 5, 10, 20 },
+    autosize_choice = 3,
+    autosize_self   = false,
+    autosize_on     = false,
+    combineSlot     = 0,
+    destType        = '',
+    dest            = '',
+    pathDist        = 0,
+    velocity        = 0,
+    estimatedTime   = 0,
+    startDist       = 0,
+    updateTime      = math.floor(mq.gettime() / 1000),
+    badMeshes       = {},
+}
 
 function _G.State.step_overview()
     task_outline_table = {}
