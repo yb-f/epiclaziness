@@ -13,7 +13,7 @@ travel.looping      = false
 
 function travel.invisTranslocatorCheck()
     logger.log_verbose('\aoChecking if we are near a translocator npc before invising.')
-    for _, name in pairs(translocators) do
+    for _, name in ipairs(translocators) do
         if mq.TLO.Spawn('npc ' .. name).Distance() ~= nil then
             if mq.TLO.Spawn('npc ' .. name).Distance() < 50 then
                 logger.log_super_verbose("\aoWe are near \ag%s\ao. Skipping invis.", mq.TLO.Spawn('npc ' .. name).DisplayName())
