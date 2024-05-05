@@ -276,7 +276,7 @@ end
 
 local function check_tradeskills(class, choice)
     if tsreqs[class] ~= nil then
-        local return_string = ''
+        local return_string = nil
         local quest = ''
         local quests = {
             ["1.0"] = "10",
@@ -365,6 +365,7 @@ local function run_epic(class, choice)
         return
     end
     local ts_return = check_tradeskills(class, choice)
+    print(type(ts_return))
     if ts_return then
         if loadsave.SaveState.general.stopTS == true then
             logger.log_error("\aoPlease raise your tradeskills to continue, or turn off the \"\agStop if tradeskill requirements are unmet\ao\" setting.")
