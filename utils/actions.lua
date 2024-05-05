@@ -189,8 +189,8 @@ end
 
 function actions.farm_radius(item, class_settings, char_settings, event)
     event = event or false
-    if event == false then
-        if item.count ~= nil then
+    if not event then
+        if item.count then
             _G.State.setStatusText(string.format("Farming for %s (%s).", item.what, item.count))
             logger.log_info("\aoFarming for \ag%s \ao(\ag%s\ao).", item.what, item.count)
         else
@@ -211,8 +211,8 @@ function actions.farm_radius(item, class_settings, char_settings, event)
     local item_status = ''
     local looping = true
     local loop_check = true
-    if event == false then
-        if item.count ~= nil then
+    if not event then
+        if item.count then
             _G.State.setStatusText(string.format("Farming for %s (%s).", item.what, item.count))
         else
             _G.State.setStatusText(string.format("Farming for %s.", item.what))
@@ -222,17 +222,17 @@ function actions.farm_radius(item, class_settings, char_settings, event)
         end
     end
     manage.removeInvis()
-    if event == false then
-        if item.count == nil then
+    if not event then
+        if not item.count then
             while looping do
-                if _G.State.skip == true then
+                if _G.State.skip then
                     travel.navPause()
                     manage.uncampGroup(class_settings)
                     manage.pauseGroup(class_settings)
                     _G.State.skip = false
                     return
                 end
-                if _G.State.pause == true then
+                if _G.State.pause then
                     manage.pauseGroup(class_settings)
                     actions.pause(_G.State.status)
                     manage.unpauseGroup(class_settings)
@@ -286,14 +286,14 @@ function actions.farm_radius(item, class_settings, char_settings, event)
             end
         else
             while mq.TLO.FindItemCount("=" .. item.what)() < item.count do
-                if _G.State.skip == true then
+                if _G.State.skip then
                     travel.navPause()
                     manage.uncampGroup(class_settings)
                     manage.pauseGroup(class_settings)
                     _G.State.skip = false
                     return
                 end
-                if _G.State.pause == true then
+                if _G.State.pause then
                     manage.pauseGroup(class_settings)
                     actions.pause(_G.State.status)
                     manage.unpauseGroup(class_settings)
@@ -326,21 +326,21 @@ function actions.farm_radius(item, class_settings, char_settings, event)
         end
     else
         while looping do
-            if _G.State.skip == true then
+            if _G.State.skip then
                 travel.navPause()
                 manage.uncampGroup(class_settings)
                 manage.pauseGroup(class_settings)
                 _G.State.skip = false
                 return
             end
-            if _G.State.pause == true then
+            if _G.State.pause then
                 manage.pauseGroup(class_settings)
                 actions.pause(_G.State.status)
                 manage.unpauseGroup(class_settings)
             end
             mq.delay(250)
             mq.doevents()
-            if actions.farm_event_triggered == true then
+            if actions.farm_event_triggered then
                 _G.State.setStatusText("Event triggered. Moving on.")
                 logger.log_info("\aoEvent triggered, moving on.")
                 logger.log_verbose("Removing farm_event trigger")
