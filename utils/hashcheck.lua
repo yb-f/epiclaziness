@@ -43,7 +43,7 @@ function hashCheck.load_stored_hashes()
 end
 
 function hashCheck.check_meshes()
-    for i, file in pairs(hashCheck.files) do
+    for i, file in ipairs(hashCheck.files) do
         local fullPath = string.format("%s%s", path, file)
         local inp = assert(io.open(fullPath, "rb"))
         local data = inp:read("*all")
