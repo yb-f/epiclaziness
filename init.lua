@@ -20,7 +20,7 @@ local http                = PackageMan.Require('luasocket', 'socket.http')
 local ssl                 = PackageMan.Require('luasec', 'ssl')
 
 local version_url         = 'https://raw.githubusercontent.com/yb-f/EL-Ver/master/latest_ver'
-local version             = v("0.3.5")
+local version             = v("0.3.6")
 local window_flags        = bit32.bor(ImGuiWindowFlags.None)
 local openGUI, drawGUI    = true, true
 local myName              = mq.TLO.Me.DisplayName()
@@ -387,12 +387,12 @@ local function init_epic(class, choice)
     for a in dbn:nrows(sql) do
         table.insert(task_table, a)
     end
-end
-
-local function run_epic(class, choice)
     manage.startGroup(class_settings.settings, loadsave.SaveState)
     mq.delay("5s")
     manage.pauseGroup(class_settings.settings)
+end
+
+local function run_epic(class, choice)
     while _G.State.current_step < #task_table do
         if overview_steps[_G.State.current_step] ~= nil then
             if overview_steps[_G.State.current_step] == 1 then
