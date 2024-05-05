@@ -49,11 +49,11 @@ function loadsave.loadState()
         loadsave.SaveState = configData()
         if loadsave.SaveState[class] ~= nil then
             if loadsave.SaveState[class][_G.State.epic_choice] ~= nil then
-                if loadsave.SaveState[class]['Last_Ran'] == nil then
-                    loadsave.SaveState[class]['Last_Ran'] = 1
+                if loadsave.SaveState[class].Last_Ran == nil then
+                    loadsave.SaveState[class].Last_Ran = 1
                 end
                 if _G.State.task_run == false then
-                    _G.State.epic_choice = loadsave.SaveState[class]['Last_Ran']
+                    _G.State.epic_choice = loadsave.SaveState[class].Last_Ran
                 else
                     _G.State.step = loadsave.SaveState[class][_G.State.epic_choice].Step
                     logger.log_info("\aoStarting on step: \ar%s\ao.", _G.State.step)
@@ -65,8 +65,8 @@ function loadsave.loadState()
             loadsave.addConfig()
         end
         if loadsave.SaveState.general ~= nil then
-            if loadsave.SaveState.general['xtargClear'] == nil then
-                loadsave.SaveState.general['xtargClear'] = 1
+            if loadsave.SaveState.general.xtargClear == nil then
+                loadsave.SaveState.general.xtargClear = 1
             end
         end
     end
@@ -74,7 +74,7 @@ end
 
 function loadsave.prepSave(step)
     loadsave.SaveState[class][_G.State.epic_choice].Step = step
-    loadsave.SaveState[class]['Last_Ran'] = _G.State.epic_choice
+    loadsave.SaveState[class].Last_Ran = _G.State.epic_choice
     loadsave.saveState()
 end
 
