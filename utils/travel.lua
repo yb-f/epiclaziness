@@ -1,11 +1,9 @@
-local mq            = require('mq')
-local logger        = require('utils/logger')
+local mq                  = require('mq')
+local logger              = require('utils/logger')
+local dist                = require 'utils/distance'
 
-local translocators = { "Magus", "Translocator", "Priest of Discord", "Nexus Scion", "Deaen Greyforge",
+local translocators       = { "Magus", "Translocator", "Priest of Discord", "Nexus Scion", "Deaen Greyforge",
     "Ambassador Cogswald", "Madronoa", "Belinda", "Herald of Druzzil Ro" }
-
-local dist          = require 'utils/distance'
-
 
 local SELOS_BUFF          = 3704
 local CHEETAH_BUFF        = 939
@@ -345,6 +343,9 @@ function travel.general_travel(item, class_settings, char_settings, ID)
     if ID == 0 then
         ID = _G.Mob.findNearestName(item.npc, item, class_settings, char_settings)
     end
+    if dist.GetDistance3D(mq.TLO.Spawn(ID).X(), mq.TLO.Spawn(ID).Y(), mq.TLO.Spawn(ID).Z(), mq.TLO.Me.X(), mq.TLO.Me.Y(), mq.TLO.Me.Z()) < 10 then
+        logger.log_debug('\aoDistance to \ag%s \aois less than 10. Not traveling.', item.npc)
+    end
     logger.log_info("\aoNavigating to \ag%s \ao(\ag%s\ao).", item.npc, ID)
     if _G.State.group_choice == 1 then
         mq.cmdf("/squelch /nav id %s", ID)
@@ -683,6 +684,10 @@ function travel.loc_travel(item, class_settings, char_settings)
     local x = item.whereX
     local y = item.whereY
     local z = item.whereZ
+    if dist.GetDistance3D(x, y, z, mq.TLO.Me.X(), mq.TLO.Me.Y(), mq.TLO.Me.Z()) < 10 then
+        logger.log_debug('\aoDistance to \ag%s %s %s \aois less than 10, not moving.', y, x, z)
+        return
+    end
     _G.State:setStatusText(string.format("Traveling to location: %s %s %s.", y, x, z))
     logger.log_info("\aoTraveling to location \ag%s, %s, %s\ao.", y, x, z)
     if mq.TLO.Navigation.PathExists('loc ' .. y .. ' ' .. x .. ' ' .. z) == false then
