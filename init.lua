@@ -164,8 +164,8 @@ end
 
 local function create_spawn_list()
     exclude_list = mq.getFilteredSpawns(matchFilters)
-    for _, spawn in pairs(exclude_list) do
-        logger.log_verbose("\aoInserting \ar%s (%s) \aointo list of bad IDs.", spawn.DisplayName(), spawn.ID())
+    for _, spawn in ipairs(exclude_list) do
+        logger.log_verbose("\aoInserting bad ID for: \ar%s \ao(\ar%s\ao).", spawn.DisplayName(), spawn.ID())
         table.insert(_G.State.bad_IDs, spawn.ID())
     end
 end
@@ -174,11 +174,11 @@ function _G.State.save(item)
     logger.log_info("\aoSaving step: \ar%s", _G.State.step)
     loadsave.prepSave(_G.State.step)
     if _G.State.stop_at_save then
-        logger.log_warn("\aoStopping at step \ar%s.", _G.State.Step)
+        logger.log_warn("\aoStopping at step: \ar%s\ao.", _G.State.Step)
         _G.State.epicstring = ''
         _G.State.task_run = false
         _G.State.stop_at_save = false
-        _G.State.status = "Stopped at step " .. _G.State.step
+        _G.State.status = string.format("Stopped at step: %s", _G.State.step)
         return
     end
 end
@@ -189,6 +189,7 @@ function _G.State.exclude_npc(item)
 end
 
 function _G.State.execute_command(item)
+    logger.log_info("\aoExecuting command: \ag%s", item.what)
     mq.cmdf("%s", item.what)
 end
 
@@ -242,7 +243,7 @@ end
 function _G.State.populate_group_combo()
     _G.State.group_combo = {}
     table.insert(_G.State.group_combo, "None")
-    if mq.TLO.Me.Grouped() == true then
+    if mq.TLO.Me.Grouped() then
         table.insert(_G.State.group_combo, "Group")
         for i = 0, mq.TLO.Group() do
             if mq.TLO.Group.Member(i).DisplayName() ~= mq.TLO.Me.DisplayName() then
@@ -257,15 +258,13 @@ local function check_tradeskills(class, choice)
     if tsreqs[class] ~= nil then
         local return_string = ''
         local quest = ''
-        if _G.State.epic_list[choice] == "1.0" then
-            quest = '10'
-        elseif _G.State.epic_list[choice] == "Pre-1.5" then
-            quest = 'pre15'
-        elseif _G.State.epic_list[choice] == "1.5" then
-            quest = '15'
-        elseif _G.State.epic_list[choice] == "2.0" then
-            quest = '20'
-        end
+        local quests = {
+            ["1.0"] = "10",
+            ["Pre-1.5"] = "pre15",
+            ["1.5"] = "15",
+            ["2.0"] = "20"
+        }
+        quest = quests[_G.State.epic_list[choice]]
         if tsreqs[class][quest] ~= nil then
             local first = true
             for ts, req in pairs(tsreqs[class][quest]) do
@@ -280,7 +279,7 @@ local function check_tradeskills(class, choice)
                     end
                 else
                     if mq.TLO.Me.Skill(ts)() < req then
-                        if first == true then
+                        if first then
                             first = false
                             return_string = " \ag" .. ts .. " \aorequires \ar" .. req .. " \aoskill. Currently \ar" .. mq.TLO.Me.Skill(ts)() .. "."
                         else
@@ -289,7 +288,7 @@ local function check_tradeskills(class, choice)
                     end
                 end
             end
-            if return_string == '' then
+            if not return_string then
                 return false
             else
                 return return_string
