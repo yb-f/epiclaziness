@@ -119,14 +119,24 @@ _G.State = {
     startDist       = 0,
     updateTime      = math.floor(mq.gettime() / 1000),
     badMeshes       = {},
+
+
 }
 
-function _G.State.setStatusText(text)
-    _G.State.status = text
+function _G.State:setStatusText(text)
+    self.status = text
 end
 
-function _G.State.readStatusText()
-    return _G.State.status
+function _G.State:setStatusTwoText(text)
+    self.status2 = text
+end
+
+function _G.State:readStatusText()
+    return self.status
+end
+
+function _G.State:readStatusTwoText()
+    return self.status2
 end
 
 function _G.State.step_overview()
@@ -192,7 +202,7 @@ function _G.State.save(item)
         _G.State.epicstring = ''
         _G.State.task_run = false
         _G.State.stop_at_save = false
-        _G.State.setStatusText(string.format("Stopped at step: %s", _G.State.step))
+        _G.State:setStatusText(string.format("Stopped at step: %s", _G.State.step))
         return
     end
 end
@@ -208,7 +218,7 @@ function _G.State.execute_command(item)
 end
 
 function _G.State.pause(item)
-    _G.State.setStatusText(item.status)
+    _G.State:setStatusText(item.status)
     _G.State.task_run = false
 end
 
@@ -314,7 +324,7 @@ end
 local function update_general_status()
     for i = 1, #task_outline_table do
         if task_outline_table[i].Step == _G.State.step then
-            _G.State.status2 = task_outline_table[i].Description
+            _G.State:setStatusTwoText(task_outline_table[i].Description)
         end
     end
 end
@@ -330,7 +340,7 @@ local function execute_task(task)
         else
             if task_type == '' then type = 'none' end
             logger.log_error("\aoUnknown Type: \ar%s!", type)
-            _G.State.setStatusText(string.format("Unknown type: %s -- Step: %s", task_type, _G.State.step))
+            _G.State:setStatusText(string.format("Unknown type: %s -- Step: %s", task_type, _G.State.step))
             _G.State.task_run = false
             return
         end
@@ -404,7 +414,7 @@ local function run_epic(class, choice)
         end
         _G.State.cannot_count = 0
         while _G.State.pause == true do
-            _G.State.setStatusText("Paused")
+            _G.State:setStatusText("Paused")
             mq.delay(500)
             if mq.TLO.EverQuest.GameState() ~= 'INGAME' then
                 logger.log_error('\arNot in game, closing.')
@@ -441,7 +451,7 @@ local function run_epic(class, choice)
                     _G.State.epicstring = ''
                     _G.State.task_run = false
                     _G.State.stop_at_save = false
-                    _G.State.setStatusText(string.format("Stopped at step %s", _G.State.step))
+                    _G.State:setStatusText(string.format("Stopped at step %s", _G.State.step))
                     return
                 end
             end
@@ -454,7 +464,7 @@ local function run_epic(class, choice)
             return
         end
     end
-    _G.State.setStatusText(string.format("Completed %s: %s", mq.TLO.Me.Class(), _G.State.epicstring))
+    _G.State:setStatusText(string.format("Completed %s: %s", mq.TLO.Me.Class(), _G.State.epicstring))
     _G.State.epicstring = ''
     _G.State.task_run = false
     logger.log_info("\aoCompleted \ay%s \ao- \ar%s!", mq.TLO.Me.Class(), _G.State.epicstring)

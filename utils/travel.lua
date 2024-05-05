@@ -30,7 +30,7 @@ function travel.invisTranslocatorCheck()
 end
 
 function travel.face_heading(item)
-    _G.State.setStatusText(string.format("Facing heading %s.", item.what))
+    _G.State:setStatusText(string.format("Facing heading %s.", item.what))
     logger.log_info("\aoFacing heading: \ag%s\ao.", item.what)
     if _G.State.group_choice == 1 then
         mq.cmdf("/squelch /face heading %s", item.what)
@@ -47,7 +47,7 @@ function travel.face_loc(item)
     local x = item.whereX
     local y = item.whereY
     local z = item.whereZ
-    _G.State.setStatusText(string.format("Facing location: %s %s %s.", y, x, z))
+    _G.State:setStatusText(string.format("Facing location: %s %s %s.", y, x, z))
     logger.log_info("\aoFacing location \ag%s, %s, %s\ao.", y, x, z)
     if _G.State.group_choice == 1 then
         mq.cmdf("/squelch /face loc %s,%s,%s", y, x, z)
@@ -72,7 +72,7 @@ function travel.forward_zone(item, class_settings, char_settings)
     if travel.invisCheck(char_settings, class_settings, item.invis) then
         travel.invis(class_settings)
     end
-    _G.State.setStatusText(string.format("Traveling forward to zone: %s.", item.zone))
+    _G.State:setStatusText(string.format("Traveling forward to zone: %s.", item.zone))
     logger.log_info("\aoTraveling forward to zone: \ag%s\ao.", item.zone)
     if _G.State.group_choice == 1 then
         mq.cmd("/squelch /keypress forward hold")
@@ -130,7 +130,7 @@ function travel.no_nav_travel(item, class_settings, char_settings)
     if travel.invisCheck(char_settings, class_settings, item.invis) then
         travel.invis(class_settings)
     end
-    _G.State.setStatusText(string.format("Traveling forward to location: %s %s %s.", y, x, z))
+    _G.State:setStatusText(string.format("Traveling forward to location: %s %s %s.", y, x, z))
     logger.log_info("\aoTraveling without MQ2Nav to \ag%s, %s, %s\ao.", y, x, z)
     if _G.State.group_choice == 1 then
         mq.cmd("/squelch /keypress forward hold")
@@ -182,7 +182,7 @@ function travel.no_nav_travel(item, class_settings, char_settings)
 end
 
 function travel.open_door(item)
-    _G.State.setStatusText("Opening door.")
+    _G.State:setStatusText("Opening door.")
     mq.delay(200)
     mq.cmd("/squelch /doortarget")
     logger.log_info("\aoOpening door: \ar%s%s", mq.TLO.SwitchTarget(), mq.TLO.SwitchTarget.Name())
@@ -265,7 +265,7 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
                 end
             end
             loopCount = 0
-            _G.State.setStatusText(temp)
+            _G.State:setStatusText(temp)
         end
         if dist.GetDistance3D(mq.TLO.Me.X(), mq.TLO.Me.Y(), mq.TLO.Me.Z(), _G.State.X, _G.State.Y, _G.State.Z) < 20 then
             loopCount = loopCount + 1
@@ -325,7 +325,7 @@ function travel.general_travel(item, class_settings, char_settings, ID)
     if travel.invisCheck(char_settings, class_settings, item.invis) then
         travel.invis(class_settings)
     end
-    _G.State.setStatusText(string.format("Waiting for %s.", item.npc))
+    _G.State:setStatusText(string.format("Waiting for %s.", item.npc))
     logger.log_info("\aoLooking for \ag%s\ao.", item.npc)
     while ID == 0 or ID == nil do
         mq.delay(500)
@@ -341,7 +341,7 @@ function travel.general_travel(item, class_settings, char_settings, ID)
         end
         ID = _G.Mob.findNearestName(item.npc, item, class_settings, char_settings)
     end
-    _G.State.setStatusText(string.format("Navigating to %s.", item.npc))
+    _G.State:setStatusText(string.format("Navigating to %s.", item.npc))
     if ID == 0 then
         ID = _G.Mob.findNearestName(item.npc, item, class_settings, char_settings)
     end
@@ -363,7 +363,7 @@ end
 
 function travel.invis(class_settings)
     local temp = _G.State.status
-    _G.State.setStatusText("Using invis.")
+    _G.State:setStatusText("Using invis.")
     logger.log_info("\aoUsing invisibility.")
     local invis_type = {}
     if mq.TLO.Me.Combat() == true then
@@ -490,7 +490,7 @@ function travel.invis(class_settings)
         mq.delay("4s")
     end
     mq.delay(100)
-    _G.State.setStatusText(temp)
+    _G.State:setStatusText(temp)
 end
 
 function travel.invisCheck(char_settings, class_settings, invis)
@@ -683,10 +683,10 @@ function travel.loc_travel(item, class_settings, char_settings)
     local x = item.whereX
     local y = item.whereY
     local z = item.whereZ
-    _G.State.setStatusText(string.format("Traveling to location: %s %s %s.", y, x, z))
+    _G.State:setStatusText(string.format("Traveling to location: %s %s %s.", y, x, z))
     logger.log_info("\aoTraveling to location \ag%s, %s, %s\ao.", y, x, z)
     if mq.TLO.Navigation.PathExists('loc ' .. y .. ' ' .. x .. ' ' .. z) == false then
-        _G.State.setStatusText(string.format("No path exists to location: %s %s %s.", y, x, z))
+        _G.State:setStatusText(string.format("No path exists to location: %s %s %s.", y, x, z))
         logger.log_error("\aoNo path found to location \ag%s, %s, %s\ao.", y, x, z)
         _G.State.task_run = false
         mq.cmd('/foreground')
@@ -790,7 +790,7 @@ function travel.npc_follow(item, class_settings, char_settings, event)
     if travel.invisCheck(char_settings, class_settings, item.invis) then
         travel.invis(class_settings)
     end
-    _G.State.setStatusText(string.format("Following %s.", item.npc))
+    _G.State:setStatusText(string.format("Following %s.", item.npc))
     logger.log_info("\aoFollowing \ag%s\ao.", item.npc)
     if mq.TLO.Spawn("npc " .. item.npc).Distance() ~= nil then
         if mq.TLO.Spawn("npc " .. item.npc).Distance() > 100 then
@@ -858,7 +858,7 @@ function travel.npc_follow(item, class_settings, char_settings, event)
 end
 
 function travel.npc_stop_follow(item)
-    _G.State.setStatusText(string.format("Stopping autofollow."))
+    _G.State:setStatusText(string.format("Stopping autofollow."))
     logger.log_info("\aoStopping autofollow.")
     if _G.State.group_choice == 1 then
         mq.cmd('/squelch /afollow off')
@@ -893,14 +893,14 @@ function travel.npc_travel(item, class_settings, ignore_path_check, char_setting
     if item.whereX ~= nil then
         travel.loc_travel(item, class_settings, char_settings)
     else
-        _G.State.setStatusText(string.format("Waiting for NPC %s.", item.npc))
+        _G.State:setStatusText(string.format("Waiting for NPC %s.", item.npc))
         local ID = _G.Mob.findNearestName(item.npc, item, class_settings, char_settings)
         travel.general_travel(item, class_settings, char_settings, ID)
     end
 end
 
 function travel.portal_set(item)
-    _G.State.setStatusText(string.format("Setting portal to %s.", item.zone))
+    _G.State:setStatusText(string.format("Setting portal to %s.", item.zone))
     logger.log_info("\aoSetting portal to \ag%s\ao.", item.zone)
     mq.delay("1s")
     mq.cmdf("/squelch /portalset %s", item.zone)
@@ -937,7 +937,7 @@ function travel.relocate(item, class_settings, char_settings)
         _G.Mob.clearXtarget(class_settings, char_settings)
         travel.navUnpause(item)
     end
-    _G.State.setStatusText("Searching for relocation ability/item that is ready.")
+    _G.State:setStatusText("Searching for relocation ability/item that is ready.")
     logger.log_info("\aoSearching for a relocation ability/item that is ready.")
     local relocate = 'none'
     relocate = travel.findReadyRelocate()
@@ -947,7 +947,7 @@ function travel.relocate(item, class_settings, char_settings)
         mq.delay("3s")
         relocate = travel.findReadyRelocate()
     end
-    _G.State.setStatusText(string.format("Relocating to %s.", relocate))
+    _G.State:setStatusText(string.format("Relocating to %s.", relocate))
     logger.log_info("\aoRelocating to \ag%s\ao.", relocate)
     if _G.State.group_choice == 1 then
         mq.cmdf('/squelch /relocate %s', relocate)
@@ -1011,7 +1011,7 @@ end
 
 function travel.zone_travel(item, class_settings, char_settings, continue)
     if char_settings.general.returnToBind == true and continue == false then
-        _G.State.setStatusText("Returning to bind point.")
+        _G.State:setStatusText("Returning to bind point.")
         while mq.TLO.Zone.ShortName() ~= mq.TLO.Me.BoundLocation('0')() do
             travel.gate_group()
             mq.delay("15s")
@@ -1029,7 +1029,7 @@ function travel.zone_travel(item, class_settings, char_settings, continue)
         travel.navPause()
         travel.invis(class_settings)
     end
-    _G.State.setStatusText(string.format("Traveling to %s.", item.zone))
+    _G.State:setStatusText(string.format("Traveling to %s.", item.zone))
     logger.log_info("\aoTraveling to \ag%s\ao.", item.zone)
     _G.State.traveling = true
     if _G.State.group_choice == 1 then
@@ -1133,7 +1133,7 @@ function travel.zone_travel(item, class_settings, char_settings, continue)
                     end
                 end
                 loopCount = 0
-                _G.State.setStatusText(temp)
+                _G.State:setStatusText(temp)
             end
             if dist.GetDistance3D(mq.TLO.Me.X(), mq.TLO.Me.Y(), mq.TLO.Me.Z(), _G.State.X, _G.State.Y, _G.State.Z) < 20 then
                 loopCount = loopCount + 1

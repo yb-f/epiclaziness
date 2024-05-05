@@ -226,7 +226,7 @@ function draw_gui.generalTab(task_table)
                 _G.State.task_run = false
                 _G.State.skip = true
                 logger.log_warn("\aoManually stopping script at step: \ar%s", _G.State.step)
-                _G.State.setStatusText(string.format("Manually stopped at step %s.", _G.State.step))
+                _G.State:setStatusText(string.format("Manually stopped at step %s.", _G.State.step))
             end
             if ImGui.IsItemHovered() then
                 ImGui.SetTooltip("Stop script immedietly.")
@@ -275,9 +275,9 @@ function draw_gui.generalTab(task_table)
             ImGui.Text(draw_gui.travelText)
             --end
         end
-        ImGui.TextWrapped(_G.State.status)
+        ImGui.TextWrapped(_G.State:readStatusText())
         ImGui.NewLine()
-        ImGui.TextWrapped(_G.State.status2)
+        ImGui.TextWrapped(_G.State:readStatusTwoText())
         ImGui.NewLine()
         ImGui.TextWrapped(_G.State.reqs)
         ImGui.EndTabItem()
