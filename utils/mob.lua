@@ -35,16 +35,18 @@ end
 
 function mob.xtargetCheck(char_settings)
     logger.log_super_verbose("\aoPerforming xtarget check.")
-    if mq.TLO.Me.XTarget() >= char_settings.general.xtargClear then
-        local haterCount = 0
-        for i = 1, mq.TLO.Me.XTargetSlots() do
-            if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
-                haterCount = haterCount + 1
+    if mq.TLO.Me.XTarget() then
+        if mq.TLO.Me.XTarget() >= char_settings.general.xtargClear then
+            local haterCount = 0
+            for i = 1, mq.TLO.Me.XTargetSlots() do
+                if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
+                    haterCount = haterCount + 1
+                end
             end
-        end
-        if haterCount >= char_settings.general.xtargClear then
-            logger.log_info("\aoSuffecient auto hater targets found. Calling clear xtarget function.")
-            return true
+            if haterCount >= char_settings.general.xtargClear then
+                logger.log_info("\aoSuffecient auto hater targets found. Calling clear xtarget function.")
+                return true
+            end
         end
     end
     return false
