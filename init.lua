@@ -156,7 +156,7 @@ function _G.State.step_overview()
 end
 
 local function matchFilters(spawn)
-    if string.find(string.lower(spawn.CleanName()), string.lower(exclude_name)) then
+    if string.match(string.lower(spawn.CleanName()), string.lower(exclude_name)) then
         return true
     end
     return false
