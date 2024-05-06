@@ -222,7 +222,7 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
                 travel.navUnpause(item)
             end
         end
-        if _G.State.is_paused == true then
+        if _G.State:readPaused() then
             travel.navPause()
             _G.Actions.pauseTask(_G.State:readStatusText())
             travel.navUnpause(item)
@@ -325,7 +325,7 @@ function travel.general_travel(item, class_settings, char_settings, ID)
             _G.State.should_skip = false
             return
         end
-        if _G.State.is_paused == true then
+        if _G.State:readPaused() then
             travel.navPause()
             _G.Actions.pauseTask(_G.State:readStatusText())
             travel.navUnpause(item)
@@ -968,7 +968,7 @@ function travel.relocate(item, class_settings, char_settings)
             _G.State.should_skip = false
             return
         end
-        if _G.State.is_paused == true then
+        if _G.State:readPaused() then
             travel.navPause()
             _G.Actions.pauseTask(_G.State:readStatusText())
             travel.navUnpause(item)
@@ -987,7 +987,7 @@ function travel.relocate(item, class_settings, char_settings)
             _G.State.should_skip = false
             return
         end
-        if _G.State.is_paused == true then
+        if _G.State:readPaused() then
             travel.navPause()
             _G.Actions.pauseTask(_G.State:readStatusText())
             travel.navUnpause(item)
@@ -1063,7 +1063,7 @@ function travel.zone_travel(item, class_settings, char_settings, continue)
             _G.Mob.clearXtarget(class_settings, char_settings)
             travel.navUnpause(item)
         end
-        if _G.State.is_paused == true then
+        if _G.State:readPaused() then
             travel.navPause()
             _G.Actions.pauseTask(_G.State:readStatusText())
             travel.navUnpause(item)

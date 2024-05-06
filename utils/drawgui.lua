@@ -153,7 +153,7 @@ end
 function draw_gui.generalTab(task_table)
     if ImGui.BeginTabItem("General") then
         ImGui.Text("Class: " .. myClass .. " " .. _G.State.epicstring)
-        if _G.State.is_task_running == false then
+        if _G.State:readTaskRunning() == false then
             _G.State.epic_choice, changed = ImGui.Combo('##Combo', _G.State.epic_choice, _G.State.epic_list, #_G.State.epic_list, #_G.State.epic_list)
             if ImGui.IsItemHovered() then
                 ImGui.SetTooltip('Which epic to run.')
@@ -172,7 +172,7 @@ function draw_gui.generalTab(task_table)
                 _G.State.populate_group_combo()
             end
         end
-        if _G.State.is_task_running == false then
+        if _G.State:readTaskRunning() == false then
             if ImGui.Button("Begin") then
                 _G.State.start_run = true
             end
@@ -184,7 +184,7 @@ function draw_gui.generalTab(task_table)
                 ImGui.SetTooltip(tooltip)
             end
         end
-        if _G.State.is_task_running == true then
+        if _G.State:readTaskRunning() then
             if ImGui.SmallButton(ICONS.MD_FAST_REWIND) then
                 _G.State:handle_step_change(_G.State.current_step - 1)
             end
@@ -192,17 +192,17 @@ function draw_gui.generalTab(task_table)
                 ImGui.SetTooltip("Move to previous step.")
             end
             ImGui.SameLine()
-            if _G.State.is_paused == false then
+            if _G.State:readPaused() == false then
                 if ImGui.SmallButton(ICONS.MD_PAUSE) then
                     logger.log_info("\aoPausing script.")
-                    _G.State.is_paused = true
+                    _G.State:setPaused(true)
                 end
                 if ImGui.IsItemHovered() then
                     ImGui.SetTooltip("Pause script.")
                 end
             else
                 if ImGui.SmallButton(ICONS.FA_PLAY) then
-                    _G.State.is_paused = false
+                    _G.State:setPaused(false)
                     logger.log_info("\aoResuming script.")
                 end
                 if ImGui.IsItemHovered() then
@@ -211,7 +211,7 @@ function draw_gui.generalTab(task_table)
             end
             ImGui.SameLine()
             if ImGui.SmallButton(ICONS.MD_STOP) then
-                _G.State.is_task_running = false
+                _G.State:setTaskRunning(false)
                 _G.State.should_skip = true
                 logger.log_warn("\aoManually stopping script at step: \ar%s", _G.State.current_step)
                 _G.State:setStatusText(string.format("Manually stopped at step %s.", _G.State.current_step))
@@ -228,7 +228,7 @@ function draw_gui.generalTab(task_table)
             end
             if ImGui.Button("Stop @ Next Save") then
                 logger.log_info("\aoStopping at next save point.")
-                _G.State.stop_at_save = true
+                _G.State:setStopAtSave(true)
             end
         end
         ImGui.Separator()
@@ -310,7 +310,7 @@ function draw_gui.outlineRow(overview_steps, task_outline_table, task_table, i)
     overview_steps[task_outline_table[i].Step] = draw_gui.outline_check_box("outline_box_" .. i, overview_steps[task_outline_table[i].Step], task_outline_table[i].Step)
     ImGui.TableNextColumn()
     if ImGui.Selectable("##a" .. i, false, ImGuiSelectableFlags.None) then
-        if _G.State.is_task_running == true then
+        if _G.State:readTaskRunning() then
             _G.State:handle_step_change(task_outline_table[i].Step)
         end
     end
@@ -318,7 +318,7 @@ function draw_gui.outlineRow(overview_steps, task_outline_table, task_table, i)
     ImGui.TextColored(IM_COL32(0, 255, 0, 255), task_outline_table[i].Step)
     ImGui.TableNextColumn()
     if ImGui.Selectable("##b" .. i, false, ImGuiSelectableFlags.None) then
-        if _G.State.is_task_running == true then
+        if _G.State:readTaskRunning() == true then
             _G.State:handle_step_change(task_outline_table[i].Step)
         end
     end

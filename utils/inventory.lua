@@ -141,7 +141,7 @@ function inventory.combine_item(item, class_settings, char_settings, slot)
     if mq.TLO.FindItem("=" .. item.what)() == nil then
         _G.State:setStatusText(string.format("Unable to find item for combine (%s)", item.what))
         logger.log_error("\aoUnable to find \ar%s \aofor combine.", item.what)
-        _G.State.is_task_running = false
+        _G.State:setTaskRunning(false)
         mq.cmd('/foreground')
         return
     end
@@ -153,7 +153,7 @@ function inventory.combine_item(item, class_settings, char_settings, slot)
         if itemslot == 0 and itemslot2 == 0 then
             _G.State:setStatusText(string.format("Unable to find item for combine (%s).", item.what))
             logger.log_error("\aoUnable to find \ar%s \aofor combine.", item.what)
-            _G.State.is_task_running = false
+            _G.State:setTaskRunning(false)
             mq.cmd('/foreground')
             return
         end
@@ -223,7 +223,7 @@ function inventory.enviro_combine_container(item)
     logger.log_info("\aoMoving to \ag%s \aoto perform combine.", item.what)
     mq.cmdf("/squelch /itemtarget %s", item.what)
     if mq.TLO.ItemTarget.DisplayName() ~= item.what then
-        _G.State.is_task_running = false
+        _G.State:setTaskRunning(false)
         _G.State:setStatusText(string.format("Could not find item: %s.", item.what))
         mq.cmd('/foreground')
         logger.log_error("\aoCould not find item \ar%s\ao.", item.what)
@@ -260,7 +260,7 @@ function inventory.enviro_combine_item(item)
     if mq.TLO.FindItem("=" .. item.what)() == nil then
         _G.State:setStatusText(string.format("Unable to find item for combine (%s).", item.what))
         logger.log_error("\aoUnable to find \ar%s \aofor combine.", item.what)
-        _G.State.is_task_running = false
+        _G.State:setTaskRunning(false)
         mq.cmd('/foreground')
         return
     end
@@ -480,7 +480,7 @@ function inventory.loot(item)
                     return true
                 end
             end
-            --_G.State.is_task_running = false
+            --_G.State:setTaskRunning(false)
             _G.State:setStatusText(string.format("Tried to loot %s at step %s but failed!", item.what, _G.State.current_step))
             logger.log_error("\aoFailed to loot \ar%s \aoat step \ar%s\ao.", item.what, _G.State.current_step)
             mq.cmd('/foreground')
@@ -493,7 +493,7 @@ function inventory.move_combine_container(slot, container)
     if mq.TLO.FindItem("=" .. container)() == nil then
         _G.State:setStatusText(string.format("Unable to find combine container (%s).", container))
         logger.log_error("\aoUnable to find combine container (\ar%s\ao).", container)
-        _G.State.is_task_running = false
+        _G.State:setTaskRunning(false)
         mq.cmd('/foreground')
         return
     end

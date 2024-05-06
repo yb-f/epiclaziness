@@ -318,7 +318,7 @@ function manage.picklockGroup(item)
         else
             logger.log_error("\aoI am not a class that is able to pick locks. Stopping script at step \ar%s \ao.", _G.State.current_step)
             _G.State:setStatusText(string.format("I require a lockpicker to proceed. (%s).", _G.State.current_step))
-            _G.State.is_task_running = false
+            _G.State:setTaskRunning(false)
             mq.cmd('/foreground')
             return
         end
@@ -353,7 +353,7 @@ function manage.picklockGroup(item)
         if pickerFound == false then
             _G.State:setStatusText(string.format("I require a lockpicker to proceed. (%s).", _G.State.current_step))
             logger.log_error("\aoNo one in my group is a class that is able to pick locks. Stopping script at step \ar%s \ao.", _G.State.current_step)
-            _G.State.is_task_running = false
+            _G.State:setTaskRunning(false)
             mq.cmd('/foreground')
             return
         end
@@ -381,7 +381,7 @@ function manage.picklockGroup(item)
             _G.State:setStatusText(string.format("I require a lockpicker to proceed. (%s).", _G.State.current_step))
             logger.log_error("\aoI am not a class that is able to pick locks, nor is \ag%s\ao. Stopping script at step \ar%s \ao.", mq.TLO.Group.Member(name).DisplayName(),
                 _G.State.current_step)
-            _G.State.is_task_running = false
+            _G.State:setTaskRunning(false)
             mq.cmd('/foreground')
             return
         end

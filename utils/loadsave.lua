@@ -52,7 +52,7 @@ function loadsave.loadState()
                 if loadsave.SaveState[class].Last_Ran == nil then
                     loadsave.SaveState[class].Last_Ran = 1
                 end
-                if _G.State.is_task_running == false then
+                if _G.State:readTaskRunning() == false then
                     _G.State.epic_choice = loadsave.SaveState[class].Last_Ran
                 else
                     print(loadsave.SaveState[class][_G.State.epic_choice].Step)

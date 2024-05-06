@@ -175,7 +175,7 @@ function actions.farm_check_pause(item, class_settings, char_settings)
     if not_found == true then
         logger.log_error("\aoMissing \ar%s\ao. Stopping at step: \ar%s\ao.", item.what, _G.State.current_step)
         _G.State:setStatusText(item.status)
-        _G.State.is_task_running = false
+        _G.State:setTaskRunning(false)
         mq.cmd('/foreground')
     end
 end
@@ -229,7 +229,7 @@ function actions.farm_radius(item, class_settings, char_settings, event)
                     _G.State.should_skip = false
                     return
                 end
-                if _G.State.is_paused then
+                if _G.State:readPaused() then
                     manage.pauseGroup(class_settings)
                     actions.pauseTask(_G.State:readStatusText())
                     manage.unpauseGroup(class_settings)
@@ -290,7 +290,7 @@ function actions.farm_radius(item, class_settings, char_settings, event)
                     _G.State.should_skip = false
                     return
                 end
-                if _G.State.is_paused then
+                if _G.State:readPaused() then
                     manage.pauseGroup(class_settings)
                     actions.pauseTask(_G.State:readStatusText())
                     manage.unpauseGroup(class_settings)
@@ -330,7 +330,7 @@ function actions.farm_radius(item, class_settings, char_settings, event)
                 _G.State.should_skip = false
                 return
             end
-            if _G.State.is_paused then
+            if _G.State:readPaused() then
                 manage.pauseGroup(class_settings)
                 actions.pauseTask(_G.State:readStatusText())
                 manage.unpauseGroup(class_settings)
@@ -405,7 +405,7 @@ function actions.fish_farm(item, class_settings, char_settings, once)
                 _G.State.should_skip = false
                 return
             end
-            if _G.State.is_paused == true then
+            if _G.State:readPaused() then
                 actions.pauseTask(_G.State:readStatusText())
             end
             if _G.Mob.xtargetCheck(char_settings) then
@@ -491,7 +491,7 @@ function actions.forage_farm(item, class_settings, char_settings)
                 _G.State.should_skip = false
                 return
             end
-            if _G.State.is_paused == true then
+            if _G.State:readPaused() then
                 actions.pauseTask(_G.State:readStatusText())
             end
             if _G.Mob.xtargetCheck(char_settings) then
@@ -577,7 +577,7 @@ function actions.ground_spawn_farm(item, class_settings, char_settings)
             _G.State.should_skip = false
             return
         end
-        if _G.State.is_paused == true then
+        if _G.State:readPaused() then
             manage.pauseGroup(class_settings)
             actions.pauseTask(_G.State:readStatusText())
             manage.unpauseGroup(class_settings)
@@ -626,13 +626,13 @@ function actions.group_size_check(item)
     if not mq.TLO.Group.GroupSize() then
         _G.State:setStatusText(item.status)
         logger.log_error("\aoYou will require \ar%s \aoplayers in your party to progress through this step.", item.count)
-        _G.State.is_task_running = false
+        _G.State:setTaskRunning(false)
         return
     end
     if mq.TLO.Group.GroupSize() < item.count then
         _G.State:setStatusText(item.status)
         logger.log_error("\aoYou will require \ar%s \aoplayers in your party to progress through this step.", item.count)
-        _G.State.is_task_running = false
+        _G.State:setTaskRunning(false)
         return
     end
 end
@@ -674,13 +674,13 @@ end
 function actions.pauseTask(status)
     _G.State:setStatusText('Paused.')
     logger.log_info("\aoPausing on step \ar%s\ao.", _G.State.current_step)
-    while _G.State.is_paused == true do
+    while _G.State:readPaused() do
         mq.delay(200)
         if mq.TLO.EverQuest.GameState() ~= 'INGAME' then
             logger.log_error('\arNot in game, closing.')
             mq.exit()
         end
-        if _G.State.is_task_running == false then
+        if _G.State:readTaskRunning() == false then
             return
         end
     end
@@ -707,7 +707,7 @@ function actions.npc_give(item, class_settings, char_settings)
     if mq.TLO.FindItem('=' .. item.what) == nil then
         logger.log_error("\ar%s \aowas not found in inventory.", item.what)
         _G.State:setStatusText(string.format("%s should be handed to %s but is not found in inventory.", item.what, item.npc))
-        _G.State.is_task_running = false
+        _G.State:setTaskRunning(false)
         mq.cmd('/foreground')
         return
     end
@@ -734,7 +734,7 @@ function actions.npc_give(item, class_settings, char_settings)
         if loopCount == 10 then
             logger.log_error("\aoFailed to give \ar%s \ao to \ar%s \aoon step \ar%s\ao.", item.what, item.npc, _G.State.current_step)
             _G.State:setStatusText(string.format("Failed to give %s to %s on step %s.", item.what, item.npc, _G.State.current_step))
-            _G.State.is_task_running = false
+            _G.State:setTaskRunning(false)
             mq.cmd('/foreground')
             return
         end
@@ -905,7 +905,7 @@ function actions.npc_wait(item, class_settings, char_settings)
             _G.State.should_skip = false
             return
         end
-        if _G.State.is_paused == true then
+        if _G.State:readPaused() then
             actions.pauseTask(_G.State:readStatusText())
         end
         mq.delay(200)
@@ -924,7 +924,7 @@ function actions.npc_wait_despawn(item, class_settings, char_settings)
             _G.State.should_skip = false
             return
         end
-        if _G.State.is_paused == true then
+        if _G.State:readPaused() then
             actions.pauseTask(_G.State:readStatusText())
         end
         mq.delay(200)
@@ -1025,7 +1025,7 @@ function actions.start_adventure(item)
     if mq.TLO.Me.Grouped() == false then
         logger.log_error("\aoYou must be in a group with 3 members to request an LDON adventure.")
         _G.State:setStatusText("Please be a part of a group to continue.")
-        _G.State.is_task_running = false
+        _G.State:setTaskRunning(false)
         mq.cmd('/foreground')
         return
     end
@@ -1077,7 +1077,7 @@ function actions.wait(item, class_settings, char_settings)
             _G.State.should_skip = false
             return
         end
-        if _G.State.is_paused == true then
+        if _G.State:readPaused() then
             actions.pauseTask(_G.State:readStatusText())
         end
         mq.delay(200)

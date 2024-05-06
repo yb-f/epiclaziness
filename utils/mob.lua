@@ -199,7 +199,7 @@ function mob.findNearestName(npc, item, class_settings, char_settings)
         if mob.xtargetCheck(char_settings) then
             mob.clearXtarget(class_settings, char_settings)
         end
-        if _G.State.is_paused == true then
+        if _G.State:readPaused() then
             _G.Actions.pauseTask(_G.State:readStatusText())
         end
         if char_settings.general.speedForTravel == true then
@@ -441,7 +441,7 @@ function mob.npc_kill_all(item, class_settings, char_settings)
             break
         end
         mq.delay(500)
-        if _G.State.is_paused == true then
+        if _G.State:readPaused() then
             _G.Actions.pauseTask(_G.State:readStatusText())
         end
         local ID = mob.findNearestName(item.npc, item, class_settings, char_settings)
