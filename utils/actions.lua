@@ -357,7 +357,21 @@ function actions.farm_while_near(item, class_settings, char_settings)
     manage.campGroup(item.radius, class_settings, char_settings)
     manage.unpauseGroup(class_settings)
     manage.removeInvis()
-    while mq.TLO.Spawn('npc ' .. item.npc).Distance() < tonumber(item.what) do
+    local not_found_count = 0
+    local distance = mq.TLO.Spawn('npc ' .. item.npc).Distance() or 0
+    while distance < tonumber(item.what) do
+        distance = mq.TLO.Spawn('npc ' .. item.npc).Distance() or 0
+        if distance == 0 then
+            not_found_count = not_found_count + 1
+            if not_found_count >= 15 then
+                logger.log_error('\aoWe have not seen \ar%s \ao for \ar3 \aoseconds.', item.npc)
+                _G.State:setTaskRunning(false)
+                mq.cmd('/foreground')
+                return
+            end
+        else
+            not_found_count = 0
+        end
         mq.delay(200)
     end
     logger.log_info("\ag%s \aohas moved, proceeding.", item.npc)
