@@ -174,7 +174,7 @@ function draw_gui.generalTab(task_table)
         end
         if _G.State:readTaskRunning() == false then
             if ImGui.Button("Begin") then
-                _G.State.start_run = true
+                _G.State:setStartRun(true)
             end
             if ImGui.IsItemHovered() then
                 local invis_num = invis_needed(mq.TLO.Me.Class.ShortName(), _G.State.epic_choice)

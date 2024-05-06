@@ -71,15 +71,15 @@ end
 
 _G.State = {
     is_paused           = false, --
-    is_task_running     = false,
-    do_start_run        = false,
+    is_task_running     = false, --
+    do_start_run        = false, --
     should_stop_at_save = false, --
     current_step        = 0,     --
     status              = '',    --
     status2             = '',    --
     requirements        = '',    --
-    bagslot1            = 0,
-    bagslot2            = 0,
+    bagslot1            = 0,     --0
+    bagslot2            = 0,     --0
     group_combo         = {},
     group_choice        = 1,
     epic_list           = quests_done[string.lower(mq.TLO.Me.Class.ShortName())],
@@ -110,6 +110,14 @@ _G.State = {
     updateTime          = mq.gettime(),
     badMeshes           = {},
 }
+
+function _G.State:readStartRun()
+    return self.do_start_run
+end
+
+function _G.State:setStartRun(value)
+    self.do_start_run = value
+end
 
 function _G.State:readTaskRunning()
     return self.is_task_running
@@ -613,8 +621,8 @@ local function main()
             logger.log_error('\arNot in game, closing.')
             mq.exit()
         end
-        if _G.State.start_run == true then
-            _G.State.start_run = false
+        if _G.State:readStartRun() then
+            _G.State:setStartRun(false)
             _G.State.current_step = 0
             init_epic(string.lower(mq.TLO.Me.Class.ShortName()), _G.State.epic_choice)
             run_epic(string.lower(mq.TLO.Me.Class.ShortName()), _G.State.epic_choice)

@@ -686,7 +686,7 @@ function travel.loc_travel(item, class_settings, char_settings)
     if mq.TLO.Navigation.PathExists('loc ' .. y .. ' ' .. x .. ' ' .. z) == false then
         _G.State:setStatusText(string.format("No path exists to location: %s %s %s.", y, x, z))
         logger.log_error("\aoNo path found to location \ag%s, %s, %s\ao.", y, x, z)
-        _G.State.is_task_running = false
+        _G.State:setTaskRunning(false)
         mq.cmd('/foreground')
         return
     end
