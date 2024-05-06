@@ -887,13 +887,6 @@ function actions.npc_talk(item, class_settings, char_settings)
     mq.delay(750)
 end
 
-function actions.npc_talk_all(item, class_settings, char_settings)
-    manage.removeInvis()
-    _G.State:setStatusText(string.format("Talking to %s (%s).", item.npc, item.phrase))
-    logger.log_info("\aoHaving all grouped characters say \ag%s \ao to \ag%s\ao.", item.phrase, item.npc)
-    manage.groupTalk(item.npc, item.phrase)
-end
-
 function actions.npc_wait(item, class_settings, char_settings)
     _G.State:setStatusText(string.format("Waiting for %s (%s).", item.npc, item.waittime))
     logger.log_info("\aoWaiting for \ag%s\ao. This may take \ag%s\ao.", item.npc, item.waittime)
