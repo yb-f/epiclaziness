@@ -36,7 +36,7 @@ local task_functions = {
     },
     COMBINE_DO               = {
         func   = inv.combine_do,
-        params = { class_settings.settings, loadsave.SaveState, _G.State.combineSlot },
+        params = function() return { class_settings.settings, loadsave.SaveState, _G.State.combineSlot } end,
         desc   = 'Perform combine'
     },
     COMBINE_DONE             = {
@@ -46,7 +46,7 @@ local task_functions = {
     },
     COMBINE_ITEM             = {
         func   = inv.combine_item,
-        params = { class_settings.settings, loadsave.SaveState, _G.State.combineSlot },
+        params = function() return { class_settings.settings, loadsave.SaveState, _G.State.combineSlot } end,
         desc   = function(item) return 'Add ' .. item.what .. ' to combine container' end
     },
     DROP_ADVENTURE           = {
@@ -86,12 +86,12 @@ local task_functions = {
     },
     FACE_HEADING             = {
         func   = travel.face_heading,
-        params = {},
+        params = function() return { _G.State:readGroupSelection() } end,
         desc   = function(item) return 'Face the heading ' .. item.what end
     },
     FACE_LOC                 = {
         func   = travel.face_loc,
-        params = {},
+        params = function() return { _G.State:readGroupSelection() } end,
         desc   = function(item) return 'Face location ' .. item.whereY .. ', ' .. item.whereX .. ', ' .. item.whereZ end
     },
     FARM_CHECK               = {
@@ -136,7 +136,7 @@ local task_functions = {
     },
     FORWARD_ZONE             = {
         func   = travel.forward_zone,
-        params = { class_settings.settings, loadsave.SaveState },
+        params = function() return { class_settings.settings, loadsave.SaveState, _G.State:readGroupSelection() } end,
         desc   = function(item) return 'Move forward to zone into ' .. item.zone end
     },
     GENERAL_SEARCH           = {
@@ -146,7 +146,7 @@ local task_functions = {
     },
     GENERAL_TRAVEL           = {
         func   = travel.general_travel,
-        params = { class_settings.settings, loadsave.SaveState },
+        params = function() return { class_settings.settings, loadsave.SaveState, _G.State:readGroupSelection() } end,
         desc   = function(item) return 'Travel to ' .. item.npc end
     },
     GROUND_SPAWN             = {
@@ -176,7 +176,7 @@ local task_functions = {
     },
     LOC_TRAVEL               = {
         func   = travel.loc_travel,
-        params = { class_settings.settings, loadsave.SaveState },
+        params = function() return { class_settings.settings, loadsave.SaveState, _G.State:readGroupSelection() } end,
         desc   = function(item) return 'Travel to ' .. item.whereY .. ', ' .. item.whereX .. ', ' .. item.whereZ end
     },
     LOOT                     = {
@@ -186,7 +186,7 @@ local task_functions = {
     },
     NO_NAV_TRAVEL            = {
         func   = travel.no_nav_travel,
-        params = { class_settings.settings, loadsave.SaveState },
+        params = function() return { class_settings.settings, loadsave.SaveState, _G.State:readGroupSelection() } end,
         desc   = function(item) return 'Travel without using MQ2Nav to ' .. item.whereY .. ', ' .. item.whereX .. ', ' .. item.whereZ end
     },
     NPC_BUY                  = {
@@ -201,7 +201,7 @@ local task_functions = {
     },
     NPC_FOLLOW               = {
         func   = travel.npc_follow,
-        params = { class_settings.settings, loadsave.SaveState },
+        params = function() return { class_settings.settings, loadsave.SaveState, _G.State:readGroupSelection() } end,
         desc   = function(item) return 'Follow ' .. item.npc end
     },
     NPC_FOLLOW_EVENT         = {
@@ -251,7 +251,7 @@ local task_functions = {
     },
     NPC_STOP_FOLLOW          = {
         func   = travel.npc_stop_follow,
-        params = {},
+        params = function() return { _G.State:readGroupSelection() } end,
         desc   = function(item) return 'Stop following ' .. item.npc end
     },
     NPC_TALK                 = {
@@ -260,7 +260,7 @@ local task_functions = {
         desc   = function(item) return 'Say ' .. item.phrase .. ' to ' .. item.npc end
     },
     NPC_TALK_ALL             = {
-        func   = _G.Actions.npc_talk_all,
+        func   = manage.groupTalk,
         params = { class_settings.settings, loadsave.SaveState },
         desc   = function(item) return 'Have all characters say ' .. item.phrase .. ' to ' .. item.npc end
     },
@@ -290,8 +290,8 @@ local task_functions = {
         desc   = 'Open door'
     },
     OPEN_DOOR_ALL            = {
-        func   = inv.loot,
-        params = { class_settings.settings, loadsave.SaveState },
+        func   = manage.openDoorAll,
+        params = function() return { _G.State:readGroupSelection() } end,
         desc   = 'Group click door'
     },
     PAUSE                    = {
@@ -306,7 +306,7 @@ local task_functions = {
     },
     PICK_DOOR                = {
         func   = manage.picklockGroup,
-        params = {},
+        params = function() return { _G.State:readGroupSelection() } end,
         desc   = 'Attempt to lockpick door'
     },
     PICK_POCKET              = {
@@ -331,12 +331,12 @@ local task_functions = {
     },
     RELOCATE                 = {
         func   = travel.relocate,
-        params = { class_settings.settings, loadsave.SaveState },
+        params = function() return { class_settings.settings, loadsave.SaveState, _G.State:readGroupSelection() } end,
         desc   = function(item) return 'Relocate to ' .. item.what end
     },
     REMOVE_INVIS             = {
         func   = manage.removeInvis,
-        params = {},
+        params = function() return { _G.State:readGroupSelection() } end,
         desc   = 'Remove invisibility'
     },
     RESTORE_ITEM             = {
@@ -361,7 +361,7 @@ local task_functions = {
     },
     SEND_YES                 = {
         func   = manage.sendYes,
-        params = {},
+        params = function() return { _G.State:readGroupSelection() } end,
         desc   = 'Select yes in confirmation box'
     },
     SNEAK                    = {
@@ -391,12 +391,12 @@ local task_functions = {
     },
     ZONE_CONTINUE_TRAVEL     = {
         func   = travel.zone_travel,
-        params = { class_settings.settings, loadsave.SaveState, true },
+        params = function() return { class_settings.settings, loadsave.SaveState, true, _G.State:readGroupSelection() } end,
         desc   = function(item) return 'Travel to ' .. item.zone end
     },
     ZONE_TRAVEL              = {
         func   = travel.zone_travel,
-        params = { class_settings.settings, loadsave.SaveState, true },
+        params = function() return { class_settings.settings, loadsave.SaveState, false, _G.State:readGroupSelection() } end,
         desc   = function(item) return 'Travel to ' .. item.zone end
     },
 }
