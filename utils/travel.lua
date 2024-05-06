@@ -1005,7 +1005,7 @@ function travel.relocate(item, class_settings, char_settings)
     end
 end
 
-function travel.zone_travel(item, class_settings, char_settings, continue)
+function travel.zone_travel(item, class_settings, char_settings, continue, choiceNum, choiceName)
     if char_settings.general.returnToBind == true and continue == false then
         _G.State:setStatusText("Returning to bind point.")
         while mq.TLO.Zone.ShortName() ~= mq.TLO.Me.BoundLocation('0')() do
