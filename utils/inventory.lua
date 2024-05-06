@@ -181,7 +181,7 @@ function inventory.combine_item(item, class_settings, char_settings, slot)
     logger.log_verbose("\aoSuccessfully moved \ag%s \aoto combine container.", item.what)
 end
 
-function inventory.combine_do(class_settings, char_settings, slot)
+function inventory.combine_do(item, class_settings, char_settings, slot)
     if _G.Mob.xtargetCheck(char_settings) then
         _G.Mob.clearXtarget(class_settings, char_settings)
     end
