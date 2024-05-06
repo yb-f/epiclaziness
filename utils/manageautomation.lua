@@ -202,28 +202,31 @@ function manage.doAutomation(character, class, script, action, char_settings)
     end
 end
 
-function manage.groupTalk(npc, phrase)
-    if mq.TLO.Spawn(npc).Distance() ~= nil then
-        if mq.TLO.Spawn(npc).Distance() > MAX_DISTANCE then
-            logger.log_warn("\ar%s \aois over %s units away. Moving back to step \ar%s\ao.", npc, MAX_DISTANCE, _G.State.current_step)
+function manage.groupTalk(item)
+    manage.removeInvis()
+    _G.State:setStatusText(string.format("Talking to %s (%s).", item.npc, item.phrase))
+    logger.log_info("\aoHaving all grouped characters say \ag%s \ao to \ag%s\ao.", item.phrase, item.npc)
+    if mq.TLO.Spawn(item.npc).Distance() ~= nil then
+        if mq.TLO.Spawn(item.npc).Distance() > MAX_DISTANCE then
+            logger.log_warn("\ar%s \aois over %s units away. Moving back to step \ar%s\ao.", item.npc, MAX_DISTANCE, _G.State.current_step)
             _G.State:handle_step_change(_G.State.current_step - 1)
             return
         end
     end
     if _G.State.group_choice == 1 then
-        if mq.TLO.Target.ID() ~= mq.TLO.Spawn(npc).ID() then
-            logger.log_verbose("\aoTargeting \ar%s\ao.", npc)
-            mq.TLO.Spawn(npc).DoTarget()
+        if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
+            logger.log_verbose("\aoTargeting \ar%s\ao.", item.npc)
+            mq.TLO.Spawn(item.npc).DoTarget()
             mq.delay(300)
         end
-        mq.cmdf("/say %s", phrase)
+        mq.cmdf("/say %s", item.phrase)
         mq.delay(750)
     elseif _G.State.group_choice == 2 then
         for i = 0, mq.TLO.Group.GroupSize() - 1 do
             if mq.TLO.Group.Member(i).DisplayName() ~= mq.TLO.Me.DisplayName() then
-                mq.cmdf("/dex %s /squelch /target id %s", mq.TLO.Group.Member(i).DisplayName(), mq.TLO.Spawn(npc).ID())
+                mq.cmdf("/dex %s /squelch /target id %s", mq.TLO.Group.Member(i).DisplayName(), mq.TLO.Spawn(item.npc).ID())
                 mq.delay(300)
-                mq.cmdf("/dex %s /say %s", mq.TLO.Group.Member(i).DisplayName(), phrase)
+                mq.cmdf("/dex %s /say %s", mq.TLO.Group.Member(i).DisplayName(), item.phrase)
             end
             math.randomseed(os.time())
             local wait = math.random(4000, 10000)
@@ -232,24 +235,24 @@ function manage.groupTalk(npc, phrase)
         math.randomseed(os.time())
         local wait = math.random(4000, 10000)
         mq.delay(wait)
-        if mq.TLO.Target.ID() ~= mq.TLO.Spawn(npc).ID() then
-            mq.TLO.Spawn(npc).DoTarget()
+        if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
+            mq.TLO.Spawn(item.npc).DoTarget()
             mq.delay(300)
         end
-        mq.cmdf("/say %s", phrase)
+        mq.cmdf("/say %s", item.phrase)
         mq.delay(750)
     else
-        mq.cmdf("/dex %s /squelch /target id %s", _G.State.group_combo[_G.State.group_choice], mq.TLO.Spawn(npc).ID())
+        mq.cmdf("/dex %s /squelch /target id %s", _G.State.group_combo[_G.State.group_choice], mq.TLO.Spawn(item.npc).ID())
         mq.delay(300)
-        mq.cmdf("/dex %s /say %s", _G.State.group_combo[_G.State.group_choice], phrase)
+        mq.cmdf("/dex %s /say %s", _G.State.group_combo[_G.State.group_choice], item.phrase)
         math.randomseed(os.time())
         local wait = math.random(4000, 10000)
         mq.delay(wait)
-        if mq.TLO.Target.ID() ~= mq.TLO.Spawn(npc).ID() then
-            mq.TLO.Spawn(npc).DoTarget()
+        if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
+            mq.TLO.Spawn(item.npc).DoTarget()
             mq.delay(300)
         end
-        mq.cmdf("/say %s", phrase)
+        mq.cmdf("/say %s", item.phrase)
         mq.delay(750)
     end
 end
