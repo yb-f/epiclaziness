@@ -160,16 +160,20 @@ function draw_gui.generalTab(task_table)
             end
             if changed == true then
                 _G.State.step_overview()
+                changed = false
             end
         end
         if mq.TLO.Me.Grouped() == true then
-            _G.State.group_choice = ImGui.Combo('##Group_Combo', _G.State.group_choice, _G.State.group_combo)
+            _G.State.group_choice, changed = ImGui.Combo('##Group_Combo', _G.State.group_choice, _G.State.group_combo, #_G.State.group_combo, #_G.State.group_combo)
             if ImGui.IsItemHovered() then
                 ImGui.SetTooltip('Who should come with you (None. Full group. Individual group member.)')
             end
+            if changed == true then
+                _G.State:setGroupSelection()
+            end
             ImGui.SameLine()
             if ImGui.SmallButton(ICONS.MD_REFRESH) then
-                _G.State.populate_group_combo()
+                _G.State:populate_group_combo()
             end
         end
         if _G.State:readTaskRunning() == false then

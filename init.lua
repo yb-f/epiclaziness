@@ -70,45 +70,46 @@ local function loadTheme()
 end
 
 _G.State = {
-    is_paused           = false, --
-    is_task_running     = false, --
-    do_start_run        = false, --
-    should_stop_at_save = false, --
-    current_step        = 0,     --
-    status              = '',    --
-    status2             = '',    --
-    requirements        = '',    --
-    bagslot1            = 0,     --0
-    bagslot2            = 0,     --0
-    group_combo         = {},
-    group_choice        = 1,
-    epic_list           = quests_done[string.lower(mq.TLO.Me.Class.ShortName())],
-    epic_choice         = 1,
-    epicstring          = '',
-    Location            = { --
+    is_paused             = false, --
+    is_task_running       = false, --
+    do_start_run          = false, --
+    should_stop_at_save   = false, --
+    current_step          = 0,     --
+    status                = '',    --
+    status2               = '',    --
+    requirements          = '',    --
+    bagslot1              = 0,     --0
+    bagslot2              = 0,     --0
+    group_combo           = {},
+    group_choice          = 1,
+    group_selected_member = '',
+    epic_list             = quests_done[string.lower(mq.TLO.Me.Class.ShortName())],
+    epic_choice           = 1,
+    epicstring            = '',
+    Location              = { --
         X = 0,
         Y = 0,
         Z = 0,
     },
-    should_skip         = false,
-    is_rewound          = false,
-    bad_IDs             = {},
-    cannot_count        = 0,
-    is_traveling        = false,
-    autosize            = false,
-    autosize_sizes      = AUTOSIZE_SIZES,
-    autosize_choice     = AUTOSIZE_CHOICE,
-    autosize_self       = false,
-    autosize_on         = false,
-    combineSlot         = 0,
-    destType            = '',
-    dest                = '',
-    pathDist            = 0,
-    velocity            = 0,
-    estimatedTime       = 0,
-    startDist           = 0,
-    updateTime          = mq.gettime(),
-    badMeshes           = {},
+    should_skip           = false,
+    is_rewound            = false,
+    bad_IDs               = {},
+    cannot_count          = 0,
+    is_traveling          = false,
+    autosize              = false,
+    autosize_sizes        = AUTOSIZE_SIZES,
+    autosize_choice       = AUTOSIZE_CHOICE,
+    autosize_self         = false,
+    autosize_on           = false,
+    combineSlot           = 0,
+    destType              = '',
+    dest                  = '',
+    pathDist              = 0,
+    velocity              = 0,
+    estimatedTime         = 0,
+    startDist             = 0,
+    updateTime            = mq.gettime(),
+    badMeshes             = {},
 }
 
 function _G.State:readStartRun()
@@ -240,6 +241,14 @@ local function create_spawn_list()
     end
 end
 
+function _G.State:setGroupSelection()
+    self.group_selected_member = self.group_combo[self.group_choice]
+end
+
+function _G.State:readGroupSelection()
+    return self.group_choice, self.group_selected_member
+end
+
 function _G.State.save(item)
     logger.log_info("\aoSaving step: \ar%s", _G.State.current_step)
     loadsave.prepSave(_G.State.scurrent_steptep)
@@ -310,18 +319,18 @@ if loadsave.SaveState.general['speedForTravel'] == nil then
     loadsave.saveState()
 end
 
-function _G.State.populate_group_combo()
-    _G.State.group_combo = {}
-    table.insert(_G.State.group_combo, "None")
+function _G.State:populate_group_combo()
+    logger.log_info("\aoPopulating group combo box with characters in your current zone.")
+    self.group_combo = {}
+    self.group_combo[#self.group_combo + 1] = 'None'
     if mq.TLO.Me.Grouped() then
-        table.insert(_G.State.group_combo, "Group")
+        self.group_combo[#self.group_combo + 1] = 'Group'
         for i = 0, mq.TLO.Group() do
             if mq.TLO.Group.Member(i).DisplayName() ~= mq.TLO.Me.DisplayName() then
-                table.insert(_G.State.group_combo, mq.TLO.Group.Member(i).DisplayName())
+                self.group_combo[#self.group_combo + 1] = mq.TLO.Group.Member(i).DisplayName()
             end
         end
     end
-    logger.log_super_verbose("\aoPopulating group combo box with characters in your current zone.")
 end
 
 local function check_tradeskills(class, choice)
@@ -382,6 +391,9 @@ local function execute_task(task)
         local func = task_info.func
         local params = task_info.params
         if func then
+            if type(params) == "function" then
+                params = params()
+            end
             func(task, unpack(params))
         else
             if task_type == '' then type = 'none' end
@@ -600,7 +612,7 @@ local function init_autosize()
 end
 
 local function init()
-    _G.State.populate_group_combo()
+    _G.State:populate_group_combo()
     _G.State.step_overview()
     mq.imgui.init('displayGUI', displayGUI)
     version_check()
