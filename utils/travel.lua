@@ -483,7 +483,7 @@ function travel.invis(class_settings)
         end
         mq.delay("4s")
     end
-    mq.delay(100)
+    mq.delay("1s")
     _G.State:setStatusText(temp)
 end
 
