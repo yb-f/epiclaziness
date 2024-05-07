@@ -445,7 +445,7 @@ function mob.npc_kill_all(item, class_settings, char_settings)
             _G.Actions.pauseTask(_G.State:readStatusText())
         end
         local ID = mob.findNearestName(item.npc, item, class_settings, char_settings)
-        travel.general_travel(item, class_settings, char_settings, ID)
+        travel.general_travel(item, class_settings, char_settings, ID, _G.State:readGroupSelection())
         if mq.TLO.Spawn(ID).Distance() ~= nil then
             if mq.TLO.Spawn(ID).Distance() > MAX_DISTANCE then
                 logger.log_warn("\ar%s \aois over %s units away. Moving closer.", item.npc, MAX_DISTANCE)

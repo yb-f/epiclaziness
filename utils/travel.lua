@@ -27,44 +27,44 @@ function travel.invisTranslocatorCheck()
     return false
 end
 
-function travel.face_heading(item)
+function travel.face_heading(item, choice, name)
     _G.State:setStatusText(string.format("Facing heading %s.", item.what))
     logger.log_info("\aoFacing heading: \ag%s\ao.", item.what)
-    if _G.State.group_choice == 1 then
+    if choice == 1 then
         mq.cmdf("/squelch /face heading %s", item.what)
-    elseif _G.State.group_choice == 2 then
+    elseif choice == 2 then
         mq.cmdf("/dgga /squelch /face heading %s", item.what)
     else
         mq.cmdf("/squelch /face heading %s", item.what)
-        mq.cmdf("/dex %s /squelch /face heading %s", _G.State.group_combo[_G.State.group_choice], item.what)
+        mq.cmdf("/dex %s /squelch /face heading %s", name, item.what)
     end
     mq.delay(250)
 end
 
-function travel.face_loc(item)
+function travel.face_loc(item, choice, name)
     local x = item.whereX
     local y = item.whereY
     local z = item.whereZ
     _G.State:setStatusText(string.format("Facing location: %s %s %s.", y, x, z))
     logger.log_info("\aoFacing location \ag%s, %s, %s\ao.", y, x, z)
-    if _G.State.group_choice == 1 then
+    if choice == 1 then
         mq.cmdf("/squelch /face loc %s,%s,%s", y, x, z)
-    elseif _G.State.group_choice == 2 then
+    elseif choice == 2 then
         mq.cmdf("/dgga /squelch /face loc %s,%s,%s", y, x, z)
     else
         mq.cmdf("/squelch /face loc %s,%s,%s", y, x, z)
-        mq.cmdf("/dex %s /squelch /face loc %s,%s,%s", _G.State.group_combo[_G.State.group_choice], y, x, z)
+        mq.cmdf("/dex %s /squelch /face loc %s,%s,%s", name, y, x, z)
     end
     mq.delay(250)
 end
 
-function travel.forward_zone(item, class_settings, char_settings)
+function travel.forward_zone(item, class_settings, char_settings, choice, name)
     if char_settings.general.speedForTravel == true then
         local speedChar, speedSkill = travel.speedCheck(class_settings, char_settings)
         if speedChar ~= 'none' then
             travel.navPause()
             travel.doSpeed(speedChar, speedSkill)
-            travel.navUnpause(item)
+            travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
         end
     end
     if travel.invisCheck(char_settings, class_settings, item.invis) then
@@ -72,12 +72,12 @@ function travel.forward_zone(item, class_settings, char_settings)
     end
     _G.State:setStatusText(string.format("Traveling forward to zone: %s.", item.zone))
     logger.log_info("\aoTraveling forward to zone: \ag%s\ao.", item.zone)
-    if _G.State.group_choice == 1 then
+    if choice == 1 then
         mq.cmd("/squelch /keypress forward hold")
         while mq.TLO.Zone.ShortName() ~= item.zone do
             mq.delay(500)
         end
-    elseif _G.State.group_choice == 2 then
+    elseif choice == 2 then
         mq.cmd("/dgge /squelch /keypress forward hold")
         mq.cmd("/squelch /keypress forward hold")
         while mq.TLO.Zone.ShortName() ~= item.zone do
@@ -87,33 +87,33 @@ function travel.forward_zone(item, class_settings, char_settings)
             mq.delay(500)
         end
     else
-        mq.cmdf("/dex %s /keypress forward hold", _G.State.group_combo[_G.State.group_choice])
+        mq.cmdf("/dex %s /keypress forward hold", name)
         mq.cmd("/squelch /keypress forward hold")
         while mq.TLO.Zone.ShortName() ~= item.zone and mq.TLO.Zone.Name() ~= item.zone do
             mq.delay(500)
         end
-        while mq.TLO.Group.Member(_G.State.group_combo[_G.State.group_choice]).OtherZone() do
+        while mq.TLO.Group.Member(name).OtherZone() do
             mq.delay(500)
         end
     end
     mq.delay("2s")
 end
 
-function travel.gate_group()
+function travel.gate_group(choice, name)
     logger.log_info("\aoGating to \ag%s\ao.", mq.TLO.Me.BoundLocation('0')())
-    if _G.State.group_choice == 1 then
+    if choice == 1 then
         mq.cmd("/squelch /relocate gate")
         mq.delay(500)
-    elseif _G.State.group_choice == 2 then
+    elseif choice == 2 then
         mq.cmd("/dgga /squelch /relocate gate")
         mq.delay(500)
     else
         mq.cmd("/squelch /relocate gate")
-        mq.cmdf('/dex %s /squelch /relocate gate', _G.State.group_combo[_G.State.group_choice])
+        mq.cmdf('/dex %s /squelch /relocate gate', name)
     end
 end
 
-function travel.no_nav_travel(item, class_settings, char_settings)
+function travel.no_nav_travel(item, class_settings, char_settings, choice, name)
     local x = item.whereX
     local y = item.whereY
     local z = item.whereZ
@@ -122,7 +122,7 @@ function travel.no_nav_travel(item, class_settings, char_settings)
         if speedChar ~= 'none' then
             travel.navPause()
             travel.doSpeed(speedChar, speedSkill)
-            travel.navUnpause(item)
+            travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
         end
     end
     if travel.invisCheck(char_settings, class_settings, item.invis) then
@@ -130,7 +130,7 @@ function travel.no_nav_travel(item, class_settings, char_settings)
     end
     _G.State:setStatusText(string.format("Traveling forward to location: %s %s %s.", y, x, z))
     logger.log_info("\aoTraveling without MQ2Nav to \ag%s, %s, %s\ao.", y, x, z)
-    if _G.State.group_choice == 1 then
+    if choice == 1 then
         mq.cmd("/squelch /keypress forward hold")
         local distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
         logger.log_super_verbose("\aoDistance: \ag%s\ao.", distance)
@@ -144,7 +144,7 @@ function travel.no_nav_travel(item, class_settings, char_settings)
             end
         end
         mq.cmd("/squelch /keypress forward")
-    elseif _G.State.group_choice == 2 then
+    elseif choice == 2 then
         mq.cmd("/dgge /squelch /keypress forward hold")
         mq.cmd("/squelch /keypress forward hold")
         local distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
@@ -161,7 +161,7 @@ function travel.no_nav_travel(item, class_settings, char_settings)
         mq.cmd("/dgge /squelch /keypress forward")
         mq.cmd("/squelch /keypress forward")
     else
-        mq.cmdf("/dex %s /squelch /keypress forward hold", _G.State.group_combo[_G.State.group_choice])
+        mq.cmdf("/dex %s /squelch /keypress forward hold", name)
         mq.cmd("/squelch /keypress forward hold")
         local distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
         logger.log_super_verbose("\aoDistance: \ag%s\ao.", distance)
@@ -174,7 +174,7 @@ function travel.no_nav_travel(item, class_settings, char_settings)
                 return
             end
         end
-        mq.cmdf("/dex %s /squelch /keypress forward", _G.State.group_combo[_G.State.group_choice])
+        mq.cmdf("/dex %s /squelch /keypress forward", name)
         mq.cmd("/squelch /keypress forward")
     end
 end
@@ -208,7 +208,7 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
             mq.exit()
         end
         if mq.TLO.Navigation.Paused() == true then
-            travel.navUnpause(item)
+            travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
         end
         if _G.State.should_skip == true then
             travel.navPause()
@@ -219,26 +219,26 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
             if _G.Mob.xtargetCheck(char_settings) then
                 travel.navPause()
                 _G.Mob.clearXtarget(class_settings, char_settings)
-                travel.navUnpause(item)
+                travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
             end
         end
         if _G.State:readPaused() then
             travel.navPause()
             _G.Actions.pauseTask(_G.State:readStatusText())
-            travel.navUnpause(item)
+            travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
         end
         if char_settings.general.speedForTravel == true then
             local speedChar, speedSkill = travel.speedCheck(class_settings, char_settings)
             if speedChar ~= 'none' then
                 travel.navPause()
                 travel.doSpeed(speedChar, speedSkill)
-                travel.navUnpause(item)
+                travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
             end
         end
         if travel.invisCheck(char_settings, class_settings, item.invis) then
             travel.navPause()
             travel.invis(class_settings)
-            travel.navUnpause(item)
+            travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
         end
         if loopCount == 10 then
             if item.radius == 1 then
@@ -303,14 +303,14 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
     mq.cmd('/squelch /autosize off')
 end
 
-function travel.general_travel(item, class_settings, char_settings, ID)
+function travel.general_travel(item, class_settings, char_settings, ID, choice, name)
     ID = ID or _G.Mob.findNearestName(item.npc, item, class_settings, char_settings)
     if char_settings.general.speedForTravel == true then
         local speedChar, speedSkill = travel.speedCheck(class_settings, char_settings)
         if speedChar ~= 'none' then
             travel.navPause()
             travel.doSpeed(speedChar, speedSkill)
-            travel.navUnpause(item)
+            travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
         end
     end
     if travel.invisCheck(char_settings, class_settings, item.invis) then
@@ -328,7 +328,7 @@ function travel.general_travel(item, class_settings, char_settings, ID)
         if _G.State:readPaused() then
             travel.navPause()
             _G.Actions.pauseTask(_G.State:readStatusText())
-            travel.navUnpause(item)
+            travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
         end
         ID = _G.Mob.findNearestName(item.npc, item, class_settings, char_settings)
     end
@@ -340,13 +340,13 @@ function travel.general_travel(item, class_settings, char_settings, ID)
         logger.log_debug('\aoDistance to \ag%s \aois less than 10. Not traveling.', item.npc)
     end
     logger.log_info("\aoNavigating to \ag%s \ao(\ag%s\ao).", item.npc, ID)
-    if _G.State.group_choice == 1 then
+    if choice == 1 then
         mq.cmdf("/squelch /nav id %s", ID)
-    elseif _G.State.group_choice == 2 then
+    elseif choice == 2 then
         mq.cmdf("/dgga /squelch /nav id %s", ID)
     else
         mq.cmdf("/squelch /nav id %s", ID)
-        mq.cmdf('/dex %s /squelch /nav id %s', _G.State.group_combo[_G.State.group_choice], ID)
+        mq.cmdf('/dex %s /squelch /nav id %s', name, ID)
     end
     _G.State.startDist = mq.TLO.Navigation.PathLength("id " .. ID)()
     _G.State.destType = 'ID'
@@ -356,6 +356,7 @@ function travel.general_travel(item, class_settings, char_settings, ID)
 end
 
 function travel.invis(class_settings)
+    local choice, name = _G.State:readGroupSelection()
     local temp = _G.State:readStatusText()
     _G.State:setStatusText("Using invis.")
     logger.log_info("\aoUsing invisibility.")
@@ -403,9 +404,9 @@ function travel.invis(class_settings)
             end
         end
     end
-    if _G.State.group_choice == 1 then
-    elseif _G.State.group_choice == 2 then
-        for i = 0, mq.TLO.Group.GroupSize() - 1 do
+    if choice == 1 then
+    elseif choice == 2 then
+        for i = 1, mq.TLO.Group.Members() do
             if mq.TLO.Group.Member(i).DisplayName() ~= mq.TLO.Me.DisplayName() then
                 if mq.TLO.Group.Member(i).Invis() == false then
                     local invis_type = {}
@@ -451,35 +452,34 @@ function travel.invis(class_settings)
         mq.delay("4s")
     else
         local invis_type = {}
-        for word in string.gmatch(class_settings.class_invis[mq.TLO.Group.Member(_G.State.group_combo[_G.State.group_choice]).Class()], '([^|]+)') do
+        for word in string.gmatch(class_settings.class_invis[mq.TLO.Group.Member(name).Class()], '([^|]+)') do
             table.insert(invis_type, word)
         end
-        if invis_type[class_settings.invis[mq.TLO.Group.Member(_G.State.group_combo[_G.State.group_choice]).Class()]] == 'Potion' then
-            logger.log_super_verbose("\aoHaving \ag%s \aouse a cloudy potion.", mq.TLO.Group.Member(_G.State.group_combo[_G.State.group_choice]).DisplayName())
-            mq.cmdf('/dex %s /squelch /useitem "Cloudy Potion"', mq.TLO.Group.Member(_G.State.group_combo[_G.State.group_choice]).DisplayName())
-        elseif invis_type[class_settings.invis[mq.TLO.Group.Member(_G.State.group_combo[_G.State.group_choice]).Class()]] == 'Hide/Sneak' then
-            logger.log_super_verbose("\aoHaving \ag%s \aouse hide/sneak.", mq.TLO.Group.Member(_G.State.group_combo[_G.State.group_choice]).DisplayName())
-            mq.cmdf("/dquery %s -q Me.Sneaking", mq.TLO.Group.Member(_G.State.group_combo[_G.State.group_choice]).DisplayName())
+        if invis_type[class_settings.invis[mq.TLO.Group.Member(name).Class()]] == 'Potion' then
+            logger.log_super_verbose("\aoHaving \ag%s \aouse a cloudy potion.", name)
+            mq.cmdf('/dex %s /squelch /useitem "Cloudy Potion"', name)
+        elseif invis_type[class_settings.invis[mq.TLO.Group.Member(name).Class()]] == 'Hide/Sneak' then
+            logger.log_super_verbose("\aoHaving \ag%s \aouse hide/sneak.", name)
+            mq.cmdf("/dquery %s -q Me.Sneaking", name)
             if mq.TLO.DanNet.Query() == "FALSE" then
-                mq.cmdf("/dobserve %s -q Me.AbilityReady[Sneak]", mq.TLO.Group.Member(_G.State.group_combo[_G.State.group_choice]).DisplayName())
-                while mq.TLO.DanNet(mq.TLO.Group.Member(_G.State.group_combo[_G.State.group_choice]).DisplayName()).Observe("Me.AbilityReady[Sneak]")() == "FALSE" do
+                mq.cmdf("/dobserve %s -q Me.AbilityReady[Sneak]", name)
+                while mq.TLO.DanNet(name).Observe("Me.AbilityReady[Sneak]")() == "FALSE" do
                     mq.delay(50)
                 end
-                mq.cmdf("/dex %s /squelch /doability sneak", mq.TLO.Group.Member(_G.State.group_combo[_G.State.group_choice]).DisplayName())
-                mq.cmdf("/dobserve %s -q Me.AbilityReady[Sneak] -drop", mq.TLO.Group.Member(_G.State.group_combo[_G.State.group_choice]).DisplayName())
+                mq.cmdf("/dex %s /squelch /doability sneak", name)
+                mq.cmdf("/dobserve %s -q Me.AbilityReady[Sneak] -drop", name)
             end
-            if mq.TLO.Group.Member(_G.State.group_combo[_G.State.group_choice]).Invis() == false then
-                mq.cmdf("/dobserve %s -q Me.AbilityReady[Hide]", mq.TLO.Group.Member(_G.State.group_combo[_G.State.group_choice]).DisplayName())
-                while mq.TLO.DanNet(mq.TLO.Group.Member(_G.State.group_combo[_G.State.group_choice]).DisplayName()).Observe("Me.AbilityReady[Hide]")() == "FALSE" do
+            if mq.TLO.Group.Member(name).Invis() == false then
+                mq.cmdf("/dobserve %s -q Me.AbilityReady[Hide]", name)
+                while mq.TLO.DanNet(name).Observe("Me.AbilityReady[Hide]")() == "FALSE" do
                     mq.delay(50)
                 end
-                mq.cmdf("/dex %s /squelch /doability hide", mq.TLO.Group.Member(_G.State.group_combo[_G.State.group_choice]).DisplayName())
+                mq.cmdf("/dex %s /squelch /doability hide", name)
             end
         else
-            local ID = class_settings['skill_to_num'][invis_type[class_settings.invis[mq.TLO.Group.Member(_G.State.group_combo[_G.State.group_choice]).Class()]]]
-            logger.log_super_verbose("\aoHaving \ag%s \aouse \ag%s \ao(\ag%s\ao).", mq.TLO.Group.Member(_G.State.group_combo[_G.State.group_choice]).DisplayName(),
-                invis_type[class_settings.invis[mq.TLO.Group.Member(_G.State.group_combo[_G.State.group_choice]).Class()]], ID)
-            mq.cmdf('/dex %s /squelch /alt act "%s"', mq.TLO.Group.Member(_G.State.group_combo[_G.State.group_choice]).DisplayName(), ID)
+            local ID = class_settings['skill_to_num'][invis_type[class_settings.invis[mq.TLO.Group.Member(name).Class()]]]
+            logger.log_super_verbose("\aoHaving \ag%s \aouse \ag%s \ao(\ag%s\ao).", name, invis_type[class_settings.invis[mq.TLO.Group.Member(name).Class()]], ID)
+            mq.cmdf('/dex %s /squelch /alt act "%s"', name, ID)
         end
         mq.delay("4s")
     end
@@ -488,14 +488,15 @@ function travel.invis(class_settings)
 end
 
 function travel.invisCheck(char_settings, class_settings, invis)
+    local choice, name = _G.State:readGroupSelection()
     logger.log_super_verbose("\aoChecking if we should be invis.")
     if invis == 1 and char_settings.general.invisForTravel == true then
         if mq.TLO.Me.Invis() == false then
             logger.log_super_verbose("\aoYes, we should be invis.")
             return true
         end
-        if _G.State.group_choice == 2 then
-            for i = 0, mq.TLO.Group.GroupSize() - 1 do
+        if choice == 2 then
+            for i = 1, mq.TLO.Group.Members() do
                 if mq.TLO.Group.Member(i).DisplayName() ~= mq.TLO.Me.DisplayName() then
                     if mq.TLO.Group.Member(i).Invis() == false then
                         logger.log_super_verbose("\aoYes, \ag%s \aoshould be invis.", mq.TLO.Group.Member(i).DisplayName())
@@ -503,9 +504,9 @@ function travel.invisCheck(char_settings, class_settings, invis)
                     end
                 end
             end
-        else
-            if mq.TLO.Group.Member(_G.State.group_combo[_G.State.group_choice]).Invis() == false then
-                logger.log_super_verbose("\aoYes, \ag%s \aoshould be invis.", mq.TLO.Group.Member(_G.State.group_combo[_G.State.group_choice]).DisplayName())
+        elseif choice > 2 then
+            if mq.TLO.Group.Member(name).Invis() == false then
+                logger.log_super_verbose("\aoYes, \ag%s \aoshould be invis.", name)
                 return true
             end
         end
@@ -528,6 +529,7 @@ function travel.gotSpeedyClass(class, class_settings)
 end
 
 function travel.speedCheck(class_settings, char_settings)
+    local choice, name = _G.State:readGroupSelection()
     logger.log_super_verbose("\aoChecking if we are missing travel speed buff.")
     for i, buff in ipairs(speed_buffs) do
         if mq.TLO.Me.Buff(buff)() then
@@ -538,7 +540,7 @@ function travel.speedCheck(class_settings, char_settings)
     local amSpeedy = false
     local aanums = {}
     local foundSpeed = false
-    if _G.State.group_choice == 1 then
+    if choice == 1 then
         local class = mq.TLO.Me.Class()
         amSpeedy = travel.gotSpeedyClass(class, class_settings)
         if amSpeedy == false then
@@ -558,8 +560,8 @@ function travel.speedCheck(class_settings, char_settings)
             local aaNum = class_settings['speed_to_num'][speed_skill]
             return mq.TLO.Me.DisplayName(), aaNum
         end
-    elseif _G.State.group_choice == 2 then
-        for i = 0, mq.TLO.Group.GroupSize() - 1 do
+    elseif choice == 2 then
+        for i = 1, mq.TLO.Group.Members() do
             local class = mq.TLO.Group.Member(i).Class()
             amSpeedy = travel.gotSpeedyClass(class, class_settings)
             if amSpeedy == true then
@@ -587,17 +589,17 @@ function travel.speedCheck(class_settings, char_settings)
         else
             local aaNum = 0
             local casterName = ''
-            for name, num in pairs(aanums) do
+            for names, num in pairs(aanums) do
                 if num == SELOS_BUFF then
                     aaNum = num
-                    casterName = name
+                    casterName = names
                     break
                 elseif num == CHEETAH_BUFF and aaNum ~= SELOS_BUFF then
                     aaNum = num
-                    casterName = name
+                    casterName = names
                 elseif (num == SPIRIT_FALCONS_BUFf or num == FLIGHT_FALCONS_BUFF) and aaNum ~= SELOS_BUFF and aaNum ~= CHEETAH_BUFF then
                     aaNum = num
-                    casterName = name
+                    casterName = names
                 end
             end
             return casterName, aaNum
@@ -626,7 +628,7 @@ function travel.speedCheck(class_settings, char_settings)
             return casterName, aaNum
         end
         aanums[mq.TLO.Me.DisplayName()] = aaNum
-        class = mq.TLO.Group.Member(_G.State.group_combo[_G.State.group_choice]).Class()
+        class = mq.TLO.Group.Member(name).Class()
         amSpeedy = travel.gotSpeedyClass(class, class_settings)
         if amSpeedy == true then
             local speed_type = {}
@@ -634,24 +636,24 @@ function travel.speedCheck(class_settings, char_settings)
                 table.insert(speed_type, word)
             end
             local speed_skill = speed_type[class_settings.speed[class]]
-            logger.log_verbose("\ag%s \aocan cast \ag%s\ao.", mq.TLO.Group.Member(_G.State.group_combo[_G.State.group_choice]).DisplayName(), speed_skill)
+            logger.log_verbose("\ag%s \aocan cast \ag%s\ao.", name, speed_skill)
             if speed_skill == 'Spirit of Eagles' then
                 if class == 'Ranger' then speed_skill = "Spirit of Eagles(Ranger)" end
                 if class == 'Druid' then speed_skill = "Spirit of Eagles(Druid)" end
             end
             aaNum = class_settings['speed_to_num'][speed_skill]
-            aanums[mq.TLO.Group.Member(_G.State.group_combo[_G.State.group_choice]).DisplayName()] = aaNum
-            for name, num in pairs(aanums) do
+            aanums[name] = aaNum
+            for names, num in pairs(aanums) do
                 if num == SELOS_BUFF then
                     aaNum = num
-                    casterName = name
+                    casterName = names
                     break
                 elseif num == CHEETAH_BUFF and aaNum ~= SELOS_BUFF then
                     aaNum = num
-                    casterName = name
+                    casterName = names
                 elseif (num == SPIRIT_FALCONS_BUFf or num == FLIGHT_FALCONS_BUFF) and aaNum ~= SELOS_BUFF and aaNum ~= CHEETAH_BUFF then
                     aaNum = num
-                    casterName = name
+                    casterName = names
                 end
             end
             return casterName, aaNum
@@ -673,7 +675,7 @@ function travel.doSpeed(name, aaNum)
     end
 end
 
-function travel.loc_travel(item, class_settings, char_settings)
+function travel.loc_travel(item, class_settings, char_settings, choice, name)
     local x = item.whereX
     local y = item.whereY
     local z = item.whereZ
@@ -691,13 +693,13 @@ function travel.loc_travel(item, class_settings, char_settings)
         return
     end
     _G.State.is_traveling = true
-    if _G.State.group_choice == 1 then
+    if choice == 1 then
         mq.cmdf("/squelch /nav loc %s %s %s", y, x, z)
-    elseif _G.State.group_choice == 2 then
+    elseif choice == 2 then
         mq.cmdf("/dgga /squelch /nav loc %s %s %s", y, x, z)
     else
         mq.cmdf("/squelch /nav loc %s %s %s", y, x, z)
-        mq.cmdf("/dex %s /squelch /nav loc %s %s %s", _G.State.group_combo[_G.State.group_choice], y, x, z)
+        mq.cmdf("/dex %s /squelch /nav loc %s %s %s", name, y, x, z)
     end
     local tempString = string.format("loc %s %s %s", y, x, z)
     _G.State.startDist = mq.TLO.Navigation.PathLength(tempString)()
@@ -708,81 +710,52 @@ function travel.loc_travel(item, class_settings, char_settings)
 end
 
 function travel.navPause()
+    local choice, name = _G.State:readGroupSelection()
     logger.log_info("\aoPausing navigation.")
-    if _G.State.group_choice == 1 then
+    if choice == 1 then
         mq.cmd('/squelch /nav pause')
-    elseif _G.State.group_choice == 2 then
+    elseif choice == 2 then
         mq.cmd('/dgga /squelch /nav pause')
     else
         mq.cmd('/squelch /nav pause')
-        mq.cmdf('/dex %s /nav pause', _G.State.group_combo[_G.State.group_choice])
+        mq.cmdf('/dex %s /nav pause', name)
     end
     mq.delay(500)
 end
 
-function travel.navUnpause(item)
+function travel.navUnpause(item, class_settings, char_settings, choice, name)
     if item.whereX then
         local x = item.whereX
         local y = item.whereY
         local z = item.whereZ
         logger.log_info("\aoResuming navigation to location \ag%s, %s, %s\ao.", y, x, z)
-        if _G.State.group_choice == 1 then
-            mq.cmdf("/squelch /nav loc %s %s %s", y, x, z)
-        elseif _G.State.group_choice == 2 then
-            mq.cmdf("/dgga /squelch /nav loc %s %s %s", y, x, z)
-        else
-            mq.cmdf("/squelch /nav loc %s %s %s", y, x, z)
-            mq.cmdf("/dex %s /squelch /nav loc %s %s %s", _G.State.group_combo[_G.State.group_choice], y, x, z)
-        end
-        local tempString = string.format("loc %s %s %s", y, x, z)
-        _G.State.startDist = mq.TLO.Navigation.PathLength(tempString)()
-        _G.State.destType = 'loc'
-        _G.State.dest = string.format("%s %s %s", y, x, z)
+        travel.loc_travel(item, class_settings, char_settings, choice, name)
     elseif item.npc then
         logger.log_info("\aoResuming navigation to \ag%s\ao.", item.npc)
-        if _G.State.group_choice == 1 then
-            mq.cmdf("/squelch /nav spawn %s", item.npc)
-        elseif _G.State.group_choice == 2 then
-            mq.cmdf("/dgga /squelch /nav spawn %s", item.npc)
-        else
-            mq.cmdf("/squelch /nav spawn %s", item.npc)
-            mq.cmdf("/dex %s /squelch /nav spawn %s", _G.State.group_combo[_G.State.group_choice], item.npc)
-        end
-        local tempString = string.format("spawn %s ", item.npc)
-        _G.State.startDist = mq.TLO.Navigation.PathLength(tempString)()
-        _G.State.destType = 'spawn'
-        _G.State.dest = item.npc
+        travel.general_travel(item, class_settings, char_settings, 0, choice, name)
     elseif item.zone then
         logger.log_info("\aoResuming navigation to zone \ag%s\ao.", item.zone)
-        if _G.State.group_choice == 1 then
-            mq.cmdf("/squelch /travelto %s", item.zone)
-        elseif _G.State.group_choice == 2 then
-            mq.cmdf("/dgga /squelch /travelto %s", item.zone)
-        else
-            mq.cmdf("/squelch /travelto %s", item.zone)
-            mq.cmdf('/dex %s /squelch /travelto %s', _G.State.group_combo[_G.State.group_choice], item.zone)
-        end
+        travel.zone_travel(item, class_settings, char_settings, choice, name)
     end
-    mq.delay(500)
 end
 
 function travel.follow_event()
     travel.looping = false
 end
 
-function travel.npc_follow(item, class_settings, char_settings, event)
+function travel.npc_follow(item, class_settings, char_settings, event, choice, name)
     event = event or false
     if _G.Mob.xtargetCheck(char_settings) then
         travel.navPause()
         _G.Mob.clearXtarget(class_settings, char_settings)
-        travel.navUnpause(item)
+        travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
     end
     if char_settings.general.speedForTravel == true then
         local speedChar, speedSkill = travel.speedCheck(class_settings, char_settings)
         if speedChar ~= 'none' then
             travel.navPause()
             travel.doSpeed(speedChar, speedSkill)
-            travel.navUnpause(item)
+            travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
         end
     end
     if travel.invisCheck(char_settings, class_settings, item.invis) then
@@ -797,44 +770,43 @@ function travel.npc_follow(item, class_settings, char_settings, event)
             return
         end
     end
-    if _G.State.group_choice == 1 then
+    if choice == 1 then
         mq.TLO.Spawn("npc " .. item.npc).DoTarget()
         mq.delay(300)
         mq.cmd('/squelch /afollow')
-    elseif _G.State.group_choice == 2 then
+    elseif choice == 2 then
         mq.cmdf('/dgga /squelch /target id %s', mq.TLO.Spawn("npc " .. item.npc).ID())
         mq.delay(300)
         mq.cmd('/dgga /squelch /afollow')
     else
         mq.TLO.Spawn("npc " .. item.npc).DoTarget()
-        mq.cmdf('/dex %s /squelch /target id %s', _G.State.group_combo[_G.State.group_choice],
-            mq.TLO.Spawn("npc " .. item.npc).ID())
+        mq.cmdf('/dex %s /squelch /target id %s', name, mq.TLO.Spawn("npc " .. item.npc).ID())
         mq.delay(300)
         mq.cmd('/squelch /afollow')
-        mq.cmdf('/dex %s /squelch /afollow', _G.State.group_combo[_G.State.group_choice])
+        mq.cmdf('/dex %s /squelch /afollow', name)
     end
     if item.whereX ~= nil then
         local distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), item.whereX, item.whereY)
         while distance > 50 do
             if _G.State.should_skip == true then
-                if _G.State.group_choice == 1 then
+                if choice == 1 then
                     mq.cmd('/squelch /afollow off')
                     _G.State.should_skip = false
                     return
-                elseif _G.State.group_choice == 2 then
+                elseif choice == 2 then
                     mq.cmd('/dgga /squelch /afollow off')
                     _G.State.should_skip = false
                     return
                 else
                     mq.cmd('/squelch /afollow off')
-                    mq.cmdf('/dex %s /squelch /afollow off', _G.State.group_combo[_G.State.group_choice])
+                    mq.cmdf('/dex %s /squelch /afollow off', name)
                 end
             end
             mq.delay(200)
             distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), item.whereX, item.whereY)
         end
         logger.log_info("\aoWe have reached our destination. Stopping follow.")
-        travel.npc_stop_follow()
+        travel.npc_stop_follow(item, choice, name)
     end
     travel.looping = true
     if event == true then
@@ -854,16 +826,16 @@ function travel.npc_follow(item, class_settings, char_settings, event)
     end
 end
 
-function travel.npc_stop_follow(item)
+function travel.npc_stop_follow(item, choice, name)
     _G.State:setStatusText(string.format("Stopping autofollow."))
     logger.log_info("\aoStopping autofollow.")
-    if _G.State.group_choice == 1 then
+    if choice == 1 then
         mq.cmd('/squelch /afollow off')
-    elseif _G.State.group_choice == 2 then
+    elseif choice == 2 then
         mq.cmd('/dgga /squelch /afollow off')
     else
         mq.cmd('/squelch /afollow off')
-        mq.cmdf('/dex %s /squelch /afollow off', _G.State.group_combo[_G.State.group_choice])
+        mq.cmdf('/dex %s /squelch /afollow off', name)
     end
 end
 
@@ -873,7 +845,7 @@ function travel.npc_travel(item, class_settings, ignore_path_check, char_setting
         if _G.Mob.xtargetCheck(char_settings) then
             travel.navPause()
             _G.Mob.clearXtarget(class_settings, char_settings)
-            travel.navUnpause(item)
+            travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
         end
     end
     if char_settings.general.speedForTravel == true then
@@ -881,18 +853,18 @@ function travel.npc_travel(item, class_settings, ignore_path_check, char_setting
         if speedChar ~= 'none' then
             travel.navPause()
             travel.doSpeed(speedChar, speedSkill)
-            travel.navUnpause(item)
+            travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
         end
     end
     if travel.invisCheck(char_settings, class_settings, item.invis) then
         travel.invis(class_settings)
     end
     if item.whereX ~= nil then
-        travel.loc_travel(item, class_settings, char_settings)
+        travel.loc_travel(item, class_settings, char_settings, _G.State:readGroupSelection())
     else
         _G.State:setStatusText(string.format("Waiting for NPC %s.", item.npc))
         local ID = _G.Mob.findNearestName(item.npc, item, class_settings, char_settings)
-        travel.general_travel(item, class_settings, char_settings, ID)
+        travel.general_travel(item, class_settings, char_settings, ID, _G.State:readGroupSelection())
     end
 end
 
@@ -927,12 +899,12 @@ function travel.findReadyRelocate()
     return 'none'
 end
 
-function travel.relocate(item, class_settings, char_settings)
+function travel.relocate(item, class_settings, char_settings, choice, name)
     local currentZone = mq.TLO.Zone.Name()
     if _G.Mob.xtargetCheck(char_settings) then
         travel.navPause()
         _G.Mob.clearXtarget(class_settings, char_settings)
-        travel.navUnpause(item)
+        travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
     end
     _G.State:setStatusText("Searching for relocation ability/item that is ready.")
     logger.log_info("\aoSearching for a relocation ability/item that is ready.")
@@ -946,18 +918,18 @@ function travel.relocate(item, class_settings, char_settings)
     end
     _G.State:setStatusText(string.format("Relocating to %s.", relocate))
     logger.log_info("\aoRelocating to \ag%s\ao.", relocate)
-    if _G.State.group_choice == 1 then
+    if choice == 1 then
         mq.cmdf('/squelch /relocate %s', relocate)
-    elseif _G.State.group_choice == 2 then
+    elseif choice == 2 then
         mq.cmdf('/dgga /squelch /relocate %s', relocate)
     else
         mq.cmdf('/squelch /relocate %s', relocate)
-        mq.cmdf('/dex %s /squelch /relocate %s', _G.State.group_combo[_G.State.group_choice], relocate)
+        mq.cmdf('/dex %s /squelch /relocate %s', name, relocate)
     end
     if _G.Mob.xtargetCheck(char_settings) then
         travel.navPause()
         _G.Mob.clearXtarget(class_settings, char_settings)
-        travel.navUnpause(item)
+        travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
     end
     local loopCount = 0
     while mq.TLO.Me.Casting() == nil do
@@ -971,7 +943,7 @@ function travel.relocate(item, class_settings, char_settings)
         if _G.State:readPaused() then
             travel.navPause()
             _G.Actions.pauseTask(_G.State:readStatusText())
-            travel.navUnpause(item)
+            travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
         end
         if loopCount >= 200 then
             logger.log_warn("\aoSpent 2 seconds waiting for relocate to \ar%s \aoto cast. Moving on.", relocate)
@@ -990,12 +962,8 @@ function travel.relocate(item, class_settings, char_settings)
         if _G.State:readPaused() then
             travel.navPause()
             _G.Actions.pauseTask(_G.State:readStatusText())
-            travel.navUnpause(item)
+            travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
         end
-        --[[if loopCount >= 33 then
-            logger.log_warn("\aoSpent 16 seconds waiting for relocate to \ar%s \ao to finish casting. Moving on.", relocate)
-            break
-        end--]]
     end
     mq.delay("2s")
     if currentZone == mq.TLO.Zone.Name() then
@@ -1005,11 +973,11 @@ function travel.relocate(item, class_settings, char_settings)
     end
 end
 
-function travel.zone_travel(item, class_settings, char_settings, continue, choiceNum, choiceName)
+function travel.zone_travel(item, class_settings, char_settings, continue, choice, name)
     if char_settings.general.returnToBind == true and continue == false then
         _G.State:setStatusText("Returning to bind point.")
         while mq.TLO.Zone.ShortName() ~= mq.TLO.Me.BoundLocation('0')() do
-            travel.gate_group()
+            travel.gate_group(choice, name)
             mq.delay("15s")
         end
     end
@@ -1018,7 +986,7 @@ function travel.zone_travel(item, class_settings, char_settings, continue, choic
         if speedChar ~= 'none' then
             travel.navPause()
             travel.doSpeed(speedChar, speedSkill)
-            travel.navUnpause(item)
+            travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
         end
     end
     if travel.invisCheck(char_settings, class_settings, item.invis) then
@@ -1028,13 +996,13 @@ function travel.zone_travel(item, class_settings, char_settings, continue, choic
     _G.State:setStatusText(string.format("Traveling to %s.", item.zone))
     logger.log_info("\aoTraveling to \ag%s\ao.", item.zone)
     _G.State.is_traveling = true
-    if _G.State.group_choice == 1 then
+    if choice == 1 then
         mq.cmdf("/squelch /travelto %s", item.zone)
-    elseif _G.State.group_choice == 2 then
+    elseif choice == 2 then
         mq.cmdf("/dgga /squelch /travelto %s", item.zone)
     else
         mq.cmdf("/squelch /travelto %s", item.zone)
-        mq.cmdf('/dex %s /squelch /travelto %s', _G.State.group_combo[_G.State.group_choice], item.zone)
+        mq.cmdf('/dex %s /squelch /travelto %s', name, item.zone)
     end
     local loopCount = 0
     _G.State:setLocation(mq.TLO.Me.X(), mq.TLO.Me.Y(), mq.TLO.Me.Z())
@@ -1049,7 +1017,7 @@ function travel.zone_travel(item, class_settings, char_settings, continue, choic
             mq.exit()
         end
         if mq.TLO.Navigation.Paused() == true then
-            travel.navUnpause(item)
+            travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
         end
         if _G.State.should_skip == true then
             travel.navPause()
@@ -1061,26 +1029,26 @@ function travel.zone_travel(item, class_settings, char_settings, continue, choic
         if _G.Mob.xtargetCheck(char_settings) then
             travel.navPause()
             _G.Mob.clearXtarget(class_settings, char_settings)
-            travel.navUnpause(item)
+            travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
         end
         if _G.State:readPaused() then
             travel.navPause()
             _G.Actions.pauseTask(_G.State:readStatusText())
-            travel.navUnpause(item)
+            travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
         end
         if char_settings.general.speedForTravel == true then
             local speedChar, speedSkill = travel.speedCheck(class_settings, char_settings)
             if speedChar ~= 'none' then
                 travel.navPause()
                 travel.doSpeed(speedChar, speedSkill)
-                travel.navUnpause(item)
+                travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
             end
         end
         if travel.invisCheck(char_settings, class_settings, item.invis) then
             if travel.invisTranslocatorCheck() == false then
                 travel.navPause()
                 travel.invis(class_settings)
-                travel.navUnpause(item)
+                travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
             end
         end
         if not mq.TLO.Navigation.Active() then
@@ -1093,13 +1061,13 @@ function travel.zone_travel(item, class_settings, char_settings, continue, choic
                 end
                 if mq.TLO.FindItem('=Spire Stone')() == nil then
                     logger.log_info("\aoTravel stopped. Starting travel to \ag%s \aoagain.", item.zone)
-                    if _G.State.group_choice == 1 then
+                    if choice == 1 then
                         mq.cmdf("/squelch /travelto %s", item.zone)
-                    elseif _G.State.group_choice == 2 then
+                    elseif choice == 2 then
                         mq.cmdf("/dgga /squelch /travelto %s", item.zone)
                     else
                         mq.cmdf("/squelch /travelto %s", item.zone)
-                        mq.cmdf('/dex %s /squelch /travelto %s', _G.State.group_combo[_G.State.group_choice], item.zone)
+                        mq.cmdf('/dex %s /squelch /travelto %s', name, item.zone)
                     end
                 end
             end
@@ -1141,7 +1109,7 @@ function travel.zone_travel(item, class_settings, char_settings, continue, choic
             end
         end
     end
-    if _G.State.group_choice == 2 then
+    if choice == 2 then
         logger.log_info("\aoWaiting for group members to arrive before continuing.")
         while mq.TLO.Group.AnyoneMissing() do
             mq.delay(500)
@@ -1152,9 +1120,9 @@ function travel.zone_travel(item, class_settings, char_settings, continue, choic
         end
         mq.delay("5s")
     end
-    if _G.State.group_choice > 2 then
-        logger.log_info("\aoWaiting for \ag%s to arrive before continuing.", _G.State.group_combo[_G.State.group_choice])
-        while mq.TLO.Group.Member(_G.State.group_combo[_G.State.group_choice]).OtherZone() do
+    if choice > 2 then
+        logger.log_info("\aoWaiting for \ag%s to arrive before continuing.", name)
+        while mq.TLO.Group.Member(name).OtherZone() do
             mq.delay(500)
             if _G.State.should_skip == true then
                 _G.State.should_skip = false

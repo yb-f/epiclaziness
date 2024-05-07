@@ -130,7 +130,7 @@ function actions.adventure_entrance(item, class_settings, char_settings)
     logger.log_verbose('\aoSearching for string "\ag%s\ao" in adventure text.', item.what)
     if string.find(mq.TLO.Window('AdventureRequestWnd/AdvRqst_NPCText').Text(), item.what) then
         mq.delay(50)
-        travel.loc_travel(item, class_settings, char_settings)
+        travel.loc_travel(item, class_settings, char_settings, _G.State:readGroupSelection())
         _G.State:handle_step_change(item.gotostep)
     end
 end
@@ -201,7 +201,7 @@ function actions.farm_radius(item, class_settings, char_settings, event)
         logger.log_debug("\aoEvent trigger is \ag%s\ao.", item.what)
         mq.event('farm_event', item.phrase, actions.farm_event)
     end
-    travel.loc_travel(item, class_settings, char_settings)
+    travel.loc_travel(item, class_settings, char_settings, _G.State:readGroupSelection())
     manage.campGroup(item.radius, class_settings, char_settings)
     manage.unpauseGroup(class_settings)
     local item_list = {}
@@ -353,7 +353,7 @@ end
 function actions.farm_while_near(item, class_settings, char_settings)
     _G.State:setStatusText(string.format("Killing nearby mobs until %s moves.", item.npc))
     logger.log_info("\aoKilling nearby mobs until \ag%s \aomoves.", item.npc)
-    travel.loc_travel(item, class_settings, char_settings)
+    travel.loc_travel(item, class_settings, char_settings, _G.State:readGroupSelection())
     manage.campGroup(item.radius, class_settings, char_settings)
     manage.unpauseGroup(class_settings)
     manage.removeInvis()
@@ -553,7 +553,7 @@ end
 
 function actions.ground_spawn(item, class_settings, char_settings)
     _G.State:setStatusText(string.format("Traveling to ground spawn @ %s %s %s.", item.whereX, item.whereY, item.whereZ))
-    travel.loc_travel(item, class_settings, char_settings)
+    travel.loc_travel(item, class_settings, char_settings, _G.State:readGroupSelection())
     _G.State:setStatusText(string.format("Picking up ground spawn %s.", item.what))
     mq.cmd("/squelch /itemtarget")
     mq.delay(200)
@@ -623,7 +623,7 @@ function actions.ground_spawn_farm(item, class_settings, char_settings)
             item.whereZ = item.whereZ * 100
             item.whereZ = math.floor(item.whereZ)
             item.whereZ = item.whereZ / 100
-            travel.loc_travel(item, class_settings, char_settings)
+            travel.loc_travel(item, class_settings, char_settings, _G.State:readGroupSelection())
             mq.delay(200)
             mq.cmd("/squelch /click left itemtarget")
             mq.delay(200)

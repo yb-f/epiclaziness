@@ -106,7 +106,7 @@ local task_functions = {
     },
     FARM_RADIUS              = {
         func   = _G.Actions.farm_radius,
-        params = { class_settings.settings, loadsave.SaveState },
+        params = { class_settings.settings, loadsave.SaveState, false },
         desc   = function(item) return 'Farm for ' .. item.what end
     },
     FARM_RADIUS_EVENT        = {
@@ -201,12 +201,12 @@ local task_functions = {
     },
     NPC_FOLLOW               = {
         func   = travel.npc_follow,
-        params = function() return { class_settings.settings, loadsave.SaveState, _G.State:readGroupSelection() } end,
+        params = function() return { class_settings.settings, loadsave.SaveState, false, _G.State:readGroupSelection() } end,
         desc   = function(item) return 'Follow ' .. item.npc end
     },
     NPC_FOLLOW_EVENT         = {
         func   = travel.npc_follow,
-        params = { class_settings.settings, loadsave.SaveState, true },
+        params = function() return { class_settings.settings, loadsave.SaveState, true, _G.State:readGroupSelection() } end,
         desc   = function(item) return 'Follow ' .. item.npc .. ' until event: ' .. item.phrase end
     },
     NPC_GIVE                 = {
@@ -261,7 +261,7 @@ local task_functions = {
     },
     NPC_TALK_ALL             = {
         func   = manage.groupTalk,
-        params = { class_settings.settings, loadsave.SaveState },
+        params = function() return { _G.State:readGroupSelection() } end,
         desc   = function(item) return 'Have all characters say ' .. item.phrase .. ' to ' .. item.npc end
     },
     NPC_TRAVEL               = {
@@ -336,7 +336,7 @@ local task_functions = {
     },
     REMOVE_INVIS             = {
         func   = manage.removeInvis,
-        params = function() return { _G.State:readGroupSelection() } end,
+        params = {},
         desc   = 'Remove invisibility'
     },
     RESTORE_ITEM             = {
