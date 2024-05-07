@@ -729,14 +729,44 @@ function travel.navUnpause(item, class_settings, char_settings, choice, name)
         local y = item.whereY
         local z = item.whereZ
         logger.log_info("\aoResuming navigation to location \ag%s, %s, %s\ao.", y, x, z)
-        travel.loc_travel(item, class_settings, char_settings, choice, name)
+        if choice == 1 then
+            mq.cmdf("/squelch /nav loc %s %s %s", y, x, z)
+        elseif choice == 2 then
+            mq.cmdf("/dgga /squelch /nav loc %s %s %s", y, x, z)
+        else
+            mq.cmdf("/squelch /nav loc %s %s %s", y, x, z)
+            mq.cmdf("/dex %s /squelch /nav loc %s %s %s", name, y, x, z)
+        end
+        local tempString = string.format("loc %s %s %s", y, x, z)
+        _G.State.startDist = mq.TLO.Navigation.PathLength(tempString)()
+        _G.State.destType = 'loc'
+        _G.State.dest = string.format("%s %s %s", y, x, z)
     elseif item.npc then
         logger.log_info("\aoResuming navigation to \ag%s\ao.", item.npc)
-        travel.general_travel(item, class_settings, char_settings, 0, choice, name)
+        if choice == 1 then
+            mq.cmdf("/squelch /nav spawn %s", item.npc)
+        elseif choice == 2 then
+            mq.cmdf("/dgga /squelch /nav spawn %s", item.npc)
+        else
+            mq.cmdf("/squelch /nav spawn %s", item.npc)
+            mq.cmdf("/dex %s /squelch /nav spawn %s", name, item.npc)
+        end
+        local tempString = string.format("spawn %s ", item.npc)
+        _G.State.startDist = mq.TLO.Navigation.PathLength(tempString)()
+        _G.State.destType = 'spawn'
+        _G.State.dest = item.npc
     elseif item.zone then
         logger.log_info("\aoResuming navigation to zone \ag%s\ao.", item.zone)
-        travel.zone_travel(item, class_settings, char_settings, choice, name)
+        if choice == 1 then
+            mq.cmdf("/squelch /travelto %s", item.zone)
+        elseif choice == 2 then
+            mq.cmdf("/dgga /squelch /travelto %s", item.zone)
+        else
+            mq.cmdf("/squelch /travelto %s", item.zone)
+            mq.cmdf('/dex %s /squelch /travelto %s', name, item.zone)
+        end
     end
+    mq.delay(500)
 end
 
 function travel.follow_event()
