@@ -391,7 +391,7 @@ function manage.doAutomation(character, class, script, action, char_settings)
 end
 
 function manage.groupTalk(item, choice, name)
-    manage.removeInvis(item, choice, name)
+    manage.removeInvis(item)
     _G.State:setStatusText(string.format("Talking to %s (%s).", item.npc, item.phrase))
     logger.log_info("\aoHaving all grouped characters say \ag%s \ao to \ag%s\ao.", item.phrase, item.npc)
     if mq.TLO.Spawn(item.npc).Distance() ~= nil then
