@@ -251,7 +251,7 @@ end
 
 function _G.State.save(item)
     logger.log_info("\aoSaving step: \ar%s", _G.State.current_step)
-    loadsave.prepSave(_G.State.scurrent_steptep)
+    loadsave.prepSave(_G.State.current_step)
     if _G.State:readStopAtSave() then
         logger.log_warn("\aoStopping at step: \ar%s\ao.", _G.State.current_step)
         _G.State.epicstring = ''
