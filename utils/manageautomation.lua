@@ -8,38 +8,6 @@ local manage       = {}
 local me           = mq.TLO.Me
 local group        = mq.TLO.Group
 
-function manage.generateGroupCommands(selfTable, groupTable, tableSame, sendEach)
-    tableSame = tableSame or false
-    sendEach = sendEach or false
-    local choice, name = _G.State:readGroupSelection()
-    local outputTable = {}
-    if tableSame then
-        for _, command in ipairs(selfTable) do
-            local cmd
-            if choice == 1 then
-                cmd = command
-            elseif choice == 2 then
-                if sendEach then
-
-                else
-                    outputTable[#outputTable + 1] = string.format("/dgga %s", command)
-                end
-            else
-                outputTable[#outputTable + 1] = string.format("/dex %s %s", name, command)
-                outputTable[#outputTable + 1] = command
-            end
-        end
-    else
-        for _, command in ipairs(groupTable) do
-            if choice == 2 then
-                outputTable[#outputTable + 1] = string.format("/dgge %s", command)
-            else
-
-            end
-        end
-    end
-end
-
 function manage.campGroup(radius, class_settings, char_settings)
     local choice, name = _G.State:readGroupSelection()
     logger.log_info("\aoSetting camp mode with radius \ag%s\ao.", radius)
