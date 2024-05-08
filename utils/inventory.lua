@@ -200,7 +200,7 @@ function inventory.combine_do(item, class_settings, char_settings, slot)
     end
 end
 
-function inventory.combine_done(class_settings, char_settings)
+function inventory.combine_done(item, class_settings, char_settings)
     if _G.Mob.xtargetCheck(char_settings) then
         _G.Mob.clearXtarget(class_settings, char_settings)
     end
