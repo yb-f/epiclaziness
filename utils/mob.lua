@@ -192,7 +192,7 @@ function mob.findNearestName(npc, item, class_settings, char_settings)
                             if distance > 50 then
                                 logger.log_verbose("\aoFound \ag%s \aobut it is not the proper spawn, continuing search.", item.npc)
                             else
-                                closest_distance = distance
+                                closest_distance = mq.TLO.Navigation.PathLength('id ' .. spawn.ID())()
                                 closest_ID = spawn.ID()
                             end
                         else
