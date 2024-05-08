@@ -110,6 +110,7 @@ function inventory.combine_container(item, class_settings, char_settings)
         _G.State.bagslot1, _G.State.bagslot2 = inventory.move_bag(mySlot)
     end
     inventory.move_combine_container(mySlot, item.what)
+    inventory.empty_bag(mySlot)
 end
 
 function inventory.find_duplicate_item(item, slot)
