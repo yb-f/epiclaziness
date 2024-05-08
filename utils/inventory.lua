@@ -62,12 +62,14 @@ function inventory.find_best_bag_slot(item)
             mySlot = i
             break
         end
-        if lowestItems == 99 then
-            lowestItems = mq.TLO.Me.Inventory(i + 22).Items()
-            mySlot = i
-        elseif mq.TLO.Me.Inventory(i + 22).Items() < lowestItems then
-            lowestItems = mq.TLO.Me.Inventory(i + 22).Items()
-            mySlot = i
+        if mq.TLO.Me.Inventory(i + 22).Items() ~= nil then
+            if lowestItems == 99 then
+                lowestItems = mq.TLO.Me.Inventory(i + 22).Items()
+                mySlot = i
+            elseif mq.TLO.Me.Inventory(i + 22).Items() < lowestItems then
+                lowestItems = mq.TLO.Me.Inventory(i + 22).Items()
+                mySlot = i
+            end
         end
     end
     _G.State.combineSlot = mySlot
