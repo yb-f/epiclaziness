@@ -3,6 +3,7 @@ local manage       = require('utils/manageautomation')
 local inv          = require('utils/inventory')
 local travel       = require('utils/travel')
 local logger       = require('utils/logger')
+local dist         = require 'utils/distance'
 
 local MAX_DISTANCE = 100
 local mob          = {}
@@ -186,8 +187,18 @@ function mob.findNearestName(npc, item, class_settings, char_settings)
                     if spawn.Type() == 'Corpse' then
                         foundCorpse = true
                     else
-                        closest_distance = mq.TLO.Navigation.PathLength('id ' .. spawn.ID())()
-                        closest_ID = spawn.ID()
+                        if item.whereX then
+                            local distance = dist.GetDistance3D(spawn.X(), spawn.Y(), spawn.Z(), item.whereX, item.whereY, item.whereZ)
+                            if distance > 50 then
+                                logger.log_verbose("\aoFound \ag%s \aobut it is not the proper spawn, continuing search.", item.npc)
+                            else
+                                closest_distance = distance
+                                closest_ID = spawn.ID()
+                            end
+                        else
+                            closest_distance = mq.TLO.Navigation.PathLength('id ' .. spawn.ID())()
+                            closest_ID = spawn.ID()
+                        end
                     end
                 end
             else
@@ -283,7 +294,7 @@ end
 
 function mob.npc_damage_until(item)
     _G.State:setStatusText(string.format("Damaging %s to below %s% health.", item.npc, item.damage_pct))
-    logger.log_info("\aoDamaging \ag%s \ao to below \ag%s%% health\ao.", item.npc, item.damage_pct)
+    logger.log_info("\aoDamaging \ag%s \aoto below \ag%s%% health\ao.", item.npc, item.damage_pct)
     ID = mq.TLO.Spawn('npc ' .. item.npc).ID()
     if mq.TLO.Spawn(ID).Distance() ~= nil then
         if mq.TLO.Spawn(ID).Distance() > MAX_DISTANCE then
