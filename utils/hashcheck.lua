@@ -53,7 +53,7 @@ function hashCheck.check_meshes()
                 --logger.log_info("\aoDownload the latest version from meshupdater.exe or from \arhttps://github.com/yb-f/meshes \aothank you.")
             end
         else
-            printf("Error opening file %s.", err)
+            logger.log_error("\aoError opening file: \ar%s\ao.", err)
         end
     end
 end
