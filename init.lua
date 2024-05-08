@@ -524,9 +524,9 @@ local function run_epic(class, choice)
         end
     end
     _G.State:setStatusText(string.format("Completed %s: %s", mq.TLO.Me.Class(), _G.State.epicstring))
+    logger.log_info("\aoCompleted \ay%s \ao- \ar%s!", mq.TLO.Me.Class(), _G.State.epicstring)
     _G.State.epicstring = ''
     _G.State:setTaskRunning(false)
-    logger.log_info("\aoCompleted \ay%s \ao- \ar%s!", mq.TLO.Me.Class(), _G.State.epicstring)
 end
 
 local function displayGUI()
