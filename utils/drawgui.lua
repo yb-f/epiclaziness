@@ -113,6 +113,7 @@ function draw_gui.fullOutlineTab(task_table)
             ImGui.TableSetupScrollFreeze(0, 1)
             ImGui.TableHeadersRow()
             for i = 1, #task_table do
+                --print(i)
                 local step, outlineText = draw_gui.generate_outline_text(task_table[i])
                 if fullOutlineFilter == '' then
                     draw_gui.full_outline_row(task_table[i], step, outlineText)
