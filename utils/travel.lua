@@ -669,9 +669,16 @@ function travel.doSpeed(name, aaNum)
     if name == mq.TLO.Me.DisplayName() then
         logger.log_verbose("\aoI am using my travel speed skill.")
         mq.cmdf("/alt act %s", aaNum)
+        mq.delay(500)
+        while mq.TLO.Me.Casting() and mq.TLO.Me.Class() ~= "Bard" do
+            mq.delay(200)
+        end
     else
         logger.log_verbose("\aoHaving \ag%s \aouse their travel speed skill.", name)
         mq.cmdf("/dex %s /alt act %s", name, aaNum)
+        while mq.TLO.Spawn(name).Casting() do
+            mq.delay(200)
+        end
     end
 end
 
@@ -1055,7 +1062,6 @@ function travel.zone_travel(item, class_settings, char_settings, continue, choic
             return
         end
         mq.delay(500)
-
         if _G.Mob.xtargetCheck(char_settings) then
             travel.navPause()
             _G.Mob.clearXtarget(class_settings, char_settings)
