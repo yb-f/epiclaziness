@@ -1012,10 +1012,12 @@ end
 
 function travel.zone_travel(item, class_settings, char_settings, continue, choice, name)
     if char_settings.general.returnToBind == true and continue == false then
-        _G.State:setStatusText("Returning to bind point.")
-        while mq.TLO.Zone.ShortName() ~= mq.TLO.Me.BoundLocation('0')() do
-            travel.gate_group(choice, name)
-            mq.delay("15s")
+        if mq.TLO.Zone.ShortName() ~= item.zone then
+            _G.State:setStatusText("Returning to bind point.")
+            while mq.TLO.Zone.ShortName() ~= mq.TLO.Me.BoundLocation('0')() do
+                travel.gate_group(choice, name)
+                mq.delay("15s")
+            end
         end
     end
     if char_settings.general.speedForTravel == true then
