@@ -412,6 +412,10 @@ function draw_gui.settingsTab(themeName, theme, themeID, class_settings, char_se
                 class_settings.settings.class[class_list[class_list_choice]], automation_list, #automation_list,
                 #automation_list)
             ImGui.PopItemWidth()
+            if changed then
+                changed = false
+                class_settings.saveSettings()
+            end
             invis_type = {}
             for word in string.gmatch(class_settings.settings.class_invis[class_list[class_list_choice]], '([^|]+)') do
                 table.insert(invis_type, word)
