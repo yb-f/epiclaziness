@@ -199,7 +199,7 @@ function actions.farm_radius(item, class_settings, char_settings, event)
         actions.farm_event_triggered = false
         _G.State:setStatusText(string.format("Killing mobs in radius %s until event.", item.radius))
         logger.log_info("\aoKilling mobs in radius \ag%s \aountil event.", item.radius)
-        logger.log_debug("\aoEvent trigger is \ag%s\ao.", item.what)
+        --logger.log_debug("\aoEvent trigger is \ag%s\ao.", item.what)
         mq.event('farm_event', item.phrase, actions.farm_event)
     end
     travel.loc_travel(item, class_settings, char_settings, _G.State:readGroupSelection())
