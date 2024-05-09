@@ -449,6 +449,9 @@ end
 function draw_gui.generate_outline_text(item)
     local step = item.step
     local task_type = item.type
+    if task_type == '' then
+        return step, "Unknown step."
+    end
     local text_generator = _G.Task_Functions[task_type].desc
     if text_generator then
         if type(text_generator) == "function" then
