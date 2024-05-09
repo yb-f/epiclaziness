@@ -11,7 +11,8 @@ local actions                = {}
 actions.farm_event_triggered = false
 local waiting                = false
 local gamble_done            = false
-local forage_trash           = { 'Fruit', 'Roots', 'Vegetables', 'Pod of Water', 'Berries', 'Rabbit Meat', 'Fishing Grubs' }
+local forage_trash           = { 'Fruit', 'Roots', 'Vegetables', 'Pod of Water', 'Berries', 'Rabbit Meat', 'Fishing Grubs', "Brasha Berries", "Green Radish", "Straggle Grass",
+    "Chameleon Rat", "Yergan Frog", "Golanda Nut", "Spikerattle Fruit" }
 local fishing_trash          = { 'Fish Scales', 'Tattered Cloth Sandal', 'Rusty Dagger', "Moray Eel", "Gunthak Gourami",
     "Deep Sea Urchin", "Fresh Fish", "Gunthak Mackerel", "Saltwater Seaweed", "Dark Fish's Scales" }
 
@@ -1118,7 +1119,9 @@ end
 
 function actions.wait_event(item)
     mq.event('wait_event', item.phrase, event_wait)
-    logger.log_info("\aoWaiting for event (\ag%s\ao) before continuing.", item.phrase)
+    _G.State:setStatusText("Waiting for event (" .. item.phrase .. ") before continuing.")
+    --logger.log_info("\aoWaiting for event (\ag%s\ao) before continuing.", item.phrase)
+    logger.log_info("\aoWaiting for event before continuing.")
     waiting = true
     while waiting do
         if _G.State.should_skip == true then
