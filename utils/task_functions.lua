@@ -346,7 +346,7 @@ local task_functions = {
         desc   = 'Reequip item'
     },
     ROG_GAMBLE               = {
-        func   = _G.Actions.rogue_gamble,
+        func   = _G.Actions.rog_gamble,
         params = {},
         desc   = 'Gamble to 1900 chips'
     },
