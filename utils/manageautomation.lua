@@ -22,7 +22,7 @@ function manage.campGroup(radius, class_settings, char_settings)
             end
         end
     else
-        manage.doAutomation(name, group.Member(name).Class.ShortName(), class_settings.class[Group.Member(name).Class.Name()], 'camp', char_settings)
+        manage.doAutomation(name, group.Member(name).Class.ShortName(), class_settings.class[group.Member(name).Class.Name()], 'camp', char_settings)
     end
 end
 
