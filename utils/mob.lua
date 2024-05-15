@@ -293,7 +293,7 @@ function mob.general_search(item, class_settings, char_settings)
 end
 
 function mob.npc_damage_until(item)
-    _G.State:setStatusText(string.format("Damaging %s to below %s% health.", item.npc, item.damage_pct))
+    _G.State:setStatusText(string.format("Damaging %s to below %s%% health.", item.npc, item.damage_pct))
     logger.log_info("\aoDamaging \ag%s \aoto below \ag%s%% health\ao.", item.npc, item.damage_pct)
     ID = mq.TLO.Spawn('npc ' .. item.npc).ID()
     if mq.TLO.Spawn(ID).Distance() ~= nil then
