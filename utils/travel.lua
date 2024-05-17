@@ -514,9 +514,11 @@ function travel.invisCheck(char_settings, class_settings, invis)
     return false
 end
 
-function travel.gotSpeedyClass(class, class_settings)
+function travel.gotSpeedyClass(class, class_settings, level)
     for i, speedy in ipairs(speed_classes) do
         if class == speedy then
+            if class == 'Bard' and level < 76 then return false end
+            if (class == 'Shaman' or class == 'Druid' or class == 'Ranger') and level < 85 then return false end
             local speed_type = {}
             for word in string.gmatch(class_settings.move_speed[class], '([^|]+)') do
                 table.insert(speed_type, word)
@@ -542,7 +544,7 @@ function travel.speedCheck(class_settings, char_settings)
     local foundSpeed = false
     if choice == 1 then
         local class = mq.TLO.Me.Class()
-        amSpeedy = travel.gotSpeedyClass(class, class_settings)
+        amSpeedy = travel.gotSpeedyClass(class, class_settings, mq.TLO.Me.Level())
         if amSpeedy == false then
             logger.log_verbose("\aoWe do not have a travel speed buff to cast.")
             return 'none', 'none'
@@ -563,7 +565,7 @@ function travel.speedCheck(class_settings, char_settings)
     elseif choice == 2 then
         for i = 1, mq.TLO.Group.Members() do
             local class = mq.TLO.Group.Member(i).Class()
-            amSpeedy = travel.gotSpeedyClass(class, class_settings)
+            amSpeedy = travel.gotSpeedyClass(class, class_settings, mq.TLO.Group.Member(i).Level())
             if amSpeedy == true then
                 local speed_type = {}
                 for word in string.gmatch(class_settings.move_speed[class], '([^|]+)') do
@@ -608,7 +610,7 @@ function travel.speedCheck(class_settings, char_settings)
         local aaNum = 0
         local casterName = ''
         local class = mq.TLO.Me.Class()
-        amSpeedy = travel.gotSpeedyClass(class, class_settings)
+        amSpeedy = travel.gotSpeedyClass(class, class_settings, mq.TLO.Me.Level())
         if amSpeedy == true then
             local speed_type = {}
             for word in string.gmatch(class_settings.move_speed[class], '([^|]+)') do
@@ -629,7 +631,7 @@ function travel.speedCheck(class_settings, char_settings)
         end
         aanums[mq.TLO.Me.DisplayName()] = aaNum
         class = mq.TLO.Group.Member(name).Class()
-        amSpeedy = travel.gotSpeedyClass(class, class_settings)
+        amSpeedy = travel.gotSpeedyClass(class, class_settings, mq.TLO.Group.Member(name).Level())
         if amSpeedy == true then
             local speed_type = {}
             for word in string.gmatch(class_settings.move_speed[class], '([^|]+)') do
