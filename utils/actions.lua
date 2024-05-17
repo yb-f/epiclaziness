@@ -1012,14 +1012,14 @@ end
 
 function actions.rog_gamble(item)
     logger.log_verbose("\aoCreating rogue gambling event.")
-    mq.event('chips', "#*#You now have #1# chips#*#", gamble_event)
+    mq.event('chips', "#*#Guard Kvovan turns his attention to the nobles#*#", gamble_event)
     while gamble_done == false do
         if _G.State.should_skip == true then
             _G.State.should_skip = false
             return
         end
         actions.npc_talk(item)
-        mq.delay("5s")
+        mq.delay("7s")
         mq.doevents()
     end
     gamble_done = false
