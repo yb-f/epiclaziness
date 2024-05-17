@@ -3,6 +3,7 @@ local inv                    = require('utils/inventory')
 local manage                 = require('utils/manageautomation')
 local travel                 = require('utils/travel')
 local logger                 = require('utils/logger')
+local dist                   = require 'utils/distance'
 
 local DESIRED_CHIPS          = 1900
 local MAX_DISTANCE           = 100
@@ -203,6 +204,12 @@ function actions.farm_radius(item, class_settings, char_settings, event)
         mq.event('farm_event', item.phrase, actions.farm_event)
     end
     travel.loc_travel(item, class_settings, char_settings, _G.State:readGroupSelection())
+    local distance = dist.GetDistance3D(mq.TLO.Me.X(), mq.TLO.Me.Y(), mq.TLO.Me.Z(), item.whereX, item.whereY, item.whereZ)
+    if distance > 30 then
+        logger.log_verbose("\aoDistance to location is \ar%s\ao. Moving to step \ar%s\ao.", distance, _G.State.current_step)
+        _G.State:handle_step_change(_G.State.current_step)
+        return
+    end
     manage.campGroup(item.radius, class_settings, char_settings)
     manage.unpauseGroup(class_settings)
     local item_list = {}
