@@ -268,6 +268,12 @@ function actions.farm_radius(item, class_settings, char_settings, event)
                                 mq.cmdf('/squelch /advloot shared %s giveto %s', i, mq.TLO.Me.DisplayName())
                                 logger.log_info("\aoLooting: \ag%s", name)
                             end
+                            if item.secondary_loot ~= nil then
+                                if mq.TLO.AdvLoot.SList(i).Name() == item.secondary_loot then
+                                    mq.cmdf('/squelch /advloot shared %s giveto %s', i, mq.TLO.Me.DisplayName())
+                                    logger.log_info("\aoLooting: \ag%s", item.secondary_loot)
+                                end
+                            end
                         end
                     end
                 end
@@ -278,6 +284,12 @@ function actions.farm_radius(item, class_settings, char_settings, event)
                             if mq.TLO.AdvLoot.PList(i).Name() == name then
                                 mq.cmdf('/squelch /advloot personal %s loot', i)
                                 logger.log_info("\aoLooting: \ag%s", name)
+                            end
+                            if item.secondary_loot ~= nil then
+                                if mq.TLO.AdvLoot.SList(i).Name() == item.secondary_loot then
+                                    mq.cmdf('/squelch /advloot shared %s giveto %s', i, mq.TLO.Me.DisplayName())
+                                    logger.log_info("\aoLooting: \ag%s", item.secondary_loot)
+                                end
                             end
                         end
                     end
