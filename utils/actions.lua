@@ -88,6 +88,16 @@ function actions.cast_alt(item)
     logger.log_super_verbose('\aoFinished casting: %s (%s)', item.what, ID)
 end
 
+function actions.dz_check(item, class_settings, char_settings)
+    if mq.TLO.DynamicZone.Name() ~= item.zone then
+        logger.log_verbose("\aoDid not receive the correct dynamic zone. Moving to step \ar%s\ao.", item.backstep)
+        _G.State:handle_step_change(item.backstep)
+    else
+        logger.log_verbose("\aoReceived the correct dynamic zone. Moving to step \ag%s\ao.", item.gotostep)
+        _G.State:handle_step_change(item.gotostep)
+    end
+end
+
 function actions.farm_check(item, class_settings, char_settings)
     if _G.Mob.xtargetCheck(char_settings) then
         _G.Mob.clearXtarget(class_settings, char_settings)

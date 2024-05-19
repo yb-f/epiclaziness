@@ -55,6 +55,11 @@ local task_functions = {
         params = {},
         desc   = 'Leave current adventure.'
     },
+    DZ_CHECK                 = {
+        func   = _G.Actions.dz_check,
+        params = function() return { class_settings.settings, loadsave.SaveState } end,
+        desc   = function(item) return 'Check if we received the proper DZ (' .. item.zone .. ')' end
+    },
     ENVIRO_COMBINE_CONTAINER = {
         func   = inv.enviro_combine_container,
         params = {},
