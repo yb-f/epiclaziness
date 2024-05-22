@@ -1173,4 +1173,33 @@ function travel.zone_travel(item, class_settings, char_settings, continue, choic
     mq.cmd('/squelch /autosize off')
 end
 
+function travel.elevator_check(item)
+    _G.State:setStatusText("Checking elevator location.")
+    logger.log_info("\aoChecking elevator location.")
+    if item.npc == 'above' then
+        if mq.TLO.Switch(item.what).Z() > item.whereZ then
+            mq.TLO.Switch(item.enviroslot).Toggle()
+        end
+        while mq.TLO.Switch(item.what).Z() > item.whereZ do
+            mq.delay(75)
+        end
+    end
+end
+
+function travel.click_switch(item)
+    _G.State:setStatusText("Clicking switch. (" .. item.what .. ").")
+    logger.log_info("\aoClicking switch. (\ag%s\ao).", item.what)
+    mq.TLO.Switch(item.what).Toggle()
+    mq.delay(500)
+end
+
+function travel.wait_z_loc(item)
+    _G.State:setStatusText("Waiting for correct Z location.")
+    logger.log_info("\aoWaiting for correct Z location. (\ag%s\ao).", item.whereZ)
+    if item.whereZ == nil then return end
+    while math.abs(mq.TLO.Me.Z() - item.whereZ) > 0.5 do
+        mq.delay(100)
+    end
+end
+
 return travel
