@@ -30,6 +30,16 @@ local task_functions = {
         params = function() return { class_settings.settings, loadsave.SaveState } end,
         desc   = function(item) return 'Cast alt ability ' .. item.what end
     },
+    CLEAR_STORED_ITEMS       = {
+        func   = inv.clear_stored_items,
+        params = {},
+        desc   = 'Clear list of stored items.'
+    },
+    CLICK_SWITCH             = {
+        func = travel.click_switch,
+        params = {},
+        desc = 'Click switch'
+    },
     COMBINE_CONTAINER        = {
         func   = inv.combine_container,
         params = function() return { class_settings.settings, loadsave.SaveState } end,
@@ -59,6 +69,11 @@ local task_functions = {
         func   = _G.Actions.dz_check,
         params = function() return { class_settings.settings, loadsave.SaveState } end,
         desc   = function(item) return 'Check if we received the proper DZ (' .. item.zone .. ')' end
+    },
+    ELEVATOR_CHECK           = {
+        func = travel.elevator_check,
+        params = {},
+        desc = 'Check location of elevator.'
     },
     ENVIRO_COMBINE_CONTAINER = {
         func   = inv.enviro_combine_container,
@@ -394,6 +409,11 @@ local task_functions = {
         func   = _G.Actions.wait_for,
         params = {},
         desc   = function(item) return 'Wait until EQ Time: ' .. item.wait .. ':00.' end
+    },
+    WAIT_Z_LOC               = {
+        func = travel.wait_z_loc,
+        params = {},
+        desc = function(item) return 'Wait until Z location is ' .. item.whereZ end
     },
     ZONE_CONTINUE_TRAVEL     = {
         func   = travel.zone_travel,
