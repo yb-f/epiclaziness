@@ -1156,7 +1156,7 @@ function travel.zone_travel(item, class_settings, char_settings, continue, choic
         mq.delay("5s")
     end
     if choice > 2 then
-        logger.log_info("\aoWaiting for \ag%s to arrive before continuing.", name)
+        logger.log_info("\aoWaiting for \ag%s \aoto arrive before continuing.", name)
         while mq.TLO.Group.Member(name).OtherZone() do
             mq.delay(500)
             if _G.State.should_skip == true then
