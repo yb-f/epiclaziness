@@ -1,20 +1,22 @@
-local mq              = require('mq')
-local manage          = require('utils/manageautomation')
-local logger          = require('utils/logger')
+local mq                    = require('mq')
+local manage                = require('utils/manageautomation')
+local logger                = require('utils/logger')
 
-local MAX_DISTANCE    = 100
-local inventory       = {}
+local MAX_DISTANCE          = 100
+local inventory             = {}
 
 --- @type number
-inventory.slot        = 0
+inventory.slot              = 0
 --- @type string
-inventory.stored_item = ''
-inventory.weapon1     = {
+inventory.stored_item       = ''
+
+inventory.stored_item_table = {}
+inventory.weapon1           = {
     ['name']  = '',
     ['slot1'] = 0,
     ['slot2'] = 0
 }
-inventory.weapon2     = {
+inventory.weapon2           = {
     ['name']  = '',
     ['slot1'] = 0,
     ['slot2'] = 0
@@ -299,43 +301,88 @@ function inventory.enviro_combine_do(item)
 end
 
 function inventory.equip_item(item)
-    _G.State:setStatusText(string.format("Equiping %s.", item.what))
-    logger.log_info('\aoEquiping \ag%s\ao.', item.what)
-    mq.delay("1s")
-    inventory.slot = mq.TLO.FindItem('=' .. item.what).WornSlot(1).Slot()
-    inventory.stored_item = mq.TLO.Me.Inventory(inventory.slot)()
-    logger.log_verbose("\aoUnequiping \ag%s\ao.", inventory.stored_item)
-    mq.cmdf("/squelch /itemnotify \"%s\" leftmouseup", item.what)
-    while mq.TLO.Cursor() == nil do
-        mq.delay(100)
-    end
-    mq.cmdf('/squelch /itemnotify %s leftmouseup', inventory.slot)
-    while mq.TLO.Me.Inventory(inventory.slot)() ~= item.what do
-        mq.delay(100)
-    end
-    mq.cmd('/squelch /autoinv')
-    while mq.TLO.Cursor() ~= nil do
-        mq.delay(100)
+    if item.count == nil then
+        _G.State:setStatusText(string.format("Equiping %s.", item.what))
+        logger.log_info('\aoEquiping \ag%s\ao.', item.what)
+        mq.delay("1s")
+        inventory.slot = mq.TLO.FindItem('=' .. item.what).WornSlot(1).Slot()
+        inventory.stored_item = mq.TLO.Me.Inventory(inventory.slot)()
+        logger.log_verbose("\aoUnequiping \ag%s\ao.", inventory.stored_item)
+        mq.cmdf("/squelch /itemnotify \"%s\" leftmouseup", item.what)
+        while mq.TLO.Cursor() == nil do
+            mq.delay(100)
+        end
+        mq.cmdf('/squelch /itemnotify %s leftmouseup', inventory.slot)
+        while mq.TLO.Me.Inventory(inventory.slot)() ~= item.what do
+            mq.delay(100)
+        end
         mq.cmd('/squelch /autoinv')
+        while mq.TLO.Cursor() ~= nil do
+            mq.delay(100)
+            mq.cmd('/squelch /autoinv')
+        end
+    else
+        _G.State:setStatusText(string.format("Equiping %s (%s).", item.what, item.enviroslot))
+        logger.log_info('\aoEquiping \ag%s\ao(\ag%s\ao).', item.what, item.enviroslot)
+        mq.delay("1s")
+        inventory.stored_item_table[item.count] = {}
+        inventory.stored_item_table[item.count].slot = item.enviroslot
+        inventory.stored_item_table[item.count].stored_item = mq.TLO.Me.Inventory(item.enviroslot)()
+        logger.log_verbose("\aoUnequiping \ag%s\ao.", inventory.stored_item_table[item.count].stored_item)
+        mq.cmdf("/squelch /itemnotify \"%s\" leftmouseup", item.what)
+        while mq.TLO.Cursor() == nil do
+            mq.delay(100)
+        end
+        mq.cmdf('/squelch /itemnotify %s leftmouseup', item.enviroslot)
+        while mq.TLO.Me.Inventory(item.enviroslot)() ~= item.what do
+            mq.delay(100)
+        end
+        mq.cmd('/squelch /autoinv')
+        while mq.TLO.Cursor() ~= nil do
+            mq.delay(100)
+            mq.cmd('/squelch /autoinv')
+        end
     end
 end
 
 function inventory.restore_item(item)
-    logger.log_info("\aoReequiping \ag%s\ao.", inventory.stored_item)
-    mq.delay("1s")
-    mq.cmdf("/squelch /itemnotify \"%s\" leftmouseup", inventory.stored_item)
-    while mq.TLO.Cursor() == nil do
-        mq.delay(100)
-    end
-    mq.cmdf('/squelch /itemnotify %s leftmouseup', inventory.slot)
-    while mq.TLO.Me.Inventory(inventory.slot)() ~= inventory.stored_item do
-        mq.delay(100)
-    end
-    mq.cmd('/squelch /autoinv')
-    while mq.TLO.Cursor() ~= nil do
-        mq.delay(100)
+    if item.count == nil then
+        logger.log_info("\aoReequiping \ag%s\ao.", inventory.stored_item)
+        mq.delay("1s")
+        mq.cmdf("/squelch /itemnotify \"%s\" leftmouseup", inventory.stored_item)
+        while mq.TLO.Cursor() == nil do
+            mq.delay(100)
+        end
+        mq.cmdf('/squelch /itemnotify %s leftmouseup', inventory.slot)
+        while mq.TLO.Me.Inventory(inventory.slot)() ~= inventory.stored_item do
+            mq.delay(100)
+        end
         mq.cmd('/squelch /autoinv')
+        while mq.TLO.Cursor() ~= nil do
+            mq.delay(100)
+            mq.cmd('/squelch /autoinv')
+        end
+    else
+        logger.log_info("\aoReequiping \ag%s\ao (\ag%s\ao).", inventory.stored_item_table[item.count].stored_item, inventory.stored_item_table[item.count].slot)
+        mq.delay("1s")
+        mq.cmdf("/squelch /itemnotify \"%s\" leftmouseup", inventory.stored_item_table[item.count].stored_item)
+        while mq.TLO.Cursor() == nil do
+            mq.delay(100)
+        end
+        mq.cmdf('/squelch /itemnotify %s leftmouseup', inventory.stored_item_table[item.count].slot)
+        while mq.TLO.Me.Inventory(inventory.stored_item_table[item.count].slot)() ~= inventory.stored_item_table[item.count].stored_item do
+            mq.delay(100)
+        end
+        mq.cmd('/squelch /autoinv')
+        while mq.TLO.Cursor() ~= nil do
+            mq.delay(100)
+            mq.cmd('/squelch /autoinv')
+        end
     end
+end
+
+function inventory.clear_stored_items(item)
+    inventory.stored_item_table = {}
 end
 
 function inventory.pickup_key(item)
