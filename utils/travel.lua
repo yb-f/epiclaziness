@@ -965,11 +965,6 @@ function travel.relocate(item, class_settings, char_settings, choice, name)
         mq.cmdf('/squelch /relocate %s', relocate)
         mq.cmdf('/dex %s /squelch /relocate %s', name, relocate)
     end
-    if _G.Mob.xtargetCheck(char_settings) then
-        travel.navPause()
-        _G.Mob.clearXtarget(class_settings, char_settings)
-        travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
-    end
     local loopCount = 0
     while mq.TLO.Me.Casting() == nil do
         loopCount = loopCount + 1
