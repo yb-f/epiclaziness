@@ -64,8 +64,8 @@ function manage.doAutomation(character, class, script, action, char_settings)
         [2] = {
             start = function()
                 return {
-                    string.format('/squelch /lua run rgmercs %s', mq.TLO.Me.DisplayName()),
-                    string.format('/squelch /lua run rgmercs %s', mq.TLO.Me.DisplayName()),
+                    string.format('/squelch /lua run rgmercs %s', mq.TLO.Me.CleanName()),
+                    string.format('/squelch /lua run rgmercs %s', mq.TLO.Me.CleanName()),
                     string.format('/squelch /rgl set PullZRadius 100'),
                     string.format('/squelch /rgl set pullmincon 1')
                 }
@@ -89,7 +89,7 @@ function manage.doAutomation(character, class, script, action, char_settings)
             end,
             uncamp = function()
                 return {
-                    string.format('/squelch /rgl campoff'),
+                    string.format('/squelch /rgl dopull off'),
                     string.format('/squelch /rgl pause')
                 }
             end,
@@ -219,7 +219,7 @@ function manage.doAutomation(character, class, script, action, char_settings)
             start = function()
                 return {
                     string.format("/dex %s /squelch /lua run rgmercs", character),
-                    string.format('/dex %s /squelch /rgl chaseon %s', character, mq.TLO.Me.DisplayName()),
+                    string.format('/dex %s /squelch /rgl chaseon %s', character, mq.TLO.Me.CleanName()),
                 }
             end,
             pause = function()
@@ -234,15 +234,13 @@ function manage.doAutomation(character, class, script, action, char_settings)
             end,
             camp = function()
                 return {
-                    string.format("/dex %s /squelch /rgl campoff", character),
-                    string.format('/dex %s /squelch /rgl chaseon %s', character, mq.TLO.Me.DisplayName()),
+                    string.format('/dex %s /squelch /rgl chaseon %s', character, mq.TLO.Me.CleanName()),
                     string.format("/dex %s /squelch /rgl pause", character),
                 }
             end,
             uncamp = function()
                 return {
-                    string.format("/dex %s /squelch /rgl campoff", character),
-                    string.format('/dex %s /squelch /rgl chaseon %s', character, mq.TLO.Me.DisplayName()),
+                    string.format('/dex %s /squelch /rgl chaseon %s', character, mq.TLO.Me.CleanName()),
                     string.format("/dex %s /squelch /rgl pause", character),
                 }
             end,
