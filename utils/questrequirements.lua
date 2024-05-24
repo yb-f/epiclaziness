@@ -40,7 +40,7 @@ local quests_requirements = {
     ['mag'] = {
         ['10']    = '',
         ['pre15'] = '',
-        ['15']    = '',
+        ['15']    = 'Requires brewing 100.',
         ['20']    = '',
     },
     ['mnk'] = {
@@ -64,7 +64,7 @@ local quests_requirements = {
     },
     ['rng'] = {
         ['10']    = '',
-        ['pre15'] = '',
+        ['pre15'] = 'Lockpicker required for step 89-102 in Howling Stones.',
         ['15']    = '',
         ['20']    = '',
     },
