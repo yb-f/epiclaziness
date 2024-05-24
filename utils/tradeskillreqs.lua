@@ -33,6 +33,11 @@ local tradeskill_requirements = {
         }
 
     },
+    ['rng'] = {
+        ['15'] = {
+            ['Fletching'] = 102,
+        },
+    },
     ['rog'] = {
         ['15'] = {
             ['Baking']         = 192,
