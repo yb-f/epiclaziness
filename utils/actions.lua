@@ -13,7 +13,7 @@ actions.farm_event_triggered = false
 local waiting                = false
 local gamble_done            = false
 local forage_trash           = { 'Fruit', 'Roots', 'Vegetables', 'Pod of Water', 'Berries', 'Rabbit Meat', 'Fishing Grubs', "Brasha Berries", "Green Radish", "Straggle Grass",
-    "Chameleon Rat", "Yergan Frog", "Spikerattle Fruit" }
+    "Chameleon Rat", "Yergan Frog", "Spikerattle Fruit", "Stonewood Root", "Spikerattle Root" }
 local fishing_trash          = { 'Fish Scales', 'Tattered Cloth Sandal', 'Rusty Dagger', "Moray Eel", "Gunthak Gourami",
     "Deep Sea Urchin", "Fresh Fish", "Gunthak Mackerel", "Saltwater Seaweed", "Dark Fish's Scales" }
 
@@ -596,28 +596,45 @@ function actions.forage_farm(item, class_settings, char_settings)
                 _G.Mob.clearXtarget(class_settings, char_settings)
             end
             _G.State:setStatusText(string.format("Foraging for %s (%s/%s).", item.what, mq.TLO.FindItemCount("=" .. item.what)(), (item.count)))
-            logger.log_info("\aoForaging for \ag%s\ao (\ag%s\ao/\ag%s\ao).", item.what, mq.TLO.FindItemCount("=" .. item.what)(), (item.count))
             if mq.TLO.Me.AbilityReady('Forage')() then
+                logger.log_info("\aoForaging for \ag%s\ao (\ag%s\ao/\ag%s\ao).", item.what, mq.TLO.FindItemCount("=" .. item.what)(), (item.count))
                 mq.cmd('/squelch /doability Forage')
                 while mq.TLO.Me.AbilityReady('Forage')() do
                     mq.delay(200)
                 end
                 mq.delay(500)
-                for i, name in pairs(forage_trash) do
-                    if mq.TLO.Cursor.Name() == name then
-                        logger.log_verbose("\aoForage trash \ar%s\ao found on cursor. Destroying.", name)
-                        mq.cmd('/squelch /destroy')
-                        mq.delay(200)
-                    end
-                end
-                if mq.TLO.Cursor.Name() ~= nil then
-                    logger.log_info("\aoFound \ag%s\ao on cursor. Moving to inventory.", mq.TLO.Cursor.Name())
-                    mq.cmd('/autoinv')
+                while mq.TLO.Cursor() ~= nil do
+                    actions.forage_cursor_check(item)
                 end
             end
             if mq.TLO.FindItemCount("=" .. item.what)() >= item.count then
                 looping = false
             end
+        end
+    end
+end
+
+function actions.forage_cursor_check(item)
+    if mq.TLO.Cursor() == nil then
+        return false
+    end
+    while mq.TLO.Cursor() ~= nil do
+        mq.delay(200)
+        if mq.TLO.Cursor() == nil then
+            return
+        end
+        for i, name in pairs(forage_trash) do
+            if mq.TLO.Cursor.Name() == name then
+                logger.log_verbose("\aoForage trash \ar%s\ao found on cursor. Destroying.", name)
+                mq.cmd('/squelch /destroy')
+                mq.delay(200)
+                return
+            end
+        end
+        if mq.TLO.Cursor.Name() ~= nil then
+            logger.log_info("\aoFound \ag%s\ao on cursor. Moving to inventory.", mq.TLO.Cursor.Name())
+            mq.cmd('/autoinv')
+            return
         end
     end
 end
