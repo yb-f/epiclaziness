@@ -13,7 +13,7 @@ actions.farm_event_triggered = false
 local waiting                = false
 local gamble_done            = false
 local forage_trash           = { 'Fruit', 'Roots', 'Vegetables', 'Pod of Water', 'Berries', 'Rabbit Meat', 'Fishing Grubs', "Brasha Berries", "Green Radish", "Straggle Grass",
-    "Chameleon Rat", "Yergan Frog", "Golanda Nut", "Spikerattle Fruit" }
+    "Chameleon Rat", "Yergan Frog", "Spikerattle Fruit" }
 local fishing_trash          = { 'Fish Scales', 'Tattered Cloth Sandal', 'Rusty Dagger', "Moray Eel", "Gunthak Gourami",
     "Deep Sea Urchin", "Fresh Fish", "Gunthak Mackerel", "Saltwater Seaweed", "Dark Fish's Scales" }
 
@@ -562,6 +562,9 @@ function actions.forage_farm(item, class_settings, char_settings)
             end
             if mq.TLO.Me.AbilityReady('Forage')() then
                 mq.cmd('/squelch /doability Forage')
+                while mq.TLO.Me.AbilityReady('Forage')() do
+                    mq.delay(200)
+                end
                 mq.delay(500)
                 for i, name in pairs(forage_trash) do
                     if mq.TLO.Cursor.Name() == name then
