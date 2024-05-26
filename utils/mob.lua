@@ -292,7 +292,46 @@ function mob.general_search(item, class_settings, char_settings)
     end
 end
 
-function mob.npc_damage_until(item)
+function mob.npc_slow_kill(item, class_settings, char_settings)
+    mq.cmd("/face away")
+    mq.cmd("/duck")
+    local looping = true
+    while looping do
+        if _G.State.should_skip == true then
+            _G.State.should_skip = false
+            return
+        end
+        if mq.TLO.Me.Ducking() == false then
+            mq.cmd("/duck")
+        end
+        if _G.State:readPaused() then
+            _G.Actions.pauseTask(_G.State:readStatusText())
+        end
+        if mq.TLO.Me.SpellReady(1) then
+            if mq.TLO.Me.Ducking() == true then
+                local angle = mq.TLO.Target.HeadingTo.DegreesCCW() - mq.TLO.Me.Heading.DegreesCCW()
+                if angle > 230 or angle < 130 then
+                    mq.cmd("/face away")
+                end
+                mq.cmd("/stand")
+            end
+            mq.cmd("/cast 1")
+            while mq.TLO.Me.Casting() == false do
+                mq.delay(50)
+            end
+            while mq.TLO.Me.Casting() do
+                mq.delay(100)
+            end
+        end
+        if mq.TLO.Spawn(ID)() == nil then
+            looping = false
+        elseif mq.TLO.Spawn(ID).PctHPs() < item.damage_pct then
+            looping = false
+        end
+    end
+end
+
+function mob.npc_damage_until(item, class_settings, char_settings)
     _G.State:setStatusText(string.format("Damaging %s to below %s%% health.", item.npc, item.damage_pct))
     logger.log_info("\aoDamaging \ag%s \aoto below \ag%s%% health\ao.", item.npc, item.damage_pct)
     ID = mq.TLO.Spawn('npc ' .. item.npc).ID()
@@ -303,12 +342,10 @@ function mob.npc_damage_until(item)
             return
         end
     end
-    local weapon1 = ''
-    local weapon2 = ''
     if item.zone ~= nil then
         if mq.TLO.Me.Level() >= item.maxlevel then
-            logger.log_warn("\aoOur level is \ag%s \aoor higher. Removing weapons before engaging.", item.maxlevel)
-            inv.remove_weapons()
+            logger.log_warn("\aoOur level is \ag%s \aoor higher. Being cautious.", item.maxlevel)
+            mob.npc_slow_kill(item, class_settings, char_settings)
         end
     end
     mq.TLO.Spawn(ID).DoTarget()
