@@ -217,7 +217,7 @@ local task_functions = {
     },
     NPC_DAMAGE_UNTIL         = {
         func   = mob.npc_damage_until,
-        params = {},
+        params = function() return { class_settings.settings, loadsave.SaveState } end,
         desc   = function(item) return 'Damage ' .. item.npc .. ' to ' .. item.damage_pct .. '% health' end
     },
     NPC_FOLLOW               = {
