@@ -581,6 +581,44 @@ function actions.forage_farm(item, class_settings, char_settings)
         end
     else
         _G.State:setStatusText(string.format("Foraging for %s (%s).", item.what, item.count))
+        logger.log_info("\aoForaging for \ag%s\ao (\ag%s\ao).", item.what, item.count)
+        local looping = true
+        while looping do
+            mq.delay(200)
+            if _G.State.should_skip == true then
+                _G.State.should_skip = false
+                return
+            end
+            if _G.State:readPaused() then
+                actions.pauseTask(_G.State:readStatusText())
+            end
+            if _G.Mob.xtargetCheck(char_settings) then
+                _G.Mob.clearXtarget(class_settings, char_settings)
+            end
+            _G.State:setStatusText(string.format("Foraging for %s (%s/%s).", item.what, mq.TLO.FindItemCount("=" .. item.what)(), (item.count)))
+            logger.log_info("\aoForaging for \ag%s\ao (\ag%s\ao/\ag%s\ao).", item.what, mq.TLO.FindItemCount("=" .. item.what)(), (item.count))
+            if mq.TLO.Me.AbilityReady('Forage')() then
+                mq.cmd('/squelch /doability Forage')
+                while mq.TLO.Me.AbilityReady('Forage')() do
+                    mq.delay(200)
+                end
+                mq.delay(500)
+                for i, name in pairs(forage_trash) do
+                    if mq.TLO.Cursor.Name() == name then
+                        logger.log_verbose("\aoForage trash \ar%s\ao found on cursor. Destroying.", name)
+                        mq.cmd('/squelch /destroy')
+                        mq.delay(200)
+                    end
+                end
+                if mq.TLO.Cursor.Name() ~= nil then
+                    logger.log_info("\aoFound \ag%s\ao on cursor. Moving to inventory.", mq.TLO.Cursor.Name())
+                    mq.cmd('/autoinv')
+                end
+            end
+            if mq.TLO.FindItemCount("=" .. item.what)() >= item.count then
+                looping = false
+            end
+        end
     end
 end
 
