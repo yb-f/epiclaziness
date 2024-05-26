@@ -7,10 +7,11 @@ local translocators       = { "Magus", "Translocator", "Priest of Discord", "Nex
 
 local SELOS_BUFF          = 3704
 local CHEETAH_BUFF        = 939
-local SPIRIT_FALCONS_BUFf = 8600
+local SPIRIT_EAGELE_BUFF  = 8600
+local SPIRIT_FALCONS_BUFF = 8600
 local FLIGHT_FALCONS_BUFF = 8601
 local speed_classes       = { "Bard", "Druid", "Ranger", "Shaman" }
-local speed_buffs         = { "Selo's Accelerato", "Communion of the Cheetah", "Spirit of Falcons", "Flight of Falcons" }
+local speed_buffs         = { "Selo's Accelerato", "Communion of the Cheetah", "Spirit of Falcons", "Flight of Falcons", "Spirit of Eagle" }
 local travel              = {}
 travel.looping            = false
 
@@ -555,8 +556,8 @@ function travel.speedCheck(class_settings, char_settings)
             end
             local speed_skill = speed_type[class_settings.speed[class]]
             logger.log_verbose("\agI \aocan cast \ag%s\ao.", speed_skill)
-            if speed_skill == 'Spirit of Eagles' then
-                if class == 'Ranger' then speed_skill = "Spirit of Eagles(Ranger)" end
+            if speed_skill == 'Spirit of Eagle' then
+                if class == 'Ranger' then speed_skill = "Spirit of Eagle(Ranger)" end
                 if class == 'Druid' then speed_skill = "Spirit of Eagles(Druid)" end
             end
             local aaNum = class_settings['speed_to_num'][speed_skill]
@@ -599,7 +600,7 @@ function travel.speedCheck(class_settings, char_settings)
                 elseif num == CHEETAH_BUFF and aaNum ~= SELOS_BUFF then
                     aaNum = num
                     casterName = names
-                elseif (num == SPIRIT_FALCONS_BUFf or num == FLIGHT_FALCONS_BUFF) and aaNum ~= SELOS_BUFF and aaNum ~= CHEETAH_BUFF then
+                elseif (num == SPIRIT_FALCONS_BUFf or num == FLIGHT_FALCONS_BUFF or num == SPIRIT_EAGELE_BUFF) and aaNum ~= SELOS_BUFF and aaNum ~= CHEETAH_BUFF then
                     aaNum = num
                     casterName = names
                 end
@@ -640,7 +641,7 @@ function travel.speedCheck(class_settings, char_settings)
             local speed_skill = speed_type[class_settings.speed[class]]
             logger.log_verbose("\ag%s \aocan cast \ag%s\ao.", name, speed_skill)
             if speed_skill == 'Spirit of Eagles' then
-                if class == 'Ranger' then speed_skill = "Spirit of Eagles(Ranger)" end
+                if class == 'Ranger' then speed_skill = "Spirit of Eagle(Ranger)" end
                 if class == 'Druid' then speed_skill = "Spirit of Eagles(Druid)" end
             end
             aaNum = class_settings['speed_to_num'][speed_skill]
@@ -653,7 +654,7 @@ function travel.speedCheck(class_settings, char_settings)
                 elseif num == CHEETAH_BUFF and aaNum ~= SELOS_BUFF then
                     aaNum = num
                     casterName = names
-                elseif (num == SPIRIT_FALCONS_BUFf or num == FLIGHT_FALCONS_BUFF) and aaNum ~= SELOS_BUFF and aaNum ~= CHEETAH_BUFF then
+                elseif (num == SPIRIT_FALCONS_BUFF or num == FLIGHT_FALCONS_BUFF or num == SPIRIT_EAGELE_BUFF) and aaNum ~= SELOS_BUFF and aaNum ~= CHEETAH_BUFF then
                     aaNum = num
                     casterName = names
                 end
@@ -670,6 +671,7 @@ function travel.doSpeed(name, aaNum)
     if name == 'none' then return end
     if name == mq.TLO.Me.DisplayName() then
         logger.log_verbose("\aoI am using my travel speed skill.")
+        print(aaNum)
         mq.cmdf("/alt act %s", aaNum)
         mq.delay(500)
         while mq.TLO.Me.Casting() and mq.TLO.Me.Class() ~= "Bard" do

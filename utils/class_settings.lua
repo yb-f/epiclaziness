@@ -135,7 +135,7 @@ function class_settings.createSettings()
             ['Bard'] = "Selo's Sonata",
             ['Druid'] = "Communion of the Cheetah|Spirit of Eagles",
             ['Shaman'] = "Communion of the Cheetah",
-            ['Ranger'] = 'Spirit of Eagles'
+            ['Ranger'] = 'Spirit of Eagle'
         },
         ['speed']        = {
             ['Druid']  = 1,
@@ -145,7 +145,7 @@ function class_settings.createSettings()
         },
         ['speed_to_num'] = {
             ['Spirit of Eagles(Druid)']  = 8601,
-            ['Spirit of Eagles(Ranger)'] = 8600,
+            ['Spirit of Eagle(Ranger)']  = 8600,
             ['Communion of the Cheetah'] = 939,
             ["Selo's Sonata"]            = 3704,
         }
