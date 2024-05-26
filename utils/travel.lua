@@ -671,7 +671,6 @@ function travel.doSpeed(name, aaNum)
     if name == 'none' then return end
     if name == mq.TLO.Me.DisplayName() then
         logger.log_verbose("\aoI am using my travel speed skill.")
-        print(aaNum)
         mq.cmdf("/alt act %s", aaNum)
         mq.delay(500)
         while mq.TLO.Me.Casting() and mq.TLO.Me.Class() ~= "Bard" do
