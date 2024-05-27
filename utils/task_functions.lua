@@ -36,9 +36,9 @@ local task_functions = {
         desc   = 'Clear list of stored items.'
     },
     CLICK_SWITCH             = {
-        func = travel.click_switch,
+        func   = travel.click_switch,
         params = {},
-        desc = 'Click switch'
+        desc   = 'Click switch'
     },
     COMBINE_CONTAINER        = {
         func   = inv.combine_container,
@@ -71,9 +71,9 @@ local task_functions = {
         desc   = function(item) return 'Check if we received the proper DZ (' .. item.zone .. ')' end
     },
     ELEVATOR_CHECK           = {
-        func = travel.elevator_check,
+        func   = travel.elevator_check,
         params = {},
-        desc = 'Check location of elevator.'
+        desc   = 'Check location of elevator.'
     },
     ENVIRO_COMBINE_CONTAINER = {
         func   = inv.enviro_combine_container,
@@ -416,9 +416,9 @@ local task_functions = {
         desc   = function(item) return 'Wait until EQ Time: ' .. item.wait .. ':00.' end
     },
     WAIT_Z_LOC               = {
-        func = travel.wait_z_loc,
+        func   = travel.wait_z_loc,
         params = {},
-        desc = function(item) return 'Wait until Z location is ' .. item.whereZ end
+        desc   = function(item) return 'Wait until Z location is ' .. item.whereZ end
     },
     ZONE_CONTINUE_TRAVEL     = {
         func   = travel.zone_travel,
