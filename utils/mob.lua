@@ -298,8 +298,9 @@ function mob.general_search(item, class_settings, char_settings)
 end
 
 function mob.npc_slow_kill(item, class_settings, char_settings)
+    mq.TLO.Spawn('npc ' .. item.npc).DoTarget()
     mq.cmd("/face away")
-    mq.cmd("/duck")
+    mq.cmd("/keypress DUCK")
     local looping = true
     while looping do
         if _G.State.should_skip == true then
@@ -307,30 +308,38 @@ function mob.npc_slow_kill(item, class_settings, char_settings)
             return
         end
         if mq.TLO.Me.Ducking() == false then
-            mq.cmd("/duck")
+            mq.cmd("/keypress DUCK")
         end
         if _G.State:readPaused() then
             _G.Actions.pauseTask(_G.State:readStatusText())
         end
         if mq.TLO.Me.SpellReady(1) then
             if mq.TLO.Me.Ducking() == true then
-                local angle = mq.TLO.Target.HeadingTo.DegreesCCW() - mq.TLO.Me.Heading.DegreesCCW()
-                if angle > 230 or angle < 130 then
-                    mq.cmd("/face away")
+                if mq.TLO.Target() == nil then
+                    if mq.TLO.Spawn('npc ' .. item.npc)() ~= nil then
+                        mq.TLO.Spawn('npc ' .. item.npc).DoTarget()
+                    end
                 end
-                mq.cmd("/stand")
-            end
-            mq.cmd("/cast 1")
-            while mq.TLO.Me.Casting() == false do
-                mq.delay(50)
-            end
-            while mq.TLO.Me.Casting() do
-                mq.delay(100)
+                if mq.TLO.Target.CleanName() == item.npc then
+                    local angle = mq.TLO.Target.HeadingTo.DegreesCCW() - mq.TLO.Me.Heading.DegreesCCW()
+                    if angle > 230 or angle < 130 then
+                        mq.cmd("/face away")
+                    end
+                    mq.cmd("/stand")
+                    mq.cmd("/cast 1")
+                    while mq.TLO.Me.Casting() == false do
+                        mq.delay(50)
+                    end
+                    while mq.TLO.Me.Casting() do
+                        mq.delay(100)
+                    end
+                end
             end
         end
-        if mq.TLO.Spawn(ID)() == nil then
+        if mq.TLO.Spawn('npc ' .. item.npc)() == nil then
+            mq.cmd("/stopcast")
             looping = false
-        elseif mq.TLO.Spawn(ID).PctHPs() < item.damage_pct then
+        elseif mq.TLO.Spawn('npc ' .. item.npc).PctHPs() < item.damage_pct then
             mq.cmd("/stopcast")
             looping = false
         end
@@ -342,7 +351,7 @@ function mob.pre_damage_until(item, class_settings, char_settings)
     if mq.TLO.Me.Level() >= item.maxlevel then
         logger.log_debug("\aoLevel is higher than \ag%s\ao. Preparing low damage skill (\ag%s\ao).", item.maxlevel, low_damage_skills[mq.TLO.Me.Class.Name()])
         mq.cmdf('/mem 1 "%s"', low_damage_skills[mq.TLO.Me.Class.Name()])
-        while mq.TLO.Me.Gem(low_damage_skills[mq.TLO.Me.Class.Name()]) ~= low_damage_skills[mq.TLO.Me.Class.Name()] do
+        while mq.TLO.Me.Gem(low_damage_skills[mq.TLO.Me.Class.Name()])() ~= 1 do
             mq.delay(100)
         end
     end
@@ -389,12 +398,6 @@ function mob.npc_damage_until(item, class_settings, char_settings)
     while mq.TLO.Spawn(ID)() ~= nil do
         logger.log_verbose("\aoWaiting for \aritem.npc \aoto despawn before continuing.", item.damage_pct)
         mq.delay(50)
-    end
-    if item.maxlevel ~= nil then
-        if mq.TLO.Me.Level() >= item.maxlevel then
-            logger.log_info("\aoReequiping weapons.")
-            inv.restore_weapons()
-        end
     end
 end
 
