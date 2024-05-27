@@ -348,8 +348,10 @@ end
 
 function mob.pre_damage_until(item, class_settings, char_settings)
     logger.log_info("\aoChecking if level is higher than \ag%s\ao.", item.maxlevel)
+    _G.State:setStatusText(string.format("Checking if level is higher than %s.", item.maxlevel))
     if mq.TLO.Me.Level() >= item.maxlevel then
         logger.log_debug("\aoLevel is higher than \ag%s\ao. Preparing low damage skill (\ag%s\ao).", item.maxlevel, low_damage_skills[mq.TLO.Me.Class.Name()])
+        _G.State:setStatusText(string.format("Level is higher than %s. Preparing low damage skill.", item.maxlevel))
         mq.cmdf('/mem 1 "%s"', low_damage_skills[mq.TLO.Me.Class.Name()])
         while mq.TLO.Me.Gem(low_damage_skills[mq.TLO.Me.Class.Name()])() ~= 1 do
             mq.delay(100)
