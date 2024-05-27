@@ -345,6 +345,11 @@ local task_functions = {
         params = {},
         desc   = function(item) return 'Set guild portal location to ' .. item.zone end
     },
+    PRE_DAMAGE_UNTIL         = {
+        func   = mob.pre_damage_until,
+        params = function() return { class_settings.settings, loadsave.SaveState } end,
+        desc   = 'Check if we need to ready a lower level skill to not kill mob.'
+    },
     PRE_FARM_CHECK           = {
         func   = _G.Actions.pre_farm_check,
         params = function() return { class_settings.settings, loadsave.SaveState } end,

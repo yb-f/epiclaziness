@@ -1,13 +1,18 @@
-local mq           = require('mq')
-local manage       = require('utils/manageautomation')
-local inv          = require('utils/inventory')
-local travel       = require('utils/travel')
-local logger       = require('utils/logger')
-local dist         = require 'utils/distance'
+local mq                = require('mq')
+local manage            = require('utils/manageautomation')
+local inv               = require('utils/inventory')
+local travel            = require('utils/travel')
+local logger            = require('utils/logger')
+local dist              = require 'utils/distance'
 
-local MAX_DISTANCE = 100
-local mob          = {}
-local searchFilter = ''
+local MAX_DISTANCE      = 100
+local mob               = {}
+local searchFilter      = ''
+local low_damage_skills = {
+    ['Ranger'] = "Scorched Earth",
+    ['Bard'] = "Tjudawos' Chant of Flame"
+}
+
 
 local function target_invalid_switch()
     _G.State.cannot_count = _G.State.cannot_count + 1
@@ -326,7 +331,19 @@ function mob.npc_slow_kill(item, class_settings, char_settings)
         if mq.TLO.Spawn(ID)() == nil then
             looping = false
         elseif mq.TLO.Spawn(ID).PctHPs() < item.damage_pct then
+            mq.cmd("/stopcast")
             looping = false
+        end
+    end
+end
+
+function mob.pre_damage_until(item, class_settings, char_settings)
+    logger.log_info("\aoChecking if level is higher than \ag%s\ao.", item.maxlevel)
+    if mq.TLO.Me.Level() >= item.maxlevel then
+        logger.log_debug("\aoLevel is higher than \ag%s\ao. Preparing low damage skill (\ag%s\ao).", item.maxlevel, low_damage_skills[mq.TLO.Me.Class.Name()])
+        mq.cmdf('/mem 1 "%s"', low_damage_skills[mq.TLO.Me.Class.Name()])
+        while mq.TLO.Me.Gem(low_damage_skills[mq.TLO.Me.Class.Name()]) ~= low_damage_skills[mq.TLO.Me.Class.Name()] do
+            mq.delay(100)
         end
     end
 end
@@ -342,7 +359,7 @@ function mob.npc_damage_until(item, class_settings, char_settings)
             return
         end
     end
-    if item.zone ~= nil then
+    if item.maxlevel ~= nil then
         if mq.TLO.Me.Level() >= item.maxlevel then
             logger.log_warn("\aoOur level is \ag%s \aoor higher. Being cautious.", item.maxlevel)
             mob.npc_slow_kill(item, class_settings, char_settings)
