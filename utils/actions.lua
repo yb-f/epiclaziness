@@ -13,7 +13,7 @@ actions.farm_event_triggered = false
 local waiting                = false
 local gamble_done            = false
 local forage_trash           = { 'Fruit', 'Roots', 'Vegetables', 'Pod of Water', 'Berries', 'Rabbit Meat', 'Fishing Grubs', "Brasha Berries", "Green Radish", "Straggle Grass",
-    "Chameleon Rat", "Yergan Frog", "Spikerattle Fruit", "Stonewood Root", "Spikerattle Root" }
+    "Chameleon Rat", "Yergan Frog", "Spikerattle Fruit", "Stonewood Root", "Spikerattle Root", "Tuf of Fox Fur", "Plant Shoot", "Shadowjade Fern Leaves" }
 local fishing_trash          = { 'Fish Scales', 'Tattered Cloth Sandal', 'Rusty Dagger', "Moray Eel", "Gunthak Gourami",
     "Deep Sea Urchin", "Fresh Fish", "Gunthak Mackerel", "Saltwater Seaweed", "Dark Fish's Scales" }
 
