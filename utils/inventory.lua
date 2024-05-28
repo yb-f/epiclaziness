@@ -389,7 +389,9 @@ function inventory.pickup_key(item)
     mq.cmdf("/squelch /itemnotify \"%s\" leftmouseup", item.what)
 end
 
-function inventory.remove_weapons()
+function inventory.remove_weapons(item)
+    _G.State:setStatusText("Removing weapons.")
+    logger.log_info("\aoRemoving weapons.")
     inventory.weapon1.name = mq.TLO.InvSlot(13).Item.Name()
     if mq.TLO.InvSlot(14).Item() ~= nil then
         inventory.weapon2.name = mq.TLO.InvSlot(14).Item.Name()
@@ -399,9 +401,11 @@ function inventory.remove_weapons()
     inventory.weapon1.slot1, inventory.weapon1.slot2 = inventory.find_free_slot()
     mq.cmd('/itemnotify 13 leftmouseup')
     while mq.TLO.Cursor() == nil do
+        logger.log_debug("cursor empty")
         mq.delay(100)
     end
     while mq.TLO.Cursor() ~= nil do
+        logger.log_debug("slot1: %s slot2: %s", inventory.weapon1.slot1, inventory.weapon1.slot2)
         mq.cmdf("/squelch /nomodkey /shiftkey /itemnotify in pack%s %s leftmouseup", inventory.weapon1.slot1, inventory.weapon1.slot2)
         mq.delay(100)
     end
@@ -496,6 +500,7 @@ function inventory.loot(item)
             end
         end
     end
+    mq.delay("2s")
     if mq.TLO.AdvLoot.PCount() > 0 then
         for i = 1, mq.TLO.AdvLoot.PCount() do
             if mq.TLO.AdvLoot.PList(i).Name() == item.what then
