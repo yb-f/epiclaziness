@@ -155,11 +155,16 @@ function _G.State:setLocation(x, y, z)
 end
 
 function _G.State:handle_step_change(step)
+    logger.log_info('\aoSetting step to: \ar%s\ao.', step)
+    logger.log_verbose("\aoStep type: \ar%s\ao.", task_table[step].type)
     self.is_rewound = true
     self.should_skip = true
     self.current_step = step
-    logger.log_info('\aoSetting step to: \ar%s\ao.', self.current_step)
-    logger.log_verbose("\aoStep type: \ar%s\ao.", task_table[self.current_step].type)
+    for i, state in pairs(overview_steps) do
+        if i >= step and state == 2 then
+            overview_steps[i] = 0
+        end
+    end
 end
 
 function _G.State:setStatusText(text)
