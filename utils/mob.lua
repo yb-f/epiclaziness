@@ -9,7 +9,7 @@ local MAX_DISTANCE      = 100
 local mob               = {}
 local searchFilter      = ''
 local low_damage_skills = {
-    ['Ranger'] = "Scorched Earth",
+    ['Ranger'] = "Sylvan Burn",
     ['Bard'] = "Tjudawos' Chant of Flame"
 }
 
