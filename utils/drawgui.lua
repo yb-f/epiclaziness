@@ -280,7 +280,7 @@ function draw_gui.outline_check_box(id, on, step)
     ImGui.PushStyleColor(ImGuiCol.ButtonActive, 1.0, 1.0, 1.0, 0)
     ImGui.PushStyleColor(ImGuiCol.ButtonHovered, 1.0, 1.0, 1.0, 0)
     ImGui.PushStyleColor(ImGuiCol.Button, 1.0, 1.0, 1.0, 0)
-    if step < _G.State.current_step then
+    if step < _G.State.current_step and on == 0 then
         ImGui.PushStyleColor(ImGuiCol.Text, 1.0, 0.3, 0.3, 0.8)
         ImGui.Button(ICONS.FA_SQUARE)
         toggled = false
