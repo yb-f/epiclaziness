@@ -365,6 +365,11 @@ local task_functions = {
         params = {},
         desc   = 'Remove invisibility'
     },
+    REMOVE_WEAPONS           = {
+        func   = inv.remove_weapons,
+        params = {},
+        desc   = 'Remove equiped weapons'
+    },
     RESTORE_ITEM             = {
         func   = inv.restore_item,
         params = {},
