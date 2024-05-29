@@ -536,6 +536,17 @@ function manage.picklockGroup(item, choice, name)
             return
         end
     end
+    local loopCount = 0
+    while mq.TLO.DoorTarget.Open() == false do
+        mq.delay(200)
+        loopCount = loopCount + 1
+        if loopCount > 60 then
+            logger.log_error("\aoDoor did not open after 12 seconds. Repeating step \ar%s\ao.", _G.State.current_step)
+            _G.State:setStatusText(string.format("Door did not open after 12 seconds. (%s).", _G.State.current_step))
+            _G.State:handle_step_change(_G.State.current_step)
+            return
+        end
+    end
 end
 
 function manage.removeInvis(item)
