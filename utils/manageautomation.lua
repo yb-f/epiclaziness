@@ -8,11 +8,11 @@ local manage       = {}
 local me           = mq.TLO.Me
 local group        = mq.TLO.Group
 
-function manage.campGroup(radius, class_settings, char_settings)
+function manage.campGroup(radius, zradius, class_settings, char_settings)
     local choice, name = _G.State:readGroupSelection()
     logger.log_info("\aoSetting camp mode with radius \ag%s\ao.", radius)
     manage.doAutomation(me.DisplayName(), me.Class.ShortName(), class_settings.class[me.Class.Name()], 'camp', char_settings)
-    manage.setRadius(me.DisplayName(), me.Class.ShortName(), class_settings.class[me.Class.Name()], radius, char_settings)
+    manage.setRadius(me.DisplayName(), me.Class.ShortName(), class_settings.class[me.Class.Name()], radius, zradius, char_settings)
     if choice == 1 then
         return
     elseif choice == 2 then
@@ -593,12 +593,14 @@ function manage.sendYes(item, choice, name)
     end
 end
 
-function manage.setRadius(character, class, script, radius, char_settings)
+function manage.setRadius(character, class, script, radius, zradius, char_settings)
     logger.log_verbose("\aoSetting radius to \ag%s\ao.", radius)
     if script == 1 then
         mq.cmdf('/squelch /%s pullradius %s nosave', class, radius)
+        mq.cmdf('/squelch /%s zradius %s nosave', class, zradius)
     elseif script == 2 then
         mq.cmdf("/squelch /rgl set pullradiushunt %s", radius)
+        mq.cmdf("/squelch /rgl set pullzradius %s", zradius)
     elseif script == 3 then
         mq.cmd("/squelch /rg pullrad %s", radius)
     elseif script == 4 then
