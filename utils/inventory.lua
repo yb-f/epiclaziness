@@ -401,11 +401,9 @@ function inventory.remove_weapons(item)
     inventory.weapon1.slot1, inventory.weapon1.slot2 = inventory.find_free_slot()
     mq.cmd('/itemnotify 13 leftmouseup')
     while mq.TLO.Cursor() == nil do
-        logger.log_debug("cursor empty")
         mq.delay(100)
     end
     while mq.TLO.Cursor() ~= nil do
-        logger.log_debug("slot1: %s slot2: %s", inventory.weapon1.slot1, inventory.weapon1.slot2)
         mq.cmdf("/squelch /nomodkey /shiftkey /itemnotify in pack%s %s leftmouseup", inventory.weapon1.slot1, inventory.weapon1.slot2)
         mq.delay(100)
     end
