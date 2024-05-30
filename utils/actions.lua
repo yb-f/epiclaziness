@@ -220,7 +220,7 @@ function actions.farm_radius(item, class_settings, char_settings, event)
         _G.State:handle_step_change(_G.State.current_step)
         return
     end
-    manage.campGroup(item.radius, class_settings, char_settings)
+    manage.campGroup(item.radius, item.zradius, class_settings, char_settings)
     manage.unpauseGroup(class_settings)
     local item_list = {}
     local item_status = ''
@@ -384,7 +384,7 @@ function actions.farm_while_near(item, class_settings, char_settings)
     _G.State:setStatusText(string.format("Killing nearby mobs until %s moves.", item.npc))
     logger.log_info("\aoKilling nearby mobs until \ag%s \aomoves.", item.npc)
     travel.loc_travel(item, class_settings, char_settings, _G.State:readGroupSelection())
-    manage.campGroup(item.radius, class_settings, char_settings)
+    manage.campGroup(item.radius, item.zradius, class_settings, char_settings)
     manage.unpauseGroup(class_settings)
     manage.removeInvis()
     local not_found_count = 0
