@@ -9,7 +9,7 @@ local MAX_DISTANCE      = 100
 local mob               = {}
 local searchFilter      = ''
 local low_damage_skills = {
-    ['Ranger'] = "Sylvan Burn",
+    ['Ranger'] = "Firestrike",
     ['Bard'] = "Tjudawos' Chant of Flame"
 }
 
@@ -313,7 +313,7 @@ function mob.npc_slow_kill(item, class_settings, char_settings)
         if _G.State:readPaused() then
             _G.Actions.pauseTask(_G.State:readStatusText())
         end
-        if mq.TLO.Me.SpellReady(1) then
+        if mq.TLO.Me.SpellReady(1)() then
             if mq.TLO.Me.Ducking() == true then
                 if mq.TLO.Target() == nil then
                     if mq.TLO.Spawn('npc ' .. item.npc)() ~= nil then
@@ -398,7 +398,7 @@ function mob.npc_damage_until(item, class_settings, char_settings)
     mq.cmd("/squelch /attack off")
     logger.log_info("\aoTarget has either despawned or has decreased below \ag%s \aohealth.", item.damage_pct)
     while mq.TLO.Spawn(ID)() ~= nil do
-        logger.log_verbose("\aoWaiting for \aritem.npc \aoto despawn before continuing.", item.damage_pct)
+        logger.log_verbose("\aoWaiting for \ar%s \aoto despawn before continuing.", item.npc)
         mq.delay(50)
     end
 end
