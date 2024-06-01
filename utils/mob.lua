@@ -43,6 +43,7 @@ function mob.xtargetCheck(char_settings)
     local ignore_list = {}
     local ignore_mob = _G.State:readXtargIgnore()
     if ignore_mob ~= '' then
+        print("got ignore mob")
         if string.find(ignore_mob, "|") then
             for word in string.gmatch(ignore_mob, '([^|]+)') do
                 table.insert(ignore_list, word)
@@ -60,13 +61,13 @@ function mob.xtargetCheck(char_settings)
                     if ignore_mob ~= nil then
                         if #ignore_list > 0 then
                             for _, mob in pairs(ignore_list) do
-                                if mq.TLO.Me.XTarget(i)() == mob then
+                                if mq.TLO.Me.XTarget(i).CleanName() == mob then
                                     should_hate = false
                                     logger.log_info("\aoIgnore mob on xtarget check.")
                                 end
                             end
                         else
-                            if mq.TLO.Me.XTarget(i)() ~= ignore_mob then
+                            if mq.TLO.Me.XTarget(i).CleanName() == ignore_mob then
                                 should_hate = false
                                 logger.log_info("\aoIgnore mob on xtarget check.")
                             end
@@ -109,47 +110,74 @@ function mob.clearXtarget(class_settings, char_settings)
     local loopCount = 0
     local i = 0
     local idList = {}
+    local ignore_list = {}
+    local ignore_mob = _G.State:readXtargIgnore()
+    local should_skip = false
+    if ignore_mob ~= '' then
+        if string.find(ignore_mob, "|") then
+            for word in string.gmatch(ignore_mob, '([^|]+)') do
+                table.insert(ignore_list, word)
+            end
+        end
+    end
     while looping do
         mq.delay(200)
         i = i + 1
         loopCount = loopCount + 1
-        if mq.TLO.Me.XTarget(i)() ~= '' and mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' then
-            if mq.TLO.Me.XTarget(i).CleanName() ~= nil then
-                if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
-                    if mq.TLO.Me.XTarget(i).Distance() ~= nil then
-                        logger.log_verbose("\aoTargeting XTarget #\ag%s\ao.", i)
-                        mq.TLO.Me.XTarget(i).DoTarget()
-                        ID = mq.TLO.Me.XTarget(i).ID()
-                        _G.State:setStatusText(string.format("Clearing XTarget %s: %s (%s).", i, mq.TLO.Me.XTarget(i)(), ID))
-                        logger.log_info("\aoClearing XTarget \ag%s \ao: \ag%s \ao(\ag%s\ao).", i, mq.TLO.Me.XTarget(i)(), ID)
-                        manage.unpauseGroup(class_settings)
-                        mq.cmd("/squelch /stick")
-                        mq.delay(100)
-                        mq.cmd("/squelch /attack on")
-                        while mq.TLO.Spawn(ID).Type() == 'NPC' do
-                            local breakout = true
-                            for j = 1, max_xtargs do
-                                if mq.TLO.Me.XTarget(j).ID() == ID then
-                                    breakout = false
+        if mq.TLO.Me.XTarget(i).CleanName() ~= nil and ignore_mob ~= '' then
+            if #ignore_list > 0 then
+                for _, mob in pairs(ignore_list) do
+                    if mq.TLO.Me.XTarget(i)() == mob then
+                        logger.log_info("\aoIgnore mob on xtarget check.")
+                        should_skip = true
+                    end
+                end
+            else
+                if mq.TLO.Me.XTarget(i)() == ignore_mob then
+                    logger.log_info("\aoIgnore mob on xtarget check.")
+                    should_skip = true
+                end
+            end
+        end
+        if should_skip == false then
+            if mq.TLO.Me.XTarget(i)() ~= '' and mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' then
+                if mq.TLO.Me.XTarget(i).CleanName() ~= nil then
+                    if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
+                        if mq.TLO.Me.XTarget(i).Distance() ~= nil then
+                            logger.log_verbose("\aoTargeting XTarget #\ag%s\ao.", i)
+                            mq.TLO.Me.XTarget(i).DoTarget()
+                            ID = mq.TLO.Me.XTarget(i).ID()
+                            _G.State:setStatusText(string.format("Clearing XTarget %s: %s (%s).", i, mq.TLO.Me.XTarget(i)(), ID))
+                            logger.log_info("\aoClearing XTarget \ag%s \ao: \ag%s \ao(\ag%s\ao).", i, mq.TLO.Me.XTarget(i)(), ID)
+                            manage.unpauseGroup(class_settings)
+                            mq.cmd("/squelch /stick")
+                            mq.delay(100)
+                            mq.cmd("/squelch /attack on")
+                            while mq.TLO.Spawn(ID).Type() == 'NPC' do
+                                local breakout = true
+                                for j = 1, max_xtargs do
+                                    if mq.TLO.Me.XTarget(j).ID() == ID then
+                                        breakout = false
+                                    end
                                 end
+                                if breakout == true then break end
+                                if mq.TLO.Target.ID() ~= ID then
+                                    mq.TLO.Spawn(ID).DoTarget()
+                                end
+                                if mq.TLO.Me.Combat() == false then
+                                    logger.log_super_verbose("\aoAttack was off when it should have been on. Turning it back on.")
+                                    mq.cmd("/squelch /attack on")
+                                end
+                                mq.delay(200)
                             end
-                            if breakout == true then break end
-                            if mq.TLO.Target.ID() ~= ID then
-                                mq.TLO.Spawn(ID).DoTarget()
+                            i = 0
+                            loopCount = 0
+                            if i > mq.TLO.Me.XTarget() then
+                                i = 0
                             end
-                            if mq.TLO.Me.Combat() == false then
-                                logger.log_super_verbose("\aoAttack was off when it should have been on. Turning it back on.")
-                                mq.cmd("/squelch /attack on")
-                            end
-                            mq.delay(200)
-                        end
-                        i = 0
-                        loopCount = 0
-                        if i > mq.TLO.Me.XTarget() then
+                        else
                             i = 0
                         end
-                    else
-                        i = 0
                     end
                 end
             end
