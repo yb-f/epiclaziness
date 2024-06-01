@@ -806,17 +806,33 @@ function actions.npc_give(item, class_settings, char_settings)
         mq.TLO.Spawn(item.npc).DoTarget()
         mq.delay(750)
     end
-    if mq.TLO.FindItem('=' .. item.what) == nil then
-        logger.log_error("\ar%s \aowas not found in inventory.", item.what)
-        _G.State:setStatusText(string.format("%s should be handed to %s but is not found in inventory.", item.what, item.npc))
-        _G.State:setTaskRunning(false)
-        mq.cmd('/foreground')
-        return
+    if item.itemID ~= nil then
+        if mq.TLO.FindItem(item.itemID)() == nil then
+            logger.log_error("\ar%s \aowas not found in inventory.", item.what)
+            _G.State:setStatusText(string.format("%s should be handed to %s but is not found in inventory.", item.what, item.npc))
+            _G.State:setTaskRunning(false)
+            mq.cmd('/foreground')
+            return
+        end
+        local bag = mq.TLO.FindItem(item.itemID).ItemSlot() - 22
+        local slot = mq.TLO.FindItem(item.itemID).ItemSlot2() + 1
+        mq.cmdf('/squelch /nomodkey /shift /itemnotify in pack%s %s leftmouseup', bag, slot)
+        mq.delay("5s", actions.got_cursor)
+        mq.TLO.Target.LeftClick()
+        mq.delay("10s", actions.give_window)
+    else
+        if mq.TLO.FindItem('=' .. item.what)() == nil then
+            logger.log_error("\ar%s \aowas not found in inventory.", item.what)
+            _G.State:setStatusText(string.format("%s should be handed to %s but is not found in inventory.", item.what, item.npc))
+            _G.State:setTaskRunning(false)
+            mq.cmd('/foreground')
+            return
+        end
+        mq.cmdf('/squelch /nomodkey /shift /itemnotify "%s" leftmouseup', item.what)
+        mq.delay("5s", actions.got_cursor)
+        mq.TLO.Target.LeftClick()
+        mq.delay("10s", actions.give_window)
     end
-    mq.cmdf('/squelch /nomodkey /shift /itemnotify "%s" leftmouseup', item.what)
-    mq.delay("5s", actions.got_cursor)
-    mq.TLO.Target.LeftClick()
-    mq.delay("10s", actions.give_window)
     local looping = true
     local loopCount = 0
     while looping do
@@ -1225,7 +1241,15 @@ function actions.wait_cursor(item)
     while true do
         _G.State:setStatusText("Waiting for " .. item.what .. "on cursor.")
         logger.log_info("\aoWaiting for \ag%s \aoon cursor.", item.what)
+        if _G.State.should_skip == true then
+            _G.State.should_skip = false
+            return
+        end
         while mq.TLO.Cursor() == nil do
+            if _G.State.should_skip == true then
+                _G.State.should_skip = false
+                return
+            end
             mq.delay(200)
         end
         if mq.TLO.Cursor.Name() == item.what then
