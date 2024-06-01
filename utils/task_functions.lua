@@ -375,6 +375,11 @@ local task_functions = {
         params = {},
         desc   = 'Reequip item'
     },
+    RESTORE_WEAPONS          = {
+        func   = inv.restore_weapons,
+        params = {},
+        desc   = 'Reequip weapons'
+    },
     ROG_GAMBLE               = {
         func   = _G.Actions.rog_gamble,
         params = {},
@@ -409,6 +414,11 @@ local task_functions = {
         func   = _G.Actions.wait,
         params = function() return { class_settings.settings, loadsave.SaveState } end,
         desc   = function(item) return 'Wait for ' .. item.wait / 1000 .. ' seconds' end
+    },
+    WAIT_CURSOR              = {
+        func   = _G.Actions.wait_cursor,
+        params = {},
+        desc   = function(item) return 'Waiting for ' .. item.what .. ' on cursor.' end
     },
     WAIT_EVENT               = {
         func   = _G.Actions.wait_event,
