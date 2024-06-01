@@ -305,7 +305,8 @@ function inventory.equip_item(item)
         _G.State:setStatusText(string.format("Equiping %s.", item.what))
         logger.log_info('\aoEquiping \ag%s\ao.', item.what)
         mq.delay("1s")
-        inventory.slot = mq.TLO.FindItem('=' .. item.what).WornSlot(1).Slot()
+        inventory.slot = mq.TLO.FindItem('=' .. item.what).WornSlot(1)()
+        logger.log_verbose("\aoUnequiping slot \ag%s\ao.", inventory.slot)
         inventory.stored_item = mq.TLO.Me.Inventory(inventory.slot)()
         logger.log_verbose("\aoUnequiping \ag%s\ao.", inventory.stored_item)
         mq.cmdf("/squelch /itemnotify \"%s\" leftmouseup", item.what)
@@ -425,13 +426,14 @@ function inventory.restore_weapons()
     while mq.TLO.Cursor() == nil do
         mq.delay(100)
     end
-    while mq.TLO.Cursor() ~= nil do
+    while mq.TLO.Cursor() == inventory.weapon1.name do
         mq.cmd('/itemnotify 13 leftmouseup')
         mq.delay(100)
     end
     if mq.TLO.Me.Inventory(13).Name() ~= inventory.weapon1.name then
         logger.log_warn("\aoThe main hand weapon does not seem to have been properly restored.")
     end
+    mq.cmdf("/squelch /autoinv")
     if inventory.weapon2.name ~= 'none' then
         mq.cmdf("/squelch /nomodkey /shiftkey /itemnotify in pack%s %s leftmouseup", inventory.weapon2.slot1, inventory.weapon2.slot2)
         while mq.TLO.Cursor() == nil do
@@ -454,15 +456,17 @@ function inventory.find_free_slot(exclude_bag)
     logger.log_verbose("\aoFinding free slot to place item.")
     for i = mq.TLO.Me.NumBagSlots(), 1, -1 do
         if i ~= exclude_bag then
-            if mq.TLO.Me.Inventory('pack' .. i).Container() ~= 0 then
-                if mq.TLO.Me.Inventory('pack' .. i).Container() ~= nil then
-                    for j = mq.TLO.Me.Inventory('pack' .. i).Container(), 1, -1 do
-                        if mq.TLO.Me.Inventory('pack' .. i).Item(j)() == nil then
-                            return i, j
+            if mq.TLO.Me.Inventory('pack' .. i).Type() ~= "Quiver" then
+                if mq.TLO.Me.Inventory('pack' .. i).Container() ~= 0 then
+                    if mq.TLO.Me.Inventory('pack' .. i).Container() ~= nil then
+                        for j = mq.TLO.Me.Inventory('pack' .. i).Container(), 1, -1 do
+                            if mq.TLO.Me.Inventory('pack' .. i).Item(j)() == nil then
+                                return i, j
+                            end
                         end
+                    else
+                        return i, 0
                     end
-                else
-                    return i, 0
                 end
             end
         end
