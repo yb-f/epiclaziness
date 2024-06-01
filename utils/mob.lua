@@ -40,12 +40,41 @@ end
 
 function mob.xtargetCheck(char_settings)
     logger.log_super_verbose("\aoPerforming xtarget check.")
+    local ignore_list = {}
+    local ignore_mob = _G.State:readXtargIgnore()
+    if ignore_mob ~= '' then
+        if string.find(ignore_mob, "|") then
+            for word in string.gmatch(ignore_mob, '([^|]+)') do
+                table.insert(ignore_list, word)
+            end
+            logger.log_info("\aoIgnoring xtarget check.")
+            return false
+        end
+    end
     if mq.TLO.Me.XTarget() then
         if mq.TLO.Me.XTarget() >= char_settings.general.xtargClear then
             local haterCount = 0
+            local should_hate = true
             for i = 1, mq.TLO.Me.XTargetSlots() do
                 if mq.TLO.Me.XTarget(i).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(i)() ~= '' then
-                    haterCount = haterCount + 1
+                    if ignore_mob ~= nil then
+                        if #ignore_list > 0 then
+                            for _, mob in pairs(ignore_list) do
+                                if mq.TLO.Me.XTarget(i)() == mob then
+                                    should_hate = false
+                                    logger.log_info("\aoIgnore mob on xtarget check.")
+                                end
+                            end
+                        else
+                            if mq.TLO.Me.XTarget(i)() ~= ignore_mob then
+                                should_hate = false
+                                logger.log_info("\aoIgnore mob on xtarget check.")
+                            end
+                        end
+                    end
+                    if should_hate then
+                        haterCount = haterCount + 1
+                    end
                 end
             end
             if haterCount >= char_settings.general.xtargClear then
@@ -341,6 +370,13 @@ function mob.npc_slow_kill(item, class_settings, char_settings)
             looping = false
         elseif mq.TLO.Spawn('npc ' .. item.npc).PctHPs() < item.damage_pct then
             mq.cmd("/stopcast")
+            local angle = mq.TLO.Target.HeadingTo.DegreesCCW() - mq.TLO.Me.Heading.DegreesCCW()
+            if angle > 230 or angle < 130 then
+                mq.cmd("/face away")
+            end
+            if mq.TLO.Me.Ducking() == false then
+                mq.cmd("/keypress DUCK")
+            end
             looping = false
         end
     end
@@ -397,10 +433,6 @@ function mob.npc_damage_until(item, class_settings, char_settings)
     end
     mq.cmd("/squelch /attack off")
     logger.log_info("\aoTarget has either despawned or has decreased below \ag%s \aohealth.", item.damage_pct)
-    while mq.TLO.Spawn(ID)() ~= nil do
-        logger.log_verbose("\aoWaiting for \ar%s \aoto despawn before continuing.", item.npc)
-        mq.delay(50)
-    end
 end
 
 function mob.npc_kill(item, class_settings, char_settings)

@@ -70,6 +70,7 @@ local function loadTheme()
 end
 
 _G.State = {
+    xtargIgnore           = '',
     is_paused             = false, --
     is_task_running       = false, --
     do_start_run          = false, --
@@ -118,6 +119,18 @@ end
 
 function _G.State:setStartRun(value)
     self.do_start_run = value
+end
+
+function _G.State:setXtargIgnore(value)
+    self.xtargIgnore = value
+end
+
+function _G.State:readXtargIgnore()
+    return self.xtargIgnore
+end
+
+function _G.State:clearXtargIgnore()
+    self.xtargIgnore = ''
 end
 
 function _G.State:readTaskRunning()
@@ -500,6 +513,11 @@ local function run_epic(class, choice)
         end
         update_general_status()
         mq.doevents()
+        if task_table[_G.State.current_step].xtarget_ignore ~= nil then
+            _G.State:setXtargIgnore(task_table[_G.State.current_step].xtarget_ignore)
+        elseif task_table[_G.State.current_step].xtarget_ignore == nil and _G.State:readXtargIgnore() ~= nil then
+            _G.State:clearXtargIgnore()
+        end
         execute_task(task_table[_G.State.current_step])
         if mq.TLO.Me.Levitating() then
             if task_table[_G.State.current_step].belev == nil then
