@@ -315,6 +315,8 @@ function inventory.equip_item(item)
         end
         mq.cmdf('/squelch /itemnotify %s leftmouseup', inventory.slot)
         while mq.TLO.Me.Inventory(inventory.slot)() ~= item.what do
+            print(mq.TLO.Me.Inventory(inventory.slot)())
+            print(item.what)
             mq.delay(100)
         end
         mq.cmd('/squelch /autoinv')
@@ -521,9 +523,9 @@ function inventory.loot(item)
     mq.delay("1s")
     if mq.TLO.FindItem("=" .. item.what)() ~= nil then
         logger.log_info("\aoSuccessfully looted \ag%s\ao.", item.what)
-        --[[ if item.gotostep ~= nil then
+        if item.gotostep ~= nil then
             _G.State:handle_step_change(item.gotostep)
-        end--]]
+        end
         return true
     else
         if looted == true then
@@ -531,9 +533,9 @@ function inventory.loot(item)
                 mq.delay(200)
                 if mq.TLO.FindItem("=" .. item.what)() ~= nil then
                     logger.log_info("\aoSuccessfully looted \ag%s\ao.", item.what)
-                    --[[if item.gotostep ~= nil then
+                    if item.gotostep ~= nil then
                         _G.State:handle_step_change(item.gotostep - 1)
-                    end--]]
+                    end
                     return true
                 end
             end
@@ -543,6 +545,9 @@ function inventory.loot(item)
             mq.cmd('/foreground')
             return false
         end
+    end
+    if item.gotostep ~= nil then
+        _G.State:handle_step_change(item.gotostep)
     end
 end
 
