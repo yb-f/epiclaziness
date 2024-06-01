@@ -456,6 +456,7 @@ end
 function manage.picklockGroup(item, choice, name)
     _G.State:setStatusText("Lockpicking door.")
     logger.log_info("\aoLockpicking door.")
+    mq.cmd("/squelch /doortarget")
     if choice == 1 then
         if me.Class.ShortName() == 'BRD' or me.Class.ShortName() == 'ROG' then
             logger.log_verbose("\aoI am able to pick locks, doing so now.")
