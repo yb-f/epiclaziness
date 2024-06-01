@@ -1221,6 +1221,22 @@ function actions.wait_event(item)
     end
 end
 
+function actions.wait_cursor(item)
+    while true do
+        _G.State:setStatusText("Waiting for " .. item.what .. "on cursor.")
+        logger.log_info("\aoWaiting for \ag%s \aoon cursor.", item.what)
+        while mq.TLO.Cursor() == nil do
+            mq.delay(200)
+        end
+        if mq.TLO.Cursor.Name() == item.what then
+            logger.log_info("\aoFound \ag%s \aoon cursor.", item.what)
+            mq.cmd('/autoinv')
+            return
+        end
+        mq.cmd('/autoinv')
+    end
+end
+
 function actions.wait_for(item)
     local looping     = true
     local cur_eq_hour = mq.TLO.GameTime.Hour()
