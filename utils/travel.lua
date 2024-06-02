@@ -14,6 +14,7 @@ local speed_classes       = { "Bard", "Druid", "Ranger", "Shaman" }
 local speed_buffs         = { "Selo's Accelerato", "Communion of the Cheetah", "Spirit of Falcons", "Flight of Falcons", "Spirit of Eagle" }
 local travel              = {}
 travel.looping            = false
+travel.timeStamp          = 0
 
 function travel.invisTranslocatorCheck()
     logger.log_verbose('\aoChecking if we are near a translocator npc before invising.')
@@ -202,7 +203,14 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
     ID = ID or 0
     local loopCount = 0
     local distance = 0
+    _G.State:clearVelocityTable()
+    travel.timeStamp = mq.gettime()
+    _G.State.velocity = mq.TLO.Navigation.Velocity()
     while mq.TLO.Navigation.Active() do
+        if mq.gettime() - travel.timeStamp > 1000 then
+            _G.State:addVelocity(mq.TLO.Navigation.Velocity())
+            _G.State.velocity = _G.State:getAverageVelocity()
+        end
         mq.delay(200)
         if mq.TLO.EverQuest.GameState() ~= 'INGAME' then
             logger.log_error('\arNot in game, closing.')
@@ -241,6 +249,7 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
             travel.invis(class_settings)
             travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
         end
+
         if loopCount == 10 then
             if item.radius == 1 then
                 return
@@ -265,7 +274,7 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
             loopCount = 0
             _G.State:setStatusText(temp)
         end
-        if dist.GetDistance3D(me.X(), me.Y(), me.Z(), _G.State:readLocation()) < 20 then
+        if dist.GetDistance3D(me.X(), me.Y(), me.Z(), _G.State:readLocation()) < 30 then
             loopCount = loopCount + 1
         elseif dist.GetDistance3D(me.X(), me.Y(), me.Z(), _G.State:readLocation()) > 75 then
             logger.log_info("\aoWe seem to have crossed a teleporter, moving to next step.")
