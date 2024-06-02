@@ -814,9 +814,7 @@ function actions.npc_give(item, class_settings, char_settings)
             mq.cmd('/foreground')
             return
         end
-        local bag = mq.TLO.FindItem(item.itemID).ItemSlot() - 22
-        local slot = mq.TLO.FindItem(item.itemID).ItemSlot2() + 1
-        mq.cmdf('/squelch /nomodkey /shift /itemnotify in pack%s %s leftmouseup', bag, slot)
+        mq.cmdf('/squelch /nomodkey /shift /itemnotify #%s leftmouseup', item.itemID)
         mq.delay("5s", actions.got_cursor)
         mq.TLO.Target.LeftClick()
         mq.delay("10s", actions.give_window)
