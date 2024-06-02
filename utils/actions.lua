@@ -993,6 +993,12 @@ function actions.npc_talk(item, class_settings, char_settings)
     manage.removeInvis()
     _G.State:setStatusText(string.format("Talking to %s (%s).", item.npc, item.phrase))
     logger.log_info("\aoSaying \ag%s \aoto \ag%s\ao.", item.phrase, item.npc)
+    if item.npc == 'SELF' then
+        mq.TLO.Me.DoTarget()
+        mq.cmdf("/say %s", item.phrase)
+        mq.delay(750)
+        return
+    end
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
         if mq.TLO.Spawn(item.npc).Distance() ~= nil then
             if mq.TLO.Spawn(item.npc).Distance() > MAX_DISTANCE then
@@ -1243,7 +1249,7 @@ end
 
 function actions.wait_cursor(item)
     while true do
-        _G.State:setStatusText("Waiting for " .. item.what .. "on cursor.")
+        _G.State:setStatusText("Waiting for " .. item.what .. " on cursor.")
         logger.log_info("\aoWaiting for \ag%s \aoon cursor.", item.what)
         if _G.State.should_skip == true then
             _G.State.should_skip = false
