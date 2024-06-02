@@ -433,6 +433,8 @@ function mob.npc_damage_until(item, class_settings, char_settings)
             return
         end
     end
+    logger.log_debug("\aoChecking buffs for any damage shields and removing them.")
+    _G.Actions.RemoveDamageShields()
     if item.maxlevel ~= nil then
         if mq.TLO.Me.Level() >= item.maxlevel then
             logger.log_warn("\aoOur level is \ag%s \aoor higher. Being cautious.", item.maxlevel)

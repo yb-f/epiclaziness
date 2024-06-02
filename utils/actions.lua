@@ -790,6 +790,12 @@ function actions.pauseTask(status)
     return true
 end
 
+function actions.RemoveDamageShields()
+    while mq.TLO.Me.FindBuff("spa 59")() ~= nil do
+        mq.TLO.Me.FindBuff("spa 59").Remove()
+    end
+end
+
 function actions.npc_give(item, class_settings, char_settings)
     manage.removeInvis()
     _G.State:setStatusText(string.format("Giving %s to %s.", item.what, item.npc))
