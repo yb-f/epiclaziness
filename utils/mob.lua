@@ -519,7 +519,10 @@ function mob.npc_kill(item, class_settings, char_settings)
                 mq.unevent('cannot_see')
                 mq.unevent('cannot_cast')
                 logger.log_warn('\aoUnable to hit this target. Adding \ar%s \aoto bad IDs and moving back to step \ar%s\ao.', ID, _G.State.current_step)
-                _G.State:handle_step_change(_G.State.current_step - 1)
+                if item.count == 1 then
+                    _G.State:handle_step_change(item.gotostep)
+                end
+                _G.State:handle_step_change(_G.State.current_step)
                 return
             end
             if mq.TLO.Target.ID() ~= ID then
