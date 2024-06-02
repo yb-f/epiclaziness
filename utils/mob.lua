@@ -38,6 +38,12 @@ function mob.backstab(item, class_settings, char_settings)
 end
 
 function mob.xtargetCheck(char_settings)
+    local choice, name = _G.State:readGroupSelection()
+    if choice > 1 then
+        if travel.GroupZoneCheck(choice, name) == false then
+            return false
+        end
+    end
     logger.log_super_verbose("\aoPerforming xtarget check.")
     local ignore_list = {}
     local ignore_mob = _G.State:readXtargIgnore()

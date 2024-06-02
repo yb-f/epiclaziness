@@ -501,6 +501,11 @@ end
 
 function travel.invisCheck(char_settings, class_settings, invis)
     local choice, name = _G.State:readGroupSelection()
+    if choice > 1 then
+        if travel.GroupZoneCheck(choice, name) == false then
+            return false
+        end
+    end
     logger.log_super_verbose("\aoChecking if we should be invis.")
     if invis == 1 and char_settings.general.invisForTravel == true then
         if mq.TLO.Me.Invis() == false then
@@ -544,6 +549,11 @@ end
 
 function travel.speedCheck(class_settings, char_settings)
     local choice, name = _G.State:readGroupSelection()
+    if choice > 1 then
+        if travel.GroupZoneCheck(choice, name) == false then
+            return 'none', 'none'
+        end
+    end
     logger.log_super_verbose("\aoChecking if we are missing travel speed buff.")
     for i, buff in ipairs(speed_buffs) do
         if mq.TLO.Me.Buff(buff)() then
@@ -1166,26 +1176,16 @@ function travel.zone_travel(item, class_settings, char_settings, continue, choic
             end
         end
     end
-    if choice == 2 then
-        logger.log_info("\aoWaiting for group members to arrive before continuing.")
-        while mq.TLO.Group.AnyoneMissing() do
+    if choice > 1 then
+        logger.log_verbose("\aoInsuring all managed group members are in zone.")
+        while travel.GroupZoneCheck(choice, name) == false do
             mq.delay(500)
             if _G.State.should_skip == true then
                 _G.State.should_skip = false
                 return
             end
         end
-        mq.delay("5s")
-    end
-    if choice > 2 then
-        logger.log_info("\aoWaiting for \ag%s \aoto arrive before continuing.", name)
-        while mq.TLO.Group.Member(name).OtherZone() do
-            mq.delay(500)
-            if _G.State.should_skip == true then
-                _G.State.should_skip = false
-                return
-            end
-        end
+        logger.log_debug("\aoAll managed group members are in zone, waiting 5 seconds to allow all characters to load properly.")
         mq.delay("5s")
     end
     _G.State.destType = ''
@@ -1193,6 +1193,21 @@ function travel.zone_travel(item, class_settings, char_settings, continue, choic
     _G.State.is_traveling = false
     _G.State.autosize_on = false
     mq.cmd('/squelch /autosize off')
+end
+
+function travel.GroupZoneCheck(choice, name)
+    if choice == 1 then
+        return true
+    elseif choice == 2 then
+        if mq.TLO.Group.AnyoneMissing() then
+            return false
+        end
+    else
+        if mq.TLO.Group.Member(name).OtherZone() then
+            return false
+        end
+    end
+    return true
 end
 
 function travel.elevator_check(item)
