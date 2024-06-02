@@ -48,7 +48,6 @@ function mob.xtargetCheck(char_settings)
     local ignore_list = {}
     local ignore_mob = _G.State:readXtargIgnore()
     if ignore_mob ~= '' then
-        print("got ignore mob")
         if string.find(ignore_mob, "|") then
             for word in string.gmatch(ignore_mob, '([^|]+)') do
                 table.insert(ignore_list, word)

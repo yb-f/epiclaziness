@@ -325,8 +325,6 @@ function inventory.equip_item(item)
         end
         mq.cmdf('/squelch /itemnotify %s leftmouseup', inventory.slot)
         while mq.TLO.Me.Inventory(inventory.slot)() ~= item.what do
-            print(mq.TLO.Me.Inventory(inventory.slot)())
-            print(item.what)
             mq.delay(100)
         end
         mq.cmd('/squelch /autoinv')
