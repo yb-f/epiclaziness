@@ -1,7 +1,7 @@
 local mq                    = require('mq')
 local manage                = require('utils/manageautomation')
 local logger                = require('utils/logger')
-
+local dist                  = require 'utils/distance'
 local MAX_DISTANCE          = 100
 local inventory             = {}
 
@@ -235,10 +235,20 @@ function inventory.enviro_combine_container(item)
         return
     end
     mq.delay(500)
-    mq.cmd("/squelch /nav item")
     local y = mq.TLO.ItemTarget.Y()
     local x = mq.TLO.ItemTarget.X()
     local z = mq.TLO.ItemTarget.Z()
+    if dist.GetDistance3D(x, y, z, mq.TLO.ItemTarget.X(), mq.TLO.ItemTarget.Y(), mq.TLO.ItemTarget.Z()) > 20 then
+        mq.cmd("/squelch /nav item")
+        local tempString = string.format("loc %s %s %s", y, x, z)
+        _G.State.startDist = mq.TLO.Navigation.PathLength(tempString)()
+        _G.State.destType = 'loc'
+        _G.State.dest = string.format("%s %s %s", y, x, z)
+        while mq.TLO.Navigation.Active() do
+            mq.delay(500)
+        end
+    end
+    mq.cmd("/squelch /nav item")
     local tempString = string.format("loc %s %s %s", y, x, z)
     _G.State.startDist = mq.TLO.Navigation.PathLength(tempString)()
     _G.State.destType = 'loc'
