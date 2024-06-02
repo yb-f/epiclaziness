@@ -4,12 +4,11 @@ local inv               = require('utils/inventory')
 local travel            = require('utils/travel')
 local logger            = require('utils/logger')
 local dist              = require 'utils/distance'
-
 local MAX_DISTANCE      = 100
 local mob               = {}
 local searchFilter      = ''
 local low_damage_skills = {
-    ['Ranger'] = "Call of Flame",
+    ['Ranger'] = "Burning Arrow",
     ['Bard'] = "Tjudawos' Chant of Flame"
 }
 
