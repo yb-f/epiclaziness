@@ -111,7 +111,28 @@ _G.State = {
     startDist             = 0,
     updateTime            = mq.gettime(),
     badMeshes             = {},
+    velocityTable         = {},
 }
+
+function _G.State:clearVelocityTable()
+    self.velocityTable = {}
+end
+
+function _G.State:getAverageVelocity()
+    --TODO: Implement average velocity calculation
+    local velocitySum = 0
+    for i, v in pairs(self.velocityTable) do
+        velocitySum = velocitySum + v
+    end
+    return velocitySum / #self.velocityTable
+end
+
+function _G.State:addVelocity(velocity)
+    if #self.velocityTable >= 20 then
+        table.remove(self.velocityTable, 1)
+    end
+    table.insert(self.velocityTable, velocity)
+end
 
 function _G.State:readStartRun()
     return self.do_start_run
