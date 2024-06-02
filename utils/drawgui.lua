@@ -142,7 +142,7 @@ function draw_gui.pathUpdate()
         else--]]
         local path             = string.format("%s %s", _G.State.destType, _G.State.dest)
         _G.State.pathDist      = mq.TLO.Navigation.PathLength(path)()
-        _G.State.velocity      = mq.TLO.Navigation.Velocity()
+        --_G.State.velocity      = mq.TLO.Navigation.Velocity()
         _G.State.estimatedTime = _G.State.pathDist / _G.State.velocity
         draw_gui.travelPct     = 1.0 - (_G.State.pathDist / _G.State.startDist)
         draw_gui.travelText    = string.format("Distance: %s Velocity: %s ETA: %s seconds", math.floor(_G.State.pathDist), math.floor(_G.State.velocity),
