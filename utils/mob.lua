@@ -1,16 +1,16 @@
-local mq                = require('mq')
-local manage            = require('utils/manageautomation')
-local inv               = require('utils/inventory')
-local travel            = require('utils/travel')
-local logger            = require('utils/logger')
-local dist              = require 'utils/distance'
-local MAX_DISTANCE      = 100
-local mob               = {}
-local searchFilter      = ''
-local low_damage_skills = {
+local mq           = require('mq')
+local manage       = require('utils/manageautomation')
+local inv          = require('utils/inventory')
+local travel       = require('utils/travel')
+local logger       = require('utils/logger')
+local dist         = require 'utils/distance'
+local MAX_DISTANCE = 100
+local mob          = {}
+local searchFilter = ''
+--[[local low_damage_skills = {
     ['Ranger'] = "Burning Arrow",
     ['Bard'] = "Tjudawos' Chant of Flame"
-}
+}--]]
 
 
 local function target_invalid_switch()
@@ -418,10 +418,10 @@ function mob.pre_damage_until(item, class_settings, char_settings)
     logger.log_info("\aoChecking if level is higher than \ag%s\ao.", item.maxlevel)
     _G.State:setStatusText(string.format("Checking if level is higher than %s.", item.maxlevel))
     if mq.TLO.Me.Level() >= item.maxlevel then
-        logger.log_debug("\aoLevel is higher than \ag%s\ao. Preparing low damage skill (\ag%s\ao).", item.maxlevel, low_damage_skills[mq.TLO.Me.Class.Name()])
-        _G.State:setStatusText(string.format("Level is higher than %s. Preparing low damage skill.", item.maxlevel))
-        mq.cmdf('/mem "%s" 1', low_damage_skills[mq.TLO.Me.Class.Name()])
-        while mq.TLO.Me.Gem(low_damage_skills[mq.TLO.Me.Class.Name()])() ~= 1 do
+        logger.log_debug("\aoLevel is higher than \ag%s\ao. Preparing low damage skill (\ag%s\ao).", item.maxlevel, item.what)
+        _G.State:setStatusText(string.format("Level is higher than %s. Preparing low damage skill (%).", item.maxlevel, item.what))
+        mq.cmdf('/mem "%s" 1', item.what)
+        while mq.TLO.Me.Gem(item.what)() ~= 1 do
             mq.delay(100)
         end
     end
