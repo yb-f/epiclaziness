@@ -18,10 +18,12 @@ local fishing_trash          = { 'Fish Scales', 'Tattered Cloth Sandal', 'Rusty 
     "Deep Sea Urchin", "Fresh Fish", "Gunthak Mackerel", "Saltwater Seaweed", "Dark Fish's Scales" }
 
 local function gamble_event(line, arg1)
-    if arg1 == tostring(DESIRED_CHIPS) then
+    --[[if arg1 == tostring(DESIRED_CHIPS) then
         logger.log_info("\aoGambling has reached the desired number of chips. Moving on.")
         gamble_done = true
-    end
+    end--]]
+    logger.log_info("\aoGambling has reached the desired number of chips. Moving on.")
+    gamble_done = true
 end
 
 function actions.adventure_window()
