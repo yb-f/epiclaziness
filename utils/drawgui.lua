@@ -25,6 +25,7 @@ local invis_type           = {}
 local treeview_table_flags = bit32.bor(ImGuiTableFlags.Hideable, ImGuiTableFlags.RowBg, ImGuiTableFlags.Borders, ImGuiTableFlags.SizingFixedFit, ImGuiTableFlags.ScrollX)
 local myClass              = mq.TLO.Me.Class()
 
+draw_gui.jumpStep          = 0
 draw_gui.travelPct         = 0
 draw_gui.travelText        = ''
 
@@ -151,9 +152,79 @@ function draw_gui.pathUpdate()
     end
 end
 
+function draw_gui.header()
+    ImGui.Text("Epic: " .. myClass .. " " .. _G.State.epicstring)
+    if _G.State:readTaskRunning() == false then
+        if ImGui.Button("Begin") then
+            _G.State:setStartRun(true)
+        end
+        if ImGui.IsItemHovered() then
+            local invis_num = invis_needed(mq.TLO.Me.Class.ShortName(), _G.State.epic_choice)
+            local gate_num = gate_needed(mq.TLO.Me.Class.ShortName(), _G.State.epic_choice)
+            local tooltip = "Begin/resume epic quest\nThis may require at least " ..
+                invis_num .. " invis potions.\nThis may require at least " .. gate_num .. " gate potions."
+            ImGui.SetTooltip(tooltip)
+        end
+    end
+    if _G.State:readTaskRunning() then
+        if ImGui.SmallButton(ICONS.MD_FAST_REWIND) then
+            _G.State:handle_step_change(_G.State.current_step - 1)
+        end
+        if ImGui.IsItemHovered() then
+            ImGui.SetTooltip("Move to previous step.")
+        end
+        ImGui.SameLine()
+        if _G.State:readPaused() == false then
+            if ImGui.SmallButton(ICONS.MD_PAUSE) then
+                logger.log_info("\aoPausing script.")
+                _G.State:setPaused(true)
+            end
+            if ImGui.IsItemHovered() then
+                ImGui.SetTooltip("Pause script.")
+            end
+        else
+            if ImGui.SmallButton(ICONS.FA_PLAY) then
+                _G.State:setPaused(false)
+                logger.log_info("\aoResuming script.")
+            end
+            if ImGui.IsItemHovered() then
+                ImGui.SetTooltip("Resume script.")
+            end
+        end
+        ImGui.SameLine()
+        if ImGui.SmallButton(ICONS.MD_STOP) then
+            _G.State:setTaskRunning(false)
+            _G.State.should_skip = true
+            logger.log_warn("\aoManually stopping script at step: \ar%s", _G.State.current_step)
+            _G.State:setStatusText(string.format("Manually stopped at step %s.", _G.State.current_step))
+        end
+        if ImGui.IsItemHovered() then
+            ImGui.SetTooltip("Stop script immedietly.")
+        end
+        ImGui.SameLine()
+        if ImGui.SmallButton(ICONS.MD_FAST_FORWARD) then
+            _G.State:handle_step_change(_G.State.current_step + 1)
+        end
+        if ImGui.IsItemHovered() then
+            ImGui.SetTooltip("Skip to next step.")
+        end
+        if ImGui.Button("Stop @ Next Save") then
+            logger.log_info("\aoStopping at next save point.")
+            _G.State:setStopAtSave(true)
+        end
+        ImGui.PushItemWidth(40)
+        draw_gui.jumpStep = ImGui.InputInt("##Step Jump", draw_gui.jumpStep, 0, 0, 0)
+        ImGui.PopItemWidth()
+        ImGui.SameLine()
+        if ImGui.Button("Jump to Step") then
+            _G.State:handle_step_change(draw_gui.jumpStep)
+        end
+        ImGui.Separator()
+    end
+end
+
 function draw_gui.generalTab(task_table)
     if ImGui.BeginTabItem("General") then
-        ImGui.Text("Class: " .. myClass .. " " .. _G.State.epicstring)
         if _G.State:readTaskRunning() == false then
             _G.State.epic_choice, changed = ImGui.Combo('##Combo', _G.State.epic_choice, _G.State.epic_list, #_G.State.epic_list, #_G.State.epic_list)
             if ImGui.IsItemHovered() then
@@ -177,65 +248,7 @@ function draw_gui.generalTab(task_table)
                 _G.State:populate_group_combo()
             end
         end
-        if _G.State:readTaskRunning() == false then
-            if ImGui.Button("Begin") then
-                _G.State:setStartRun(true)
-            end
-            if ImGui.IsItemHovered() then
-                local invis_num = invis_needed(mq.TLO.Me.Class.ShortName(), _G.State.epic_choice)
-                local gate_num = gate_needed(mq.TLO.Me.Class.ShortName(), _G.State.epic_choice)
-                local tooltip = "Begin/resume epic quest\nThis may require at least " ..
-                    invis_num .. " invis potions.\nThis may require at least " .. gate_num .. " gate potions."
-                ImGui.SetTooltip(tooltip)
-            end
-        end
-        if _G.State:readTaskRunning() then
-            if ImGui.SmallButton(ICONS.MD_FAST_REWIND) then
-                _G.State:handle_step_change(_G.State.current_step - 1)
-            end
-            if ImGui.IsItemHovered() then
-                ImGui.SetTooltip("Move to previous step.")
-            end
-            ImGui.SameLine()
-            if _G.State:readPaused() == false then
-                if ImGui.SmallButton(ICONS.MD_PAUSE) then
-                    logger.log_info("\aoPausing script.")
-                    _G.State:setPaused(true)
-                end
-                if ImGui.IsItemHovered() then
-                    ImGui.SetTooltip("Pause script.")
-                end
-            else
-                if ImGui.SmallButton(ICONS.FA_PLAY) then
-                    _G.State:setPaused(false)
-                    logger.log_info("\aoResuming script.")
-                end
-                if ImGui.IsItemHovered() then
-                    ImGui.SetTooltip("Resume script.")
-                end
-            end
-            ImGui.SameLine()
-            if ImGui.SmallButton(ICONS.MD_STOP) then
-                _G.State:setTaskRunning(false)
-                _G.State.should_skip = true
-                logger.log_warn("\aoManually stopping script at step: \ar%s", _G.State.current_step)
-                _G.State:setStatusText(string.format("Manually stopped at step %s.", _G.State.current_step))
-            end
-            if ImGui.IsItemHovered() then
-                ImGui.SetTooltip("Stop script immedietly.")
-            end
-            ImGui.SameLine()
-            if ImGui.SmallButton(ICONS.MD_FAST_FORWARD) then
-                _G.State:handle_step_change(_G.State.current_step + 1)
-            end
-            if ImGui.IsItemHovered() then
-                ImGui.SetTooltip("Skip to next step.")
-            end
-            if ImGui.Button("Stop @ Next Save") then
-                logger.log_info("\aoStopping at next save point.")
-                _G.State:setStopAtSave(true)
-            end
-        end
+
         ImGui.Separator()
         ImGui.PushStyleColor(ImGuiCol.PlotHistogram, IM_COL32(40, 150, 40, 255))
         ImGui.ProgressBar(_G.State.current_step / #task_table, ImGui.GetWindowWidth(), 17, "##prog")

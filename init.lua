@@ -450,6 +450,7 @@ local function init_epic(class, choice)
     _G.State:setTaskRunning(true)
     _G.State:setPaused(false)
     loadsave.loadState()
+    draw_gui.jumpStep = _G.State.current_step
     logger.log_info("Begining quest for %s epic %s", mq.TLO.Me.Class(), _G.State.epic_list[choice])
     local epic_list = {
         ["1.0"]     = class .. "_10",
@@ -588,6 +589,7 @@ local function displayGUI()
     local ColorCount, StyleCount = LoadTheme.StartTheme(theme.Theme[themeID])
     openGUI, drawGUI = ImGui.Begin("Epic Laziness##" .. myName, openGUI, window_flags)
     if drawGUI then
+        draw_gui.header()
         ImGui.BeginTabBar("##Tabs")
         draw_gui.generalTab(task_table)
         theme.LoadTheme, themeName, themeID, class_settings.settings.LoadTheme = draw_gui.settingsTab(themeName, theme, themeID, class_settings, loadsave)
