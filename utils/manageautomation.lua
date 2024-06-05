@@ -31,155 +31,155 @@ function manage.doAutomation(character, class, script, action, char_settings)
         [1] = {
             start = function()
                 return {
-                    string.format('/squelch /%s mode 0 n osave', class),
-                    string.format('/squelch /%s usestick on nosave', class),
-                    string.format('/squelch /%s zhigh 100 nosave', class),
-                    string.format('/squelch /%s zlow 100 nosave', class)
+                    string.format('/%s mode 0 n osave', class),
+                    string.format('/%s usestick on nosave', class),
+                    string.format('/%s zhigh 100 nosave', class),
+                    string.format('/%s zlow 100 nosave', class)
                 }
             end,
             pause = function()
                 return {
-                    string.format('/squelch /%s pause on nosave', class)
+                    string.format('/%s pause on nosave', class)
                 }
             end,
             unpause = function()
                 return {
-                    string.format('/squelch /%s pause off nosave', class)
+                    string.format('/%s pause off nosave', class)
                 }
             end,
             camp = function()
                 return {
-                    string.format('/squelch /%s resetcamp nosave', class),
-                    string.format('/squelch /%s pause off nosave', class),
-                    string.format('/squelch /%s mode HunterTank nosave', class)
+                    string.format('/%s resetcamp nosave', class),
+                    string.format('/%s pause off nosave', class),
+                    string.format('/%s mode HunterTank nosave', class)
                 }
             end,
             uncamp = function()
                 return {
-                    string.format('/squelch /%s mode 0 nosave', class),
-                    string.format('/squelch /%s pause on nosave', class)
+                    string.format('/%s mode 0 nosave', class),
+                    string.format('/%s pause on nosave', class)
                 }
             end,
         },
         [2] = {
             start = function()
                 return {
-                    string.format('/squelch /lua run rgmercs %s', mq.TLO.Me.CleanName()),
-                    string.format('/squelch /lua run rgmercs %s', mq.TLO.Me.CleanName()),
-                    string.format('/squelch /rgl set PullZRadius 100'),
-                    string.format('/squelch /rgl set pullmincon 1')
+                    string.format('/lua run rgmercs %s', mq.TLO.Me.CleanName()),
+                    string.format('/lua run rgmercs %s', mq.TLO.Me.CleanName()),
+                    string.format('/rgl set PullZRadius 100'),
+                    string.format('/rgl set pullmincon 1')
                 }
             end,
             pause = function()
                 return {
-                    string.format('/squelch /rgl pause')
+                    string.format('/rgl pause')
                 }
             end,
             unpause = function()
                 return {
-                    string.format('/squelch /rgl unpause')
+                    string.format('/rgl unpause')
                 }
             end,
             camp = function()
                 return {
-                    string.format('/squelch /rgl unpause'),
-                    string.format('/squelch /rgl set pullmode 3'),
-                    string.format('/squelch /rgl set dopull on')
+                    string.format('/rgl unpause'),
+                    string.format('/rgl set pullmode 3'),
+                    string.format('/rgl set dopull on')
                 }
             end,
             uncamp = function()
                 return {
-                    string.format('/squelch /rgl dopull off'),
-                    string.format('/squelch /rgl pause')
+                    string.format('/rgl dopull off'),
+                    string.format('/rgl pause')
                 }
             end,
         },
         [3] = {
             start = function()
                 return {
-                    string.format("/squelch /mac rgmercs/rgmerc"),
+                    string.format("/mac rgmercs/rgmerc"),
                 }
             end,
             pause = function()
                 return {
-                    string.format("/squelch /rg off"),
+                    string.format("/rg off"),
                 }
             end,
             unpause = function()
                 return {
-                    string.format("/squelch /rg on"),
+                    string.format("/rg on"),
                 }
             end,
             camp = function()
                 return {
-                    string.format("/squelch /rg camphere"),
-                    string.format("/squelch /rg on"),
+                    string.format("/rg camphere"),
+                    string.format("/rg on"),
                 }
             end,
             uncamp = function()
                 return {
-                    string.format("/squelch /rg campoff"),
-                    string.format("/squelch /rg off"),
+                    string.format("/rg campoff"),
+                    string.format("/rg off"),
                 }
             end,
         },
         [4] = {
             start = function()
                 return {
-                    string.format("/squelch /mac kissassist %s", mq.TLO.Me.DisplayName()),
-                    string.format("/squelch /maxzrange 100"),
+                    string.format("/mac kissassist %s", mq.TLO.Me.DisplayName()),
+                    string.format("/maxzrange 100"),
                 }
             end,
             pause = function()
                 return {
-                    string.format("/squelch /mqp on"),
+                    string.format("/mqp on"),
                 }
             end,
             unpause = function()
                 return {
-                    string.format("/squelch /mqp off"),
+                    string.format("/mqp off"),
                 }
             end,
             camp = function()
                 return {
-                    string.format("/squelch /camphere on"),
-                    string.format("/squelch /mqp off"),
+                    string.format("/camphere on"),
+                    string.format("/mqp off"),
                 }
             end,
             uncamp = function()
                 return {
-                    string.format("/squelch /camphere off"),
-                    string.format("/squelch /mqp on"),
+                    string.format("/camphere off"),
+                    string.format("/mqp on"),
                 }
             end,
         },
         [5] = {
             start = function()
                 return {
-                    string.format("/squelch /mac muleassist %s", mq.TLO.Me.DisplayName()),
-                    string.format("/squelch /maxzrange 100"),
+                    string.format("/mac muleassist %s", mq.TLO.Me.DisplayName()),
+                    string.format("/maxzrange 100"),
                 }
             end,
             pause = function()
                 return {
-                    string.format("/squelch /mqp on"),
+                    string.format("/mqp on"),
                 }
             end,
             unpause = function()
                 return {
-                    string.format("/squelch /mqp off"),
+                    string.format("/mqp off"),
                 }
             end,
             camp = function()
                 return {
-                    string.format("/squelch /camphere on"),
-                    string.format("/squelch /mqp off"),
+                    string.format("/camphere on"),
+                    string.format("/mqp off"),
                 }
             end,
             uncamp = function()
                 return {
-                    string.format("/squelch /camphere off"),
-                    string.format("/squelch /mqp on"),
+                    string.format("/camphere off"),
+                    string.format("/mqp on"),
                 }
             end,
         },
@@ -188,153 +188,153 @@ function manage.doAutomation(character, class, script, action, char_settings)
         [1] = {
             start = function()
                 return {
-                    string.format('/dex %s /squelch /%s mode 2 nosave', character, class),
+                    string.format('/dex %s /%s mode 2 nosave', character, class),
                 }
             end,
             pause = function()
                 return {
-                    string.format('/dex %s /squelch /%s pause on nosave', character, class),
+                    string.format('/dex %s /%s pause on nosave', character, class),
                 }
             end,
             unpause = function()
                 return {
-                    string.format('/dex %s /squelch /%s pause off nosave', character, class),
+                    string.format('/dex %s /%s pause off nosave', character, class),
                 }
             end,
             camp = function()
                 return {
-                    string.format('/dex %s /squelch /%s resetcamp nosave', character, class),
-                    string.format('/dex %s /squelch /%s mode 1 nosave', character, class),
-                    string.format('/dex %s /squelch /%s pause off nosave', character, class),
+                    string.format('/dex %s /%s resetcamp nosave', character, class),
+                    string.format('/dex %s /%s mode 1 nosave', character, class),
+                    string.format('/dex %s /%s pause off nosave', character, class),
                 }
             end,
             uncamp = function()
                 return {
-                    string.format('/dex %s /squelch /%s mode 2 nosave', character, class),
-                    string.format('/dex %s /squelch /%s pause on nosave', character, class),
+                    string.format('/dex %s /%s mode 2 nosave', character, class),
+                    string.format('/dex %s /%s pause on nosave', character, class),
                 }
             end,
         },
         [2] = {
             start = function()
                 return {
-                    string.format("/dex %s /squelch /lua run rgmercs", character),
-                    string.format('/dex %s /squelch /rgl chaseon %s', character, mq.TLO.Me.CleanName()),
+                    string.format("/dex %s /lua run rgmercs", character),
+                    string.format('/dex %s /rgl chaseon %s', character, mq.TLO.Me.CleanName()),
                 }
             end,
             pause = function()
                 return {
-                    string.format("/dex %s /squelch /rgl pause", character),
+                    string.format("/dex %s /rgl pause", character),
                 }
             end,
             unpause = function()
                 return {
-                    string.format("/dex %s /squelch /rgl unpause", character),
+                    string.format("/dex %s /rgl unpause", character),
                 }
             end,
             camp = function()
                 return {
-                    string.format('/dex %s /squelch /rgl chaseon %s', character, mq.TLO.Me.CleanName()),
-                    string.format("/dex %s /squelch /rgl pause", character),
+                    string.format('/dex %s /rgl chaseon %s', character, mq.TLO.Me.CleanName()),
+                    string.format("/dex %s /rgl pause", character),
                 }
             end,
             uncamp = function()
                 return {
-                    string.format('/dex %s /squelch /rgl chaseon %s', character, mq.TLO.Me.CleanName()),
-                    string.format("/dex %s /squelch /rgl pause", character),
+                    string.format('/dex %s /rgl chaseon %s', character, mq.TLO.Me.CleanName()),
+                    string.format("/dex %s /rgl pause", character),
                 }
             end,
         },
         [3] = {
             start = function()
                 return {
-                    string.format("/dex %s /squelch /mac rgmercs", character),
-                    string.format('/dex %s /squelch /rg chaseon %s', character, mq.TLO.Me.DisplayName()),
+                    string.format("/dex %s /mac rgmercs", character),
+                    string.format('/dex %s /rg chaseon %s', character, mq.TLO.Me.DisplayName()),
                 }
             end,
             pause = function()
                 return {
-                    string.format("/dex %s /squelch /rg off", character),
+                    string.format("/dex %s /rg off", character),
                 }
             end,
             unpause = function()
                 return {
-                    string.format("/dex %s /squelch /rg on", character),
+                    string.format("/dex %s /rg on", character),
                 }
             end,
             camp = function()
                 return {
-                    string.format("/dex %s /squelch /rg camphere", character),
-                    string.format('/dex %s /squelch /rg on', character),
+                    string.format("/dex %s /rg camphere", character),
+                    string.format('/dex %s /rg on', character),
                 }
             end,
             uncamp = function()
                 return {
-                    string.format("/dex %s /squelch /rg camphere", character),
-                    string.format('/dex %s /squelch /rg chaseon %s', character, mq.TLO.Me.DisplayName()),
-                    string.format("/dex %s /squelch /rg off", character),
+                    string.format("/dex %s /rg camphere", character),
+                    string.format('/dex %s /rg chaseon %s', character, mq.TLO.Me.DisplayName()),
+                    string.format("/dex %s /rg off", character),
                 }
             end,
         },
         [4] = {
             start = function()
                 return {
-                    string.format("/dex %s /squelch /mac kissassist %s", character, mq.TLO.Me.DisplayName()),
-                    string.format("/dex %s /squelch /chase on %s", character, mq.TLO.Me.DisplayName()),
+                    string.format("/dex %s /mac kissassist %s", character, mq.TLO.Me.DisplayName()),
+                    string.format("/dex %s /chase on %s", character, mq.TLO.Me.DisplayName()),
                 }
             end,
             pause = function()
                 return {
-                    string.format("/dex %s /squelch /mqp on", character),
+                    string.format("/dex %s /mqp on", character),
                 }
             end,
             unpause = function()
                 return {
-                    string.format("/dex %s /squelch /mqp off", character),
+                    string.format("/dex %s /mqp off", character),
                 }
             end,
             camp = function()
                 return {
-                    string.format("/dex %s /squelch /mqp off", character),
-                    string.format("/dex %s /squelch /camphere on", character),
+                    string.format("/dex %s /mqp off", character),
+                    string.format("/dex %s /camphere on", character),
                 }
             end,
             uncamp = function()
                 return {
-                    string.format("/dex %s /squelch /camphere off", character),
-                    string.format("/dex %s /squelch /chaseon", character),
-                    string.format("/dex %s /squelch /mqp on", character),
+                    string.format("/dex %s /camphere off", character),
+                    string.format("/dex %s /chaseon", character),
+                    string.format("/dex %s /mqp on", character),
                 }
             end,
         },
         [5] = {
             start = function()
                 return {
-                    string.format("/dex %s /squelch /mac muleassist %s", character, mq.TLO.Me.DisplayName()),
-                    string.format("/dex %s /squelch /chase on %s", character, mq.TLO.Me.DisplayName()),
+                    string.format("/dex %s /mac muleassist %s", character, mq.TLO.Me.DisplayName()),
+                    string.format("/dex %s /chase on %s", character, mq.TLO.Me.DisplayName()),
                 }
             end,
             pause = function()
                 return {
-                    string.format("/dex %s /squelch /mqp on", character),
+                    string.format("/dex %s /mqp on", character),
                 }
             end,
             unpause = function()
                 return {
-                    string.format("/dex %s /squelch /mqp off", character),
+                    string.format("/dex %s /mqp off", character),
                 }
             end,
             camp = function()
                 return {
-                    string.format("/dex %s /squelch /mqp off", character),
-                    string.format("/dex %s /squelch /camphere on", character),
+                    string.format("/dex %s /mqp off", character),
+                    string.format("/dex %s /camphere on", character),
                 }
             end,
             uncamp = function()
                 return {
-                    string.format("/dex %s /squelch /camphere off", character),
-                    string.format("/dex %s /squelch /chaseon", character),
-                    string.format("/dex %s /squelch /mqp on", character),
+                    string.format("/dex %s /camphere off", character),
+                    string.format("/dex %s /chaseon", character),
+                    string.format("/dex %s /mqp on", character),
                 }
             end,
         },
@@ -378,7 +378,7 @@ function manage.groupTalk(item, choice, name)
     elseif choice == 2 then
         for i = 1, group.Members() do
             if group.Member(i).DisplayName() ~= me.DisplayName() then
-                mq.cmdf("/dex %s /squelch /target id %s", group.Member(i).DisplayName(), mq.TLO.Spawn(item.npc).ID())
+                mq.cmdf("/dex %s /target id %s", group.Member(i).DisplayName(), mq.TLO.Spawn(item.npc).ID())
                 mq.delay(300)
                 mq.cmdf("/dex %s /say %s", group.Member(i).DisplayName(), item.phrase)
             end
@@ -396,7 +396,7 @@ function manage.groupTalk(item, choice, name)
         mq.cmdf("/say %s", item.phrase)
         mq.delay(750)
     else
-        mq.cmdf("/dex %s /squelch /target id %s", name, mq.TLO.Spawn(item.npc).ID())
+        mq.cmdf("/dex %s /target id %s", name, mq.TLO.Spawn(item.npc).ID())
         mq.delay(300)
         mq.cmdf("/dex %s /say %s", name, item.phrase)
         math.randomseed(os.time())
@@ -415,23 +415,23 @@ function manage.openDoorAll(item, choice, name)
     logger.log_info("\aoHaving group click door.")
     if choice == 1 then
         mq.delay(200)
-        mq.cmd("/squelch /doortarget")
+        mq.cmd("/doortarget")
         mq.delay(200)
-        mq.cmd("/squelch /click left door")
+        mq.cmd("/click left door")
         mq.delay(1000)
     elseif choice == 2 then
         mq.delay(200)
-        mq.cmd("/dgga /squelch /doortarget")
+        mq.cmd("/dgga /doortarget")
         mq.delay(200)
-        mq.cmd("/dgga /squelch /click left door")
+        mq.cmd("/dgga /click left door")
         mq.delay(1000)
     else
         mq.delay(200)
-        mq.cmd("/squelch /doortarget")
-        mq.cmdf("/dex %s /squelch /doortarget", name)
+        mq.cmd("/doortarget")
+        mq.cmdf("/dex %s /doortarget", name)
         mq.delay(200)
-        mq.cmdf("/dex %s /squelch /click left door", name)
-        mq.cmd("/squelch /click left door")
+        mq.cmdf("/dex %s /click left door", name)
+        mq.cmd("/click left door")
         mq.delay(100)
     end
 end
@@ -456,17 +456,17 @@ end
 function manage.picklockGroup(item, choice, name)
     _G.State:setStatusText("Lockpicking door.")
     logger.log_info("\aoLockpicking door.")
-    mq.cmd("/squelch /doortarget")
+    mq.cmd("/doortarget")
     if choice == 1 then
         if me.Class.ShortName() == 'BRD' or me.Class.ShortName() == 'ROG' then
             logger.log_verbose("\aoI am able to pick locks, doing so now.")
-            mq.cmd("/squelch /itemnotify lockpicks leftmouseup")
+            mq.cmd("/itemnotify lockpicks leftmouseup")
             mq.delay(200)
-            mq.cmd("/squelch /doortarget")
+            mq.cmd("/doortarget")
             mq.delay(200)
-            mq.cmd("/squelch /click left door")
+            mq.cmd("/click left door")
             mq.delay(200)
-            mq.cmd("/squelch /autoinv")
+            mq.cmd("/autoinv")
         else
             logger.log_error("\aoI am not a class that is able to pick locks. Stopping script at step \ar%s \ao.", _G.State.current_step)
             _G.State:setStatusText(string.format("I require a lockpicker to proceed. (%s).", _G.State.current_step))
@@ -478,25 +478,25 @@ function manage.picklockGroup(item, choice, name)
         local pickerFound = false
         if me.Class.ShortName() == 'BRD' or me.Class.ShortName() == 'ROG' then
             logger.log_verbose("\aoI am able to pick locks, doing so now.")
-            mq.cmd("/squelch /itemnotify lockpicks leftmouseup")
+            mq.cmd("/itemnotify lockpicks leftmouseup")
             mq.delay(200)
-            mq.cmd("/squelch /doortarget")
+            mq.cmd("/doortarget")
             mq.delay(200)
-            mq.cmd("/squelch /click left door")
+            mq.cmd("/click left door")
             mq.delay(200)
-            mq.cmd("/squelch /autoinv")
+            mq.cmd("/autoinv")
             pickerFound = true
         else
             for i = 1, group.Members() do
                 if group.Member(i).Class.ShortName() == 'BRD' or group.Member(i).Class.ShortName() == 'ROG' then
                     logger.log_verbose("\ag%s \aois able to pick locks. Having them do so.", group.Member(i).DisplayName())
-                    mq.cmdf("/dex %s /squelch /itemnotify lockpicks leftmouseup", group.Member(i).DisplayName())
+                    mq.cmdf("/dex %s /itemnotify lockpicks leftmouseup", group.Member(i).DisplayName())
                     mq.delay(200)
-                    mq.cmdf("/dex %s /squelch /doortarget", group.Member(i).DisplayName())
+                    mq.cmdf("/dex %s /doortarget", group.Member(i).DisplayName())
                     mq.delay(200)
-                    mq.cmdf("/dex %s /squelch /click left door", group.Member(i).DisplayName())
+                    mq.cmdf("/dex %s /click left door", group.Member(i).DisplayName())
                     mq.delay(200)
-                    mq.cmdf("/dex %s /squelch /autoinv", group.Member(i).DisplayName())
+                    mq.cmdf("/dex %s /autoinv", group.Member(i).DisplayName())
                     pickerFound = true
                     break
                 end
@@ -512,22 +512,22 @@ function manage.picklockGroup(item, choice, name)
     else
         if group.Member(name).Class.ShortName() == 'BRD' or group.Member(name).Class.ShortName() == 'ROG' then
             logger.log_verbose("\ag%s \aois able to pick locks. Having them do so.", group.Member(name).DisplayName())
-            mq.cmdf("/dex %s /squelch /itemnotify lockpicks leftmouseup", name)
+            mq.cmdf("/dex %s /itemnotify lockpicks leftmouseup", name)
             mq.delay(200)
-            mq.cmdf("/dex %s /squelch /doortarget", name)
+            mq.cmdf("/dex %s /doortarget", name)
             mq.delay(200)
-            mq.cmdf("/dex %s /squelch /click left door", name)
+            mq.cmdf("/dex %s /click left door", name)
             mq.delay(200)
-            mq.cmdf("/dex %s /squelch /autoinv", name)
+            mq.cmdf("/dex %s /autoinv", name)
         elseif mq.TLO.Me.Class.ShortName() == 'BRD' or mq.TLO.Me.Class.ShortName() == 'ROG' then
             logger.log_verbose("\aoI am able to pick locks, doing so now.")
-            mq.cmd("/squelch /itemnotify lockpicks leftmouseup")
+            mq.cmd("/itemnotify lockpicks leftmouseup")
             mq.delay(200)
-            mq.cmd("/squelch /doortarget")
+            mq.cmd("/doortarget")
             mq.delay(200)
-            mq.cmd("/squelch /click left door")
+            mq.cmd("/click left door")
             mq.delay(200)
-            mq.cmd("/squelch /autoinv")
+            mq.cmd("/autoinv")
         else
             _G.State:setStatusText(string.format("I require a lockpicker to proceed. (%s).", _G.State.current_step))
             logger.log_error("\aoI am not a class that is able to pick locks, nor is \ag%s\ao. Stopping script at step \ar%s \ao.", group.Member(name).DisplayName(),
@@ -557,12 +557,12 @@ function manage.removeInvis(item)
     if me.Invis() then
         logger.log_info("\aoRemoving invisibility.")
         if choice == 1 then
-            mq.cmd("/squelch /makemevis")
+            mq.cmd("/makemevis")
         elseif choice == 2 then
-            mq.cmd("/dgga /squelch /makemevis")
+            mq.cmd("/dgga /makemevis")
         else
-            mq.cmdf("/squelch /makemevis")
-            mq.cmdf("/dex %s /squelch /makemevis", name)
+            mq.cmdf("/makemevis")
+            mq.cmdf("/dex %s /makemevis", name)
         end
     end
     _G.State:setStatusText(temp)
@@ -573,41 +573,41 @@ function manage.removeLev()
     _G.State:setStatusText("Removing levitate.")
     logger.log_info("\aoRemoving levitate.")
     if choice == 1 then
-        mq.cmd("/squelch /removelev")
+        mq.cmd("/removelev")
     elseif choice == 2 then
-        mq.cmd("/dgga /squelch /removelev")
+        mq.cmd("/dgga /removelev")
     else
-        mq.cmdf("/squelch /removelev")
-        mq.cmdf("/dex %s /squelch /removelev", name)
+        mq.cmdf("/removelev")
+        mq.cmdf("/dex %s /removelev", name)
     end
 end
 
 function manage.sendYes(item, choice, name)
     logger.log_info("\aoGive me a yes!")
     if choice == 1 then
-        mq.cmd("/squelch /yes")
+        mq.cmd("/yes")
     elseif choice == 2 then
-        mq.cmd("/dgga /squelch /yes")
+        mq.cmd("/dgga /yes")
     else
-        mq.cmdf("/squelch /yes")
-        mq.cmdf("/dex %s /squelch /yes", name)
+        mq.cmdf("/yes")
+        mq.cmdf("/dex %s /yes", name)
     end
 end
 
 function manage.setRadius(character, class, script, radius, zradius, char_settings)
     logger.log_verbose("\aoSetting radius to \ag%s\ao.", radius)
     if script == 1 then
-        mq.cmdf('/squelch /%s pullradius %s nosave', class, radius)
-        mq.cmdf('/squelch /%s zradius %s nosave', class, zradius)
+        mq.cmdf('/%s pullradius %s nosave', class, radius)
+        mq.cmdf('/%s zradius %s nosave', class, zradius)
     elseif script == 2 then
-        mq.cmdf("/squelch /rgl set pullradiushunt %s", radius)
-        mq.cmdf("/squelch /rgl set pullzradius %s", zradius)
+        mq.cmdf("/rgl set pullradiushunt %s", radius)
+        mq.cmdf("/rgl set pullzradius %s", zradius)
     elseif script == 3 then
-        mq.cmd("/squelch /rg pullrad %s", radius)
+        mq.cmd("/rg pullrad %s", radius)
     elseif script == 4 then
-        mq.cmd("/squelch /maxradius %s", radius)
+        mq.cmd("/maxradius %s", radius)
     elseif script == 5 then
-        mq.cmd("/squelch /maxradius %s", radius)
+        mq.cmd("/maxradius %s", radius)
     end
 end
 
@@ -616,8 +616,8 @@ function manage.startGroup(class_settings, char_settings)
     logger.log_verbose("\aoStarting class automation for group and setting group roles.")
     if me.Grouped() == true and group.Leader() == me.DisplayName() then
         logger.log_super_verbose("\aoSetting self to MA and MT.")
-        mq.cmdf("/squelch /grouprole set %s 1", mq.TLO.Me.DisplayName())
-        mq.cmdf("/squelch /grouprole set %s 2", mq.TLO.Me.DisplayName())
+        mq.cmdf("/grouprole set %s 1", mq.TLO.Me.DisplayName())
+        mq.cmdf("/grouprole set %s 2", mq.TLO.Me.DisplayName())
     end
     manage.doAutomation(me.DisplayName(), me.Class.ShortName(), class_settings.class[me.Class.Name()], 'start', char_settings)
     if choice == 1 then

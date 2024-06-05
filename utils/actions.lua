@@ -82,7 +82,7 @@ function actions.cast_alt(item)
     _G.State:setStatusText(string.format("Casting %s", item.what))
     local ID = mq.TLO.Me.AltAbility(item.what)()
     logger.log_info('\aoCasting alternate ability: %s (%s)', item.what, ID)
-    mq.cmdf('/squelch /alt act %s', ID)
+    mq.cmdf('/alt act %s', ID)
     mq.delay(200)
     while mq.TLO.Me.Casting() ~= nil and mq.TLO.Me.Class() ~= "Bard" do
         mq.delay(100)
@@ -277,12 +277,12 @@ function actions.farm_radius(item, class_settings, char_settings, event)
                     for i = 1, mq.TLO.AdvLoot.SCount() do
                         for _, name in pairs(item_list) do
                             if mq.TLO.AdvLoot.SList(i).Name() == name then
-                                mq.cmdf('/squelch /advloot shared %s giveto %s', i, mq.TLO.Me.DisplayName())
+                                mq.cmdf('/advloot shared %s giveto %s', i, mq.TLO.Me.DisplayName())
                                 logger.log_info("\aoLooting: \ag%s", name)
                             end
                             if item.secondary_loot ~= nil then
                                 if mq.TLO.AdvLoot.SList(i).Name() == item.secondary_loot then
-                                    mq.cmdf('/squelch /advloot shared %s giveto %s', i, mq.TLO.Me.DisplayName())
+                                    mq.cmdf('/advloot shared %s giveto %s', i, mq.TLO.Me.DisplayName())
                                     logger.log_info("\aoLooting: \ag%s", item.secondary_loot)
                                 end
                             end
@@ -294,12 +294,12 @@ function actions.farm_radius(item, class_settings, char_settings, event)
                     for i = 1, mq.TLO.AdvLoot.PCount() do
                         for _, name in pairs(item_list) do
                             if mq.TLO.AdvLoot.PList(i).Name() == name then
-                                mq.cmdf('/squelch /advloot personal %s loot', i)
+                                mq.cmdf('/advloot personal %s loot', i)
                                 logger.log_info("\aoLooting: \ag%s", name)
                             end
                             if item.secondary_loot ~= nil then
                                 if mq.TLO.AdvLoot.SList(i).Name() == item.secondary_loot then
-                                    mq.cmdf('/squelch /advloot shared %s giveto %s', i, mq.TLO.Me.DisplayName())
+                                    mq.cmdf('/advloot shared %s giveto %s', i, mq.TLO.Me.DisplayName())
                                     logger.log_info("\aoLooting: \ag%s", item.secondary_loot)
                                 end
                             end
@@ -330,7 +330,7 @@ function actions.farm_radius(item, class_settings, char_settings, event)
                 if mq.TLO.AdvLoot.SCount() > 0 then
                     for i = 1, mq.TLO.AdvLoot.SCount() do
                         if mq.TLO.AdvLoot.SList(i).Name() == item.what then
-                            mq.cmdf('/squelch /advloot shared %s giveto %s', i, mq.TLO.Me.DisplayName())
+                            mq.cmdf('/advloot shared %s giveto %s', i, mq.TLO.Me.DisplayName())
                             logger.log_info("\aoLooting: \ag%s", item.what)
                         end
                     end
@@ -339,7 +339,7 @@ function actions.farm_radius(item, class_settings, char_settings, event)
                     for i = 1, mq.TLO.AdvLoot.PCount() do
                         for _, name in pairs(item_list) do
                             if mq.TLO.AdvLoot.PList(i).Name() == name then
-                                mq.cmdf('/squelch /advloot personal %s loot', i)
+                                mq.cmdf('/advloot personal %s loot', i)
                                 logger.log_info("\aoLooting: \ag%s", item.what)
                             end
                         end
@@ -478,7 +478,7 @@ function actions.fish_farm(item, class_settings, char_settings, once)
             if mq.TLO.Cursor() ~= nil then
                 for i, name in pairs(fishing_trash) do
                     if mq.TLO.Cursor.Name() == name then
-                        mq.cmd('/squelch /destroy')
+                        mq.cmd('/destroy')
                         mq.delay(200)
                     end
                 end
@@ -497,7 +497,7 @@ function actions.fish_farm(item, class_settings, char_settings, once)
                     end
                 end
                 did_once = true
-                mq.cmd('/squelch /doability Fishing')
+                mq.cmd('/doability Fishing')
                 logger.log_verbose("\aoCasting line.")
                 mq.delay(500)
             end
@@ -563,7 +563,7 @@ function actions.forage_farm(item, class_settings, char_settings)
                 looping = false
             end
             if mq.TLO.Me.AbilityReady('Forage')() then
-                mq.cmd('/squelch /doability Forage')
+                mq.cmd('/doability Forage')
                 while mq.TLO.Me.AbilityReady('Forage')() do
                     mq.delay(200)
                 end
@@ -571,7 +571,7 @@ function actions.forage_farm(item, class_settings, char_settings)
                 for i, name in pairs(forage_trash) do
                     if mq.TLO.Cursor.Name() == name then
                         logger.log_verbose("\aoForage trash \ar%s\ao found on cursor. Destroying.", name)
-                        mq.cmd('/squelch /destroy')
+                        mq.cmd('/destroy')
                         mq.delay(200)
                     end
                 end
@@ -600,7 +600,7 @@ function actions.forage_farm(item, class_settings, char_settings)
             _G.State:setStatusText(string.format("Foraging for %s (%s/%s).", item.what, mq.TLO.FindItemCount("=" .. item.what)(), (item.count)))
             if mq.TLO.Me.AbilityReady('Forage')() then
                 logger.log_info("\aoForaging for \ag%s\ao (\ag%s\ao/\ag%s\ao).", item.what, mq.TLO.FindItemCount("=" .. item.what)(), (item.count))
-                mq.cmd('/squelch /doability Forage')
+                mq.cmd('/doability Forage')
                 while mq.TLO.Me.AbilityReady('Forage')() do
                     mq.delay(200)
                 end
@@ -628,7 +628,7 @@ function actions.forage_cursor_check(item)
         for i, name in pairs(forage_trash) do
             if mq.TLO.Cursor.Name() == name then
                 logger.log_verbose("\aoForage trash \ar%s\ao found on cursor. Destroying.", name)
-                mq.cmd('/squelch /destroy')
+                mq.cmd('/destroy')
                 mq.delay(200)
                 return
             end
@@ -645,9 +645,9 @@ function actions.ground_spawn(item, class_settings, char_settings)
     _G.State:setStatusText(string.format("Traveling to ground spawn @ %s %s %s.", item.whereX, item.whereY, item.whereZ))
     travel.loc_travel(item, class_settings, char_settings, _G.State:readGroupSelection())
     _G.State:setStatusText(string.format("Picking up ground spawn %s.", item.what))
-    mq.cmd("/squelch /itemtarget")
+    mq.cmd("/itemtarget")
     mq.delay(200)
-    mq.cmd("/squelch /click left itemtarget")
+    mq.cmd("/click left itemtarget")
     logger.log_info("\aoPicking up \ag%s\ao.", item.what)
     while mq.TLO.Cursor.Name() ~= item.what do
         if _G.State.should_skip == true then
@@ -655,9 +655,9 @@ function actions.ground_spawn(item, class_settings, char_settings)
             return
         end
         mq.delay(200)
-        mq.cmd("/squelch /itemtarget")
+        mq.cmd("/itemtarget")
         mq.delay(200)
-        mq.cmd("/squelch /click left itemtarget")
+        mq.cmd("/click left itemtarget")
     end
     inv.auto_inv()
 end
@@ -704,7 +704,7 @@ function actions.ground_spawn_farm(item, class_settings, char_settings)
         if loop_check then
             looping = false
         end
-        mq.cmdf('/squelch /itemtarget "%s"', item.npc)
+        mq.cmdf('/itemtarget "%s"', item.npc)
         mq.delay(50)
         if mq.TLO.ItemTarget() ~= nil then
             item.whereX = mq.TLO.ItemTarget.X()
@@ -715,12 +715,12 @@ function actions.ground_spawn_farm(item, class_settings, char_settings)
             item.whereZ = item.whereZ / 100
             travel.loc_travel(item, class_settings, char_settings, _G.State:readGroupSelection())
             mq.delay(200)
-            mq.cmd("/squelch /click left itemtarget")
+            mq.cmd("/click left itemtarget")
             mq.delay(200)
             if mq.TLO.Cursor() ~= nil then
                 logger.log_debug("\aoWe have picked up a \ag%s\ao.", mq.TLO.Cursor())
             end
-            mq.cmd("/squelch /autoinv")
+            mq.cmd("/autoinv")
         end
     end
 end
@@ -744,34 +744,34 @@ end
 function actions.ignore_mob(item, class_settings)
     logger.log_verbose("\aoAdding \ag%s\ao to mob ignore list.", item.npc)
     if class_settings.class[mq.TLO.Me.Class()] == 1 then
-        mq.cmdf('/squelch /%s ignore "%s"', mq.TLO.Me.Class.ShortName(), item.npc)
+        mq.cmdf('/%s ignore "%s"', mq.TLO.Me.Class.ShortName(), item.npc)
     elseif class_settings.class[mq.TLO.Me.Class()] == 2 then
-        mq.cmdf('/squelch /rgl pulldeny "%s"', item.npc)
+        mq.cmdf('/rgl pulldeny "%s"', item.npc)
     elseif class_settings.class[mq.TLO.Me.Class()] == 3 then
         mq.TLO.Spawn('npc ' .. item.npc).DoTarget()
         mq.delay(200)
-        mq.cmd('/squelch /addignore')
+        mq.cmd('/addignore')
     elseif class_settings.class[mq.TLO.Me.Class()] == 4 then
-        mq.cmdf('/squelch /addignore "%s"', item.npc)
+        mq.cmdf('/addignore "%s"', item.npc)
     elseif class_settings.class[mq.TLO.Me.Class()] == 5 then
-        mq.cmdf('/squelch /addignore "%s"', item.npc)
+        mq.cmdf('/addignore "%s"', item.npc)
     end
 end
 
 function actions.unignore_mob(item, class_settings)
     logger.log_verbose("\aoRemoving \ag%s\ao from mob ignore list.", item.npc)
     if class_settings.class[mq.TLO.Me.Class()] == 1 then
-        mq.cmdf('/squelch /%s unignore "%s"', mq.TLO.Me.Class.ShortName(), item.npc)
+        mq.cmdf('/%s unignore "%s"', mq.TLO.Me.Class.ShortName(), item.npc)
     elseif class_settings.class[mq.TLO.Me.Class()] == 2 then
-        mq.cmdf('/squelch /rgl pulldenyrm "%s"', item.npc)
+        mq.cmdf('/rgl pulldenyrm "%s"', item.npc)
     elseif class_settings.class[mq.TLO.Me.Class()] == 3 then
         mq.TLO.Spawn('npc ' .. item.npc).DoTarget()
         mq.delay(200)
-        mq.cmd('/squelch /clearignore')
+        mq.cmd('/clearignore')
         --[[elseif class_settings.class[mq.TLO.Me.Class()] == 4 then
-        mq.cmdf('/squelch /addignore "%s"', item.npc)
+        mq.cmdf('/addignore "%s"', item.npc)
     elseif class_settings.class[mq.TLO.Me.Class()] == 5 then
-        mq.cmdf('/squelch /addignore "%s"', item.npc)--]]
+        mq.cmdf('/addignore "%s"', item.npc)--]]
     end
 end
 
@@ -822,7 +822,7 @@ function actions.npc_give(item, class_settings, char_settings)
             mq.cmd('/foreground')
             return
         end
-        mq.cmdf('/squelch /nomodkey /shift /itemnotify #%s leftmouseup', item.itemID)
+        mq.cmdf('/nomodkey /shift /itemnotify #%s leftmouseup', item.itemID)
         mq.delay("5s", actions.got_cursor)
         mq.TLO.Target.LeftClick()
         mq.delay("10s", actions.give_window)
@@ -834,7 +834,7 @@ function actions.npc_give(item, class_settings, char_settings)
             mq.cmd('/foreground')
             return
         end
-        mq.cmdf('/squelch /nomodkey /shift /itemnotify "%s" leftmouseup', item.what)
+        mq.cmdf('/nomodkey /shift /itemnotify "%s" leftmouseup', item.what)
         mq.delay("5s", actions.got_cursor)
         mq.TLO.Target.LeftClick()
         mq.delay("10s", actions.give_window)
@@ -893,7 +893,7 @@ function actions.npc_give_add(item, class_settings, char_settings)
         mq.TLO.Spawn(item.npc).DoTarget()
         mq.delay(300)
     end
-    mq.cmdf('/squelch /ctrl /itemnotify "%s" leftmouseup', item.what)
+    mq.cmdf('/ctrl /itemnotify "%s" leftmouseup', item.what)
     mq.delay("2s", actions.got_cursor)
     mq.TLO.Target.LeftClick()
     mq.delay("5s", actions.give_window)
@@ -987,7 +987,7 @@ function actions.npc_hail(item, class_settings, char_settings)
         mq.TLO.Spawn(item.npc).DoTarget()
         mq.delay(300)
     end
-    mq.cmd("/squelch /keypress HAIL")
+    mq.cmd("/keypress HAIL")
     mq.delay(300)
 end
 
@@ -1073,7 +1073,7 @@ function actions.pickpocket(item)
             return
         end
         if mq.TLO.Me.AbilityReady('Pick Pockets')() then
-            mq.cmd('/squelch /doability Pick Pockets')
+            mq.cmd('/doability Pick Pockets')
             mq.delay(500)
             if mq.TLO.Cursor.Name() == item.what then
                 logger.log_info("\aoSuccessfully pickpocketed \ag%s\ao.", item.what)
@@ -1138,7 +1138,7 @@ function actions.sneak(item)
         while mq.TLO.Me.Sneaking() == false do
             mq.delay(100)
             if mq.TLO.Me.AbilityReady('Sneak')() == true then
-                mq.cmd("/squelch /doability sneak")
+                mq.cmd("/doability sneak")
             end
         end
     end

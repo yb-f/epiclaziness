@@ -30,10 +30,10 @@ function mob.backstab(item, class_settings, char_settings)
     logger.log_verbose("\aoTargeting \ar%s\ao.", item.npc)
     mq.TLO.Spawn(item.npc).DoTarget()
     mq.delay(300)
-    mq.cmd('/squelch /stick behind')
+    mq.cmd('/stick behind')
     mq.delay("2s")
     logger.log_super_verbose("\aoPerforming backstab.")
-    mq.cmd('/squelch /doability backstab')
+    mq.cmd('/doability backstab')
     mq.delay(500)
 end
 
@@ -125,6 +125,7 @@ function mob.clearXtarget(class_settings, char_settings)
         end
     end
     while looping do
+        local skip_count = 0
         mq.delay(200)
         i = i + 1
         loopCount = loopCount + 1
@@ -133,12 +134,14 @@ function mob.clearXtarget(class_settings, char_settings)
                 for _, mob in pairs(ignore_list) do
                     if mq.TLO.Me.XTarget(i)() == mob then
                         logger.log_info("\aoIgnore mob on xtarget check.")
+                        skip_count = skip_count + 1
                         should_skip = true
                     end
                 end
             else
                 if mq.TLO.Me.XTarget(i)() == ignore_mob then
                     logger.log_info("\aoIgnore mob on xtarget check.")
+                    skip_count = skip_count + 1
                     should_skip = true
                 end
             end
@@ -154,9 +157,9 @@ function mob.clearXtarget(class_settings, char_settings)
                             _G.State:setStatusText(string.format("Clearing XTarget %s: %s (%s).", i, mq.TLO.Me.XTarget(i)(), ID))
                             logger.log_info("\aoClearing XTarget \ag%s \ao: \ag%s \ao(\ag%s\ao).", i, mq.TLO.Me.XTarget(i)(), ID)
                             manage.unpauseGroup(class_settings)
-                            mq.cmd("/squelch /stick")
+                            mq.cmd("/stick")
                             mq.delay(100)
-                            mq.cmd("/squelch /attack on")
+                            mq.cmd("/attack on")
                             while mq.TLO.Spawn(ID).Type() == 'NPC' do
                                 local breakout = true
                                 for j = 1, max_xtargs do
@@ -170,7 +173,7 @@ function mob.clearXtarget(class_settings, char_settings)
                                 end
                                 if mq.TLO.Me.Combat() == false then
                                     logger.log_super_verbose("\aoAttack was off when it should have been on. Turning it back on.")
-                                    mq.cmd("/squelch /attack on")
+                                    mq.cmd("/attack on")
                                 end
                                 mq.delay(200)
                             end
@@ -194,11 +197,16 @@ function mob.clearXtarget(class_settings, char_settings)
             looping = false
         end
         local continueLoop = false
+        local target_count = 0
         for j = 1, max_xtargs do
             if mq.TLO.Me.XTarget(j).TargetType() == 'Auto Hater' and mq.TLO.Me.XTarget(j)() ~= '' then
+                target_count = target_count + 1
                 continueLoop = true
             else
             end
+        end
+        if skip_count >= target_count then
+            continueLoop = false
         end
         if continueLoop == false then
             looping = false
@@ -207,7 +215,7 @@ function mob.clearXtarget(class_settings, char_settings)
     manage.pauseGroup(class_settings)
     logger.log_info("\aoAll auto hater targets cleared from XTarget list.")
     if mq.TLO.Stick.Active() == true then
-        mq.cmd('/squelch /stick off')
+        mq.cmd('/stick off')
     end
     _G.State:setStatusText(temp)
 end
@@ -422,7 +430,11 @@ function mob.pre_damage_until(item, class_settings, char_settings)
         _G.State:setStatusText(string.format("Level is higher than %s. Preparing low damage skill (%s).", item.maxlevel, item.what))
         mq.cmdf('/mem "%s" 1', item.what)
         while mq.TLO.Me.Gem(item.what)() ~= 1 do
+            if mob.xtargetCheck(char_settings) then
+                mob.clearXtarget(class_settings, char_settings)
+            end
             mq.delay(100)
+            mq.cmdf('/mem "%s" 1', item.what)
         end
     end
 end
@@ -447,9 +459,9 @@ function mob.npc_damage_until(item, class_settings, char_settings)
         end
     end
     mq.TLO.Spawn(ID).DoTarget()
-    mq.cmd("/squelch /stick")
+    mq.cmd("/stick")
     mq.delay(100)
-    mq.cmd("/squelch /attack on")
+    mq.cmd("/attack on")
     local looping = true
     while looping do
         if _G.State.should_skip == true then
@@ -465,7 +477,7 @@ function mob.npc_damage_until(item, class_settings, char_settings)
         end
         mq.delay(50)
     end
-    mq.cmd("/squelch /attack off")
+    mq.cmd("/attack off")
     logger.log_info("\aoTarget has either despawned or has decreased below \ag%s \aohealth.", item.damage_pct)
 end
 
@@ -499,9 +511,9 @@ function mob.npc_kill(item, class_settings, char_settings)
             logger.log_verbose("\aoTargeting \ag%s \ao(\ag%s\ao).", item.npc, ID)
             mq.TLO.Spawn(ID).DoTarget()
         end
-        mq.cmd("/squelch /stick")
+        mq.cmd("/stick")
         mq.delay(100)
-        mq.cmd("/squelch /attack on")
+        mq.cmd("/attack on")
         logger.log_super_verbose("\aoGenerating events to detect unhittable or bugged target.")
         mq.event("cannot_see", "You cannot see your target.", target_invalid_switch)
         mq.event("cannot_cast", "You cannot cast#*#on#*#", target_invalid_switch)
@@ -531,7 +543,7 @@ function mob.npc_kill(item, class_settings, char_settings)
             end
             if mq.TLO.Me.Combat() == false then
                 logger.log_super_verbose("\aoAttack was off when it should have been on. Turning it back on.")
-                mq.cmd("/squelch /attack on")
+                mq.cmd("/attack on")
             end
             mq.delay(200)
             if item.what ~= nil then
@@ -594,15 +606,15 @@ function mob.npc_kill_all(item, class_settings, char_settings)
         end
         logger.log_verbose("\aoTargeting \ar%s\ao.", item.npc)
         mq.TLO.Spawn(ID).DoTarget()
-        mq.cmd("/squelch /stick")
+        mq.cmd("/stick")
         mq.delay(100)
-        mq.cmd('/squelch /attack on')
+        mq.cmd('/attack on')
         while mq.TLO.Me.Casting() do
             mq.delay(100)
         end
         if item.zone ~= nil then
             local altID = mq.TLO.Me.AltAbility(item.zone)()
-            mq.cmdf('/squelch /alt act %s', altID)
+            mq.cmdf('/alt act %s', altID)
             logger.log_verbose("\aoCasting \ag%s \ao(\ag%s\ao) to pull.", item.zone, altID)
             mq.delay("1s")
         end
@@ -628,13 +640,13 @@ function mob.npc_kill_all(item, class_settings, char_settings)
                 loopCount = 0
                 if item.zone ~= nil then
                     local altID = mq.TLO.Me.AltAbility(item.zone)()
-                    mq.cmdf('/squelch /alt act %s', altID)
+                    mq.cmdf('/alt act %s', altID)
                     logger.log_verbose("\aoCasting \ag%s \ao(\ag%s\ao) to pull.", item.zone, altID)
                     mq.delay("1s")
                 end
                 if mq.TLO.Me.Combat() == false then
                     logger.log_super_verbose("\aoAttack was off when it should have been on. Turning it back on.")
-                    mq.cmd('/squelch /attack on')
+                    mq.cmd('/attack on')
                 end
             end
         end

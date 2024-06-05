@@ -33,12 +33,12 @@ function travel.face_heading(item, choice, name)
     _G.State:setStatusText(string.format("Facing heading %s.", item.what))
     logger.log_info("\aoFacing heading: \ag%s\ao.", item.what)
     if choice == 1 then
-        mq.cmdf("/squelch /face heading %s", item.what)
+        mq.cmdf("/face heading %s", item.what)
     elseif choice == 2 then
-        mq.cmdf("/dgga /squelch /face heading %s", item.what)
+        mq.cmdf("/dgga /face heading %s", item.what)
     else
-        mq.cmdf("/squelch /face heading %s", item.what)
-        mq.cmdf("/dex %s /squelch /face heading %s", name, item.what)
+        mq.cmdf("/face heading %s", item.what)
+        mq.cmdf("/dex %s /face heading %s", name, item.what)
     end
     mq.delay(250)
 end
@@ -50,12 +50,12 @@ function travel.face_loc(item, choice, name)
     _G.State:setStatusText(string.format("Facing location: %s %s %s.", y, x, z))
     logger.log_info("\aoFacing location \ag%s, %s, %s\ao.", y, x, z)
     if choice == 1 then
-        mq.cmdf("/squelch /face loc %s,%s,%s", y, x, z)
+        mq.cmdf("/face loc %s,%s,%s", y, x, z)
     elseif choice == 2 then
-        mq.cmdf("/dgga /squelch /face loc %s,%s,%s", y, x, z)
+        mq.cmdf("/dgga /face loc %s,%s,%s", y, x, z)
     else
-        mq.cmdf("/squelch /face loc %s,%s,%s", y, x, z)
-        mq.cmdf("/dex %s /squelch /face loc %s,%s,%s", name, y, x, z)
+        mq.cmdf("/face loc %s,%s,%s", y, x, z)
+        mq.cmdf("/dex %s /face loc %s,%s,%s", name, y, x, z)
     end
     mq.delay(250)
 end
@@ -75,13 +75,13 @@ function travel.forward_zone(item, class_settings, char_settings, choice, name)
     _G.State:setStatusText(string.format("Traveling forward to zone: %s.", item.zone))
     logger.log_info("\aoTraveling forward to zone: \ag%s\ao.", item.zone)
     if choice == 1 then
-        mq.cmd("/squelch /keypress forward hold")
+        mq.cmd("/keypress forward hold")
         while mq.TLO.Zone.ShortName() ~= item.zone do
             mq.delay(500)
         end
     elseif choice == 2 then
-        mq.cmd("/dgge /squelch /keypress forward hold")
-        mq.cmd("/squelch /keypress forward hold")
+        mq.cmd("/dgge /keypress forward hold")
+        mq.cmd("/keypress forward hold")
         while mq.TLO.Zone.ShortName() ~= item.zone do
             mq.delay(500)
         end
@@ -90,7 +90,7 @@ function travel.forward_zone(item, class_settings, char_settings, choice, name)
         end
     else
         mq.cmdf("/dex %s /keypress forward hold", name)
-        mq.cmd("/squelch /keypress forward hold")
+        mq.cmd("/keypress forward hold")
         while mq.TLO.Zone.ShortName() ~= item.zone and mq.TLO.Zone.Name() ~= item.zone do
             mq.delay(500)
         end
@@ -104,14 +104,14 @@ end
 function travel.gate_group(choice, name)
     logger.log_info("\aoGating to \ag%s\ao.", mq.TLO.Me.BoundLocation('0')())
     if choice == 1 then
-        mq.cmd("/squelch /relocate gate")
+        mq.cmd("/relocate gate")
         mq.delay(500)
     elseif choice == 2 then
-        mq.cmd("/dgga /squelch /relocate gate")
+        mq.cmd("/dgga /relocate gate")
         mq.delay(500)
     else
-        mq.cmd("/squelch /relocate gate")
-        mq.cmdf('/dex %s /squelch /relocate gate', name)
+        mq.cmd("/relocate gate")
+        mq.cmdf('/dex %s /relocate gate', name)
     end
 end
 
@@ -133,7 +133,7 @@ function travel.no_nav_travel(item, class_settings, char_settings, choice, name)
     _G.State:setStatusText(string.format("Traveling forward to location: %s %s %s.", y, x, z))
     logger.log_info("\aoTraveling without MQ2Nav to \ag%s, %s, %s\ao.", y, x, z)
     if choice == 1 then
-        mq.cmd("/squelch /keypress forward hold")
+        mq.cmd("/keypress forward hold")
         local distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
         logger.log_super_verbose("\aoDistance: \ag%s\ao.", distance)
         while distance > 5 do
@@ -145,10 +145,10 @@ function travel.no_nav_travel(item, class_settings, char_settings, choice, name)
                 return
             end
         end
-        mq.cmd("/squelch /keypress forward")
+        mq.cmd("/keypress forward")
     elseif choice == 2 then
-        mq.cmd("/dgge /squelch /keypress forward hold")
-        mq.cmd("/squelch /keypress forward hold")
+        mq.cmd("/dgge /keypress forward hold")
+        mq.cmd("/keypress forward hold")
         local distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
         logger.log_super_verbose("\aoDistance: \ag%s\ao.", distance)
         while distance > 5 do
@@ -160,11 +160,11 @@ function travel.no_nav_travel(item, class_settings, char_settings, choice, name)
                 return
             end
         end
-        mq.cmd("/dgge /squelch /keypress forward")
-        mq.cmd("/squelch /keypress forward")
+        mq.cmd("/dgge /keypress forward")
+        mq.cmd("/keypress forward")
     else
-        mq.cmdf("/dex %s /squelch /keypress forward hold", name)
-        mq.cmd("/squelch /keypress forward hold")
+        mq.cmdf("/dex %s /keypress forward hold", name)
+        mq.cmd("/keypress forward hold")
         local distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), x, y)
         logger.log_super_verbose("\aoDistance: \ag%s\ao.", distance)
         while distance > 5 do
@@ -176,20 +176,20 @@ function travel.no_nav_travel(item, class_settings, char_settings, choice, name)
                 return
             end
         end
-        mq.cmdf("/dex %s /squelch /keypress forward", name)
-        mq.cmd("/squelch /keypress forward")
+        mq.cmdf("/dex %s /keypress forward", name)
+        mq.cmd("/keypress forward")
     end
 end
 
 function travel.open_door(item)
     _G.State:setStatusText("Opening door.")
     mq.delay(200)
-    mq.cmd("/squelch /doortarget")
+    mq.cmd("/doortarget")
     logger.log_info("\aoOpening door: \ar%s%s", mq.TLO.SwitchTarget(), mq.TLO.SwitchTarget.Name())
     mq.delay(200)
     if mq.TLO.Switch.Distance() ~= nil then
         if mq.TLO.Switch.Distance() < 20 then
-            mq.cmd('/squelch /click left door')
+            mq.cmd('/click left door')
             mq.delay(1000)
             return true
         end
@@ -262,13 +262,13 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
                     _G.State.autosize_self = true
                 end
                 if _G.State.autosize_on == false then
-                    mq.cmd('/squelch /autosize on')
+                    mq.cmd('/autosize on')
                     _G.State.autosize_on = true
-                    mq.cmdf('/squelch /autosize sizeself %s', _G.State.autosize_sizes[_G.State.autosize_choice])
+                    mq.cmdf('/autosize sizeself %s', _G.State.autosize_sizes[_G.State.autosize_choice])
                 else
                     _G.State.autosize_choice = _G.State.autosize_choice + 1
                     if _G.State.autosize_choice == 6 then _G.State.autosize_choice = 1 end
-                    mq.cmdf('/squelch /autosize sizeself %s', _G.State.autosize_sizes[_G.State.autosize_choice])
+                    mq.cmdf('/autosize sizeself %s', _G.State.autosize_sizes[_G.State.autosize_choice])
                 end
             end
             loopCount = 0
@@ -282,7 +282,7 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
             _G.State.dest = ''
             _G.State.is_traveling = false
             _G.State.autosize_on = false
-            mq.cmd('/squelch /autosize off')
+            mq.cmd('/autosize off')
             travel.navPause()
             _G.State:setLocation(me.X(), me.Y(), me.Z())
             return
@@ -291,7 +291,7 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
             loopCount = 0
             if _G.State.autosize_on == true then
                 _G.State.autosize_on = false
-                mq.cmd('/squelch /autosize off')
+                mq.cmd('/autosize off')
             end
         end
     end
@@ -310,7 +310,7 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
     _G.State.dest = ''
     _G.State.is_traveling = false
     _G.State.autosize_on = false
-    mq.cmd('/squelch /autosize off')
+    mq.cmd('/autosize off')
 end
 
 function travel.general_travel(item, class_settings, char_settings, ID, choice, name)
@@ -351,12 +351,12 @@ function travel.general_travel(item, class_settings, char_settings, ID, choice, 
     end
     logger.log_info("\aoNavigating to \ag%s \ao(\ag%s\ao).", item.npc, ID)
     if choice == 1 then
-        mq.cmdf("/squelch /nav id %s", ID)
+        mq.cmdf("/nav id %s", ID)
     elseif choice == 2 then
-        mq.cmdf("/dgga /squelch /nav id %s", ID)
+        mq.cmdf("/dgga /nav id %s", ID)
     else
-        mq.cmdf("/squelch /nav id %s", ID)
-        mq.cmdf('/dex %s /squelch /nav id %s', name, ID)
+        mq.cmdf("/nav id %s", ID)
+        mq.cmdf('/dex %s /nav id %s', name, ID)
     end
     _G.State.startDist = mq.TLO.Navigation.PathLength("id " .. ID)()
     _G.State.destType = 'ID'
@@ -372,7 +372,7 @@ function travel.invis(class_settings)
     logger.log_info("\aoUsing invisibility.")
     local invis_type = {}
     if mq.TLO.Me.Combat() == true then
-        mq.cmd('/squelch /attack off')
+        mq.cmd('/attack off')
     end
     for word in string.gmatch(class_settings.class_invis[mq.TLO.Me.Class()], '([^|]+)') do
         table.insert(invis_type, word)
@@ -381,23 +381,23 @@ function travel.invis(class_settings)
         logger.log_debug("\aoI am using \ag%s \aoto invis myself.", invis_type[class_settings.invis[mq.TLO.Me.Class()]])
         if invis_type[class_settings.invis[mq.TLO.Me.Class()]] == 'Potion' then
             logger.log_super_verbose("\aoUsing a cloudy potion.")
-            mq.cmd('/squelch /useitem "Cloudy Potion"')
+            mq.cmd('/useitem "Cloudy Potion"')
         elseif invis_type[class_settings.invis[mq.TLO.Me.Class()]] == 'Circlet of Shadows' then
             logger.log_super_verbose("\aoUsing Circlet of Shadows.")
-            mq.cmd('/squelch /useitem "Circlet of Shadows"')
+            mq.cmd('/useitem "Circlet of Shadows"')
         elseif invis_type[class_settings.invis[mq.TLO.Me.Class()]] == 'Hide/Sneak' then
             logger.log_super_verbose("\aoUsing hide/sneak.")
             while mq.TLO.Me.Invis() == false do
                 mq.delay(100)
                 if mq.TLO.Me.AbilityReady('Hide')() == true then
-                    mq.cmd("/squelch /doability hide")
+                    mq.cmd("/doability hide")
                 end
             end
             if mq.TLO.Me.Sneaking() == false then
                 while mq.TLO.Me.Sneaking() == false do
                     mq.delay(100)
                     if mq.TLO.Me.AbilityReady('Sneak')() == true then
-                        mq.cmd("/squelch /doability sneak")
+                        mq.cmd("/doability sneak")
                     end
                 end
             end
@@ -407,7 +407,7 @@ function travel.invis(class_settings)
             while mq.TLO.Me.AltAbilityReady(ID)() == false do
                 mq.delay(50)
             end
-            mq.cmdf('/squelch /alt act %s', ID)
+            mq.cmdf('/alt act %s', ID)
             mq.delay(500)
             while mq.TLO.Me.Casting() and mq.TLO.Me.Class() ~= "Bard" do
                 mq.delay(200)
@@ -427,7 +427,7 @@ function travel.invis(class_settings)
                         mq.TLO.Group.Member(i).DisplayName())
                     if invis_type[class_settings.invis[mq.TLO.Group.Member(i).Class()]] == 'Potion' then
                         logger.log_super_verbose("\aoHaving \ag%s \aouse a cloudy potion.", mq.TLO.Group.Member(i).DisplayName())
-                        mq.cmdf('/dex %s /squelch /useitem "Cloudy Potion"', mq.TLO.Group.Member(i).DisplayName())
+                        mq.cmdf('/dex %s /useitem "Cloudy Potion"', mq.TLO.Group.Member(i).DisplayName())
                     elseif invis_type[class_settings.invis[mq.TLO.Group.Member(i).Class()]] == 'Hide/Sneak' then
                         logger.log_super_verbose("\aoHaving \ag%s \aouse hide/sneak.", mq.TLO.Group.Member(i).DisplayName())
                         mq.cmdf("/dquery %s -q Me.Sneaking", mq.TLO.Group.Member(i).DisplayName())
@@ -436,7 +436,7 @@ function travel.invis(class_settings)
                             while mq.TLO.DanNet(mq.TLO.Group.Member(i).DisplayName()).Observe("Me.AbilityReady[Sneak]")() == "FALSE" do
                                 mq.delay(50)
                             end
-                            mq.cmdf("/dex %s /squelch /doability sneak", mq.TLO.Group.Member(i).DisplayName())
+                            mq.cmdf("/dex %s /doability sneak", mq.TLO.Group.Member(i).DisplayName())
                             mq.cmdf("/dobserve %s -q Me.AbilityReady[Sneak] -drop", mq.TLO.Group.Member(i).DisplayName())
                         end
                         if mq.TLO.Group.Member(i).Invis() == false then
@@ -444,16 +444,16 @@ function travel.invis(class_settings)
                             while mq.TLO.DanNet(mq.TLO.Group.Member(i).DisplayName()).Observe("Me.AbilityReady[Hide]")() == "FALSE" do
                                 mq.delay(50)
                             end
-                            mq.cmdf("/dex %s /squelch /doability hide", mq.TLO.Group.Member(i).DisplayName())
+                            mq.cmdf("/dex %s /doability hide", mq.TLO.Group.Member(i).DisplayName())
                         end
                     elseif invis_type[class_settings.invis[mq.TLO.Group.Member(i).Class()]] == 'Circlet of Shadows' then
                         logger.log_super_verbose("\aoHaving \ag%s \aouse circlet of shadows.", mq.TLO.Group.Member(i).DisplayName())
-                        mq.cmdf('/dex %s /squelch /useitem "Circlet of Shadows"', mq.TLO.Group.Member(i).DisplayName())
+                        mq.cmdf('/dex %s /useitem "Circlet of Shadows"', mq.TLO.Group.Member(i).DisplayName())
                     else
                         local ID = class_settings['skill_to_num'][invis_type[class_settings.invis[mq.TLO.Group.Member(i).Class()]]]
                         logger.log_super_verbose("\aoHaving \ag%s \aouse \ag%s \ao(\ag%s\ao).", mq.TLO.Group.Member(i).DisplayName(),
                             invis_type[class_settings.invis[mq.TLO.Group.Member(i).Class()]], ID)
-                        mq.cmdf('/dex %s /squelch /alt act "%s"', mq.TLO.Group.Member(i).DisplayName(),
+                        mq.cmdf('/dex %s /alt act "%s"', mq.TLO.Group.Member(i).DisplayName(),
                             ID)
                     end
                 end
@@ -468,7 +468,7 @@ function travel.invis(class_settings)
             end
             if invis_type[class_settings.invis[mq.TLO.Group.Member(name).Class()]] == 'Potion' then
                 logger.log_super_verbose("\aoHaving \ag%s \aouse a cloudy potion.", name)
-                mq.cmdf('/dex %s /squelch /useitem "Cloudy Potion"', name)
+                mq.cmdf('/dex %s /useitem "Cloudy Potion"', name)
             elseif invis_type[class_settings.invis[mq.TLO.Group.Member(name).Class()]] == 'Hide/Sneak' then
                 logger.log_super_verbose("\aoHaving \ag%s \aouse hide/sneak.", name)
                 mq.cmdf("/dquery %s -q Me.Sneaking", name)
@@ -477,7 +477,7 @@ function travel.invis(class_settings)
                     while mq.TLO.DanNet(name).Observe("Me.AbilityReady[Sneak]")() == "FALSE" do
                         mq.delay(50)
                     end
-                    mq.cmdf("/dex %s /squelch /doability sneak", name)
+                    mq.cmdf("/dex %s /doability sneak", name)
                     mq.cmdf("/dobserve %s -q Me.AbilityReady[Sneak] -drop", name)
                 end
                 if mq.TLO.Group.Member(name).Invis() == false then
@@ -485,12 +485,12 @@ function travel.invis(class_settings)
                     while mq.TLO.DanNet(name).Observe("Me.AbilityReady[Hide]")() == "FALSE" do
                         mq.delay(50)
                     end
-                    mq.cmdf("/dex %s /squelch /doability hide", name)
+                    mq.cmdf("/dex %s /doability hide", name)
                 end
             else
                 local ID = class_settings['skill_to_num'][invis_type[class_settings.invis[mq.TLO.Group.Member(name).Class()]]]
                 logger.log_super_verbose("\aoHaving \ag%s \aouse \ag%s \ao(\ag%s\ao).", name, invis_type[class_settings.invis[mq.TLO.Group.Member(name).Class()]], ID)
-                mq.cmdf('/dex %s /squelch /alt act "%s"', name, ID)
+                mq.cmdf('/dex %s /alt act "%s"', name, ID)
             end
         end
         mq.delay("4s")
@@ -734,12 +734,12 @@ function travel.loc_travel(item, class_settings, char_settings, choice, name)
     end
     _G.State.is_traveling = true
     if choice == 1 then
-        mq.cmdf("/squelch /nav loc %s %s %s", y, x, z)
+        mq.cmdf("/nav loc %s %s %s", y, x, z)
     elseif choice == 2 then
-        mq.cmdf("/dgga /squelch /nav loc %s %s %s", y, x, z)
+        mq.cmdf("/dgga /nav loc %s %s %s", y, x, z)
     else
-        mq.cmdf("/squelch /nav loc %s %s %s", y, x, z)
-        mq.cmdf("/dex %s /squelch /nav loc %s %s %s", name, y, x, z)
+        mq.cmdf("/nav loc %s %s %s", y, x, z)
+        mq.cmdf("/dex %s /nav loc %s %s %s", name, y, x, z)
     end
     local tempString = string.format("loc %s %s %s", y, x, z)
     _G.State.startDist = mq.TLO.Navigation.PathLength(tempString)()
@@ -753,11 +753,11 @@ function travel.navPause()
     local choice, name = _G.State:readGroupSelection()
     logger.log_info("\aoPausing navigation.")
     if choice == 1 then
-        mq.cmd('/squelch /nav pause')
+        mq.cmd('/nav pause')
     elseif choice == 2 then
-        mq.cmd('/dgga /squelch /nav pause')
+        mq.cmd('/dgga /nav pause')
     else
-        mq.cmd('/squelch /nav pause')
+        mq.cmd('/nav pause')
         mq.cmdf('/dex %s /nav pause', name)
     end
     mq.delay(500)
@@ -770,12 +770,12 @@ function travel.navUnpause(item, class_settings, char_settings, choice, name)
         local z = item.whereZ
         logger.log_info("\aoResuming navigation to location \ag%s, %s, %s\ao.", y, x, z)
         if choice == 1 then
-            mq.cmdf("/squelch /nav loc %s %s %s", y, x, z)
+            mq.cmdf("/nav loc %s %s %s", y, x, z)
         elseif choice == 2 then
-            mq.cmdf("/dgga /squelch /nav loc %s %s %s", y, x, z)
+            mq.cmdf("/dgga /nav loc %s %s %s", y, x, z)
         else
-            mq.cmdf("/squelch /nav loc %s %s %s", y, x, z)
-            mq.cmdf("/dex %s /squelch /nav loc %s %s %s", name, y, x, z)
+            mq.cmdf("/nav loc %s %s %s", y, x, z)
+            mq.cmdf("/dex %s /nav loc %s %s %s", name, y, x, z)
         end
         local tempString = string.format("loc %s %s %s", y, x, z)
         _G.State.startDist = mq.TLO.Navigation.PathLength(tempString)()
@@ -784,12 +784,12 @@ function travel.navUnpause(item, class_settings, char_settings, choice, name)
     elseif item.npc then
         logger.log_info("\aoResuming navigation to \ag%s\ao.", item.npc)
         if choice == 1 then
-            mq.cmdf("/squelch /nav spawn %s", item.npc)
+            mq.cmdf("/nav spawn %s", item.npc)
         elseif choice == 2 then
-            mq.cmdf("/dgga /squelch /nav spawn %s", item.npc)
+            mq.cmdf("/dgga /nav spawn %s", item.npc)
         else
-            mq.cmdf("/squelch /nav spawn %s", item.npc)
-            mq.cmdf("/dex %s /squelch /nav spawn %s", name, item.npc)
+            mq.cmdf("/nav spawn %s", item.npc)
+            mq.cmdf("/dex %s /nav spawn %s", name, item.npc)
         end
         local tempString = string.format("spawn %s ", item.npc)
         _G.State.startDist = mq.TLO.Navigation.PathLength(tempString)()
@@ -798,12 +798,12 @@ function travel.navUnpause(item, class_settings, char_settings, choice, name)
     elseif item.zone then
         logger.log_info("\aoResuming navigation to zone \ag%s\ao.", item.zone)
         if choice == 1 then
-            mq.cmdf("/squelch /travelto %s", item.zone)
+            mq.cmdf("/travelto %s", item.zone)
         elseif choice == 2 then
-            mq.cmdf("/dgga /squelch /travelto %s", item.zone)
+            mq.cmdf("/dgga /travelto %s", item.zone)
         else
-            mq.cmdf("/squelch /travelto %s", item.zone)
-            mq.cmdf('/dex %s /squelch /travelto %s', name, item.zone)
+            mq.cmdf("/travelto %s", item.zone)
+            mq.cmdf('/dex %s /travelto %s', name, item.zone)
         end
     end
     mq.delay(500)
@@ -843,33 +843,33 @@ function travel.npc_follow(item, class_settings, char_settings, event, choice, n
     if choice == 1 then
         mq.TLO.Spawn("npc " .. item.npc).DoTarget()
         mq.delay(300)
-        mq.cmd('/squelch /afollow')
+        mq.cmd('/afollow')
     elseif choice == 2 then
-        mq.cmdf('/dgga /squelch /target id %s', mq.TLO.Spawn("npc " .. item.npc).ID())
+        mq.cmdf('/dgga /target id %s', mq.TLO.Spawn("npc " .. item.npc).ID())
         mq.delay(300)
-        mq.cmd('/dgga /squelch /afollow')
+        mq.cmd('/dgga /afollow')
     else
         mq.TLO.Spawn("npc " .. item.npc).DoTarget()
-        mq.cmdf('/dex %s /squelch /target id %s', name, mq.TLO.Spawn("npc " .. item.npc).ID())
+        mq.cmdf('/dex %s /target id %s', name, mq.TLO.Spawn("npc " .. item.npc).ID())
         mq.delay(300)
-        mq.cmd('/squelch /afollow')
-        mq.cmdf('/dex %s /squelch /afollow', name)
+        mq.cmd('/afollow')
+        mq.cmdf('/dex %s /afollow', name)
     end
     if item.whereX ~= nil then
         local distance = dist.GetDistance(mq.TLO.Me.X(), mq.TLO.Me.Y(), item.whereX, item.whereY)
         while distance > 50 do
             if _G.State.should_skip == true then
                 if choice == 1 then
-                    mq.cmd('/squelch /afollow off')
+                    mq.cmd('/afollow off')
                     _G.State.should_skip = false
                     return
                 elseif choice == 2 then
-                    mq.cmd('/dgga /squelch /afollow off')
+                    mq.cmd('/dgga /afollow off')
                     _G.State.should_skip = false
                     return
                 else
-                    mq.cmd('/squelch /afollow off')
-                    mq.cmdf('/dex %s /squelch /afollow off', name)
+                    mq.cmd('/afollow off')
+                    mq.cmdf('/dex %s /afollow off', name)
                 end
             end
             mq.delay(200)
@@ -885,14 +885,14 @@ function travel.npc_follow(item, class_settings, char_settings, event, choice, n
             mq.delay(100)
             mq.doevents()
             if _G.Mob.xtargetCheck(char_settings) then
-                mq.cmd('/squelch /afollow off')
+                mq.cmd('/afollow off')
                 _G.Mob.clearXtarget(class_settings, char_settings)
                 mq.TLO.Spawn("npc " .. item.npc).DoTarget()
                 mq.delay(300)
-                mq.cmd('/squelch /afollow')
+                mq.cmd('/afollow')
             end
         end
-        mq.cmd('/squelch /afollow off')
+        mq.cmd('/afollow off')
     end
 end
 
@@ -900,12 +900,12 @@ function travel.npc_stop_follow(item, choice, name)
     _G.State:setStatusText(string.format("Stopping autofollow."))
     logger.log_info("\aoStopping autofollow.")
     if choice == 1 then
-        mq.cmd('/squelch /afollow off')
+        mq.cmd('/afollow off')
     elseif choice == 2 then
-        mq.cmd('/dgga /squelch /afollow off')
+        mq.cmd('/dgga /afollow off')
     else
-        mq.cmd('/squelch /afollow off')
-        mq.cmdf('/dex %s /squelch /afollow off', name)
+        mq.cmd('/afollow off')
+        mq.cmdf('/dex %s /afollow off', name)
     end
 end
 
@@ -942,7 +942,7 @@ function travel.portal_set(item)
     _G.State:setStatusText(string.format("Setting portal to %s.", item.zone))
     logger.log_info("\aoSetting portal to \ag%s\ao.", item.zone)
     mq.delay("1s")
-    mq.cmdf("/squelch /portalset %s", item.zone)
+    mq.cmdf("/portalset %s", item.zone)
     mq.delay("1s")
     while mq.TLO.PortalSetter.InProgress() == true do
         mq.delay(200)
@@ -989,12 +989,12 @@ function travel.relocate(item, class_settings, char_settings, choice, name)
     _G.State:setStatusText(string.format("Relocating to %s.", relocate))
     logger.log_info("\aoRelocating to \ag%s\ao.", relocate)
     if choice == 1 then
-        mq.cmdf('/squelch /relocate %s', relocate)
+        mq.cmdf('/relocate %s', relocate)
     elseif choice == 2 then
-        mq.cmdf('/dgga /squelch /relocate %s', relocate)
+        mq.cmdf('/dgga /relocate %s', relocate)
     else
-        mq.cmdf('/squelch /relocate %s', relocate)
-        mq.cmdf('/dex %s /squelch /relocate %s', name, relocate)
+        mq.cmdf('/relocate %s', relocate)
+        mq.cmdf('/dex %s /relocate %s', name, relocate)
     end
     local loopCount = 0
     while mq.TLO.Me.Casting() == nil do
@@ -1064,12 +1064,12 @@ function travel.zone_travel(item, class_settings, char_settings, continue, choic
     logger.log_info("\aoTraveling to \ag%s\ao.", item.zone)
     _G.State.is_traveling = true
     if choice == 1 then
-        mq.cmdf("/squelch /travelto %s", item.zone)
+        mq.cmdf("/travelto %s", item.zone)
     elseif choice == 2 then
-        mq.cmdf("/dgga /squelch /travelto %s", item.zone)
+        mq.cmdf("/dgga /travelto %s", item.zone)
     else
-        mq.cmdf("/squelch /travelto %s", item.zone)
-        mq.cmdf('/dex %s /squelch /travelto %s', name, item.zone)
+        mq.cmdf("/travelto %s", item.zone)
+        mq.cmdf('/dex %s /travelto %s', name, item.zone)
     end
     local loopCount = 0
     _G.State:setLocation(mq.TLO.Me.X(), mq.TLO.Me.Y(), mq.TLO.Me.Z())
@@ -1122,18 +1122,18 @@ function travel.zone_travel(item, class_settings, char_settings, continue, choic
                 loopCount = 0
                 if mq.TLO.Cursor() ~= nil then
                     if mq.TLO.Cursor() == "Spire Stone" then
-                        mq.cmd('/squelch /autoinv')
+                        mq.cmd('/autoinv')
                     end
                 end
                 if mq.TLO.FindItem('=Spire Stone')() == nil then
                     logger.log_info("\aoTravel stopped. Starting travel to \ag%s \aoagain.", item.zone)
                     if choice == 1 then
-                        mq.cmdf("/squelch /travelto %s", item.zone)
+                        mq.cmdf("/travelto %s", item.zone)
                     elseif choice == 2 then
-                        mq.cmdf("/dgga /squelch /travelto %s", item.zone)
+                        mq.cmdf("/dgga /travelto %s", item.zone)
                     else
-                        mq.cmdf("/squelch /travelto %s", item.zone)
-                        mq.cmdf('/dex %s /squelch /travelto %s', name, item.zone)
+                        mq.cmdf("/travelto %s", item.zone)
+                        mq.cmdf('/dex %s /travelto %s', name, item.zone)
                     end
                 end
             end
@@ -1151,13 +1151,13 @@ function travel.zone_travel(item, class_settings, char_settings, continue, choic
                         _G.State.autosize_self = true
                     end
                     if _G.State.autosize_on == false then
-                        mq.cmd('/squelch /autosize on')
+                        mq.cmd('/autosize on')
                         _G.State.autosize_on = true
-                        mq.cmdf('/squelch /autosize sizeself %s', _G.State.autosize_sizes[_G.State.autosize_choice])
+                        mq.cmdf('/autosize sizeself %s', _G.State.autosize_sizes[_G.State.autosize_choice])
                     else
                         _G.State.autosize_choice = _G.State.autosize_choice + 1
                         if _G.State.autosize_choice == 6 then _G.State.autosize_choice = 1 end
-                        mq.cmdf('/squelch /autosize sizeself %s', _G.State.autosize_sizes[_G.State.autosize_choice])
+                        mq.cmdf('/autosize sizeself %s', _G.State.autosize_sizes[_G.State.autosize_choice])
                     end
                 end
                 loopCount = 0
@@ -1170,7 +1170,7 @@ function travel.zone_travel(item, class_settings, char_settings, continue, choic
                 loopCount = 0
                 if _G.State.autosize_on == true then
                     _G.State.autosize_on = false
-                    mq.cmd('/squelch /autosize off')
+                    mq.cmd('/autosize off')
                 end
             end
         end
@@ -1191,7 +1191,7 @@ function travel.zone_travel(item, class_settings, char_settings, continue, choic
     _G.State.dest = ''
     _G.State.is_traveling = false
     _G.State.autosize_on = false
-    mq.cmd('/squelch /autosize off')
+    mq.cmd('/autosize off')
 end
 
 function travel.GroupZoneCheck(choice, name)

@@ -491,10 +491,10 @@ local function run_epic(class, choice)
         if overview_steps[_G.State.current_step] ~= nil then
             if overview_steps[_G.State.current_step] == 1 then
                 logger.log_warn('\aoYou have selected to complete this step (\ag%s\ao) manually. Stopping script.', _G.State.current_step)
-                mq.cmdf('/squelch /autosize sizeself %s', loadsave.SaveState.general['self_size'])
-                mq.cmd('/squelch /afollow off')
-                mq.cmd('/squelch /nav stop')
-                mq.cmd('/squelch /stick off')
+                mq.cmdf('/autosize sizeself %s', loadsave.SaveState.general['self_size'])
+                mq.cmd('/afollow off')
+                mq.cmd('/nav stop')
+                mq.cmd('/stick off')
                 _G.State:setTaskRunning(false)
                 return
             elseif overview_steps[_G.State.current_step] == 2 then
@@ -561,10 +561,10 @@ local function run_epic(class, choice)
             end
         end
         if _G.State:readTaskRunning() == false then
-            mq.cmdf('/squelch /autosize sizeself %s', loadsave.SaveState.general['self_size'])
-            mq.cmd('/squelch /afollow off')
-            mq.cmd('/squelch /nav stop')
-            mq.cmd('/squelch /stick off')
+            mq.cmdf('/autosize sizeself %s', loadsave.SaveState.general['self_size'])
+            mq.cmd('/afollow off')
+            mq.cmd('/nav stop')
+            mq.cmd('/stick off')
             return
         end
     end
@@ -642,9 +642,9 @@ local function init_autosize()
         mq.delay(30)
         mq.doevents()
         if _G.State.autosize_self == false then
-            mq.cmd('/squelch /autosize self')
+            mq.cmd('/autosize self')
         end
-        mq.cmd('/squelch /autosize off')
+        mq.cmd('/autosize off')
         if loadsave.SaveState.general['self_size'] == nil then
             mq.event('auto_self_size', 'MQ2AutoSize:: Self size is #1# (was not modified)', autosize_self_size)
             mq.cmd('/autosize sizeself 0')
