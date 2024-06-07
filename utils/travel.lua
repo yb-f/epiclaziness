@@ -297,9 +297,9 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
     end
     if ID ~= 0 then
         local spawn = mq.TLO.Spawn(ID)
-        distance = dist.GetDistance(me.X(), me.Y(), spawn.X(), spawn.Y())
+        distance = dist.GetDistance3D(me.X(), me.Y(), me.Z(), spawn.X(), spawn.Y(), spawn.Z())
     elseif item.whereX ~= 0 then
-        distance = dist.GetDistance(me.X(), me.Y(), item.whereX, item.whereY)
+        distance = dist.GetDistance3D(me.X(), me.Y(), me.Z(), item.whereX, item.whereY, item.whereZ)
     end
     if distance > 30 and item.radius == nil then
         logger.log_warn("\aoStopped before reaching our destination. Attempting to restart navigation.")
