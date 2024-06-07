@@ -23,6 +23,13 @@ local tradeskill_requirements = {
             ['Brewing'] = 100
         },
     },
+    ['mnk'] = {
+        ['15'] = {
+            ['Pottery'] = 140,
+            ['Tailoring'] = 66
+
+        }
+    },
     ['pal'] = {
         ['15'] = {
             ['Fishing'] = 100

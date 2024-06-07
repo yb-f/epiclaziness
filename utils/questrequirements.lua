@@ -46,7 +46,7 @@ local quests_requirements = {
     ['mnk'] = {
         ['10']    = '',
         ['pre15'] = '',
-        ['15']    = '',
+        ['15']    = 'Requires Pottery 140 and Tailoring 66.',
         ['20']    = '',
     },
     ['nec'] = {
