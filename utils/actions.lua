@@ -725,8 +725,29 @@ function actions.ground_spawn_farm(item, class_settings, char_settings)
     end
 end
 
-function actions.group_size_check(item)
+function actions.group_size_check(item, same_zone)
+    same_zone = same_zone or false
     logger.log_super_verbose("\aoChecking group size (\ag%s \aoplayers needed).", item.count)
+    if same_zone == true then
+        if mq.TLO.Group.GroupSize() == nil then
+            _G.State:setStatusText(item.status)
+            logger.log_error("\aoYou will require \ar%s \aoplayers in your party and within the same zone to progress through this step.", item.count)
+            _G.State:setTaskRunning(false)
+            return
+        end
+        if mq.TLO.Group.GroupSize() < item.count then
+            _G.State:setStatusText(item.status)
+            logger.log_error("\aoYou will require \ar%s \aoplayers in your party and within the same zone  to progress through this step.", item.count)
+            _G.State:setTaskRunning(false)
+            return
+        end
+        if mq.TLO.Group.Present() + 1 < item.count then
+            _G.State:setStatusText(item.status)
+            logger.log_error("\aoYou will require \ar%s \aoplayers in your party and within the same zone to progress through this step.", item.count)
+            _G.State:setTaskRunning(false)
+            return
+        end
+    end
     if not mq.TLO.Group.GroupSize() then
         _G.State:setStatusText(item.status)
         logger.log_error("\aoYou will require \ar%s \aoplayers in your party to progress through this step.", item.count)
@@ -1130,6 +1151,11 @@ function actions.rog_gamble(item)
         mq.delay("7s")
         mq.doevents()
     end
+    local talk_param = {
+        npc = item.npc,
+        phrase = "cash out"
+    }
+    actions.npc_talk(talk_param)
     gamble_done = false
 end
 
