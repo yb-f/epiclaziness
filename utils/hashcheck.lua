@@ -3,6 +3,7 @@ local sha       = require('lib/sha2')
 local logger    = require('utils/logger')
 
 local path      = mq.luaDir .. "/../resources/MQ2Nav/"
+---@class HashCheck
 local hashCheck = {}
 
 hashCheck.files = {
@@ -42,6 +43,9 @@ hashCheck.files = {
     ['sirens.navmesh']        = '8ef779818b2ac82d6b93d56a375c540c',
 }
 
+-- Check the hash of mesh files against the stored hashes to determine if user is using the correct navmesh
+-- Adds items to the badMeshes table if the hash does not match
+-- This will be used to display the snitch tag in the log messages
 function hashCheck.check_meshes()
     for file, hash in pairs(hashCheck.files) do
         local fullPath = string.format("%s%s", path, file)

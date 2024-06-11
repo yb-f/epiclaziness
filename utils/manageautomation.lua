@@ -4,29 +4,40 @@ local logger       = require('utils/logger')
 local RANDOM_MIN   = 300
 local RANDOM_MAX   = 3000
 local MAX_DISTANCE = 100
+---@class ManageAutomation
 local manage       = {}
 local me           = mq.TLO.Me
 local group        = mq.TLO.Group
 
+-- Set class automation script to camp and kill in a certain radius
+---@param radius number
+---@param zradius number
+---@param class_settings Class_Settings_Settings
+---@param char_settings Char_Settings_SaveState
 function manage.campGroup(radius, zradius, class_settings, char_settings)
     local choice, name = _G.State:readGroupSelection()
     logger.log_info("\aoSetting camp mode with radius \ag%s\ao.", radius)
-    manage.doAutomation(me.DisplayName(), me.Class.ShortName(), class_settings.class[me.Class.Name()], 'camp', char_settings)
+    manage.doAutomation(me.DisplayName(), me.Class.ShortName(), class_settings.class[me.Class.Name()], 'camp')
     manage.setRadius(me.DisplayName(), me.Class.ShortName(), class_settings.class[me.Class.Name()], radius, zradius, char_settings)
     if choice == 1 then
         return
     elseif choice == 2 then
         for i = 1, group.Members() do
             if group.Member(i).DisplayName() ~= me.DisplayName() then
-                manage.doAutomation(group.Member(i).DisplayName(), group.Member(i).Class.ShortName(), class_settings.class[group.Member(i).Class.Name()], 'camp', char_settings)
+                manage.doAutomation(group.Member(i).DisplayName(), group.Member(i).Class.ShortName(), class_settings.class[group.Member(i).Class.Name()], 'camp')
             end
         end
     else
-        manage.doAutomation(name, group.Member(name).Class.ShortName(), class_settings.class[group.Member(name).Class.Name()], 'camp', char_settings)
+        manage.doAutomation(name, group.Member(name).Class.ShortName(), class_settings.class[group.Member(name).Class.Name()], 'camp')
     end
 end
 
-function manage.doAutomation(character, class, script, action, char_settings)
+-- Issue commands to class automation scripts for self and group members.
+---@param character string
+---@param class string
+---@param script number
+---@param action string
+function manage.doAutomation(character, class, script, action)
     local commands_self = {
         [1] = {
             start = function()
@@ -356,6 +367,10 @@ function manage.doAutomation(character, class, script, action, char_settings)
     end
 end
 
+-- Have the entire group say a phrase to an NPC
+---@param item Item
+---@param choice number
+---@param name string
 function manage.groupTalk(item, choice, name)
     manage.removeInvis(item)
     _G.State:setStatusText(string.format("Talking to %s (%s).", item.npc, item.phrase))
@@ -411,6 +426,10 @@ function manage.groupTalk(item, choice, name)
     end
 end
 
+-- Have all group members click a door (ie to zone in)
+---@param item Item
+---@param choice number
+---@param name string
 function manage.openDoorAll(item, choice, name)
     logger.log_info("\aoHaving group click door.")
     if choice == 1 then
@@ -436,6 +455,8 @@ function manage.openDoorAll(item, choice, name)
     end
 end
 
+-- Pause class automation for all group members
+---@param class_settings Class_Settings_Settings
 function manage.pauseGroup(class_settings)
     local choice, name = _G.State:readGroupSelection()
     logger.log_info("\aoPausing class automation for all group members.")
@@ -453,6 +474,10 @@ function manage.pauseGroup(class_settings)
     end
 end
 
+-- Find a group member (or self) to pick a lock
+---@param item Item
+---@param choice number
+---@param name string
 function manage.picklockGroup(item, choice, name)
     _G.State:setStatusText("Lockpicking door.")
     logger.log_info("\aoLockpicking door.")
@@ -550,6 +575,8 @@ function manage.picklockGroup(item, choice, name)
     end
 end
 
+-- Remove invisibility
+---@param item Item
 function manage.removeInvis(item)
     local choice, name = _G.State:readGroupSelection()
     local temp = _G.State:readStatusText()
@@ -568,6 +595,7 @@ function manage.removeInvis(item)
     _G.State:setStatusText(temp)
 end
 
+-- Remove levitate
 function manage.removeLev()
     local choice, name = _G.State:readGroupSelection()
     _G.State:setStatusText("Removing levitate.")
@@ -582,6 +610,10 @@ function manage.removeLev()
     end
 end
 
+-- Have everyone click yes on popup window
+---@param item Item
+---@param choice number
+---@param name string
 function manage.sendYes(item, choice, name)
     logger.log_info("\aoGive me a yes!")
     if choice == 1 then
@@ -594,6 +626,13 @@ function manage.sendYes(item, choice, name)
     end
 end
 
+-- Set radius for class automation script to farm in
+---@param character string
+---@param class string
+---@param script number
+---@param radius number
+---@param zradius number
+---@param char_settings Char_Settings_SaveState
 function manage.setRadius(character, class, script, radius, zradius, char_settings)
     logger.log_verbose("\aoSetting radius to \ag%s\ao.", radius)
     if script == 1 then
@@ -611,6 +650,9 @@ function manage.setRadius(character, class, script, radius, zradius, char_settin
     end
 end
 
+-- Start class automation for group
+---@param class_settings Class_Settings_Settings
+---@param char_settings Char_Settings_SaveState
 function manage.startGroup(class_settings, char_settings)
     local choice, name = _G.State:readGroupSelection()
     logger.log_verbose("\aoStarting class automation for group and setting group roles.")
@@ -619,20 +661,22 @@ function manage.startGroup(class_settings, char_settings)
         mq.cmdf("/grouprole set %s 1", mq.TLO.Me.DisplayName())
         mq.cmdf("/grouprole set %s 2", mq.TLO.Me.DisplayName())
     end
-    manage.doAutomation(me.DisplayName(), me.Class.ShortName(), class_settings.class[me.Class.Name()], 'start', char_settings)
+    manage.doAutomation(me.DisplayName(), me.Class.ShortName(), class_settings.class[me.Class.Name()], 'start')
     if choice == 1 then
         return
     elseif choice == 2 then
         for i = 1, group.Members() do
             if group.Member(i).DisplayName() ~= me.DisplayName() then
-                manage.doAutomation(group.Member(i).DisplayName(), group.Member(i).Class.ShortName(), class_settings.class[group.Member(i).Class.Name()], 'start', char_settings)
+                manage.doAutomation(group.Member(i).DisplayName(), group.Member(i).Class.ShortName(), class_settings.class[group.Member(i).Class.Name()], 'start')
             end
         end
     else
-        manage.doAutomation(name, group.Member(name).Class.ShortName(), class_settings.class[group.Member(name).Class.Name()], 'start', char_settings)
+        manage.doAutomation(name, group.Member(name).Class.ShortName(), class_settings.class[group.Member(name).Class.Name()], 'start')
     end
 end
 
+-- Stop class automation from farming the current area
+---@param class_settings Class_Settings_Settings
 function manage.uncampGroup(class_settings)
     local choice, name = _G.State:readGroupSelection()
     logger.log_info("\aoEnding camp mode.")
@@ -650,6 +694,8 @@ function manage.uncampGroup(class_settings)
     end
 end
 
+-- Unpause class automation for group
+---@param class_settings Class_Settings_Settings
 function manage.unpauseGroup(class_settings)
     local choice, name = _G.State:readGroupSelection()
     logger.log_info("\aoUnpausing class automation for group.")

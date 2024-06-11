@@ -3,6 +3,7 @@ local manage                = require('utils/manageautomation')
 local logger                = require('utils/logger')
 local dist                  = require 'utils/distance'
 local MAX_DISTANCE          = 100
+---@class Inventory
 local inventory             = {}
 
 --- @type number
@@ -22,14 +23,20 @@ inventory.weapon2           = {
     ['slot2'] = 0
 }
 
+-- Callback to determine if Tradeskill window is open
+---@return boolean
 function inventory.tradeskill_window()
     return mq.TLO.Window('TradeskillWnd').Open()
 end
 
+-- Callback to determine if Merchant window is open
+---@return boolean
 function inventory.merchant_window()
     return mq.TLO.Window('MerchantWnd').Open()
 end
 
+-- Move item on cursor into inventory
+---@param item Item
 function inventory.auto_inv(item)
     if mq.TLO.Cursor() ~= nil then
         _G.State:setStatusText(string.format("Moving %s to inventory.", mq.TLO.Cursor()))
@@ -45,6 +52,9 @@ function inventory.auto_inv(item)
     mq.delay("1s")
 end
 
+-- Look for the best slot to move a tradeskill bag into (for tradeskill combine functions)
+---@param item Item
+---@return number
 function inventory.find_best_bag_slot(item)
     _G.State.combineSlot = 0
     logger.log_info("\aoFinding best bag slot for combine container.")
@@ -78,6 +88,9 @@ function inventory.find_best_bag_slot(item)
     return mySlot
 end
 
+-- Check if indicated item is in the loot window
+---@param item Item
+---@return boolean
 function inventory.loot_check(item)
     logger.log_verbose("\aoChecking if \ag%s \aois in the loot window.", item.what)
     if mq.TLO.AdvLoot.SCount() > 0 then
@@ -96,6 +109,10 @@ function inventory.loot_check(item)
     return false
 end
 
+-- Prepare the indicated combiner to have combines performed in it
+---@param item Item
+---@param class_settings Class_Settings_Settings
+---@param char_settings Char_Settings_SaveState
 function inventory.combine_container(item, class_settings, char_settings)
     if _G.Mob.xtargetCheck(char_settings) then
         _G.Mob.clearXtarget(class_settings, char_settings)
@@ -117,6 +134,11 @@ function inventory.combine_container(item, class_settings, char_settings)
     inventory.empty_bag(mySlot)
 end
 
+-- Handle duplicates of the same item for tradeskill combines.
+-- Finds the indicated item in inventory that is not in the indicated bag.
+---@param item string
+---@param slot number
+---@return number, number
 function inventory.find_duplicate_item(item, slot)
     for i = 1, mq.TLO.Me.NumBagSlots() do
         if i ~= slot then
@@ -137,6 +159,11 @@ function inventory.find_duplicate_item(item, slot)
     return 0, 0
 end
 
+-- Move the indicated item to the combine bag
+---@param item Item
+---@param class_settings Class_Settings_Settings
+---@param char_settings Char_Settings_SaveState
+---@param slot number
 function inventory.combine_item(item, class_settings, char_settings, slot)
     if _G.Mob.xtargetCheck(char_settings) then
         _G.Mob.clearXtarget(class_settings, char_settings)
@@ -186,6 +213,11 @@ function inventory.combine_item(item, class_settings, char_settings, slot)
     logger.log_verbose("\aoSuccessfully moved \ag%s \aoto combine container.", item.what)
 end
 
+-- Perform the combine with the indicated container
+---@param item Item
+---@param class_settings Class_Settings_Settings
+---@param char_settings Char_Settings_SaveState
+---@param slot number
 function inventory.combine_do(item, class_settings, char_settings, slot)
     if _G.Mob.xtargetCheck(char_settings) then
         _G.Mob.clearXtarget(class_settings, char_settings)
@@ -204,6 +236,10 @@ function inventory.combine_do(item, class_settings, char_settings, slot)
     end
 end
 
+-- Return combine container and any moved item to their previous slots
+---@param item Item
+---@param class_settings Class_Settings_Settings
+---@param char_settings Char_Settings_SaveState
 function inventory.combine_done(item, class_settings, char_settings)
     if _G.Mob.xtargetCheck(char_settings) then
         _G.Mob.clearXtarget(class_settings, char_settings)
@@ -223,6 +259,8 @@ function inventory.combine_done(item, class_settings, char_settings)
     end
 end
 
+-- Move to the indicated enviromental tradeskill container and open it.
+---@param item Item
 function inventory.enviro_combine_container(item)
     _G.State:setStatusText(string.format("Moving to %s.", item.what))
     logger.log_info("\aoMoving to \ag%s \aoto perform combine.", item.what)
@@ -269,6 +307,8 @@ function inventory.enviro_combine_container(item)
     end
 end
 
+-- Move the indicated item to the enviromental tradeskill container in the indicated slot
+---@param item Item
 function inventory.enviro_combine_item(item)
     _G.State:setStatusText(string.format("Moving %s to combine container slot %s.", item.what, item.enviroslot))
     logger.log_info("\aoMoving \ag%s \aoto combine container.", item.what)
@@ -294,6 +334,8 @@ function inventory.enviro_combine_item(item)
     logger.log_verbose("\aoSuccessfully moved \ag%s \aoto combine container in slot \ag%s\ao.", item.what, item.enviroslot)
 end
 
+-- Perform the combine with the indicated enviromental tradeskill container
+---@param item Item
 function inventory.enviro_combine_do(item)
     _G.State:setStatusText("Combining.")
     logger.log_info("\aoPerforming combine in enviromental container.")
@@ -307,9 +349,11 @@ function inventory.enviro_combine_do(item)
         mq.delay(100)
         mq.TLO.Window("ContainerWindow/Container_Combine").LeftMouseUp()
     end
-    inventory.auto_inv()
+    inventory.auto_inv(item)
 end
 
+-- Equip the indicated item and store the item previously in that slot
+---@param item Item
 function inventory.equip_item(item)
     if item.count == nil then
         _G.State:setStatusText(string.format("Equiping %s.", item.what))
@@ -317,7 +361,7 @@ function inventory.equip_item(item)
         mq.delay("1s")
         inventory.slot = mq.TLO.FindItem('=' .. item.what).WornSlot(1)()
         logger.log_verbose("\aoUnequiping slot \ag%s\ao.", inventory.slot)
-        inventory.stored_item = mq.TLO.Me.Inventory(inventory.slot)()
+        inventory.stored_item = mq.TLO.Me.Inventory(inventory.slot)() or ''
         logger.log_verbose("\aoUnequiping \ag%s\ao.", inventory.stored_item)
         mq.cmdf("/itemnotify \"%s\" leftmouseup", item.what)
         while mq.TLO.Cursor() == nil do
@@ -356,6 +400,8 @@ function inventory.equip_item(item)
     end
 end
 
+-- Reequip the previously equiped items that equip_item removed
+---@param item Item
 function inventory.restore_item(item)
     if item.count == nil then
         logger.log_info("\aoReequiping \ag%s\ao.", inventory.stored_item)
@@ -392,14 +438,20 @@ function inventory.restore_item(item)
     end
 end
 
+-- Clear the table of stored items
+---@param item Item
 function inventory.clear_stored_items(item)
     inventory.stored_item_table = {}
 end
 
+-- Pickup the indicated item onto your cursor (for keys primarily)
+---@param item Item
 function inventory.pickup_key(item)
     mq.cmdf("/itemnotify \"%s\" leftmouseup", item.what)
 end
 
+-- Remove weapons from the main and offhand slots.  Store their name and what slot they are moved to.
+---@param item Item
 function inventory.remove_weapons(item)
     _G.State:setStatusText("Removing weapons.")
     logger.log_info("\aoRemoving weapons.")
@@ -431,6 +483,7 @@ function inventory.remove_weapons(item)
     end
 end
 
+-- Restore weapons to the main and offhand slots
 function inventory.restore_weapons()
     mq.cmdf("/nomodkey /shiftkey /itemnotify in pack%s %s leftmouseup", inventory.weapon1.slot1, inventory.weapon1.slot2)
     while mq.TLO.Cursor() == nil do
@@ -461,6 +514,9 @@ function inventory.restore_weapons()
     inventory.weapon2.name = ''
 end
 
+-- Find a free slot that is not within the indicated bag (default to a non existant bag if no parameter is passed)
+---@param exclude_bag number|nil
+---@return number, number
 function inventory.find_free_slot(exclude_bag)
     exclude_bag = exclude_bag or 15
     logger.log_verbose("\aoFinding free slot to place item.")
@@ -481,8 +537,12 @@ function inventory.find_free_slot(exclude_bag)
             end
         end
     end
+    return 15, 15
 end
 
+-- Check if the indicated item is in inventory
+---@param item Item
+---@return boolean
 function inventory.item_check(item)
     if item.count == nil then
         logger.log_super_verbose("\aoChecking inventory for \ag%s\ao.", item.what)
@@ -500,6 +560,9 @@ function inventory.item_check(item)
     return false
 end
 
+-- Loot the indicated item, return boolean indicating success
+---@param item Item
+---@return boolean
 function inventory.loot(item)
     _G.State:setStatusText(string.format("Looting %s.", item.what))
     local looted = false
@@ -557,8 +620,12 @@ function inventory.loot(item)
     if item.gotostep ~= nil then
         _G.State:handle_step_change(item.gotostep)
     end
+    return false
 end
 
+-- Move the combine container to the indicated slot
+---@param slot number
+---@param container string
 function inventory.move_combine_container(slot, container)
     if mq.TLO.FindItem("=" .. container)() == nil then
         _G.State:setStatusText(string.format("Unable to find combine container (%s).", container))
@@ -594,6 +661,9 @@ function inventory.move_combine_container(slot, container)
     mq.delay(250)
 end
 
+-- Move the indicated bag to a new location
+---@param slot number
+---@return number, number
 function inventory.move_bag(slot)
     local free_pack, free_slot = inventory.find_free_slot(slot)
     logger.log_info("\aoMoving item from bag slot \ag%s \ao to bag \ag%s\ao slot \ag%s\ao.", slot, free_pack, free_slot)
@@ -605,8 +675,12 @@ function inventory.move_bag(slot)
     return free_pack, free_slot
 end
 
+-- Buy an item (or multiples of an item) from a merchant
+---@param item Item
+---@param class_settings Class_Settings_Settings
+---@param char_settings Char_Settings_SaveState
 function inventory.npc_buy(item, class_settings, char_settings)
-    manage.removeInvis()
+    manage.removeInvis(item)
     _G.State:setStatusText(string.format("Buying %s from %s.", item.what, item.npc))
     logger.log_info("\aoBuying \ag%s \ao from \ag%s\ao.", item.what, item.npc)
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
@@ -638,6 +712,8 @@ function inventory.npc_buy(item, class_settings, char_settings)
     mq.TLO.Window('MerchantWnd').DoClose()
 end
 
+-- Empty all items from the indicated bag
+---@param slot number
 function inventory.empty_bag(slot)
     mq.cmd("/keypress OPEN_INV_BAGS")
     if mq.TLO.Me.Inventory('pack' .. slot).Container() then

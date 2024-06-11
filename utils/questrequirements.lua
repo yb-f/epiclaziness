@@ -1,3 +1,4 @@
+---@class Quest_Requirements
 local quests_requirements = {
     ['brd'] = {
         ['10']    = '',

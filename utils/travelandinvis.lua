@@ -1,3 +1,4 @@
+---@class TravelAndInvis
 local travel = {
     ['brd_pre15'] = {
         ['gate']  = 5,

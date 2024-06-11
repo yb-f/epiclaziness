@@ -15,6 +15,7 @@ local LogLevels            = {
 
 local outlineFilter        = ''
 local fullOutlineFilter    = ''
+---@class DrawGui
 local draw_gui             = {}
 local class_list_choice    = 1
 local class_list           = { 'Bard', 'Beastlord', 'Berserker', 'Cleric', 'Druid', 'Enchanter', 'Magician', 'Monk', 'Necromancer', 'Paladin', 'Ranger', 'Rogue', 'Shadow Knight',
@@ -29,6 +30,10 @@ draw_gui.jumpStep          = 0
 draw_gui.travelPct         = 0
 draw_gui.travelText        = ''
 
+-- Draw the row of the indicated step in the Full Outline tab
+---@param item table
+---@param step number
+---@param outlineText string
 function draw_gui.full_outline_row(item, step, outlineText)
     ImGui.TableNextRow()
     ImGui.TableNextColumn()
@@ -54,6 +59,10 @@ function draw_gui.full_outline_row(item, step, outlineText)
     ImGui.TextWrapped(outlineText)
 end
 
+-- Return how many invis potions are needed for the given class and quest
+---@param class string
+---@param choice number
+---@return number
 local function invis_needed(class, choice)
     local class_epic = ''
     if choice == 1 then
@@ -68,6 +77,10 @@ local function invis_needed(class, choice)
     return invis_travel[class_epic].invis
 end
 
+-- Return how many gate potions are needed for the given class and quest
+---@param class string
+---@param choice number
+---@return number
 local function gate_needed(class, choice)
     local class_epic = ''
     if choice == 1 then
@@ -82,6 +95,8 @@ local function gate_needed(class, choice)
     return invis_travel[class_epic].gate
 end
 
+-- Draw the Console log tab
+---@param class_settings Class_Settings
 function draw_gui.consoleTab(class_settings)
     if ImGui.BeginTabItem("Console") then
         local changed
@@ -105,6 +120,8 @@ function draw_gui.consoleTab(class_settings)
     end
 end
 
+-- Draw the Full Outline tab
+---@param task_table table
 function draw_gui.fullOutlineTab(task_table)
     if ImGui.BeginTabItem("Full Outline") then
         fullOutlineFilter = ImGui.InputText("Filter", fullOutlineFilter, ImGuiInputTextFlags.None)
@@ -128,6 +145,7 @@ function draw_gui.fullOutlineTab(task_table)
     end
 end
 
+-- Fill in distance to destination, average velocity, and ETA
 function draw_gui.pathUpdate()
     if mq.gettime() > _G.State.updateTime then
         _G.State.updateTime = mq.gettime() + 100
@@ -152,6 +170,7 @@ function draw_gui.pathUpdate()
     end
 end
 
+-- Draw the header section of the GUI (Control buttons and fields)
 function draw_gui.header()
     ImGui.Text("Epic: " .. myClass .. " " .. _G.State.epicstring)
     if _G.State:readTaskRunning() == false then
@@ -223,6 +242,8 @@ function draw_gui.header()
     end
 end
 
+-- Draw the General tab of the GUI
+---@param task_table table
 function draw_gui.generalTab(task_table)
     if ImGui.BeginTabItem("General") then
         if _G.State:readTaskRunning() == false then
@@ -286,6 +307,10 @@ function draw_gui.generalTab(task_table)
     end
 end
 
+-- Get values and draw the check boxes in the Outline tab
+---@param id string
+---@param on number
+---@param step number
 function draw_gui.outline_check_box(id, on, step)
     local toggled = false
     local state = on
@@ -322,6 +347,11 @@ function draw_gui.outline_check_box(id, on, step)
     return state, toggled
 end
 
+-- Draw the row of the indicated step in the Outline Tab
+---@param overview_steps table
+---@param task_outline_table table
+---@param task_table table
+---@param i number
 function draw_gui.outlineRow(overview_steps, task_outline_table, task_table, i)
     ImGui.TableNextRow()
     ImGui.TableNextColumn()
@@ -345,6 +375,10 @@ function draw_gui.outlineRow(overview_steps, task_outline_table, task_table, i)
     ImGui.TextWrapped(task_outline_table[i].Description)
 end
 
+-- Draw the Outline tab
+---@param task_outline_table table
+---@param overview_steps table
+---@param task_table table
 function draw_gui.outlineTab(task_outline_table, overview_steps, task_table)
     if ImGui.BeginTabItem("Outline") then
         outlineFilter = ImGui.InputText("Filter", outlineFilter, ImGuiInputTextFlags.None)
@@ -367,6 +401,13 @@ function draw_gui.outlineTab(task_outline_table, overview_steps, task_table)
     end
 end
 
+-- Draw the Settings tab
+---@param themeName string
+---@param theme table
+---@param themeID number
+---@param class_settings Class_Settings
+---@param char_settings Char_Settings
+---@return string, string, number, string
 function draw_gui.settingsTab(themeName, theme, themeID, class_settings, char_settings)
     if ImGui.BeginTabItem("Settings") then
         ImGui.BeginChild("##SettingsChild")
@@ -461,8 +502,9 @@ function draw_gui.settingsTab(themeName, theme, themeID, class_settings, char_se
     return theme.LoadTheme, themeName, themeID, class_settings.settings.LoadTheme
 end
 
---- @return number
---- @return string
+-- Generate the outline text for the indicated step (via task_fuctions desc field)
+---@param item table
+---@return number, string
 function draw_gui.generate_outline_text(item)
     local step = item.step
     local task_type = item.type
@@ -481,6 +523,11 @@ function draw_gui.generate_outline_text(item)
     end
 end
 
+-- Draw the toggle switch (yoinked from Derple)
+---@param id string
+---@param text string
+---@param on boolean
+---@return boolean, boolean
 function draw_gui.RenderOptionToggle(id, text, on)
     local toggled = false
     local state = on

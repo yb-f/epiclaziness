@@ -1,15 +1,18 @@
 local mq            = require('mq')
 local logger        = require('utils/logger')
 
+---@class Char_Settings
 local loadsave      = {}
 loadsave.SaveState  = {}
 local myName        = mq.TLO.Me.DisplayName()
 loadsave.configPath = mq.configDir .. '/epiclaziness/epiclaziness_' .. mq.TLO.EverQuest.Server() .. "_" .. myName .. '.lua'
 local class         = mq.TLO.Me.Class.Name()
 
+-- Create the character settings file if it does not exist
 function loadsave.createConfig()
+    ---@class Char_Settings_SaveState
     loadsave.SaveState = {
-        [class] = {
+        ['class'] = {
             [_G.State.epic_choice] = {
                 ['Step'] = 0
             },
@@ -26,6 +29,7 @@ function loadsave.createConfig()
     loadsave.saveState()
 end
 
+-- Add configuration settings if user is on a new character (or class in case of personas)
 function loadsave.addConfig()
     if loadsave.SaveState[class] == nil then
         loadsave.SaveState[class] = {
@@ -41,6 +45,7 @@ function loadsave.addConfig()
     loadsave.saveState()
 end
 
+-- Load the saved character settings
 function loadsave.loadState()
     local configData, err = loadfile(loadsave.configPath)
     if err then
@@ -72,12 +77,14 @@ function loadsave.loadState()
     end
 end
 
+-- Prepare to save the current step
 function loadsave.prepSave(step)
     loadsave.SaveState[class][_G.State.epic_choice].Step = step
     loadsave.SaveState[class].Last_Ran = _G.State.epic_choice
     loadsave.saveState()
 end
 
+-- Save settings
 function loadsave.saveState()
     logger.log_info("\aoSaving character settings.")
     mq.pickle(loadsave.configPath, loadsave.SaveState)

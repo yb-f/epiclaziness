@@ -1,3 +1,4 @@
+---@class Tradeskill_Requirements
 local tradeskill_requirements = {
     ['bst'] = {
         ['pre15'] = {

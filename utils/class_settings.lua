@@ -1,9 +1,12 @@
 local mq                  = require('mq')
 local logger              = require('utils/logger')
 
+---@class Class_Settings
 local class_settings      = {}
+class_settings.settings   = {}
 class_settings.configPath = mq.configDir .. '/epiclaziness/epiclaziness_class_settings.lua'
 
+-- Load the settings file if it exists
 function class_settings.loadSettings()
     local configData, err = loadfile(class_settings.configPath)
     if err then
@@ -72,7 +75,9 @@ function class_settings.loadSettings()
     end
 end
 
+-- Create default settings
 function class_settings.createSettings()
+    ---@class Class_Settings_Settings
     class_settings.settings = {
         ['version']      = "0.1.5",
         ['class']        = {
@@ -92,6 +97,12 @@ function class_settings.createSettings()
             ['Shaman'] = 1,
             ['Warrior'] = 1,
             ['Wizard'] = 2
+        },
+        ['general']      = {
+            ['returnToBind'] = false,
+            ['useAOC'] = true,
+            ['invisForTravel'] = true,
+            ['stopTS'] = true,
         },
         ['invis']        = {
             ['Bard']          = 1,
@@ -154,12 +165,14 @@ function class_settings.createSettings()
             ['Spirit of Eagle(Ranger)']  = 8600,
             ['Communion of the Cheetah'] = 939,
             ["Selo's Sonata"]            = 3704,
-        }
+        },
+        ['LoadTheme']    = 'Default',
     }
     class_settings.saveSettings()
     logger.log_warn("\aoCreated default settings. Please set them appropriately for your use.")
 end
 
+--Save Settings
 function class_settings.saveSettings()
     logger.log_info("\aoGeneral settings saved.")
     mq.pickle(class_settings.configPath, class_settings.settings)

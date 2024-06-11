@@ -7,6 +7,7 @@ local dist                   = require 'utils/distance'
 
 local DESIRED_CHIPS          = 1900
 local MAX_DISTANCE           = 100
+---@class Actions
 local actions                = {}
 
 actions.farm_event_triggered = false
@@ -17,23 +18,36 @@ local forage_trash           = { 'Fruit', 'Roots', 'Vegetables', 'Pod of Water',
 local fishing_trash          = { 'Fish Scales', 'Tattered Cloth Sandal', 'Rusty Dagger', "Moray Eel", "Gunthak Gourami",
     "Deep Sea Urchin", "Fresh Fish", "Gunthak Mackerel", "Saltwater Seaweed", "Dark Fish's Scales" }
 
+-- Event to determine when gambling has reached the desired number of chips for Rogue Pre 1.5
+--- @param line string
+--- @param arg1 string
 local function gamble_event(line, arg1)
-    --[[if arg1 == tostring(DESIRED_CHIPS) then
-        logger.log_info("\aoGambling has reached the desired number of chips. Moving on.")
-        gamble_done = true
-    end--]]
     logger.log_info("\aoGambling has reached the desired number of chips. Moving on.")
     gamble_done = true
 end
 
+-- Event function to determine if the set line has been received in chat and continue if so
+---@param line string
+local function event_wait(line)
+    logger.log_verbose('\aoEvent Triggered: %s', line)
+    waiting = false
+    mq.unevent('wait_event')
+end
+
+-- Callback to determine if Adventure Window is open
+--- @return boolean
 function actions.adventure_window()
     return mq.TLO.Window('AdventureRequestWnd').Open()
 end
 
+-- Callback to determine if Adventure Accept Button is enabled in Adventure Window
+--- @return boolean
 function actions.adventure_button()
     return mq.TLO.Window('AdventureRequestWnd/AdvRqst_AcceptButton').Enabled()
 end
 
+-- Callback to determine if we have the proper adventure type selected
+--- @return boolean
 function actions.adventure_type_selection()
     if mq.TLO.Window('AdventureRequestWnd/AdvRqst_TypeCombobox').GetCurSel() == 3 then
         return true
@@ -41,6 +55,8 @@ function actions.adventure_type_selection()
     return false
 end
 
+-- Callback to determine if the proper difficulty is selected
+---@return boolean
 function actions.adventure_risk_selection()
     if mq.TLO.Window('AdventureRequestWnd/AdvRqst_RiskCombobox').GetCurSel() == 2 then
         return true
@@ -48,22 +64,32 @@ function actions.adventure_risk_selection()
     return false
 end
 
+-- Callback to determine if the Give window is open
+---@return boolean
 function actions.give_window()
     return mq.TLO.Window('GiveWnd').Open()
 end
 
+--Callback to determine if the Merchant window is open
+---@return boolean
 function actions.merchant_window()
     return mq.TLO.Window('MerchantWnd').Open()
 end
 
+-- Callback to dtermine if the Inventory window is open
+---@return boolean
 function actions.inventory_window()
     return mq.TLO.Window('InventoryWindow').Open()
 end
 
+-- Callback to determine if the Tradeskill window is open
+---@return boolean
 function actions.tradeskill_window()
     return mq.TLO.Window('TradeskillWnd').Open()
 end
 
+-- Callback to determine if there is an item on the cursor
+---@return boolean
 function actions.got_cursor()
     if mq.TLO.Cursor() ~= nil then
         return true
@@ -71,14 +97,10 @@ function actions.got_cursor()
     return false
 end
 
-local function event_wait(line)
-    logger.log_verbose('\aoEvent Triggered: %s', line)
-    waiting = false
-    mq.unevent('wait_event')
-end
-
+-- Cast the supplied alternate ability
+---@param item Item
 function actions.cast_alt(item)
-    manage.removeInvis()
+    manage.removeInvis(item)
     _G.State:setStatusText(string.format("Casting %s", item.what))
     local ID = mq.TLO.Me.AltAbility(item.what)()
     logger.log_info('\aoCasting alternate ability: %s (%s)', item.what, ID)
@@ -90,6 +112,10 @@ function actions.cast_alt(item)
     logger.log_super_verbose('\aoFinished casting: %s (%s)', item.what, ID)
 end
 
+-- Check if we received the correct dynamic zone (instance)
+---@param item Item
+---@param class_settings Class_Settings_Settings
+---@param char_settings Char_Settings_SaveState
 function actions.dz_check(item, class_settings, char_settings)
     if mq.TLO.DynamicZone.Name() ~= item.zone then
         logger.log_verbose("\aoDid not receive the correct dynamic zone. Moving to step \ar%s\ao.", item.backstep)
@@ -100,6 +126,10 @@ function actions.dz_check(item, class_settings, char_settings)
     end
 end
 
+-- Check if we have the desired item in our inventory. If true goto gotostep, if false goto backstep
+---@param item Item
+---@param class_settings Class_Settings_Settings
+---@param char_settings Char_Settings_SaveState
 function actions.farm_check(item, class_settings, char_settings)
     if _G.Mob.xtargetCheck(char_settings) then
         _G.Mob.clearXtarget(class_settings, char_settings)
@@ -137,6 +167,10 @@ function actions.farm_check(item, class_settings, char_settings)
     end
 end
 
+--Check LDON adventure text to determine where we need to enter
+---@param item Item
+---@param class_settings Class_Settings_Settings
+---@param char_settings Char_Settings_SaveState
 function actions.adventure_entrance(item, class_settings, char_settings)
     while string.find(mq.TLO.Window('AdventureRequestWnd/AdvRqst_NPCText').Text(), item.zone) do
         mq.delay(50)
@@ -149,6 +183,8 @@ function actions.adventure_entrance(item, class_settings, char_settings)
     end
 end
 
+-- Drop the curently active LDON adventure
+---@param item Item
 function actions.drop_adventure(item)
     while mq.TLO.Window('AdventureRequestWnd').Open() == false do
         mq.TLO.Window('AdventureRequestWnd').DoOpen()
@@ -162,6 +198,10 @@ function actions.drop_adventure(item)
     _G.State:handle_step_change(item.gotostep)
 end
 
+-- Check if we have the desired item in our inventory, if not pause the task
+---@param item Item
+---@param class_settings Class_Settings_Settings
+---@param char_settings Char_Settings_SaveState
 function actions.farm_check_pause(item, class_settings, char_settings)
     if _G.Mob.xtargetCheck(char_settings) then
         _G.Mob.clearXtarget(class_settings, char_settings)
@@ -194,10 +234,17 @@ function actions.farm_check_pause(item, class_settings, char_settings)
     end
 end
 
+-- Event function to determine if we have received the correct message yet
+---@param line string
 function actions.farm_event(line)
     actions.farm_event_triggered = true
 end
 
+-- Farm for items at a specific location/radius
+---@param item Item
+---@param class_settings Class_Settings_Settings
+---@param char_settings Char_Settings_SaveState
+---@param event boolean|nil
 function actions.farm_radius(item, class_settings, char_settings, event)
     event = event or false
     if not event then
@@ -238,7 +285,7 @@ function actions.farm_radius(item, class_settings, char_settings, event)
             table.insert(item_list, word)
         end
     end
-    manage.removeInvis()
+    manage.removeInvis(item)
     if not event then
         if not item.count then
             while looping do
@@ -382,13 +429,17 @@ function actions.farm_radius(item, class_settings, char_settings, event)
     manage.pauseGroup(class_settings)
 end
 
+-- Farm at location while NPC is nearby
+---@param item Item
+---@param class_settings Class_Settings_Settings
+---@param char_settings Char_Settings_SaveState
 function actions.farm_while_near(item, class_settings, char_settings)
     _G.State:setStatusText(string.format("Killing nearby mobs until %s moves.", item.npc))
     logger.log_info("\aoKilling nearby mobs until \ag%s \aomoves.", item.npc)
     travel.loc_travel(item, class_settings, char_settings, _G.State:readGroupSelection())
     manage.campGroup(item.radius, item.zradius, class_settings, char_settings)
     manage.unpauseGroup(class_settings)
-    manage.removeInvis()
+    manage.removeInvis(item)
     local not_found_count = 0
     local distance = mq.TLO.Spawn('npc ' .. item.npc).Distance() or 0
     while distance < tonumber(item.what) do
@@ -411,6 +462,11 @@ function actions.farm_while_near(item, class_settings, char_settings)
     manage.pauseGroup(class_settings)
 end
 
+-- Fish for a specific item
+---@param item Item
+---@param class_settings Class_Settings_Settings
+---@param char_settings Char_Settings_SaveState
+---@param once boolean|nil
 function actions.fish_farm(item, class_settings, char_settings, once)
     once = once or false
     if item.count ~= nil then
@@ -519,6 +575,10 @@ function actions.fish_farm(item, class_settings, char_settings, once)
     end
 end
 
+-- Forage for specific items
+---@param item Item
+---@param class_settings Class_Settings_Settings
+---@param char_settings Char_Settings_SaveState
 function actions.forage_farm(item, class_settings, char_settings)
     if item.count == nil then
         _G.State:setStatusText(string.format("Foraging for %s.", item.what))
@@ -616,6 +676,9 @@ function actions.forage_farm(item, class_settings, char_settings)
     end
 end
 
+-- Check cursor for foraged items
+---@param item Item
+---@return boolean|nil
 function actions.forage_cursor_check(item)
     if mq.TLO.Cursor() == nil then
         return false
@@ -641,6 +704,10 @@ function actions.forage_cursor_check(item)
     end
 end
 
+-- Move to location and pick up ground spawn
+---@param item Item
+---@param class_settings Class_Settings_Settings
+---@param char_settings Char_Settings_SaveState
 function actions.ground_spawn(item, class_settings, char_settings)
     _G.State:setStatusText(string.format("Traveling to ground spawn @ %s %s %s.", item.whereX, item.whereY, item.whereZ))
     travel.loc_travel(item, class_settings, char_settings, _G.State:readGroupSelection())
@@ -659,9 +726,13 @@ function actions.ground_spawn(item, class_settings, char_settings)
         mq.delay(200)
         mq.cmd("/click left itemtarget")
     end
-    inv.auto_inv()
+    inv.auto_inv(item)
 end
 
+-- Farm ground spawns in the zone until we obtain desired item
+---@param item Item
+---@param class_settings Class_Settings_Settings
+---@param char_settings Char_Settings_SaveState
 function actions.ground_spawn_farm(item, class_settings, char_settings)
     _G.State:setStatusText(string.format("Farming for ground spawns: %s.", item.what))
     logger.log_info("\aoFarming for \ag%s", item.what)
@@ -725,6 +796,9 @@ function actions.ground_spawn_farm(item, class_settings, char_settings)
     end
 end
 
+-- Check if we have the necessary number of group members, and if they are in zone if necessary
+---@param item Item
+---@param same_zone boolean|nil
 function actions.group_size_check(item, same_zone)
     same_zone = same_zone or false
     logger.log_super_verbose("\aoChecking group size (\ag%s \aoplayers needed).", item.count)
@@ -762,6 +836,9 @@ function actions.group_size_check(item, same_zone)
     end
 end
 
+-- Add mob to the ignore list for class automation
+---@param item Item
+---@param class_settings Class_Settings_Settings
 function actions.ignore_mob(item, class_settings)
     logger.log_verbose("\aoAdding \ag%s\ao to mob ignore list.", item.npc)
     if class_settings.class[mq.TLO.Me.Class()] == 1 then
@@ -779,6 +856,9 @@ function actions.ignore_mob(item, class_settings)
     end
 end
 
+-- Remove mob from the ignore list for class automation
+---@param item Item
+---@param class_settings Class_Settings_Settings
 function actions.unignore_mob(item, class_settings)
     logger.log_verbose("\aoRemoving \ag%s\ao from mob ignore list.", item.npc)
     if class_settings.class[mq.TLO.Me.Class()] == 1 then
@@ -796,6 +876,9 @@ function actions.unignore_mob(item, class_settings)
     end
 end
 
+-- Pause the script and restore previous status text when unpaused
+---@param status string
+---@return boolean|nil
 function actions.pauseTask(status)
     _G.State:setStatusText('Paused.')
     logger.log_info("\aoPausing on step \ar%s\ao.", _G.State.current_step)
@@ -813,14 +896,19 @@ function actions.pauseTask(status)
     return true
 end
 
+-- Cycle through buffs and remove any damage shields (spa 59)
 function actions.RemoveDamageShields()
     while mq.TLO.Me.FindBuff("spa 59")() ~= nil do
         mq.TLO.Me.FindBuff("spa 59").Remove()
     end
 end
 
+-- Give the indicated item to the indicated npc
+---@param item Item
+---@param class_settings Class_Settings_Settings
+---@param char_settings Char_Settings_SaveState
 function actions.npc_give(item, class_settings, char_settings)
-    manage.removeInvis()
+    manage.removeInvis(item)
     _G.State:setStatusText(string.format("Giving %s to %s.", item.what, item.npc))
     logger.log_info("\aoGiving \ag%s\ao to \ag%s\ao.", item.what, item.npc)
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
@@ -898,8 +986,12 @@ function actions.npc_give(item, class_settings, char_settings)
     mq.delay("1s")
 end
 
+-- Add an item to the give window with the indicated NPC
+---@param item Item
+---@param class_settings Class_Settings_Settings
+---@param char_settings Char_Settings_SaveState
 function actions.npc_give_add(item, class_settings, char_settings)
-    manage.removeInvis()
+    manage.removeInvis(item)
     _G.State:setStatusText(string.format("Giving %s to %s.", item.what, item.npc))
     logger.log_info("\aoAdding \ag%s\ao to give window with \ag%s\ao.", item.what, item.npc)
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
@@ -934,8 +1026,12 @@ function actions.npc_give_add(item, class_settings, char_settings)
     end
 end
 
+-- Click the give button on the give window
+---@param item Item
+---@param class_settings Class_Settings_Settings
+---@param char_settings Char_Settings_SaveState
 function actions.npc_give_click(item, class_settings, char_settings)
-    manage.removeInvis()
+    manage.removeInvis(item)
     _G.State:setStatusText("Giving items.")
     mq.TLO.Window('GiveWnd').Child('GVW_Give_Button').LeftMouseUp()
     mq.delay(100)
@@ -950,8 +1046,12 @@ function actions.npc_give_click(item, class_settings, char_settings)
     mq.delay("1s")
 end
 
+-- Give money to NPC
+---@param item Item
+---@param class_settings Class_Settings_Settings
+---@param char_settings Char_Settings_SaveState
 function actions.npc_give_money(item, class_settings, char_settings)
-    manage.removeInvis()
+    manage.removeInvis(item)
     _G.State:setStatusText(string.format("Giving %spp to %s.", item.what, item.npc))
     logger.log_info("\aoGiving \ag%s\ao platinum to \ag%s\ao.", item.what, item.npc)
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
@@ -992,8 +1092,12 @@ function actions.npc_give_money(item, class_settings, char_settings)
     mq.delay("1s")
 end
 
+-- Hail the NPC
+---@param item Item
+---@param class_settings Class_Settings_Settings
+---@param char_settings Char_Settings_SaveState
 function actions.npc_hail(item, class_settings, char_settings)
-    manage.removeInvis()
+    manage.removeInvis(item)
     _G.State:setStatusText(string.format("Hailing %s.", item.npc))
     logger.log_info("\aoHailing \ag%s\ao.", item.npc)
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
@@ -1012,8 +1116,10 @@ function actions.npc_hail(item, class_settings, char_settings)
     mq.delay(300)
 end
 
-function actions.npc_talk(item, class_settings, char_settings)
-    manage.removeInvis()
+-- Say the indicted phrase to the NPC
+---@param item Item
+function actions.npc_talk(item)
+    manage.removeInvis(item)
     _G.State:setStatusText(string.format("Talking to %s (%s).", item.npc, item.phrase))
     logger.log_info("\aoSaying \ag%s \aoto \ag%s\ao.", item.phrase, item.npc)
     if item.npc == 'SELF' then
@@ -1038,6 +1144,10 @@ function actions.npc_talk(item, class_settings, char_settings)
     mq.delay(750)
 end
 
+-- Wait for the NPC to spawn
+---@param item Item
+---@param class_settings Class_Settings_Settings
+---@param char_settings Char_Settings_SaveState
 function actions.npc_wait(item, class_settings, char_settings)
     _G.State:setStatusText(string.format("Waiting for %s (%s).", item.npc, item.waittime))
     logger.log_info("\aoWaiting for \ag%s\ao. This may take \ag%s\ao.", item.npc, item.waittime)
@@ -1056,6 +1166,10 @@ function actions.npc_wait(item, class_settings, char_settings)
     end
 end
 
+-- Wait for the NPC to despawn
+---@param item Item
+---@param class_settings Class_Settings_Settings
+---@param char_settings Char_Settings_SaveState
 function actions.npc_wait_despawn(item, class_settings, char_settings)
     _G.State:setStatusText(string.format("Waiting for %s to despawn (%s).", item.npc, item.waittime))
     logger.log_info("\aoWaiting for \ag%s\ao to despawn. This may take \ag%s\ao.", item.npc, item.waittime)
@@ -1075,6 +1189,8 @@ function actions.npc_wait_despawn(item, class_settings, char_settings)
     end
 end
 
+-- Pickpocket the indicated item from the NPC
+---@param item Item
 function actions.pickpocket(item)
     _G.State:setStatusText(string.format("Pickpocketing %s from %s.", item.what, item.npc))
     logger.log_info("\aoPickpocketing \ag%s \aofrom \ag%s\ao.", item.what, item.npc)
@@ -1109,6 +1225,10 @@ function actions.pickpocket(item)
     end
 end
 
+-- Check if we have the desired item, if so advance to gotostep
+---@param item Item
+---@param class_settings Class_Settings_Settings
+---@param char_settings Char_Settings_SaveState
 function actions.pre_farm_check(item, class_settings, char_settings)
     if _G.Mob.xtargetCheck(char_settings) then
         _G.Mob.clearXtarget(class_settings, char_settings)
@@ -1139,6 +1259,8 @@ function actions.pre_farm_check(item, class_settings, char_settings)
     end
 end
 
+-- Gamble until event triggeres (rogue pre 1.5)
+---@param item Item
 function actions.rog_gamble(item)
     logger.log_verbose("\aoCreating rogue gambling event.")
     mq.event('chips', "#*#Guard Kvovan turns his attention to the nobles#*#", gamble_event)
@@ -1159,6 +1281,8 @@ function actions.rog_gamble(item)
     gamble_done = false
 end
 
+-- Check if we are sneaking, if not sneak
+---@param item Item
 function actions.sneak(item)
     if mq.TLO.Me.Sneaking() == false then
         while mq.TLO.Me.Sneaking() == false do
@@ -1170,6 +1294,8 @@ function actions.sneak(item)
     end
 end
 
+-- Check group size and start LDON Adventure
+---@param item Item
 function actions.start_adventure(item)
     if mq.TLO.Me.Grouped() == false then
         logger.log_error("\aoYou must be in a group with 3 members to request an LDON adventure.")
@@ -1195,6 +1321,8 @@ function actions.start_adventure(item)
     mq.delay("2s")
 end
 
+-- Check if we have completed this LDON Adventure
+---@param item Item
 function actions.ldon_count_check(item)
     local timeString = mq.TLO.Window("AdventureRequestWnd/AdvRqst_CompleteTimeLeftLabel").Text()
     local progressString = mq.TLO.Window("AdventureRequestWnd/AdvRqst_ProgressTextLabel").Text()
@@ -1207,6 +1335,10 @@ function actions.ldon_count_check(item)
     end
 end
 
+-- Wait for the specified amount of time (in ms)
+---@param item Item
+---@param class_settings Class_Settings_Settings
+---@param char_settings Char_Settings_SaveState
 function actions.wait(item, class_settings, char_settings)
     _G.State:setStatusText(string.format("Waiting for %s seconds.", item.wait / 1000))
     logger.log_info("Waiting for \ag%s \ao seconds.", item.wait / 1000)
@@ -1258,6 +1390,8 @@ function actions.wait(item, class_settings, char_settings)
     end
 end
 
+-- Wait for an event to occur
+---@param item Item
 function actions.wait_event(item)
     mq.event('wait_event', item.phrase, event_wait)
     _G.State:setStatusText("Waiting for event (" .. item.phrase .. ") before continuing.")
@@ -1275,6 +1409,8 @@ function actions.wait_event(item)
     end
 end
 
+-- Wait for an item to be on the cursor
+---@param item Item
 function actions.wait_cursor(item)
     while true do
         _G.State:setStatusText("Waiting for " .. item.what .. " on cursor.")
@@ -1299,6 +1435,8 @@ function actions.wait_cursor(item)
     end
 end
 
+--Wait for a specific in game time of day
+---@param item Item
 function actions.wait_for(item)
     local looping     = true
     local cur_eq_hour = mq.TLO.GameTime.Hour()

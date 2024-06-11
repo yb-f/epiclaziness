@@ -1,3 +1,4 @@
+---@class Quests_Done
 local quests_done = {
     ['brd'] = { "Pre-1.5", "1.5", "2.0" },
     ['bst'] = { "Pre-1.5", "1.5", "2.0" },

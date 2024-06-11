@@ -9,6 +9,7 @@ local logger         = require('utils/logger')
 class_settings.loadSettings()
 loadsave.loadState()
 
+---@class Task_Functions
 local task_functions = {
     ADVENTURE_ENTRANCE         = {
         func   = _G.Actions.adventure_entrance,
@@ -282,7 +283,7 @@ local task_functions = {
     },
     NPC_TALK                   = {
         func   = _G.Actions.npc_talk,
-        params = function() return { class_settings.settings, loadsave.SaveState } end,
+        params = {},
         desc   = function(item) return 'Say ' .. item.phrase .. ' to ' .. item.npc end
     },
     NPC_TALK_ALL               = {

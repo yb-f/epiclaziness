@@ -1,0 +1,28 @@
+---@class Item
+---@field step number           The step number
+---@field type string           The type indicator of the step
+---@field zone string           The zone to travel to
+---@field npc string            The name of the NPC we are interested in
+---@field what string           The item we are interested in
+---@field whereX number         The X coordinate of the location
+---@field whereY number         The Y coordinate of the location
+---@field whereZ number         The Z coordinate of the location
+---@field radius number         The radius to farm
+---@field gotostep number       Goto this step after completion (If conditions are met)
+---@field SaveStep number       Save progress at this step  (1 true nil false)
+---@field waittime string       Text represenation of how long expected wait is
+---@field invis number          Should we invis for this step (1 true nil false)
+---@field belev number          Should we be levitating currently or should we remove any lev skills  (1 true nil false)
+---@field count number          How many of whatever this step is indicating
+---@field named number          Is this a named NPC  (1 true nil false)
+---@field backstep number       If condition was not met go to this step instead
+---@field damage_pct number     What percentage of health should the NPC be damaged to
+---@field maxlevel number       Maximum level to attack NPC normally, if you are higher than this level you will use a lower level spell/song/skill
+---@field status string         The status text to display for this step (FARM_CHECK_PAUSE faiure sets status to this text to notify user of what is missing)
+---@field phrase string         The phrase to say to the NPC or for event matching
+---@field wait number           How long to wait in ms for WAIT type
+---@field enviroslot number     The slot number where the item should be placed in the enviromental container for tradeskill combines
+---@field secondary_loot string The name of any additional pieces of loot we should be grabbing during this step_overview
+---@field zradius number        The z axis radius for farm steps
+---@field xtarget_ignore string The name of an NPC to ignore on the xtarget list
+---@field itemID number         The item ID # of the item we are interested in (for use when duplicate item names exist)

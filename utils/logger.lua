@@ -1,6 +1,13 @@
 --- @type Mq
 local mq              = require('mq')
 
+---@class Logger
+---@field log_super_verbose function
+---@field log_verbose function
+---@field log_debug function
+---@field log_info function
+---@field log_warn function
+---@field log_error function
 local actions         = {}
 
 actions.LogConsole    = nil
@@ -21,12 +28,20 @@ local logLevels       = {
     ['error']         = { level = 1, header = "\arERROR  \ax", },
 }
 
+-- Return the current log level
+---@return number
 function actions.get_log_level() return currentLogLevel end
 
+-- Set the log level
+---@param level number
 function actions.set_log_level(level) currentLogLevel = level end
 
+-- Set log to file setting.
+---@param logToFile boolean
 function actions.set_log_to_file(logToFile) logToFileAlways = logToFile end
 
+-- Get the call stack for the current function
+---@return string
 local function getCallStack()
     local info = debug.getinfo(4, "Snl")
 
@@ -36,6 +51,10 @@ local function getCallStack()
     return callerTracer
 end
 
+-- Log a message
+---@param logLevel string
+---@param output string
+---@vararg any
 local function log(logLevel, output, ...)
     if currentLogLevel < logLevels[logLevel].level then return end
     local callerTracer = getCallStack()
@@ -71,6 +90,7 @@ local function log(logLevel, output, ...)
         output)
 end
 
+-- Generate shortcut functions for logging (log_super_verbose, log_verbose, log_debug, log_info, log_warn, log_error)
 function actions.GenerateShortcuts()
     for level, _ in pairs(logLevels) do
         --- @diagnostic disable-next-line

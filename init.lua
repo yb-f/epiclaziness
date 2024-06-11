@@ -4,8 +4,9 @@ local logger              = require('utils/logger')
 _G.Actions                = require('utils/actions')
 _G.Mob                    = require('utils/mob')
 --local dist               = require 'utils/distance'
---local inv                = require 'utils/inventory'
+--local inv                 = require 'utils/inventory'
 --local travel             = require 'utils/travel'
+local class_definitions   = require('lib/class_definitions')
 local draw_gui            = require('utils/drawgui')
 local manage              = require('utils/manageautomation')
 local loadsave            = require('utils/loadsave')
@@ -43,6 +44,8 @@ local FIRST_WINDOW_HEIGHT = 475
 local AUTOSIZE_SIZES      = { 1, 2, 5, 10, 20 }
 local AUTOSIZE_CHOICE     = 3
 
+-- Check if a file exist
+--- @param name string
 local function File_Exists(name)
     local f = io.open(name, "r")
     if f ~= nil then
@@ -53,6 +56,7 @@ local function File_Exists(name)
     end
 end
 
+--Load the theme file
 local function loadTheme()
     if File_Exists(themeFile) then
         theme = dofile(themeFile)
@@ -69,6 +73,7 @@ local function loadTheme()
     end
 end
 
+-- Global State table, contains variables and methods necessary in other files
 _G.State = {
     xtargIgnore           = '',
     is_paused             = false, --
@@ -114,12 +119,14 @@ _G.State = {
     velocityTable         = {},
 }
 
+-- Clear the velocity table
 function _G.State:clearVelocityTable()
     self.velocityTable = {}
 end
 
+-- Calculate the average velocity from velocities stored in the velocity table
+--- @return number
 function _G.State:getAverageVelocity()
-    --TODO: Implement average velocity calculation
     local velocitySum = 0
     for i, v in pairs(self.velocityTable) do
         velocitySum = velocitySum + v
@@ -127,6 +134,8 @@ function _G.State:getAverageVelocity()
     return velocitySum / #self.velocityTable
 end
 
+-- Add a velocity to the velocity table
+--- @param velocity number
 function _G.State:addVelocity(velocity)
     if #self.velocityTable >= 20 then
         table.remove(self.velocityTable, 1)
@@ -134,60 +143,89 @@ function _G.State:addVelocity(velocity)
     table.insert(self.velocityTable, velocity)
 end
 
+-- Read the status of the start_run variable
+--- @return boolean
 function _G.State:readStartRun()
     return self.do_start_run
 end
 
+-- Set the start_run variable
+--- @param value boolean
 function _G.State:setStartRun(value)
     self.do_start_run = value
 end
 
+-- Set xtargIgnore to value
+--- @param value string
 function _G.State:setXtargIgnore(value)
     self.xtargIgnore = value
 end
 
+-- Read the value of xtargIgnore
+--- @return string
 function _G.State:readXtargIgnore()
     return self.xtargIgnore
 end
 
+--Clear the value of xtargIgnore
 function _G.State:clearXtargIgnore()
     self.xtargIgnore = ''
 end
 
+-- Return is_task_running to determine if script is actively running
+--- @return boolean
 function _G.State:readTaskRunning()
     return self.is_task_running
 end
 
+-- Set is_task_running to value
+--- @param value boolean
 function _G.State:setTaskRunning(value)
     self.is_task_running = value
 end
 
+-- Return is_paused to determine if script is paused
+--- @return boolean
 function _G.State:readPaused()
     return self.is_paused
 end
 
+-- Set is_paused to value
+--- @param value boolean
 function _G.State:setPaused(value)
     self.is_paused = value
 end
 
+-- Return the value of should_stop_at_save
+--- @return boolean
 function _G.State:readStopAtSave()
     return self.should_stop_at_save
 end
 
+-- Set should_stop_at_save to value
+--- @param value boolean
 function _G.State:setStopAtSave(value)
     self.should_stop_at_save = value
 end
 
+-- Return the stored location of the player
+--- @return number, number, number
 function _G.State:readLocation()
     return self.Location.X, self.Location.Y, self.Location.Z
 end
 
+-- Store the current location of the player
+--- @param x number
+--- @param y number
+--- @param z number
 function _G.State:setLocation(x, y, z)
     self.Location.X = x
     self.Location.Y = y
     self.Location.Z = z
 end
 
+-- Handle changing of step. This will set the current step to the new step and set the is_rewound and should_skip variables to true
+--- @param step number
 function _G.State:handle_step_change(step)
     logger.log_info('\aoSetting step to: \ar%s\ao.', step)
     logger.log_verbose("\aoStep type: \ar%s\ao.", task_table[step].type)
@@ -201,30 +239,43 @@ function _G.State:handle_step_change(step)
     end
 end
 
+-- Set the text of the status section in the GUI
+--- @param text string
 function _G.State:setStatusText(text)
     self.status = text
 end
 
+-- Set the text of the second status section in the GUI
+--- @param text string
 function _G.State:setStatusTwoText(text)
     self.status2 = text
 end
 
+-- Read the text of the status section in the GUI
+--- @return string
 function _G.State:readStatusText()
     return self.status
 end
 
+-- Read the text of the second status section in the GUI
+--- @return string
 function _G.State:readStatusTwoText()
     return self.status2
 end
 
+-- Set the text of the requirements for this epic. Generated from questrequirements.lua
+--- @param text string
 function _G.State:setReqsText(text)
     self.requirements = text
 end
 
+-- Read the text of the requirements for this epic
+--- @return string
 function _G.State:readReqsText()
     return self.requirements
 end
 
+-- Read the outline of the selected epic from the outline db
 function _G.State.step_overview()
     task_outline_table = {}
     local class = string.lower(mq.TLO.Me.Class.ShortName())
@@ -265,6 +316,9 @@ function _G.State.step_overview()
     logger.log_super_verbose("\aoSuccessfuly loaded outline.")
 end
 
+-- Spawn filtering predicate
+--- @param spawn spawn
+--- @return boolean
 local function matchFilters(spawn)
     if string.match(string.lower(spawn.CleanName()), string.lower(exclude_name)) then
         return true
@@ -272,6 +326,7 @@ local function matchFilters(spawn)
     return false
 end
 
+-- Create a list of spawns and add them to the list of excluded spawns.
 local function create_spawn_list()
     exclude_list = mq.getFilteredSpawns(matchFilters)
     for _, spawn in ipairs(exclude_list) do
@@ -280,14 +335,19 @@ local function create_spawn_list()
     end
 end
 
+-- Set group_selected_member to the selected member(s) in the group combo box
 function _G.State:setGroupSelection()
     self.group_selected_member = self.group_combo[self.group_choice]
 end
 
+-- Return the value of group_selected_member
+--- @return number, string
 function _G.State:readGroupSelection()
     return self.group_choice, self.group_selected_member
 end
 
+-- Save the current step to the save state
+--- @param item Item
 function _G.State.save(item)
     logger.log_info("\aoSaving step: \ar%s", _G.State.current_step)
     loadsave.prepSave(_G.State.current_step)
@@ -301,16 +361,23 @@ function _G.State.save(item)
     end
 end
 
+-- Exclude the provided NPC from the list of NPCs that will be handled
+--- @param item Item
 function _G.State.exclude_npc(item)
     exclude_name = item.npc
     create_spawn_list()
 end
 
+-- Execute the provided command string
+--- @param item Item
 function _G.State.execute_command(item)
     logger.log_info("\aoExecuting command: \ag%s", item.what)
     mq.cmdf("%s", item.what)
 end
 
+-- Pause the script
+
+--- @param item Item
 function _G.State.pauseTask(item)
     _G.State:setStatusText(item.status)
     _G.State:setTaskRunning(false)
@@ -321,8 +388,8 @@ _G.Task_Functions = require('utils/task_functions')
 
 class_settings.loadSettings()
 loadsave.loadState()
-if not class_settings.settings.LoadTheme then           --whatever your setting is saved as
-    class_settings.settings.LoadTheme = theme.LoadTheme -- load the theme tables default if not set.
+if not class_settings.settings.LoadTheme then              --whatever your setting is saved as
+    class_settings.settings['LoadTheme'] = theme.LoadTheme -- load the theme tables default if not set.
     class_settings.saveSettings()
 end
 if loadsave.SaveState['version'] == nil then
@@ -358,6 +425,7 @@ if loadsave.SaveState.general['speedForTravel'] == nil then
     loadsave.saveState()
 end
 
+-- Populate the values of the group combo box. (None, Group, and all members of group currently in zone)
 function _G.State:populate_group_combo()
     logger.log_info("\aoPopulating group combo box with characters in your current zone.")
     self.group_combo = {}
@@ -372,6 +440,10 @@ function _G.State:populate_group_combo()
     end
 end
 
+-- Check the tradeskills of the player against the requirements for the selected epic return true if they meet the requirements, false if they do not.
+--- @param class string
+--- @param choice number
+--- @return boolean
 local function check_tradeskills(class, choice)
     if tsreqs[class] ~= nil then
         local return_string = nil
@@ -413,8 +485,10 @@ local function check_tradeskills(class, choice)
             end
         end
     end
+    return false
 end
 
+-- Update the status two text in the gui when we change steps
 local function update_general_status()
     for i = 1, #task_outline_table do
         if task_outline_table[i].Step == _G.State.current_step then
@@ -423,6 +497,8 @@ local function update_general_status()
     end
 end
 
+-- Execute the provided task. Grab the function and parameters from the task_functions.lua file and execute it.
+--- @param task Item
 local function execute_task(task)
     local task_type = task.type
     local task_info = _G.Task_Functions[task_type]
@@ -444,6 +520,9 @@ local function execute_task(task)
     end
 end
 
+-- Initialize the selected quest. Load the steps from DB and check tradeskill requirements are met.
+--- @param class string
+--- @param choice number
 local function init_epic(class, choice)
     task_table      = {}
     local tablename = ''
@@ -486,6 +565,10 @@ local function init_epic(class, choice)
     manage.pauseGroup(class_settings.settings)
 end
 
+-- Run the selected quest. Loop through the steps and execute them until we reach the final step.
+-- Loop checks for paused state, task running state, if the player is in game, if auto attack is on, and if we should remove levitate.
+--- @param class string
+--- @param choice number
 local function run_epic(class, choice)
     while _G.State.current_step < #task_table do
         if overview_steps[_G.State.current_step] ~= nil then
@@ -574,6 +657,7 @@ local function run_epic(class, choice)
     _G.State:setTaskRunning(false)
 end
 
+-- Display the ImGui window
 local function displayGUI()
     if not openGUI then
         running = false
@@ -592,7 +676,7 @@ local function displayGUI()
         draw_gui.header()
         ImGui.BeginTabBar("##Tabs")
         draw_gui.generalTab(task_table)
-        theme.LoadTheme, themeName, themeID, class_settings.settings.LoadTheme = draw_gui.settingsTab(themeName, theme, themeID, class_settings, loadsave)
+        theme.LoadTheme, themeName, themeID, class_settings.settings['LoadTheme'] = draw_gui.settingsTab(themeName, theme, themeID, class_settings, loadsave)
         draw_gui.outlineTab(task_outline_table, overview_steps, task_table)
         if _G.State:readTaskRunning() then
             draw_gui.fullOutlineTab(task_table)
@@ -604,6 +688,7 @@ local function displayGUI()
     ImGui.End()
 end
 
+-- Check the version of the script against the latest version. If it is lower than the latest version notify user and exit.
 local function version_check()
     local success, response = pcall(http.request, version_url)
     if not success then
@@ -616,7 +701,9 @@ local function version_check()
         mq.exit()
     end
 end
-
+-- Event used at script startup to determine current state of MQ2Autosize
+--- @param line string
+--- @param arg1 string
 local function autosize_self_event(line, arg1)
     if arg1 == "disabled" then
         _G.State.autosize_self = false
@@ -625,11 +712,15 @@ local function autosize_self_event(line, arg1)
     end
 end
 
+-- Event used at script startup to determine current state of MQ2Autosize selfsize
+--- @param line string
+--- @param arg1 string
 local function autosize_self_size(line, arg1)
     loadsave.SaveState.general['self_size'] = tonumber(autosize_self_size)
     loadsave.saveState()
 end
 
+-- Initialize the MQ2Autosize plugin. Check current settings and if Mq2Autosize is not loaded disable it's use.
 local function init_autosize()
     if mq.TLO.Plugin('MQ2Autosize')() == nil then
         logger.log_warn(
@@ -657,6 +748,7 @@ local function init_autosize()
     end
 end
 
+-- Script startup initialization. Populate the information of various UI elements, check for required plugins and script version and load the ImGui window.
 local function init()
     _G.State:populate_group_combo()
     _G.State.step_overview()
@@ -673,6 +765,7 @@ local function init()
     init_autosize()
 end
 
+-- Main loop of the script. Check if we are in game, if we should start the script, and if we should exit.
 local function main()
     while running == true do
         if mq.TLO.EverQuest.GameState() ~= 'INGAME' then

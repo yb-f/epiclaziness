@@ -12,10 +12,13 @@ local SPIRIT_FALCONS_BUFF = 8600
 local FLIGHT_FALCONS_BUFF = 8601
 local speed_classes       = { "Bard", "Druid", "Ranger", "Shaman" }
 local speed_buffs         = { "Selo's Accelerato", "Communion of the Cheetah", "Spirit of Falcons", "Flight of Falcons", "Spirit of Eagle" }
+---@class Travel
 local travel              = {}
 travel.looping            = false
 travel.timeStamp          = 0
 
+-- Check if we are near a translocator npc before attempting to invis
+---@return boolean
 function travel.invisTranslocatorCheck()
     logger.log_verbose('\aoChecking if we are near a translocator npc before invising.')
     for _, name in ipairs(translocators) do
@@ -29,6 +32,10 @@ function travel.invisTranslocatorCheck()
     return false
 end
 
+-- Face the indicated heading
+---@param item Item
+---@param choice number
+---@param name string
 function travel.face_heading(item, choice, name)
     _G.State:setStatusText(string.format("Facing heading %s.", item.what))
     logger.log_info("\aoFacing heading: \ag%s\ao.", item.what)
@@ -43,6 +50,10 @@ function travel.face_heading(item, choice, name)
     mq.delay(250)
 end
 
+-- Face the indicated location
+---@param item Item
+---@param choice number
+---@param name string
 function travel.face_loc(item, choice, name)
     local x = item.whereX
     local y = item.whereY
@@ -60,6 +71,12 @@ function travel.face_loc(item, choice, name)
     mq.delay(250)
 end
 
+-- Move forward until we have zoned
+---@param item Item
+---@param class_settings Class_Settings_Settings
+---@param char_settings Char_Settings_SaveState
+---@param choice number
+---@param name string
 function travel.forward_zone(item, class_settings, char_settings, choice, name)
     if char_settings.general.speedForTravel == true then
         local speedChar, speedSkill = travel.speedCheck(class_settings, char_settings)
@@ -101,8 +118,11 @@ function travel.forward_zone(item, class_settings, char_settings, choice, name)
     mq.delay("2s")
 end
 
+-- Gate the group
+---@param choice number
+---@param name string
 function travel.gate_group(choice, name)
-    logger.log_info("\aoGating to \ag%s\ao.", mq.TLO.Me.BoundLocation('0')())
+    logger.log_info("\aoGating to \ag%s\ao.", mq.TLO.Me.BoundLocation(0)())
     if choice == 1 then
         mq.cmd("/relocate gate")
         mq.delay(500)
@@ -115,6 +135,12 @@ function travel.gate_group(choice, name)
     end
 end
 
+-- Travel to a location manually without using MQ2Nav
+---@param item Item
+---@param class_settings Class_Settings_Settings
+---@param char_settings Char_Settings_SaveState
+---@param choice number
+---@param name string
 function travel.no_nav_travel(item, class_settings, char_settings, choice, name)
     local x = item.whereX
     local y = item.whereY
@@ -181,6 +207,9 @@ function travel.no_nav_travel(item, class_settings, char_settings, choice, name)
     end
 end
 
+-- Open nearest door
+---@param item Item
+---@return boolean
 function travel.open_door(item)
     _G.State:setStatusText("Opening door.")
     mq.delay(200)
@@ -197,6 +226,11 @@ function travel.open_door(item)
     return false
 end
 
+-- Loop while traveling to a location
+---@param item Item
+---@param class_settings Class_Settings_Settings
+---@param char_settings Char_Settings_SaveState
+---@param ID number|string
 function travel.travelLoop(item, class_settings, char_settings, ID)
     local me = mq.TLO.Me
     _G.State:setLocation(me.X(), me.Y(), me.Z())
@@ -255,7 +289,7 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
                 return
             end
             local temp = _G.State:readStatusText()
-            local door = travel.open_door()
+            local door = travel.open_door(item)
             if door == false and _G.State.autosize == true then
                 if _G.State.autosize_self == false then
                     mq.cmd('/autosize self')
@@ -313,8 +347,15 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
     mq.cmd('/autosize off')
 end
 
+-- Travel to npc or location
+---@param item Item
+---@param class_settings Class_Settings_Settings
+---@param char_settings Char_Settings_SaveState
+---@param ID number|string
+---@param choice number
+---@param name string
 function travel.general_travel(item, class_settings, char_settings, ID, choice, name)
-    ID = ID or _G.Mob.findNearestName(item.npc, item, class_settings, char_settings)
+    ID = ID or _G.Mob.findNearestName(item.npc, item, class_settings, char_settings) or 0
     if char_settings.general.speedForTravel == true then
         local speedChar, speedSkill = travel.speedCheck(class_settings, char_settings)
         if speedChar ~= 'none' then
@@ -340,11 +381,11 @@ function travel.general_travel(item, class_settings, char_settings, ID, choice, 
             _G.Actions.pauseTask(_G.State:readStatusText())
             travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
         end
-        ID = _G.Mob.findNearestName(item.npc, item, class_settings, char_settings)
+        ID = _G.Mob.findNearestName(item.npc, item, class_settings, char_settings) or 0
     end
     _G.State:setStatusText(string.format("Navigating to %s.", item.npc))
     if ID == 0 then
-        ID = _G.Mob.findNearestName(item.npc, item, class_settings, char_settings)
+        ID = _G.Mob.findNearestName(item.npc, item, class_settings, char_settings) or 0
     end
     if dist.GetDistance3D(mq.TLO.Spawn(ID).X(), mq.TLO.Spawn(ID).Y(), mq.TLO.Spawn(ID).Z(), mq.TLO.Me.X(), mq.TLO.Me.Y(), mq.TLO.Me.Z()) < 10 then
         logger.log_debug('\aoDistance to \ag%s \aois less than 10. Not traveling.', item.npc)
@@ -365,6 +406,8 @@ function travel.general_travel(item, class_settings, char_settings, ID, choice, 
     travel.travelLoop(item, class_settings, char_settings, ID)
 end
 
+-- Use invis
+---@param class_settings Class_Settings_Settings
 function travel.invis(class_settings)
     local choice, name = _G.State:readGroupSelection()
     local temp = _G.State:readStatusText()
@@ -499,6 +542,11 @@ function travel.invis(class_settings)
     _G.State:setStatusText(temp)
 end
 
+-- Check if we are invis, or if we should be
+---@param char_settings Char_Settings_SaveState
+---@param class_settings Class_Settings_Settings
+---@param invis number
+---@return boolean
 function travel.invisCheck(char_settings, class_settings, invis)
     local choice, name = _G.State:readGroupSelection()
     if choice > 1 then
@@ -531,22 +579,31 @@ function travel.invisCheck(char_settings, class_settings, invis)
     return false
 end
 
+-- Check if we have a class with a travel speed buff
+---@param class string
+---@param class_settings Class_Settings_Settings
+---@param level number
+---@return boolean
 function travel.gotSpeedyClass(class, class_settings, level)
+    if class == 'Bard' and level < 76 then return false end
+    if (class == 'Shaman' or class == 'Druid' or class == 'Ranger') and level < 85 then return false end
     for i, speedy in ipairs(speed_classes) do
         if class == speedy then
-            if class == 'Bard' and level < 76 then return false end
-            if (class == 'Shaman' or class == 'Druid' or class == 'Ranger') and level < 85 then return false end
             local speed_type = {}
             for word in string.gmatch(class_settings.move_speed[class], '([^|]+)') do
                 table.insert(speed_type, word)
             end
             local speed_skill = speed_type[class_settings.speed[class]]
-            return speed_skill ~= 'None'
+            return speed_skill ~= nil
         end
     end
     return false
 end
 
+-- Check if we are missing a travel speed buff, and should have one applied
+---@param class_settings Class_Settings_Settings
+---@param char_settings Char_Settings_SaveState
+---@return string, number|string
 function travel.speedCheck(class_settings, char_settings)
     local choice, name = _G.State:readGroupSelection()
     if choice > 1 then
@@ -688,6 +745,9 @@ function travel.speedCheck(class_settings, char_settings)
     end
 end
 
+-- Use the travel speed buff we found
+---@param name string
+---@param aaNum number|string
 function travel.doSpeed(name, aaNum)
     if name == 'none' then return end
     if name == mq.TLO.Me.DisplayName() then
@@ -715,6 +775,12 @@ function travel.doSpeed(name, aaNum)
     end
 end
 
+-- Travel to the indicated location
+---@param item Item
+---@param class_settings Class_Settings_Settings
+---@param char_settings Char_Settings_SaveState
+---@param choice number
+---@param name string
 function travel.loc_travel(item, class_settings, char_settings, choice, name)
     local x = item.whereX
     local y = item.whereY
@@ -746,9 +812,10 @@ function travel.loc_travel(item, class_settings, char_settings, choice, name)
     _G.State.destType = 'loc'
     _G.State.dest = string.format("%s %s %s", y, x, z)
     mq.delay(100)
-    travel.travelLoop(item, class_settings, char_settings)
+    travel.travelLoop(item, class_settings, char_settings, 0)
 end
 
+-- Pause navigation
 function travel.navPause()
     local choice, name = _G.State:readGroupSelection()
     logger.log_info("\aoPausing navigation.")
@@ -763,6 +830,12 @@ function travel.navPause()
     mq.delay(500)
 end
 
+-- Unpause navigation
+---@param item Item
+---@param class_settings Class_Settings_Settings
+---@param char_settings Char_Settings_SaveState
+---@param choice number
+---@param name string
 function travel.navUnpause(item, class_settings, char_settings, choice, name)
     if item.whereX then
         local x = item.whereX
@@ -809,10 +882,18 @@ function travel.navUnpause(item, class_settings, char_settings, choice, name)
     mq.delay(500)
 end
 
+-- Event checking for the indicated phrase to stop following
 function travel.follow_event()
     travel.looping = false
 end
 
+-- Folow the indicated NPC. Can follow to location, until event, or until otherwise stopped
+---@param item Item
+---@param class_settings Class_Settings_Settings
+---@param char_settings Char_Settings_SaveState
+---@param event boolean
+---@param choice number
+---@param name string
 function travel.npc_follow(item, class_settings, char_settings, event, choice, name)
     event = event or false
     if _G.Mob.xtargetCheck(char_settings) then
@@ -896,6 +977,10 @@ function travel.npc_follow(item, class_settings, char_settings, event, choice, n
     end
 end
 
+-- Stop following the npc
+---@param item Item
+---@param choice number
+---@param name string
 function travel.npc_stop_follow(item, choice, name)
     _G.State:setStatusText(string.format("Stopping autofollow."))
     logger.log_info("\aoStopping autofollow.")
@@ -909,6 +994,11 @@ function travel.npc_stop_follow(item, choice, name)
     end
 end
 
+-- Travel to the indicated NPC
+---@param item Item
+---@param class_settings Class_Settings_Settings
+---@param ignore_path_check boolean
+---@param char_settings Char_Settings_SaveState
 function travel.npc_travel(item, class_settings, ignore_path_check, char_settings)
     ignore_path_check = ignore_path_check or false
     if item.zone == nil then
@@ -933,11 +1023,13 @@ function travel.npc_travel(item, class_settings, ignore_path_check, char_setting
         travel.loc_travel(item, class_settings, char_settings, _G.State:readGroupSelection())
     else
         _G.State:setStatusText(string.format("Waiting for NPC %s.", item.npc))
-        local ID = _G.Mob.findNearestName(item.npc, item, class_settings, char_settings)
+        local ID = _G.Mob.findNearestName(item.npc, item, class_settings, char_settings) or 0
         travel.general_travel(item, class_settings, char_settings, ID, _G.State:readGroupSelection())
     end
 end
 
+-- Set guild portal to the indicated zone via Mq2PortalSetter
+---@param item Item
 function travel.portal_set(item)
     _G.State:setStatusText(string.format("Setting portal to %s.", item.zone))
     logger.log_info("\aoSetting portal to \ag%s\ao.", item.zone)
@@ -949,6 +1041,7 @@ function travel.portal_set(item)
     end
 end
 
+-- Find a relocation skill or item that is ready for use
 --- @return string
 function travel.findReadyRelocate()
     if mq.TLO.Me.AltAbilityReady("Gate")() then
@@ -969,6 +1062,12 @@ function travel.findReadyRelocate()
     return 'none'
 end
 
+-- Check if we can relocate (findReadyReloctate) and use MQ2Relocate to do so with the indicated relocation method
+---@param item Item
+---@param class_settings Class_Settings_Settings
+---@param char_settings Char_Settings_SaveState
+---@param choice number
+---@param name string
 function travel.relocate(item, class_settings, char_settings, choice, name)
     local currentZone = mq.TLO.Zone.Name()
     if _G.Mob.xtargetCheck(char_settings) then
@@ -1038,11 +1137,18 @@ function travel.relocate(item, class_settings, char_settings, choice, name)
     end
 end
 
+-- Travel to the indicated zone. Return to bind first if returnToBind is true and continue is false
+---@param item Item
+---@param class_settings Class_Settings_Settings
+---@param char_settings Char_Settings_SaveState
+---@param continue boolean
+---@param choice number
+---@param name string
 function travel.zone_travel(item, class_settings, char_settings, continue, choice, name)
     if char_settings.general.returnToBind == true and continue == false then
-        if mq.TLO.Zone.ShortName() ~= item.zone and mq.TLO.Zone.ShortName() ~= mq.TLO.Me.BoundLocation('0')() then
+        if mq.TLO.Zone.ShortName() ~= item.zone and mq.TLO.Zone.ShortName() ~= mq.TLO.Me.BoundLocation(0)() then
             _G.State:setStatusText("Returning to bind point.")
-            while mq.TLO.Zone.ShortName() ~= mq.TLO.Me.BoundLocation('0')() do
+            while mq.TLO.Zone.ShortName() ~= mq.TLO.Me.BoundLocation(0)() do
                 travel.gate_group(choice, name)
                 mq.delay("15s")
             end
@@ -1144,7 +1250,7 @@ function travel.zone_travel(item, class_settings, char_settings, continue, choic
                     return
                 end
                 local temp = _G.State:readStatusText()
-                local door = travel.open_door()
+                local door = travel.open_door(item)
                 if door == false and _G.State.autosize == true then
                     if _G.State.autosize_self == false then
                         mq.cmd('/autosize self')
@@ -1194,6 +1300,10 @@ function travel.zone_travel(item, class_settings, char_settings, continue, choic
     mq.cmd('/autosize off')
 end
 
+-- Check if group members are in the same zone as the player
+---@param choice number
+---@param name string
+---@return boolean
 function travel.GroupZoneCheck(choice, name)
     if choice == 1 then
         return true
@@ -1209,6 +1319,8 @@ function travel.GroupZoneCheck(choice, name)
     return true
 end
 
+-- Check the z loc of the indicated elevator
+---@param item Item
 function travel.elevator_check(item)
     _G.State:setStatusText("Checking elevator location.")
     logger.log_info("\aoChecking elevator location.")
@@ -1222,6 +1334,8 @@ function travel.elevator_check(item)
     end
 end
 
+-- Click the indicated switch
+---@param item Item
 function travel.click_switch(item)
     _G.State:setStatusText("Clicking switch. (" .. item.what .. ").")
     logger.log_info("\aoClicking switch. (\ag%s\ao).", item.what)
@@ -1229,6 +1343,8 @@ function travel.click_switch(item)
     mq.delay(500)
 end
 
+--Wait until we have reached the indicated location on the z-axis
+---@param item Item
 function travel.wait_z_loc(item)
     _G.State:setStatusText("Waiting for correct Z location.")
     logger.log_info("\aoWaiting for correct Z location. (\ag%s\ao).", item.whereZ)
