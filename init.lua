@@ -1,9 +1,10 @@
 --[[
 TODO: Look into ranger 1.5 Pre-quest travel to torgiran and see what improvements can be made.
-TODO: Ranger 1.5 steps 62-100 -- Select a lower level skill. Damage is still to high and killing the NPCs.
+*?: Ranger 1.5 steps 62-100 -- Select a lower level skill. Damage is still to high and killing the NPCs.
 TODO: Check the NPC_GIVE function and see if there is an issue where it is hanging or crashing when the NPC is not present.
 TODO: Rogue 1.5 during the tradeskill combines do a pre-check before executing each of the combines.
 
+TODO: Better checks for invis and speed that won't stutter step the character.
 TODO: In farm_radius function look into prioritizing certain named mobs.
 TODO: Use group invis if available.
 
@@ -35,7 +36,7 @@ local http                = PackageMan.Require('luasocket', 'socket.http')
 local ssl                 = PackageMan.Require('luasec', 'ssl')
 
 local version_url         = 'https://raw.githubusercontent.com/yb-f/EL-Ver/master/latest_ver'
-local version             = v("0.3.36")
+local version             = v("0.3.37")
 local window_flags        = bit32.bor(ImGuiWindowFlags.None)
 local openGUI, drawGUI    = true, true
 local myName              = mq.TLO.Me.DisplayName()
