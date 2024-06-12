@@ -403,7 +403,16 @@ end
 ---@param class_settings Class_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
 function mob.npc_slow_kill(item, class_settings, char_settings)
-    mq.TLO.Spawn('npc ' .. item.npc).DoTarget()
+    local ID = 0;
+    if mq.TLO.Spawn('npc ' .. item.npc).ID() ~= 0 then
+        ID = mq.TLO.Spawn('npc ' .. item.npc).ID()
+    else
+        logger.log_error("\aoThe NPC (\ar%s\ao) was not found.", item.npc)
+        _G.State:setTaskRunning(false)
+        mq.cmd('/foreground')
+        return
+    end
+    mq.TLO.Spawn(ID).DoTarget()
     mq.cmd("/face away")
     mq.cmd("/keypress DUCK")
     local looping = true
@@ -418,30 +427,19 @@ function mob.npc_slow_kill(item, class_settings, char_settings)
         if _G.State:readPaused() then
             _G.Actions.pauseTask(_G.State:readStatusText())
         end
-        if mq.TLO.Me.SpellReady(1)() then
-            if mq.TLO.Me.Ducking() == true then
-                if mq.TLO.Target() == nil then
-                    if mq.TLO.Spawn('npc ' .. item.npc)() ~= nil then
-                        mq.TLO.Spawn('npc ' .. item.npc).DoTarget()
-                    end
-                end
-                if mq.TLO.Target.CleanName() == item.npc then
-                    local angle = mq.TLO.Target.HeadingTo.DegreesCCW() - mq.TLO.Me.Heading.DegreesCCW()
-                    if angle > 230 or angle < 130 then
-                        mq.cmd("/face away")
-                    end
-                    mq.cmd("/stand")
-                    mq.cmd("/cast 1")
-                    while mq.TLO.Me.Casting() == false do
-                        mq.delay(50)
-                    end
-                    while mq.TLO.Me.Casting() do
-                        mq.delay(100)
-                    end
-                end
+        local remaining_pct = mq.TLO.Target.PctHPs() - item.damage_pct
+        if item.count ~= nil then
+            if remaining_pct < 20 then
+                mob.cast_at(2, ID, item)
+            else
+                mob.cast_at(1, ID, item)
+            end
+        else
+            if remaining_pct > 0 then
+                mob.cast_at(1, ID, item)
             end
         end
-        if mq.TLO.Spawn('npc ' .. item.npc)() == nil then
+        if mq.TLO.Spawn(ID)() == nil then
             mq.cmd("/stopcast")
             looping = false
         elseif mq.TLO.Spawn('npc ' .. item.npc).PctHPs() < item.damage_pct then
@@ -458,6 +456,36 @@ function mob.npc_slow_kill(item, class_settings, char_settings)
     end
 end
 
+---Cast a spell at the selected NPC (for npc_slow_kill)
+---@param spell_slot number
+---@param ID number
+---@param item Item
+function mob.cast_at(spell_slot, ID, item)
+    if mq.TLO.Me.SpellReady(spell_slot)() then
+        if mq.TLO.Me.Ducking() == true then
+            if mq.TLO.Target() == nil then
+                if mq.TLO.Spawn(ID)() ~= nil then
+                    mq.TLO.Spawn(ID).DoTarget()
+                end
+            end
+            if mq.TLO.Target.CleanName() == item.npc then
+                local angle = mq.TLO.Target.HeadingTo.DegreesCCW() - mq.TLO.Me.Heading.DegreesCCW()
+                if angle > 230 or angle < 130 then
+                    mq.cmd("/face away")
+                end
+                mq.cmd("/stand")
+                mq.cmdf("/cast %s", spell_slot)
+                while mq.TLO.Me.Casting() == false do
+                    mq.delay(50)
+                end
+                while mq.TLO.Me.Casting() do
+                    mq.delay(100)
+                end
+            end
+        end
+    end
+end
+
 -- Check if we are too high of level and prepare a lower level skill/spell/song if so
 ---@param item Item
 ---@param class_settings Class_Settings_Settings
@@ -466,15 +494,38 @@ function mob.pre_damage_until(item, class_settings, char_settings)
     logger.log_info("\aoChecking if level is higher than \ag%s\ao.", item.maxlevel)
     _G.State:setStatusText(string.format("Checking if level is higher than %s.", item.maxlevel))
     if mq.TLO.Me.Level() >= item.maxlevel then
-        logger.log_debug("\aoLevel is higher than \ag%s\ao. Preparing low damage skill (\ag%s\ao).", item.maxlevel, item.what)
-        _G.State:setStatusText(string.format("Level is higher than %s. Preparing low damage skill (%s).", item.maxlevel, item.what))
-        mq.cmdf('/memspell 1 "%s"', item.what)
-        while mq.TLO.Me.Gem(item.what)() ~= 1 do
-            if mob.xtargetCheck(char_settings) then
-                mob.clearXtarget(class_settings, char_settings)
+        if item.npc ~= nil then
+            logger.log_debug("\aoLevel is higher than \ag%s\ao. Preparing low damage skills (\ag%s\ao - \ag%s\ao).", item.maxlevel, item.npc, item.what)
+            _G.State:setStatusText(string.format("Level is higher than %s. Preparing low damage skills (%s - %s).", item.maxlevel, item.npc, item.what))
+            mq.cmdf('/memspell 1 "%s"', item.npc)
+            while mq.TLO.Me.Gem(item.npc)() ~= 1 do
+                logger.log_verbose("\aoWaiting for \ag%s \aoto memorize in spell slot \ag1\ao.", item.npc)
+                if mob.xtargetCheck(char_settings) then
+                    mob.clearXtarget(class_settings, char_settings)
+                end
+                mq.delay(100)
+                mq.cmdf('/mem 1 "%s"', item.npc)
             end
-            mq.delay(100)
-            mq.cmdf('/mem 1 "%s"', item.what)
+            mq.cmdf('/memspell 2 "%s"', item.what)
+            while mq.TLO.Me.Gem(item.what)() ~= 2 do
+                logger.log_verbose("\aoWaiting for \ag%s \aoto memorize in spell slot \ag2\ao.", item.what)
+                if mob.xtargetCheck(char_settings) then
+                    mob.clearXtarget(class_settings, char_settings)
+                end
+                mq.delay(100)
+                mq.cmdf('/mem 2 "%s"', item.what)
+            end
+        else
+            logger.log_debug("\aoLevel is higher than \ag%s\ao. Preparing low damage skill (\ag%s\ao).", item.maxlevel, item.what)
+            _G.State:setStatusText(string.format("Level is higher than %s. Preparing low damage skill (%s).", item.maxlevel, item.what))
+            mq.cmdf('/memspell 1 "%s"', item.what)
+            while mq.TLO.Me.Gem(item.what)() ~= 1 do
+                if mob.xtargetCheck(char_settings) then
+                    mob.clearXtarget(class_settings, char_settings)
+                end
+                mq.delay(100)
+                mq.cmdf('/mem 1 "%s"', item.what)
+            end
         end
     end
 end
