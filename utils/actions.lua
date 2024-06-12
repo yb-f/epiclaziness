@@ -1152,6 +1152,10 @@ function actions.npc_wait(item, class_settings, char_settings)
     _G.State:setStatusText(string.format("Waiting for %s (%s).", item.npc, item.waittime))
     logger.log_info("\aoWaiting for \ag%s\ao. This may take \ag%s\ao.", item.npc, item.waittime)
     while mq.TLO.Spawn("npc " .. item.npc).ID() == 0 do
+        if mq.TLO.Spawn('corpse ' .. item.npc).ID() ~= 0 then
+            logger.log_warn("\ar%s \aohas a corpse present, continuing.")
+            return
+        end
         if _G.Mob.xtargetCheck(char_settings) then
             _G.Mob.clearXtarget(class_settings, char_settings)
         end
