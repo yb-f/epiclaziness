@@ -5,7 +5,7 @@ TODO: Check the NPC_GIVE function and see if there is an issue where it is hangi
 TODO: Rogue 1.5 during the tradeskill combines do a pre-check before executing each of the combines.
 
 TODO: In farm_radius function look into prioritizing certain named mobs.
-
+TODO: Use group invis if available.
 
 * Berserker (3), Wizard (3), Druid (3), Enchanter (3), Necromancer (3), Monk (2)
 ? meshes: chardokb
