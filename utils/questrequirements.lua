@@ -65,7 +65,7 @@ local quests_requirements = {
     },
     ['rng'] = {
         ['10']    = '',
-        ['pre15'] = 'Lockpicker required for step 89-102 in Howling Stones.',
+        ['pre15'] = 'Lockpicker required for step 93-105 in Howling Stones.',
         ['15']    = 'Requires Fletching 102.',
         ['20']    = '',
     },
