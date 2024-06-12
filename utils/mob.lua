@@ -333,10 +333,11 @@ function mob.findNearestName(npc, item, class_settings, char_settings)
             if item.named == 1 then
                 if closest_ID == 0 then
                     if mq.TLO.Spawn('corpse ' .. item.npc).ID() ~= 0 then
-                        logger.log_warn("\ar%s \aohas already been killed. Advancing to step: \ag%s\ao.", item.npc, item.gotostep)
                         if item.gotostep ~= nil then
+                            logger.log_warn("\ar%s \aohas already been killed. Advancing to step: \ag%s\ao.", item.npc, item.step + 1)
                             _G.State:handle_step_change(item.gotostep)
                         else
+                            logger.log_warn("\ar%s \aohas already been killed. Advancing to step: \ag%s\ao.", item.npc, item.gotostep)
                             _G.State:handle_step_change(item.step + 1)
                         end
                         _G.State:handle_step_change(item.gotostep)
