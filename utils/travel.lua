@@ -290,6 +290,7 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
             end
             local temp = _G.State:readStatusText()
             local door = travel.open_door(item)
+            mq.cmd('/keypress Page_Up')
             if door == false and _G.State.autosize == true then
                 if _G.State.autosize_self == false then
                     mq.cmd('/autosize self')
