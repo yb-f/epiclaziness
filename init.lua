@@ -1,3 +1,16 @@
+--[[
+TODO: Look into ranger 1.5 Pre-quest travel to torgiran and see what improvements can be made.
+TODO: Ranger 1.5 steps 62-100 -- Select a lower level skill. Damage is still to high and killing the NPCs.
+TODO: Check the NPC_GIVE function and see if there is an issue where it is hanging or crashing when the NPC is not present.
+TODO: Rogue 1.5 during the tradeskill combines do a pre-check before executing each of the combines.
+
+TODO: In farm_radius function look into prioritizing certain named mobs.
+
+
+* Berserker (3), Wizard (3), Druid (3), Enchanter (3), Necromancer (3), Monk (2)
+? meshes: chardokb
+--]]
+
 local mq                  = require('mq')
 local ImGui               = require 'ImGui'
 local logger              = require('utils/logger')
