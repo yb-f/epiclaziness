@@ -299,10 +299,12 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
                 if _G.State.autosize_on == false then
                     mq.cmd('/autosize on')
                     _G.State.autosize_on = true
+                    logger.log_debug("\aoResetting autosize1 %s", _G.State.autosize_sizes[_G.State.autosize_choice])
                     mq.cmdf('/autosize sizeself %s', _G.State.autosize_sizes[_G.State.autosize_choice])
                 else
                     _G.State.autosize_choice = _G.State.autosize_choice + 1
                     if _G.State.autosize_choice == 6 then _G.State.autosize_choice = 1 end
+                    logger.log_debug("\aoResetting autosize2 %s", _G.State.autosize_sizes[_G.State.autosize_choice])
                     mq.cmdf('/autosize sizeself %s', _G.State.autosize_sizes[_G.State.autosize_choice])
                 end
             end
@@ -316,8 +318,10 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
             _G.State.destType = ''
             _G.State.dest = ''
             _G.State.is_traveling = false
-            _G.State.autosize_on = false
-            mq.cmd('/autosize off')
+            if _G.State.autosize == true then
+                _G.State.autosize_on = false
+                mq.cmd('/autosize off')
+            end
             travel.navPause()
             _G.State:setLocation(me.X(), me.Y(), me.Z())
             return
@@ -344,8 +348,10 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
     _G.State.destType = ''
     _G.State.dest = ''
     _G.State.is_traveling = false
-    _G.State.autosize_on = false
-    mq.cmd('/autosize off')
+    if _G.State.autosize == true then
+        _G.State.autosize_on = false
+        mq.cmd('/autosize off')
+    end
 end
 
 -- Travel to npc or location
@@ -1260,10 +1266,12 @@ function travel.zone_travel(item, class_settings, char_settings, continue, choic
                     if _G.State.autosize_on == false then
                         mq.cmd('/autosize on')
                         _G.State.autosize_on = true
+                        logger.log_debug("\aoResetting autosize3 %s", _G.State.autosize_sizes[_G.State.autosize_choice])
                         mq.cmdf('/autosize sizeself %s', _G.State.autosize_sizes[_G.State.autosize_choice])
                     else
                         _G.State.autosize_choice = _G.State.autosize_choice + 1
                         if _G.State.autosize_choice == 6 then _G.State.autosize_choice = 1 end
+                        logger.log_debug("\aoResetting autosize4 %s", _G.State.autosize_sizes[_G.State.autosize_choice])
                         mq.cmdf('/autosize sizeself %s', _G.State.autosize_sizes[_G.State.autosize_choice])
                     end
                 end
@@ -1297,8 +1305,10 @@ function travel.zone_travel(item, class_settings, char_settings, continue, choic
     _G.State.destType = ''
     _G.State.dest = ''
     _G.State.is_traveling = false
-    _G.State.autosize_on = false
-    mq.cmd('/autosize off')
+    if _G.State.autosize == true then
+        _G.State.autosize_on = false
+        mq.cmd('/autosize off')
+    end
 end
 
 -- Check if group members are in the same zone as the player

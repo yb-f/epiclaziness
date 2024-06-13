@@ -9,7 +9,7 @@ TODO: In farm_radius function look into prioritizing certain named mobs.
 TODO: Use group invis if available.
 
 * Berserker (3), Wizard (3), Druid (3), Enchanter (3), Necromancer (3), Monk (2)
-? meshes: chardokb
+? meshes: chardokb, thurgadina
 --]]
 
 local mq                  = require('mq')
@@ -588,7 +588,9 @@ local function run_epic(class, choice)
         if overview_steps[_G.State.current_step] ~= nil then
             if overview_steps[_G.State.current_step] == 1 then
                 logger.log_warn('\aoYou have selected to complete this step (\ag%s\ao) manually. Stopping script.', _G.State.current_step)
-                mq.cmdf('/autosize sizeself %s', loadsave.SaveState.general['self_size'])
+                if _G.State.autosize == true then
+                    mq.cmdf('/autosize sizeself %s', loadsave.SaveState.general['self_size'])
+                end
                 mq.cmd('/afollow off')
                 mq.cmd('/nav stop')
                 mq.cmd('/stick off')
@@ -658,7 +660,9 @@ local function run_epic(class, choice)
             end
         end
         if _G.State:readTaskRunning() == false then
-            mq.cmdf('/autosize sizeself %s', loadsave.SaveState.general['self_size'])
+            if _G.State.autosize == true then
+                mq.cmdf('/autosize sizeself %s', loadsave.SaveState.general['self_size'])
+            end
             mq.cmd('/afollow off')
             mq.cmd('/nav stop')
             mq.cmd('/stick off')
@@ -730,7 +734,8 @@ end
 --- @param line string
 --- @param arg1 string
 local function autosize_self_size(line, arg1)
-    loadsave.SaveState.general['self_size'] = tonumber(autosize_self_size)
+    print(autosize_self_size)
+    loadsave.SaveState.general['self_size'] = tonumber(arg1)
     loadsave.saveState()
 end
 
