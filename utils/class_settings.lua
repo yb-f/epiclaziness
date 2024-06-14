@@ -167,6 +167,10 @@ function class_settings.createSettings()
             ["Selo's Sonata"]            = 3704,
         },
         ['LoadTheme']    = 'Default',
+        ['logger']       = {
+            ['LogLevel'] = 3,
+            ['LogToFile'] = false,
+        },
     }
     class_settings.saveSettings()
     logger.log_warn("\aoCreated default settings. Please set them appropriately for your use.")
