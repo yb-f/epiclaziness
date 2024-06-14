@@ -3,6 +3,7 @@ local ICONS                = require('mq.Icons')
 local invis_travel         = require('utils/travelandinvis')
 local ImGui                = require('ImGui')
 local logger               = require('utils/logger')
+local loadsave             = require('utils/loadsave')
 
 local LogLevels            = {
     "Errors",
@@ -25,6 +26,11 @@ local automation_list      = { 'CWTN', 'RGMercs (Lua)', 'RGMercs (Macro)', 'Kiss
 local invis_type           = {}
 local treeview_table_flags = bit32.bor(ImGuiTableFlags.Hideable, ImGuiTableFlags.RowBg, ImGuiTableFlags.Borders, ImGuiTableFlags.SizingFixedFit, ImGuiTableFlags.ScrollX)
 local myClass              = mq.TLO.Me.Class()
+
+draw_gui.dev               = {
+    ['save_step'] = 0,
+    ['dev_on']    = false
+}
 
 draw_gui.jumpStep          = 0
 draw_gui.travelPct         = 0
@@ -57,6 +63,16 @@ function draw_gui.full_outline_row(item, step, outlineText)
     end
     ImGui.SameLine()
     ImGui.TextWrapped(outlineText)
+end
+
+function draw_gui.dev_tab()
+    if ImGui.BeginTabItem("Dev") then
+        draw_gui.dev['save_step'] = ImGui.InputInt("Save Step", draw_gui.dev['save_step'])
+        if ImGui.Button("Save") then
+            loadsave.prepSave(draw_gui.dev['save_step'])
+        end
+        ImGui.EndTabItem()
+    end
 end
 
 -- Return how many invis potions are needed for the given class and quest
@@ -423,7 +439,7 @@ function draw_gui.settingsTab(themeName, theme, themeID, class_settings, char_se
                         theme.LoadTheme = data.Name
                         themeName = theme.LoadTheme
                         themeID = k
-                        class_settings.settings.LoadTheme = theme.LoadTheme
+                        class_settings.settings['LoadTheme'] = theme.LoadTheme
                     end
                 end
                 ImGui.EndCombo()

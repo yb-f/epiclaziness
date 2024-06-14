@@ -7,9 +7,18 @@ TODO: Rogue 1.5 during the tradeskill combines do a pre-check before executing e
 TODO: Better checks for invis and speed that won't stutter step the character.
 TODO: In farm_radius function look into prioritizing certain named mobs.
 TODO: Use group invis if available.
+FIXME: Determine why the travel routine for ground_spawn sometimes fails to start back up after an interruption
+FIXME: Check why pause and stop and what not do not work for enviromental container travel routine
+FIXME: Spirit of Eagle casting/dropping loop due to levitaiton check
+
+FIXME: Ranger 2.0 Step 73 Craftmaster Tieranu determine if npc will spawn if trigger spawns while you are in the room already.
+
+* ? Change lev to only be removed in specific situations?
+* ? Change spirit of eagle to excluded from being removed when removing lev
+* ? Remove spirit of eagle altogether
 
 * Berserker (3), Wizard (3), Druid (3), Enchanter (3), Necromancer (3), Monk (2)
-? meshes: chardokb, thurgadina
+? meshes: chardokb
 --]]
 
 local mq                  = require('mq')
@@ -544,6 +553,7 @@ local function init_epic(class, choice)
     _G.State:setPaused(false)
     loadsave.loadState()
     draw_gui.jumpStep = _G.State.current_step
+    draw_gui.dev.save_step = _G.State.current_step
     logger.log_info("Begining quest for %s epic %s", mq.TLO.Me.Class(), _G.State.epic_list[choice])
     local epic_list = {
         ["1.0"]     = class .. "_10",
@@ -700,6 +710,9 @@ local function displayGUI()
             draw_gui.fullOutlineTab(task_table)
         end
         draw_gui.consoleTab(class_settings)
+        if draw_gui.dev['dev_on'] == true then
+            draw_gui.dev_tab()
+        end
         ImGui.EndTabBar()
     end
     LoadTheme.EndTheme(ColorCount, StyleCount)
