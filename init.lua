@@ -79,6 +79,24 @@ local FIRST_WINDOW_WIDTH  = 415
 local FIRST_WINDOW_HEIGHT = 475
 local AUTOSIZE_SIZES      = { 1, 2, 5, 10, 20 }
 local AUTOSIZE_CHOICE     = 3
+local class_name_table    = {
+    ['Bard'] = 'brd',
+    ['Beastlord'] = 'bst',
+    ['Berserker'] = 'ber',
+    ['Cleric'] = 'clr',
+    ['Druid'] = 'dru',
+    ['Enchanter'] = 'enc',
+    ['Magician'] = 'mag',
+    ['Monk'] = 'mnk',
+    ['Necromancer'] = 'nec',
+    ['Paladin'] = 'pal',
+    ['Rogue'] = 'rog',
+    ['Shadow Knight'] = 'shd',
+    ['Shaman'] = 'shm',
+    ['Warrior'] = 'war',
+    ['Wizard'] = 'wiz'
+}
+
 
 -- Check if a file exist
 --- @param name string
@@ -567,7 +585,12 @@ local function init_epic(class, choice)
     loadsave.loadState()
     draw_gui.jumpStep = _G.State.current_step
     draw_gui.dev.save_step = _G.State.current_step
-    logger.log_info("Begining quest for %s epic %s", mq.TLO.Me.Class(), _G.State.epic_list[choice])
+    if draw_gui.dev['dev_on'] == true then
+        logger.log_info("Begining quest for %s epic %s", draw_gui.class_list[draw_gui.dev['force_class']], _G.State.epic_list[choice])
+        class = class_name_table[draw_gui.class_list[draw_gui.dev['force_class']]]
+    else
+        logger.log_info("Begining quest for %s epic %s", mq.TLO.Me.Class(), _G.State.epic_list[choice])
+    end
     local epic_list = {
         ["1.0"]     = class .. "_10",
         ["Pre-1.5"] = class .. "_pre15",
