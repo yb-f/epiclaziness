@@ -39,6 +39,7 @@ end
 -- Move item on cursor into inventory
 ---@param item Item
 function inventory.auto_inv(item)
+    mq.delay(750)
     if mq.TLO.Cursor() ~= nil then
         _G.State:setStatusText(string.format("Moving %s to inventory.", mq.TLO.Cursor()))
         logger.log_info("\aoMoving \ag%s\ao to inventory.", mq.TLO.Cursor())
