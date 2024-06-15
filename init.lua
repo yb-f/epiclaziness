@@ -422,6 +422,12 @@ function _G.State.exclude_npc(item)
     create_spawn_list()
 end
 
+function _G.State.exclude_npc_by_loc(item)
+    ID = mq.TLO.Spawn(item.what).ID()
+    print(ID)
+    table.insert(_G.State.bad_IDs, ID)
+end
+
 -- Execute the provided command string
 --- @param item Item
 function _G.State.execute_command(item)
