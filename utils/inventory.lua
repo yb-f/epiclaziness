@@ -236,6 +236,7 @@ function inventory.combine_do(item, class_settings, char_settings, slot)
         mq.cmd("/autoinv")
         mq.delay(100)
     end
+    mq.delay(300)
 end
 
 -- Return combine container and any moved item to their previous slots
@@ -259,6 +260,7 @@ function inventory.combine_done(item, class_settings, char_settings)
         _G.State.bagslot1 = 0
         _G.State.bagslot2 = 0
     end
+    mq.delay(300)
 end
 
 -- Move to the indicated enviromental tradeskill container and open it.
