@@ -1,15 +1,28 @@
 --[[
-TODO: Look into ranger 1.5 Pre-quest travel to torgiran and see what improvements can be made.
-*?: Ranger 1.5 steps 62-100 -- Select a lower level skill. Damage is still to high and killing the NPCs.
 TODO: Check the NPC_GIVE function and see if there is an issue where it is hanging or crashing when the NPC is not present.
 TODO: Rogue 1.5 during the tradeskill combines do a pre-check before executing each of the combines.
 
 TODO: Better checks for invis and speed that won't stutter step the character.
 TODO: In farm_radius function look into prioritizing certain named mobs.
 TODO: Use group invis if available.
+
+TODO: Improve travel logic if possible. (There is not a native way to implement the ideas I have, give this more thought) )
+
+TODO: Add check in Warrior 1.5 to see if High Quality Metal Bits were made successfully.
+
+TODO: Rogue 1.56 Test step 20-34 see if we get stuck @ 519, 762, 192
+
+
+FIXME: Rogue 1.5 Highpass check path to Anson McBale.
+FIXME: Warrior step 125 -- Failed ot hand item to npc?
+
+
+
 FIXME: Determine why the travel routine for ground_spawn sometimes fails to start back up after an interruption
+
 FIXME: Check why pause and stop and what not do not work for enviromental container travel routine
 FIXME: Spirit of Eagle casting/dropping loop due to levitaiton check
+
 
 FIXME: Ranger 2.0 Step 73 Craftmaster Tieranu determine if npc will spawn if trigger spawns while you are in the room already.
 
@@ -780,8 +793,19 @@ local function init_autosize()
     end
 end
 
+local function cmd_el(cmd)
+    if cmd == "dev" then
+        if draw_gui.dev['dev_on'] == true then
+            draw_gui.dev['dev_on'] = false
+        else
+            draw_gui.dev['dev_on'] = true
+        end
+    end
+end
+
 -- Script startup initialization. Populate the information of various UI elements, check for required plugins and script version and load the ImGui window.
 local function init()
+    mq.bind('/el', cmd_el)
     _G.State:populate_group_combo()
     _G.State.step_overview()
     mq.imgui.init('displayGUI', displayGUI)
