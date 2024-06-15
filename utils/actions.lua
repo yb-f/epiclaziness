@@ -711,6 +711,11 @@ end
 function actions.ground_spawn(item, class_settings, char_settings)
     _G.State:setStatusText(string.format("Traveling to ground spawn @ %s %s %s.", item.whereX, item.whereY, item.whereZ))
     travel.loc_travel(item, class_settings, char_settings, _G.State:readGroupSelection())
+    if dist.GetDistance3D(item.whereX, item.whereY, item.whereZ, mq.TLO.Me.X(), mq.TLO.Me.Y(), mq.TLO.Me.Z()) > 15 then
+        logger.log_warn("\aoWe are to far away from the necessary location (\ar%s %s %s\ao). Reseting step.", item.whereX, item.whereY, item.whereZ)
+        _G.State:handle_step_change(_G.State.current_step)
+        return
+    end
     _G.State:setStatusText(string.format("Picking up ground spawn %s.", item.what))
     mq.cmd("/itemtarget")
     mq.delay(200)
