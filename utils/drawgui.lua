@@ -19,7 +19,7 @@ local fullOutlineFilter    = ''
 ---@class DrawGui
 local draw_gui             = {}
 local class_list_choice    = 1
-local class_list           = { 'Bard', 'Beastlord', 'Berserker', 'Cleric', 'Druid', 'Enchanter', 'Magician', 'Monk', 'Necromancer', 'Paladin', 'Ranger', 'Rogue', 'Shadow Knight',
+draw_gui.class_list        = { 'Bard', 'Beastlord', 'Berserker', 'Cleric', 'Druid', 'Enchanter', 'Magician', 'Monk', 'Necromancer', 'Paladin', 'Ranger', 'Rogue', 'Shadow Knight',
     'Shaman', 'Warrior', 'Wizard' }
 local changed              = false
 local automation_list      = { 'CWTN', 'RGMercs (Lua)', 'RGMercs (Macro)', 'KissAssist', 'MuleAssist' }
@@ -28,13 +28,21 @@ local treeview_table_flags = bit32.bor(ImGuiTableFlags.Hideable, ImGuiTableFlags
 local myClass              = mq.TLO.Me.Class()
 
 draw_gui.dev               = {
-    ['save_step'] = 0,
-    ['dev_on']    = false
+    ['save_step']   = 0,
+    ['dev_on']      = false,
+    ['force_class'] = 1
 }
 
-draw_gui.jumpStep          = 0
-draw_gui.travelPct         = 0
-draw_gui.travelText        = ''
+for i = 1, 16 do
+    if draw_gui.class_list[i] == mq.TLO.Me.Class() then
+        draw_gui.dev['force_class'] = i
+        break
+    end
+end
+
+draw_gui.jumpStep   = 0
+draw_gui.travelPct  = 0
+draw_gui.travelText = ''
 
 -- Draw the row of the indicated step in the Full Outline tab
 ---@param item table
@@ -71,6 +79,7 @@ function draw_gui.dev_tab()
         if ImGui.Button("Save") then
             loadsave.prepSave(draw_gui.dev['save_step'])
         end
+        draw_gui.dev['force_class'] = ImGui.Combo("##ForcedClass", draw_gui.dev['force_class'], draw_gui.class_list)
         ImGui.EndTabItem()
     end
 end
@@ -469,17 +478,17 @@ function draw_gui.settingsTab(themeName, theme, themeID, class_settings, char_se
             ImGui.TableNextColumn()
             ImGui.PushItemWidth(120)
             ImGui.PushStyleColor(ImGuiCol.FrameBg, IM_COL32(0, 0, 0, 255))
-            class_list_choice = ImGui.ListBox("##classlist", class_list_choice, class_list, #class_list, #class_list)
+            class_list_choice = ImGui.ListBox("##classlist", class_list_choice, draw_gui.class_list, #draw_gui.class_list, #draw_gui.class_list)
             ImGui.PopItemWidth()
             ImGui.PopStyleColor()
             ImGui.TableNextColumn()
             local width = ImGui.GetColumnWidth()
-            local text_width = ImGui.CalcTextSize(class_list[class_list_choice])
+            local text_width = ImGui.CalcTextSize(draw_gui.class_list[class_list_choice])
             ImGui.SetCursorPosX((width - text_width))
-            ImGui.Text(class_list[class_list_choice])
+            ImGui.Text(draw_gui.class_list[class_list_choice])
             ImGui.PushItemWidth(160)
-            class_settings.settings.class[class_list[class_list_choice]], changed = ImGui.Combo('##AutomationType',
-                class_settings.settings.class[class_list[class_list_choice]], automation_list, #automation_list,
+            class_settings.settings.class[draw_gui.class_list[class_list_choice]], changed = ImGui.Combo('##AutomationType',
+                class_settings.settings.class[draw_gui.class_list[class_list_choice]], automation_list, #automation_list,
                 #automation_list)
             ImGui.PopItemWidth()
             if changed then
@@ -487,23 +496,24 @@ function draw_gui.settingsTab(themeName, theme, themeID, class_settings, char_se
                 class_settings.saveSettings()
             end
             invis_type = {}
-            for word in string.gmatch(class_settings.settings.class_invis[class_list[class_list_choice]], '([^|]+)') do
+            for word in string.gmatch(class_settings.settings.class_invis[draw_gui.class_list[class_list_choice]], '([^|]+)') do
                 table.insert(invis_type, word)
             end
             ImGui.PushItemWidth(230)
-            class_settings.settings.invis[class_list[class_list_choice]], changed = ImGui.Combo('##InvisType',
-                class_settings.settings.invis[class_list[class_list_choice]], invis_type, #invis_type,
+            class_settings.settings.invis[draw_gui.class_list[class_list_choice]], changed = ImGui.Combo('##InvisType',
+                class_settings.settings.invis[draw_gui.class_list[class_list_choice]], invis_type, #invis_type,
                 #invis_type)
             if changed then
                 changed = false
                 class_settings.saveSettings()
             end
-            if class_settings.settings.move_speed[class_list[class_list_choice]] then
+            if class_settings.settings.move_speed[draw_gui.class_list[class_list_choice]] then
                 local speed_type = {}
-                for word in string.gmatch(class_settings.settings.move_speed[class_list[class_list_choice]], '([^|]+)') do
+                for word in string.gmatch(class_settings.settings.move_speed[draw_gui.class_list[class_list_choice]], '([^|]+)') do
                     table.insert(speed_type, word)
                 end
-                class_settings.settings.speed[class_list[class_list_choice]], changed = ImGui.Combo('##SpeedType', class_settings.settings.speed[class_list[class_list_choice]],
+                class_settings.settings.speed[draw_gui.class_list[class_list_choice]], changed = ImGui.Combo('##SpeedType',
+                    class_settings.settings.speed[draw_gui.class_list[class_list_choice]],
                     speed_type, #speed_type, #speed_type)
                 if changed then
                     changed = false
