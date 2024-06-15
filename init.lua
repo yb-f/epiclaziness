@@ -10,25 +10,12 @@ TODO: Improve travel logic if possible. (There is not a native way to implement 
 
 TODO: Add check in Warrior 1.5 to see if High Quality Metal Bits were made successfully.
 
-
-FIXME: Warrior step 125 -- Failed ot hand item to npc?
-
-
-
-FIXME: Determine why the travel routine for ground_spawn sometimes fails to start back up after an interruption
-
-FIXME: Check why pause and stop and what not do not work for enviromental container travel routine
-FIXME: Spirit of Eagle casting/dropping loop due to levitaiton check
-
-
 FIXME: Ranger 2.0 Step 73 Craftmaster Tieranu determine if npc will spawn if trigger spawns while you are in the room already.
+* In progress -- Can not trigger NPC unless on that step, hooray.
 
-* ? Change lev to only be removed in specific situations?
-* ? Change spirit of eagle to excluded from being removed when removing lev
-* ? Remove spirit of eagle altogether
 
 * Berserker (3), Wizard (3), Druid (3), Enchanter (3), Necromancer (3), Monk (2)
-? meshes: chardokb
+? meshes: chardokb, nedaria
 --]]
 
 local mq                  = require('mq')
@@ -55,7 +42,7 @@ local http                = PackageMan.Require('luasocket', 'socket.http')
 local ssl                 = PackageMan.Require('luasec', 'ssl')
 
 local version_url         = 'https://raw.githubusercontent.com/yb-f/EL-Ver/master/latest_ver'
-local version             = v("0.3.40")
+local version             = v("0.3.41")
 local window_flags        = bit32.bor(ImGuiWindowFlags.None)
 local openGUI, drawGUI    = true, true
 local myName              = mq.TLO.Me.DisplayName()
