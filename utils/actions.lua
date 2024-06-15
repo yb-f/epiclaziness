@@ -911,6 +911,11 @@ function actions.npc_give(item, class_settings, char_settings)
     manage.removeInvis(item)
     _G.State:setStatusText(string.format("Giving %s to %s.", item.what, item.npc))
     logger.log_info("\aoGiving \ag%s\ao to \ag%s\ao.", item.what, item.npc)
+
+    logger.log_warn("\aoWaiting for \ag%s \aoto spawn.")
+    while mq.TLO.Spawn(item.npc).ID == 0 do
+        mq.delay(100)
+    end
     if mq.TLO.Target.ID() ~= mq.TLO.Spawn(item.npc).ID() then
         if mq.TLO.Spawn(item.npc).Distance() ~= nil then
             if mq.TLO.Spawn(item.npc).Distance() > MAX_DISTANCE then
