@@ -885,6 +885,11 @@ function travel.navUnpause(item, class_settings, char_settings, choice, name)
             mq.cmdf("/travelto %s", item.zone)
             mq.cmdf('/dex %s /travelto %s', name, item.zone)
         end
+    elseif item.what then
+        logger.log_info("\aoResuming navigation to \ag%s\ao.", item.what)
+        mq.cmdf("/itemtarget %s", item.what)
+        mq.delay(100)
+        mq.cmdf("/nav item")
     end
     mq.delay(500)
 end

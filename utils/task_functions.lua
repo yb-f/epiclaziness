@@ -78,7 +78,7 @@ local task_functions = {
     },
     ENVIRO_COMBINE_CONTAINER   = {
         func   = inv.enviro_combine_container,
-        params = {},
+        params = function() return { class_settings.settings, loadsave.SaveState } end,
         desc   = function(item) return 'Travel to ' .. item.what .. ' and prepare combine' end
     },
     ENVIRO_COMBINE_DO          = {

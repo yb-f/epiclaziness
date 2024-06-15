@@ -1,6 +1,7 @@
 local mq                    = require('mq')
 local manage                = require('utils/manageautomation')
 local logger                = require('utils/logger')
+local travel                = require 'utils/travel'
 local dist                  = require 'utils/distance'
 local MAX_DISTANCE          = 100
 ---@class Inventory
@@ -261,7 +262,9 @@ end
 
 -- Move to the indicated enviromental tradeskill container and open it.
 ---@param item Item
-function inventory.enviro_combine_container(item)
+---@param class_settings Class_Settings_Settings
+---@param char_settings Char_Settings_SaveState
+function inventory.enviro_combine_container(item, class_settings, char_settings)
     _G.State:setStatusText(string.format("Moving to %s.", item.what))
     logger.log_info("\aoMoving to \ag%s \aoto perform combine.", item.what)
     mq.cmdf("/itemtarget %s", item.what)
@@ -282,6 +285,7 @@ function inventory.enviro_combine_container(item)
         _G.State.startDist = mq.TLO.Navigation.PathLength(tempString)()
         _G.State.destType = 'loc'
         _G.State.dest = string.format("%s %s %s", y, x, z)
+        travel.travelLoop(item, class_settings, char_settings, 0)
         while mq.TLO.Navigation.Active() do
             mq.delay(500)
         end
