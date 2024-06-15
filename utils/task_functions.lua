@@ -101,6 +101,11 @@ local task_functions = {
         params = {},
         desc   = function(item) return 'Exclude ' .. item.npc .. ' from pull list' end
     },
+    EXCLUDE_NPC_BY_LOC         = {
+        func = _G.State.exclude_npc_by_loc,
+        params = {},
+        desc = function(item) return 'Exclude npc by search string (' .. item.what .. ') from pull list' end
+    },
     EXECUTE_COMMAND            = {
         func   = _G.State.execute_command,
         params = {},
