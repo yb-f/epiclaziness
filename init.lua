@@ -10,10 +10,7 @@ TODO: Improve travel logic if possible. (There is not a native way to implement 
 
 TODO: Add check in Warrior 1.5 to see if High Quality Metal Bits were made successfully.
 
-TODO: Rogue 1.56 Test step 20-34 see if we get stuck @ 519, 762, 192
 
-
-FIXME: Rogue 1.5 Highpass check path to Anson McBale.
 FIXME: Warrior step 125 -- Failed ot hand item to npc?
 
 
@@ -90,6 +87,7 @@ local class_name_table    = {
     ['Monk'] = 'mnk',
     ['Necromancer'] = 'nec',
     ['Paladin'] = 'pal',
+    ['Ranger'] = 'rng',
     ['Rogue'] = 'rog',
     ['Shadow Knight'] = 'shd',
     ['Shaman'] = 'shm',
