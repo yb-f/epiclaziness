@@ -119,7 +119,14 @@ local task_functions = {
     FARM_CHECK                 = {
         func   = _G.Actions.farm_check,
         params = function() return { class_settings.settings, loadsave.SaveState } end,
-        desc   = function(item) return 'Check if we have the items we need: ' .. item.what end
+        desc   = function(item)
+            if item.count == nil then
+                return 'Check if we have the items we need: ' .. item.what
+            else
+                return 'Check if we have the items we need: ' ..
+                    item.what .. ' (' .. item.count .. ')'
+            end
+        end
     },
     FARM_CHECK_PAUSE           = {
         func   = _G.Actions.farm_check_pause,
