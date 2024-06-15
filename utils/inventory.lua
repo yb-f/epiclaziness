@@ -279,24 +279,15 @@ function inventory.enviro_combine_container(item, class_settings, char_settings)
     local y = mq.TLO.ItemTarget.Y()
     local x = mq.TLO.ItemTarget.X()
     local z = mq.TLO.ItemTarget.Z()
-    if dist.GetDistance3D(x, y, z, mq.TLO.ItemTarget.X(), mq.TLO.ItemTarget.Y(), mq.TLO.ItemTarget.Z()) > 20 then
+    print(dist.GetDistance3D(x, y, z, mq.TLO.ItemTarget.X(), mq.TLO.ItemTarget.Y(), mq.TLO.ItemTarget.Z()))
+    if dist.GetDistance3D(x, y, z, mq.TLO.Me.X(), mq.TLO.Me.Y(), mq.TLO.Me.Z()) > 20 then
+        logger.log_verbose("\aoDistance to \ag%s \ao is greater than 20. Starting navigation.")
         mq.cmd("/nav item")
         local tempString = string.format("loc %s %s %s", y, x, z)
         _G.State.startDist = mq.TLO.Navigation.PathLength(tempString)()
         _G.State.destType = 'loc'
         _G.State.dest = string.format("%s %s %s", y, x, z)
         travel.travelLoop(item, class_settings, char_settings, 0)
-        while mq.TLO.Navigation.Active() do
-            mq.delay(500)
-        end
-    end
-    mq.cmd("/nav item")
-    local tempString = string.format("loc %s %s %s", y, x, z)
-    _G.State.startDist = mq.TLO.Navigation.PathLength(tempString)()
-    _G.State.destType = 'loc'
-    _G.State.dest = string.format("%s %s %s", y, x, z)
-    while mq.TLO.Navigation.Active() do
-        mq.delay(500)
     end
     _G.State:setStatusText(string.format("Opening %s window.", item.what))
     logger.log_info("\aoOpening \ag%s \aowindow.", item.what)
