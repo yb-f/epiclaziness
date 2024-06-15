@@ -424,7 +424,6 @@ end
 
 function _G.State.exclude_npc_by_loc(item)
     ID = mq.TLO.Spawn(item.what).ID()
-    print(ID)
     table.insert(_G.State.bad_IDs, ID)
 end
 
@@ -789,7 +788,6 @@ end
 --- @param line string
 --- @param arg1 string
 local function autosize_self_size(line, arg1)
-    print(autosize_self_size)
     loadsave.SaveState.general['self_size'] = tonumber(arg1)
     loadsave.saveState()
 end
