@@ -600,6 +600,11 @@ function manage.removeLev()
     local choice, name = _G.State:readGroupSelection()
     _G.State:setStatusText("Removing levitate.")
     logger.log_info("\aoRemoving levitate.")
+    if mq.TLO.Me.Buff('Spirit of Eagle')() ~= nil then
+        _G.State:setStatusText('Found Spirit of Eagle, not removing.')
+        logger.log_info("\aoFound Spirit of Eagle, not removing.")
+        return
+    end
     if choice == 1 then
         mq.cmd("/removelev")
     elseif choice == 2 then
