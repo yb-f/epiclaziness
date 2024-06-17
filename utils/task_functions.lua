@@ -374,9 +374,9 @@ local task_functions = {
         desc   = 'Check if we have the items to skip the next steps'
     },
     RELOCATE                   = {
-        func   = travel.relocate,
-        params = function() return { class_settings.settings, loadsave.SaveState, _G.State:readGroupSelection() } end,
-        desc   = function(item) return 'Relocate to ' .. item.what end
+        func   = function() return end,
+        params = {}, --function() return { class_settings.settings, loadsave.SaveState, _G.State:readGroupSelection() } end,
+        desc   = "Removed function -- disregard"
     },
     REMOVE_INVIS               = {
         func   = manage.removeInvis,
