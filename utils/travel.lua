@@ -719,6 +719,9 @@ function travel.speedCheck(class_settings, char_settings)
                 if class == 'Druid' then speed_skill = "Spirit of Eagles(Druid)" end
             end
             local aaNum = class_settings['speed_to_num'][speed_skill]
+            if mq.TLO.Me.AltAbilityReady(aaNum)() == false then
+                return 'none', 'none'
+            end
             return mq.TLO.Me.DisplayName(), aaNum
         end
     elseif choice == 2 then
@@ -739,7 +742,10 @@ function travel.speedCheck(class_settings, char_settings)
                     end
                     local aaNum = class_settings['speed_to_num'][speed_skill]
                     aanums[mq.TLO.Group.Member(i).DisplayName()] = aaNum
-                    foundSpeed = true
+                    mq.cmdf("/dquery %s -q Me.AltAbilityReady[%s]", mq.TLO.Group.Member(i).DisplayName(), aaNum)
+                    if mq.TLO.DanNet.Q() ~= "FALSE" then
+                        foundSpeed = true
+                    end
                     --return mq.TLO.Group.Member(i).DisplayName(), aaNum
                 end
             end
@@ -783,6 +789,11 @@ function travel.speedCheck(class_settings, char_settings)
             end
             aaNum = class_settings['speed_to_num'][speed_skill]
             casterName = mq.TLO.Me.DisplayName()
+            if mq.TLO.Me.AltAbilityReady(aaNum)() == false then
+                amSpeedy = false
+                aaNum = 0
+                casterName = 'none'
+            end
             --return mq.TLO.Me.DisplayName(), aaNum
         end
         if aaNum == SELOS_BUFF then
@@ -816,6 +827,10 @@ function travel.speedCheck(class_settings, char_settings)
                     aaNum = num
                     casterName = names
                 end
+            end
+            mq.cmdf("/dquery %s -q Me.AltAbilityReady[%s]", casterName, aaNum)
+            if mq.TLO.DanNet.Q() == "FALSE" then
+                return 'none', 'none'
             end
             return casterName, aaNum
         else
