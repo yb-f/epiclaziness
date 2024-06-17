@@ -254,6 +254,15 @@ local function create_spawn_list()
     return mob_list
 end
 
+--Check if spawn is up (for farm_radius function)
+---@param item Item
+---@return number
+function mob.checkSpawn(item)
+    if item.npc == nil then return 0 end
+    local ID = mq.TLO.Spawn('npc ' .. item.npc).ID()
+    return ID
+end
+
 -- find the nearest NPC by name
 ---@param npc string
 ---@param item Item
