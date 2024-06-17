@@ -23,7 +23,9 @@ function loadsave.createConfig()
             ['useAOC']         = true,
             ['invisForTravel'] = false,
             ['returnToBind']   = false,
-            ['xtargClear']     = 1
+            ['xtargClear']     = 1,
+            ['useGatePot']     = false,
+            ['useOrigin']      = false
         }
     }
     loadsave.saveState()
