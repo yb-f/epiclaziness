@@ -1134,16 +1134,6 @@ function travel.relocate(item, class_settings, char_settings, choice, name, relo
         _G.Mob.clearXtarget(class_settings, char_settings)
         travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
     end
-    _G.State:setStatusText("Searching for relocation ability/item that is ready.")
-    logger.log_info("\aoSearching for a relocation ability/item that is ready.")
-    local relocate = 'none'
-    relocate = travel.findReadyRelocate()
-    mq.delay(50)
-    while relocate == 'none' do
-        logger.log_info("\aoWaiting for a relocation ability/item to be ready.")
-        mq.delay("3s")
-        relocate = travel.findReadyRelocate()
-    end
     _G.State:setStatusText(string.format("Relocating to %s.", relocate))
     logger.log_info("\aoRelocating to \ag%s\ao.", relocate)
     if choice == 1 then
@@ -1198,8 +1188,9 @@ end
 
 --Find the shortest path
 ---@param item Item
+---@param char_settings Char_Settings_SaveState
 ---@return string
-function travel.find_best_path(item)
+function travel.find_best_path(item, char_settings)
     local paths = {}
     --Straight travel
     local distance, path = travel.check_path(mq.TLO.Zone.ShortName(), item.zone)
@@ -1208,11 +1199,29 @@ function travel.find_best_path(item)
         ['path']     = path,
         ['distance'] = distance
     }
+    --Lamp
+    if mq.TLO.FindItem("Wishing Lamp").TimerReady() == 0 then
+        distance, path = travel.check_path('stratos', item.zone)
+        paths[#paths + 1] = {
+            ['method']   = "lamp_stratos",
+            ['path']     = path,
+            ['distance'] = distance
+        }
+    end
     --Gate
-    if mq.TLO.Me.AltAbilityReady(1217)() == true or mq.TLO.FindItem('=Philter of Major Translocation').TimerReady() == 0 then
+    if mq.TLO.Me.AltAbilityReady(1217)() == true or (mq.TLO.FindItem('=Philter of Major Translocation').TimerReady() == 0 and char_settings.general['useGatePot'] == true) then
         distance, path = travel.check_path(mq.TLO.Me.ZoneBound.ShortName(), item.zone)
         paths[#paths + 1] = {
             ['method']   = "gate",
+            ['path']     = path,
+            ['distance'] = distance
+        }
+    end
+    --Stein
+    if mq.TLO.FindItem("Drunkard's Stein").TimerReady() == 0 then
+        distance, path = travel.check_path('poknowledge', item.zone)
+        paths[#paths + 1] = {
+            ['method']   = "stein",
             ['path']     = path,
             ['distance'] = distance
         }
@@ -1256,15 +1265,6 @@ function travel.find_best_path(item)
             ['distance'] = distance
         }
     end
-    --Stein
-    if mq.TLO.FindItem("Drunkard's Stein").TimerReady() == 0 then
-        distance, path = travel.check_path('poknowledge', item.zone)
-        paths[#paths + 1] = {
-            ['method']   = "stein",
-            ['path']     = path,
-            ['distance'] = distance
-        }
-    end
     --Throne of heroes
     if mq.TLO.Me.AltAbilityReady(511)() == true then
         distance, path = travel.check_path('guildlobby', item.zone)
@@ -1275,7 +1275,7 @@ function travel.find_best_path(item)
         }
     end
     --Origin
-    if mq.TLO.Me.AltAbilityReady(331)() == true then
+    if mq.TLO.Me.AltAbilityReady(331)() == true and char_settings.general['useOrigin'] == true then
         distance, path = travel.check_path(mq.TLO.Me.Origin.ShortName(), item.zone)
         paths[#paths + 1] = {
             ['method']   = "origin",
@@ -1283,29 +1283,8 @@ function travel.find_best_path(item)
             ['distance'] = distance
         }
     end
-    --Lamp
-    if mq.TLO.FindItem("Wishing Lamp").TimerReady() == 0 then
-        distance, path = travel.check_path('stratos', item.zone)
-        paths[#paths + 1] = {
-            ['method']   = "lamp_stratos",
-            ['path']     = path,
-            ['distance'] = distance
-        }
-        distance, path = travel.check_path('aalishai', item.zone)
-        paths[#paths + 1] = {
-            ['method']   = "lamp_aalishai",
-            ['path']     = path,
-            ['distance'] = distance
-        }
-        distance, path = travel.check_path('mearatas', item.zone)
-        paths[#paths + 1] = {
-            ['method']   = "lamp_mearatas",
-            ['path']     = path,
-            ['distance'] = distance
-        }
-    end
+
     --Table has been populated, now lets pick the best path.
-    --TODO: Finish this function and implement it
     local shortest_path = 1000
     local shortest_method = ''
     for i, p in pairs(paths) do
@@ -1326,48 +1305,34 @@ end
 ---@param choice number
 ---@param name string
 function travel.zone_travel(item, class_settings, char_settings, continue, choice, name)
-    local method = travel.find_best_path(item)
-    if method == "straight" then
-
-    elseif method == "gate" then
-        travel.gate_group(choice, name)
-    elseif method == "slide_dreadlands" then
-
-    elseif method == "slide_greatdivide" then
-
-    elseif method == "slide_nektulos" then
-
-    elseif method == "slide_nro" then
-
-    elseif method == "slide_skyfire" then
-
-    elseif method == "slide_stonebrunt" then
-
-    elseif method == "stein" then
-
-    elseif method == "throne" then
-
-    elseif method == "origin" then
-
-    elseif method == "lamp_stratos" then
-
-    elseif method == "lamp aalishai" then
-
-    elseif method == "lamp mearatas" then
-
-    end
-
-
-
-    --[[if char_settings.general.returnToBind == true and continue == false then
-        if mq.TLO.Zone.ShortName() ~= item.zone and mq.TLO.Zone.ShortName() ~= mq.TLO.Me.BoundLocation(0)() then
-            _G.State:setStatusText("Returning to bind point.")
-            while mq.TLO.Zone.ShortName() ~= mq.TLO.Me.BoundLocation(0)() do
-                travel.gate_group(choice, name)
-                mq.delay("15s")
-            end
+    if continue == false then
+        local method = travel.find_best_path(item, char_settings)
+        if method == "straight" then
+            --do nothing, just travel
+        elseif method == "gate" then
+            travel.gate_group(choice, name)
+        elseif method == "slide_dreadlands" then
+            travel.relocate(item, class_settings, char_settings, choice, name, "dreadlands")
+        elseif method == "slide_greatdivide" then
+            travel.relocate(item, class_settings, char_settings, choice, name, "greatdivide")
+        elseif method == "slide_nektulos" then
+            travel.relocate(item, class_settings, char_settings, choice, name, "nek")
+        elseif method == "slide_nro" then
+            travel.relocate(item, class_settings, char_settings, choice, name, "nro")
+        elseif method == "slide_skyfire" then
+            travel.relocate(item, class_settings, char_settings, choice, name, "skyfire")
+        elseif method == "slide_stonebrunt" then
+            travel.relocate(item, class_settings, char_settings, choice, name, "stonebrunt")
+        elseif method == "stein" then
+            travel.relocate(item, class_settings, char_settings, choice, name, "pok")
+        elseif method == "throne" then
+            travel.relocate(item, class_settings, char_settings, choice, name, "lobby")
+        elseif method == "origin" then
+            travel.relocate(item, class_settings, char_settings, choice, name, "origin")
+        elseif method == "lamp_stratos" then
+            travel.relocate(item, class_settings, char_settings, choice, name, "air")
         end
-    end--]]
+    end
     if char_settings.general.speedForTravel == true then
         local speedChar, speedSkill = travel.speedCheck(class_settings, char_settings)
         if speedChar ~= 'none' then
