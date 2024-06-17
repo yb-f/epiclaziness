@@ -73,6 +73,12 @@ function loadsave.loadState()
             if loadsave.SaveState.general.xtargClear == nil then
                 loadsave.SaveState.general.xtargClear = 1
             end
+            if loadsave.SaveState.general.useGatePot == nil then
+                loadsave.SaveState.general.useGatePot = false
+            end
+            if loadsave.SaveState.general.useOrigin == nil then
+                loadsave.SaveState.general.useOrigin = false
+            end
         end
     end
 end
