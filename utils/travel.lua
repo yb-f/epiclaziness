@@ -1,21 +1,27 @@
-local mq                  = require('mq')
-local logger              = require('utils/logger')
-local dist                = require 'utils/distance'
+local mq                   = require('mq')
+local logger               = require('utils/logger')
+local dist                 = require 'utils/distance'
 
-local translocators       = { "Magus", "Translocator", "Priest of Discord", "Nexus Scion", "Deaen Greyforge",
+local translocators        = { "Magus", "Translocator", "Priest of Discord", "Nexus Scion", "Deaen Greyforge",
     "Ambassador Cogswald", "Madronoa", "Belinda", "Herald of Druzzil Ro" }
 
-local SELOS_BUFF          = 3704
-local CHEETAH_BUFF        = 939
-local SPIRIT_EAGELE_BUFF  = 8600
-local SPIRIT_FALCONS_BUFF = 8600
-local FLIGHT_FALCONS_BUFF = 8601
-local speed_classes       = { "Bard", "Druid", "Ranger", "Shaman" }
-local speed_buffs         = { "Selo's Accelerato", "Communion of the Cheetah", "Spirit of Falcons", "Flight of Falcons", "Spirit of Eagle" }
+local SELOS_BUFF           = 3704
+local CHEETAH_BUFF         = 939
+local SPIRIT_EAGELE_BUFF   = 8600
+local SPIRIT_FALCONS_BUFF  = 8600
+local FLIGHT_FALCONS_BUFF  = 8601
+local speed_classes        = { "Bard", "Druid", "Ranger", "Shaman" }
+local speed_buffs          = { "Selo's Accelerato", "Communion of the Cheetah", "Spirit of Falcons", "Flight of Falcons", "Spirit of Eagle" }
 ---@class Travel
-local travel              = {}
-travel.looping            = false
-travel.timeStamp          = 0
+local travel               = {}
+travel.looping             = false
+travel.timeStamp           = 0
+
+travel.invalid_connections = {
+    ['Dragon Necropolis'] = {
+        "The Breeding Grounds"
+    }
+}
 
 -- Check if we are near a translocator npc before attempting to invis
 ---@return boolean
@@ -224,6 +230,46 @@ function travel.open_door(item)
         end
     end
     return false
+end
+
+--Check the length of the path between two zones.
+---@param start_short string
+---@param end_short string
+function travel.check_path(start_short, end_short)
+    local zone_path = {}
+    local start_long = mq.TLO.Zone(start_short)()
+    local end_long = mq.TLO.Zone(end_short)()
+    mq.TLO.Window("ZoneGuideWnd").DoOpen()
+    mq.TLO.Window("ZoneGuideWnd/ZGW_ClearPath_Btn").LeftMouseUp()
+    mq.TLO.Window("ZoneGuideWnd/ZGW_ClearZonesSearch_Btn").LeftMouseUp()
+    local zone_count = mq.TLO.Window("ZoneGuideWnd/ZGW_Zones_ListBox").Items()
+    if mq.TLO.Window("ZoneGuideWnd/ZGW_Zones_ListBox").List(start_long)() ~= nil then
+        mq.cmdf('/notify ZoneGuideWnd ZGW_Zones_ListBox Listselect %s', mq.TLO.Window("ZoneGuideWnd/ZGW_Zones_ListBox").List(start_long)())
+        mq.TLO.Window("ZoneGuideWnd/ZGW_SetStart_Btn").LeftMouseUp()
+    end
+    if mq.TLO.Window("ZoneGuideWnd/ZGW_Zones_ListBox").List(end_long)() ~= nil then
+        mq.cmdf('/notify ZoneGuideWnd ZGW_Zones_ListBox Listselect %s', mq.TLO.Window("ZoneGuideWnd/ZGW_Zones_ListBox").List(end_long)())
+        mq.TLO.Window("ZoneGuideWnd/ZGW_SetEnd_Btn").LeftMouseUp()
+    end
+    mq.TLO.Window("ZoneGuideWnd/ZGW_ViewPreviewPath_Btn").LeftMouseUp()
+    zone_count = mq.TLO.Window('ZoneGuideWnd/ZGW_ZoneConnection_ListBox').Items()
+    for i = 1, zone_count do
+        local temp = {}
+        temp.start_zone = mq.TLO.Window('ZoneGuideWnd/ZGW_ZoneConnection_ListBox').List(i, 1)()
+        temp.end_zone = mq.TLO.Window('ZoneGuideWnd/ZGW_ZoneConnection_ListBox').List(i, 2)()
+        if travel.invalid_connections[temp.start_zone] ~= nil then
+            for _, to in ipairs(travel.invalid_connections[temp.start_zone]) do
+                print(to)
+                if temp.end_zone == to then
+                    printf("invalid connection: %s -> %s", temp.start_zone, temp.end_zone)
+                    return 0, nil
+                end
+            end
+        end
+        table.insert(zone_path, temp)
+    end
+    mq.TLO.Window("ZoneGuideWnd").DoClose()
+    return zone_count, zone_path
 end
 
 -- Loop while traveling to a location
@@ -1080,7 +1126,8 @@ end
 ---@param char_settings Char_Settings_SaveState
 ---@param choice number
 ---@param name string
-function travel.relocate(item, class_settings, char_settings, choice, name)
+---@param relocate string
+function travel.relocate(item, class_settings, char_settings, choice, name, relocate)
     local currentZone = mq.TLO.Zone.Name()
     if _G.Mob.xtargetCheck(char_settings) then
         travel.navPause()
@@ -1149,6 +1196,128 @@ function travel.relocate(item, class_settings, char_settings, choice, name)
     end
 end
 
+--Find the shortest path
+---@param item Item
+---@return string
+function travel.find_best_path(item)
+    local paths = {}
+    --Straight travel
+    local distance, path = travel.check_path(mq.TLO.Zone.ShortName(), item.zone)
+    paths[#paths + 1] = {
+        ['method']   = "straight",
+        ['path']     = path,
+        ['distance'] = distance
+    }
+    --Gate
+    if mq.TLO.Me.AltAbilityReady(1217)() == true or mq.TLO.FindItem('=Philter of Major Translocation').TimerReady() == 0 then
+        distance, path = travel.check_path(mq.TLO.Me.ZoneBound.ShortName(), item.zone)
+        paths[#paths + 1] = {
+            ['method']   = "gate",
+            ['path']     = path,
+            ['distance'] = distance
+        }
+    end
+    --Slide
+    if mq.TLO.FindItem("Zueria Slide").TimerReady() == 0 then
+        distance, path = travel.check_path('dreadlands', item.zone)
+        paths[#paths + 1] = {
+            ['method']   = "slide_dreadlands",
+            ['path']     = path,
+            ['distance'] = distance
+        }
+        distance, path = travel.check_path('greatdivide', item.zone)
+        paths[#paths + 1] = {
+            ['method']   = "slide_greatdivide",
+            ['path']     = path,
+            ['distance'] = distance
+        }
+        distance, path = travel.check_path('nektulos', item.zone)
+        paths[#paths + 1] = {
+            ['method']   = "slide_nektulos",
+            ['path']     = path,
+            ['distance'] = distance
+        }
+        distance, path = travel.check_path('nro', item.zone)
+        paths[#paths + 1] = {
+            ['method']   = "slide_nro",
+            ['path']     = path,
+            ['distance'] = distance
+        }
+        distance, path = travel.check_path('skyfire', item.zone)
+        paths[#paths + 1] = {
+            ['method']   = "slide_skyfire",
+            ['path']     = path,
+            ['distance'] = distance
+        }
+        distance, path = travel.check_path('stonebrunt', item.zone)
+        paths[#paths + 1] = {
+            ['method']   = "slide_stonebrunt",
+            ['path']     = path,
+            ['distance'] = distance
+        }
+    end
+    --Stein
+    if mq.TLO.FindItem("Drunkard's Stein").TimerReady() == 0 then
+        distance, path = travel.check_path('poknowledge', item.zone)
+        paths[#paths + 1] = {
+            ['method']   = "stein",
+            ['path']     = path,
+            ['distance'] = distance
+        }
+    end
+    --Throne of heroes
+    if mq.TLO.Me.AltAbilityReady(511)() == true then
+        distance, path = travel.check_path('guildlobby', item.zone)
+        paths[#paths + 1] = {
+            ['method']   = "throne",
+            ['path']     = path,
+            ['distance'] = distance
+        }
+    end
+    --Origin
+    if mq.TLO.Me.AltAbilityReady(331)() == true then
+        distance, path = travel.check_path(mq.TLO.Me.Origin.ShortName(), item.zone)
+        paths[#paths + 1] = {
+            ['method']   = "origin",
+            ['path']     = path,
+            ['distance'] = distance
+        }
+    end
+    --Lamp
+    if mq.TLO.FindItem("Wishing Lamp").TimerReady() == 0 then
+        distance, path = travel.check_path('stratos', item.zone)
+        paths[#paths + 1] = {
+            ['method']   = "lamp_stratos",
+            ['path']     = path,
+            ['distance'] = distance
+        }
+        distance, path = travel.check_path('aalishai', item.zone)
+        paths[#paths + 1] = {
+            ['method']   = "lamp_aalishai",
+            ['path']     = path,
+            ['distance'] = distance
+        }
+        distance, path = travel.check_path('mearatas', item.zone)
+        paths[#paths + 1] = {
+            ['method']   = "lamp_mearatas",
+            ['path']     = path,
+            ['distance'] = distance
+        }
+    end
+    --Table has been populated, now lets pick the best path.
+    --TODO: Finish this function and implement it
+    local shortest_path = 1000
+    local shortest_method = ''
+    for i, p in pairs(paths) do
+        if p.distance < shortest_path then
+            shortest_path = p.distance
+            shortest_method = p.method
+        end
+    end
+    logger.log_info("\aoSelected path \ag%s\ao. Length: \ag%s", shortest_method, shortest_path)
+    return shortest_method
+end
+
 -- Travel to the indicated zone. Return to bind first if returnToBind is true and continue is false
 ---@param item Item
 ---@param class_settings Class_Settings_Settings
@@ -1157,7 +1326,40 @@ end
 ---@param choice number
 ---@param name string
 function travel.zone_travel(item, class_settings, char_settings, continue, choice, name)
-    if char_settings.general.returnToBind == true and continue == false then
+    local method = travel.find_best_path(item)
+    if method == "straight" then
+
+    elseif method == "gate" then
+        travel.gate_group(choice, name)
+    elseif method == "slide_dreadlands" then
+
+    elseif method == "slide_greatdivide" then
+
+    elseif method == "slide_nektulos" then
+
+    elseif method == "slide_nro" then
+
+    elseif method == "slide_skyfire" then
+
+    elseif method == "slide_stonebrunt" then
+
+    elseif method == "stein" then
+
+    elseif method == "throne" then
+
+    elseif method == "origin" then
+
+    elseif method == "lamp_stratos" then
+
+    elseif method == "lamp aalishai" then
+
+    elseif method == "lamp mearatas" then
+
+    end
+
+
+
+    --[[if char_settings.general.returnToBind == true and continue == false then
         if mq.TLO.Zone.ShortName() ~= item.zone and mq.TLO.Zone.ShortName() ~= mq.TLO.Me.BoundLocation(0)() then
             _G.State:setStatusText("Returning to bind point.")
             while mq.TLO.Zone.ShortName() ~= mq.TLO.Me.BoundLocation(0)() do
@@ -1165,7 +1367,7 @@ function travel.zone_travel(item, class_settings, char_settings, continue, choic
                 mq.delay("15s")
             end
         end
-    end
+    end--]]
     if char_settings.general.speedForTravel == true then
         local speedChar, speedSkill = travel.speedCheck(class_settings, char_settings)
         if speedChar ~= 'none' then
