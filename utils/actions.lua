@@ -359,6 +359,16 @@ function actions.farm_radius(item, class_settings, char_settings, event)
                     mq.TLO.Window('ConfirmationDialogBox/CD_Yes_Button').LeftMouseUp()
                     mq.delay("1s")
                 end
+                if item.npc ~= nil then
+                    local ID = _G.Mob.checkSpawn(item)
+                    if ID ~= 0 then
+                        manage.pauseGroup(class_settings)
+                        travel.npc_travel(item, class_settings, false, char_settings)
+                        _G.Mob.npc_kill(item, class_settings, char_settings)
+                        mq.delay(500)
+                        manage.unpauseGroup(class_settings)
+                    end
+                end
             end
         else
             while mq.TLO.FindItemCount("=" .. item.what)() < item.count do
@@ -398,6 +408,16 @@ function actions.farm_radius(item, class_settings, char_settings, event)
                     mq.TLO.Window('ConfirmationDialogBox/CD_Yes_Button').LeftMouseUp()
                     mq.delay("1s")
                 end
+                if item.npc ~= nil then
+                    local ID = _G.Mob.checkSpawn(item)
+                    if ID ~= 0 then
+                        manage.pauseGroup(class_settings)
+                        travel.npc_travel(item, class_settings, false, char_settings)
+                        _G.Mob.npc_kill(item, class_settings, char_settings)
+                        mq.delay(500)
+                        manage.unpauseGroup(class_settings)
+                    end
+                end
             end
         end
     else
@@ -413,6 +433,16 @@ function actions.farm_radius(item, class_settings, char_settings, event)
                 manage.pauseGroup(class_settings)
                 actions.pauseTask(_G.State:readStatusText())
                 manage.unpauseGroup(class_settings)
+            end
+            if item.npc ~= nil then
+                local ID = _G.Mob.checkSpawn(item)
+                if ID ~= 0 then
+                    manage.pauseGroup(class_settings)
+                    travel.npc_travel(item, class_settings, false, char_settings)
+                    _G.Mob.npc_kill(item, class_settings, char_settings)
+                    mq.delay(500)
+                    manage.unpauseGroup(class_settings)
+                end
             end
             mq.delay(250)
             mq.doevents()
