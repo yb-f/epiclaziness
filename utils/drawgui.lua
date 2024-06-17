@@ -455,8 +455,8 @@ function draw_gui.settingsTab(themeName, theme, themeID, class_settings, char_se
             end
             ImGui.PopItemWidth()
             char_settings.SaveState.general.stopTS = draw_gui.RenderOptionToggle("##ts_setting", "Stop if tradeskill requirements are unmet", char_settings.SaveState.general.stopTS)
-            char_settings.SaveState.general.returnToBind = draw_gui.RenderOptionToggle("##bind_setting", "Return to bind between travel steps",
-                char_settings.SaveState.general.returnToBind)
+            char_settings.SaveState.general.useGatePot = draw_gui.RenderOptionToggle("##pot_setting", "Allow use of gate potions", char_settings.SaveState.general.useGatePot)
+            char_settings.SaveState.general.useOrigin = draw_gui.RenderOptionToggle("##bind_setting", "Allow use of Origin", char_settings.SaveState.general.useOrigin)
             char_settings.SaveState.general.invisForTravel = draw_gui.RenderOptionToggle("##invis_setting", "Invis while traveling", char_settings.SaveState.general.invisForTravel)
             char_settings.SaveState.general.speedForTravel = draw_gui.RenderOptionToggle("##speed_setting", "Use travel speed skills", char_settings.SaveState.general
                 .speedForTravel)
