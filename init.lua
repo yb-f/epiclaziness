@@ -1,21 +1,19 @@
 --[[
-TODO: Check the NPC_GIVE function and see if there is an issue where it is hanging or crashing when the NPC is not present.
 TODO: Rogue 1.5 during the tradeskill combines do a pre-check before executing each of the combines.
+*low priority
 
-TODO: Better checks for invis and speed that won't stutter step the character.
-TODO: In farm_radius function look into prioritizing certain named mobs.
+
 TODO: Use group invis if available.
 
-TODO: Improve travel logic if possible. (There is not a native way to implement the ideas I have, give this more thought) )
-
 TODO: Add check in Warrior 1.5 to see if High Quality Metal Bits were made successfully.
+*low priority
 
 FIXME: Ranger 2.0 Step 73 Craftmaster Tieranu determine if npc will spawn if trigger spawns while you are in the room already.
 * In progress -- Can not trigger NPC unless on that step, hooray.
 
 
 * Berserker (3), Wizard (3), Druid (3), Enchanter (3), Necromancer (3), Monk (2)
-? meshes: chardokb, nedaria
+? meshes:
 --]]
 
 local mq                  = require('mq')
@@ -42,7 +40,7 @@ local http                = PackageMan.Require('luasocket', 'socket.http')
 local ssl                 = PackageMan.Require('luasec', 'ssl')
 
 local version_url         = 'https://raw.githubusercontent.com/yb-f/EL-Ver/master/latest_ver'
-local version             = v("0.3.41")
+local version             = v("0.3.42")
 local window_flags        = bit32.bor(ImGuiWindowFlags.None)
 local openGUI, drawGUI    = true, true
 local myName              = mq.TLO.Me.DisplayName()
