@@ -917,7 +917,7 @@ function actions.npc_give(item, class_settings, char_settings)
     _G.State:setStatusText(string.format("Giving %s to %s.", item.what, item.npc))
     logger.log_info("\aoGiving \ag%s\ao to \ag%s\ao.", item.what, item.npc)
 
-    logger.log_warn("\aoWaiting for \ag%s \aoto spawn.")
+    logger.log_warn("\aoWaiting for \ag%s \aoto spawn.", item.npc)
     while mq.TLO.Spawn(item.npc).ID == 0 do
         mq.delay(100)
     end
