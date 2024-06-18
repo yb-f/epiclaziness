@@ -512,7 +512,7 @@ function mob.pre_damage_until(item, class_settings, char_settings)
                 if mob.xtargetCheck(char_settings) then
                     mob.clearXtarget(class_settings, char_settings)
                 end
-                mq.delay(100)
+                mq.delay("1s")
                 mq.cmdf('/mem 1 "%s"', item.npc)
             end
             mq.cmdf('/memspell 2 "%s"', item.what)
@@ -521,7 +521,7 @@ function mob.pre_damage_until(item, class_settings, char_settings)
                 if mob.xtargetCheck(char_settings) then
                     mob.clearXtarget(class_settings, char_settings)
                 end
-                mq.delay(100)
+                mq.delay("1s")
                 mq.cmdf('/mem 2 "%s"', item.what)
             end
         else
