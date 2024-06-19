@@ -507,22 +507,24 @@ function mob.pre_damage_until(item, class_settings, char_settings)
             logger.log_debug("\aoLevel is higher than \ag%s\ao. Preparing low damage skills (\ag%s\ao - \ag%s\ao).", item.maxlevel, item.npc, item.what)
             _G.State:setStatusText(string.format("Level is higher than %s. Preparing low damage skills (%s - %s).", item.maxlevel, item.npc, item.what))
             mq.cmdf('/memspell 1 "%s"', item.npc)
+            mq.delay("1s")
             while mq.TLO.Me.Gem(item.npc)() ~= 1 do
                 logger.log_verbose("\aoWaiting for \ag%s \aoto memorize in spell slot \ag1\ao.", item.npc)
                 if mob.xtargetCheck(char_settings) then
                     mob.clearXtarget(class_settings, char_settings)
                 end
                 mq.delay("1s")
-                mq.cmdf('/mem 1 "%s"', item.npc)
+                mq.cmdf('/memspell 1 "%s"', item.npc)
             end
             mq.cmdf('/memspell 2 "%s"', item.what)
+            mq.delay("1s")
             while mq.TLO.Me.Gem(item.what)() ~= 2 do
                 logger.log_verbose("\aoWaiting for \ag%s \aoto memorize in spell slot \ag2\ao.", item.what)
                 if mob.xtargetCheck(char_settings) then
                     mob.clearXtarget(class_settings, char_settings)
                 end
                 mq.delay("1s")
-                mq.cmdf('/mem 2 "%s"', item.what)
+                mq.cmdf('/memspell 2 "%s"', item.what)
             end
         else
             logger.log_debug("\aoLevel is higher than \ag%s\ao. Preparing low damage skill (\ag%s\ao).", item.maxlevel, item.what)
