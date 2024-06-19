@@ -1307,7 +1307,7 @@ end
 ---@param item Item
 function actions.rog_gamble(item)
     logger.log_verbose("\aoCreating rogue gambling event.")
-    mq.event('chips', "#*#Guard Kvovan turns his attention to the nobles#*#", gamble_event)
+    mq.event('chips', "#*#Guard Kovan turns his attention to the nobles#*#", gamble_event)
     while gamble_done == false do
         if _G.State.should_skip == true then
             _G.State.should_skip = false
