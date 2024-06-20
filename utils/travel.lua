@@ -609,7 +609,6 @@ function travel.invisCheck(char_settings, class_settings, invis)
     end
     logger.log_super_verbose("\aoChecking if we should be invis.")
     if invis == 1 and char_settings.general.invisForTravel == true then
-        --TODO: Add checks to insure character actually has the invis skill that is set, return false if they do not.
         local invis_types = {}
         for word in string.gmatch(class_settings.class_invis[mq.TLO.Me.Class()], '([^|]+)') do
             table.insert(invis_types, word)
@@ -632,7 +631,7 @@ function travel.invisCheck(char_settings, class_settings, invis)
             end
         else
             local aaNum = class_settings['skill_to_num'][invis_type]
-            if mq.TLO.Me.AltAbilityReady(aaNum) == false then
+            if mq.TLO.Me.AltAbilityReady(aaNum)() == false then
                 return false
             end
         end
