@@ -1,12 +1,6 @@
 --[[
-TODO: Rogue 1.5 during the tradeskill combines do a pre-check before executing each of the combines.
-*low priority
-
 
 TODO: Use group invis if available.
-
-TODO: Add check in Warrior 1.5 to see if High Quality Metal Bits were made successfully.
-*low priority
 
 FIXME: Ranger 2.0 Step 73 Craftmaster Tieranu determine if npc will spawn if trigger spawns while you are in the room already.
 * In progress -- Can not trigger NPC unless on that step, hooray.
@@ -40,7 +34,7 @@ local http                = PackageMan.Require('luasocket', 'socket.http')
 local ssl                 = PackageMan.Require('luasec', 'ssl')
 
 local version_url         = 'https://raw.githubusercontent.com/yb-f/EL-Ver/master/latest_ver'
-local version             = v("0.4.2")
+local version             = v("0.4.3")
 local window_flags        = bit32.bor(ImGuiWindowFlags.None)
 local openGUI, drawGUI    = true, true
 local myName              = mq.TLO.Me.DisplayName()
@@ -438,6 +432,7 @@ if loadsave.SaveState['version'] == nil then
     loadsave.SaveState['version'] = version
     loadsave.saveState()
 end
+
 themeName = class_settings.settings.LoadTheme
 loadTheme()
 
@@ -756,6 +751,10 @@ local function version_check()
         mq.exit()
     end
 end
+
+loadsave.versionCheck(version)
+class_settings.version_check(version)
+
 -- Event used at script startup to determine current state of MQ2Autosize
 --- @param line string
 --- @param arg1 string
