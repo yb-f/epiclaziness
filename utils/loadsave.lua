@@ -1,5 +1,6 @@
 local mq            = require('mq')
 local logger        = require('utils/logger')
+local v             = require('lib/semver')
 
 ---@class Char_Settings
 local loadsave      = {}
@@ -25,7 +26,8 @@ function loadsave.createConfig()
             ['returnToBind']   = false,
             ['xtargClear']     = 1,
             ['useGatePot']     = false,
-            ['useOrigin']      = false
+            ['useOrigin']      = false,
+            ['useGroupInvis']  = false
         }
     }
     loadsave.saveState()
@@ -96,6 +98,17 @@ end
 function loadsave.saveState()
     logger.log_info("\aoSaving character settings.")
     mq.pickle(loadsave.configPath, loadsave.SaveState)
+end
+
+function loadsave.versionCheck(version)
+    local temp_ver = loadsave.SaveState['version']
+    local temp_semver = v(temp_ver.major, temp_ver.minor, temp_ver.patch)
+    if temp_semver < v("0.4.3") then
+        logger.log_debug("\aoUpdating character configuration to \ag%s\ao.", version)
+        loadsave.SaveState['general']['useGroupInvis'] = false
+        loadsave.SaveState['version'] = version
+        loadsave.saveState()
+    end
 end
 
 return loadsave
