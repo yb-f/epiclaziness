@@ -1,5 +1,6 @@
 local mq                  = require('mq')
 local logger              = require('utils/logger')
+local v                   = require('lib/semver')
 
 ---@class Class_Settings
 local class_settings      = {}
@@ -75,12 +76,37 @@ function class_settings.loadSettings()
     end
 end
 
+function class_settings.version_check(version)
+    local temp_ver = class_settings.settings['version']
+    local temp_semver = v(temp_ver.major, temp_ver.minor, temp_ver.patch)
+    if temp_semver < v("0.4.3") then
+        class_settings.settings['group_invis'] = {
+            ['Bard']      = "Shauri's Sonorous Clouding",
+            ['Druid']     = "Shared Camouflage",
+            ['Enchanter'] = "Group Perfected Invisibility",
+            ['Magician']  = "Group Perfected Invisibility",
+            ['Ranger']    = "Shared Camouflage",
+            ['Shaman']    = "Group Silent Presence",
+            ['Wizard']    = "Group Perfected Invisibility"
+        }
+        class_settings.settings['group_invis_to_num'] = {
+            ["Shauri's Sonorous Clouding"]   = 231,
+            ["Shared Camouflage"]            = 518,
+            ["Group Perfected Invisibility"] = 1210,
+            ["Group Silent Presence"]        = 630
+        }
+        logger.log_debug("\aoUpdating general configuration to \ag%s\ao.", version)
+        class_settings.settings['version'] = version
+        class_settings.saveSettings()
+    end
+end
+
 -- Create default settings
 function class_settings.createSettings()
     ---@class Class_Settings_Settings
     class_settings.settings = {
-        ['version']      = "0.1.5",
-        ['class']        = {
+        ['version']            = v("0.4.3"),
+        ['class']              = {
             ['Bard'] = 2,
             ['Beastlord'] = 1,
             ['Berserker'] = 1,
@@ -98,13 +124,13 @@ function class_settings.createSettings()
             ['Warrior'] = 1,
             ['Wizard'] = 2
         },
-        ['general']      = {
+        ['general']            = {
             ['returnToBind'] = false,
             ['useAOC'] = true,
             ['invisForTravel'] = true,
             ['stopTS'] = true,
         },
-        ['invis']        = {
+        ['invis']              = {
             ['Bard']          = 1,
             ['Beastlord']     = 1,
             ['Berserker']     = 1,
@@ -122,7 +148,7 @@ function class_settings.createSettings()
             ['Warrior']       = 1,
             ['Wizard']        = 1
         },
-        ['class_invis']  = {
+        ['class_invis']        = {
             ['Bard']          = "Shauri's Sonorous Clouding|Potion",
             ['Beastlord']     = "Natural Invisibility|Potion",
             ['Berserker']     = "Potion",
@@ -140,7 +166,7 @@ function class_settings.createSettings()
             ['Warrior']       = "Potion",
             ['Wizard']        = "Perfected Invisibility|Potion"
         },
-        ['skill_to_num'] = {
+        ['skill_to_num']       = {
             ["Shauri's Sonorous Clouding"] = 231,
             ['Natural Invisibility']       = 980,
             ['Innate Camouflage']          = 80,
@@ -148,26 +174,41 @@ function class_settings.createSettings()
             ['Cloak of Shadows']           = 531,
             ['Silent Presence']            = 3730
         },
-        ['move_speed']   = {
+        ['group_invis']        = {
+            ['Bard']      = "Shauri's Sonorous Clouding",
+            ['Druid']     = "Shared Camouflage",
+            ['Enchanter'] = "Group Perfected Invisibility",
+            ['Magician']  = "Group Perfected Invisibility",
+            ['Ranger']    = "Shared Camouflage",
+            ['Shaman']    = "Group Silent Presence",
+            ['Wizard']    = "Group Perfected Invisibility"
+        },
+        ['group_invis_to_num'] = {
+            ["Shauri's Sonorous Clouding"]   = 231,
+            ["Shared Camouflage"]            = 518,
+            ["Group Perfected Invisibility"] = 1210,
+            ["Group Silent Presence"]        = 630
+        },
+        ['move_speed']         = {
             ['Bard'] = "Selo's Sonata",
             ['Druid'] = "Communion of the Cheetah|Spirit of Eagles",
             ['Shaman'] = "Communion of the Cheetah",
             ['Ranger'] = 'Spirit of Eagle'
         },
-        ['speed']        = {
+        ['speed']              = {
             ['Druid']  = 1,
             ['Ranger'] = 1,
             ['Shaman'] = 1,
             ['Bard']   = 1,
         },
-        ['speed_to_num'] = {
+        ['speed_to_num']       = {
             ['Spirit of Eagles(Druid)']  = 8601,
             ['Spirit of Eagle(Ranger)']  = 8600,
             ['Communion of the Cheetah'] = 939,
             ["Selo's Sonata"]            = 3704,
         },
-        ['LoadTheme']    = 'Default',
-        ['logger']       = {
+        ['LoadTheme']          = 'Default',
+        ['logger']             = {
             ['LogLevel'] = 3,
             ['LogToFile'] = false,
         },
