@@ -259,9 +259,8 @@ function travel.check_path(start_short, end_short)
         temp.end_zone = mq.TLO.Window('ZoneGuideWnd/ZGW_ZoneConnection_ListBox').List(i, 2)()
         if travel.invalid_connections[temp.start_zone] ~= nil then
             for _, to in ipairs(travel.invalid_connections[temp.start_zone]) do
-                print(to)
                 if temp.end_zone == to then
-                    printf("invalid connection: %s -> %s", temp.start_zone, temp.end_zone)
+                    logger.log_debug("\aoInvalid connection: \ag%s\ao -> \ag%s\ao.", temp.start_zone, temp.end_zone)
                     return 0, nil
                 end
             end
@@ -1235,94 +1234,118 @@ function travel.find_best_path(item, char_settings)
     local paths = {}
     --Straight travel
     local distance, path = travel.check_path(mq.TLO.Zone.ShortName(), item.zone)
-    paths[#paths + 1] = {
-        ['method']   = "straight",
-        ['path']     = path,
-        ['distance'] = distance
-    }
-    --Lamp
-    if mq.TLO.FindItem("Wishing Lamp").TimerReady() == 0 then
-        distance, path = travel.check_path('stratos', item.zone)
+    if path ~= nil then
         paths[#paths + 1] = {
-            ['method']   = "lamp_stratos",
+            ['method']   = "straight",
             ['path']     = path,
             ['distance'] = distance
         }
+    end
+    --Lamp
+    if mq.TLO.FindItem("Wishing Lamp").TimerReady() == 0 then
+        distance, path = travel.check_path('stratos', item.zone)
+        if path ~= nil then
+            paths[#paths + 1] = {
+                ['method']   = "lamp_stratos",
+                ['path']     = path,
+                ['distance'] = distance
+            }
+        end
     end
     --Gate
     if mq.TLO.Me.AltAbilityReady(1217)() == true or (mq.TLO.FindItem('=Philter of Major Translocation').TimerReady() == 0 and char_settings.general['useGatePot'] == true) then
         distance, path = travel.check_path(mq.TLO.Me.ZoneBound.ShortName(), item.zone)
-        paths[#paths + 1] = {
-            ['method']   = "gate",
-            ['path']     = path,
-            ['distance'] = distance
-        }
+        if path ~= nil then
+            paths[#paths + 1] = {
+                ['method']   = "gate",
+                ['path']     = path,
+                ['distance'] = distance
+            }
+        end
     end
     --Stein
     if mq.TLO.FindItem("Drunkard's Stein").TimerReady() == 0 then
         distance, path = travel.check_path('poknowledge', item.zone)
-        paths[#paths + 1] = {
-            ['method']   = "stein",
-            ['path']     = path,
-            ['distance'] = distance
-        }
+        if path ~= nil then
+            paths[#paths + 1] = {
+                ['method']   = "stein",
+                ['path']     = path,
+                ['distance'] = distance
+            }
+        end
     end
     --Slide
     if mq.TLO.FindItem("Zueria Slide").TimerReady() == 0 then
         distance, path = travel.check_path('dreadlands', item.zone)
-        paths[#paths + 1] = {
-            ['method']   = "slide_dreadlands",
-            ['path']     = path,
-            ['distance'] = distance
-        }
+        if path ~= nil then
+            paths[#paths + 1] = {
+                ['method']   = "slide_dreadlands",
+                ['path']     = path,
+                ['distance'] = distance
+            }
+        end
         distance, path = travel.check_path('greatdivide', item.zone)
-        paths[#paths + 1] = {
-            ['method']   = "slide_greatdivide",
-            ['path']     = path,
-            ['distance'] = distance
-        }
+        if path ~= nil then
+            paths[#paths + 1] = {
+                ['method']   = "slide_greatdivide",
+                ['path']     = path,
+                ['distance'] = distance
+            }
+        end
         distance, path = travel.check_path('nektulos', item.zone)
-        paths[#paths + 1] = {
-            ['method']   = "slide_nektulos",
-            ['path']     = path,
-            ['distance'] = distance
-        }
+        if path ~= nil then
+            paths[#paths + 1] = {
+                ['method']   = "slide_nektulos",
+                ['path']     = path,
+                ['distance'] = distance
+            }
+        end
         distance, path = travel.check_path('nro', item.zone)
-        paths[#paths + 1] = {
-            ['method']   = "slide_nro",
-            ['path']     = path,
-            ['distance'] = distance
-        }
+        if path ~= nil then
+            paths[#paths + 1] = {
+                ['method']   = "slide_nro",
+                ['path']     = path,
+                ['distance'] = distance
+            }
+        end
         distance, path = travel.check_path('skyfire', item.zone)
-        paths[#paths + 1] = {
-            ['method']   = "slide_skyfire",
-            ['path']     = path,
-            ['distance'] = distance
-        }
+        if path ~= nil then
+            paths[#paths + 1] = {
+                ['method']   = "slide_skyfire",
+                ['path']     = path,
+                ['distance'] = distance
+            }
+        end
         distance, path = travel.check_path('stonebrunt', item.zone)
-        paths[#paths + 1] = {
-            ['method']   = "slide_stonebrunt",
-            ['path']     = path,
-            ['distance'] = distance
-        }
+        if path ~= nil then
+            paths[#paths + 1] = {
+                ['method']   = "slide_stonebrunt",
+                ['path']     = path,
+                ['distance'] = distance
+            }
+        end
     end
     --Throne of heroes
     if mq.TLO.Me.AltAbilityReady(511)() == true then
         distance, path = travel.check_path('guildlobby', item.zone)
-        paths[#paths + 1] = {
-            ['method']   = "throne",
-            ['path']     = path,
-            ['distance'] = distance
-        }
+        if path ~= nil then
+            paths[#paths + 1] = {
+                ['method']   = "throne",
+                ['path']     = path,
+                ['distance'] = distance
+            }
+        end
     end
     --Origin
     if mq.TLO.Me.AltAbilityReady(331)() == true and char_settings.general['useOrigin'] == true then
         distance, path = travel.check_path(mq.TLO.Me.Origin.ShortName(), item.zone)
-        paths[#paths + 1] = {
-            ['method']   = "origin",
-            ['path']     = path,
-            ['distance'] = distance
-        }
+        if path ~= nil then
+            paths[#paths + 1] = {
+                ['method']   = "origin",
+                ['path']     = path,
+                ['distance'] = distance
+            }
+        end
     end
 
     --Table has been populated, now lets pick the best path.
