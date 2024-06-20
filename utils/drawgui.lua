@@ -460,6 +460,8 @@ function draw_gui.settingsTab(themeName, theme, themeID, class_settings, char_se
             char_settings.SaveState.general.invisForTravel = draw_gui.RenderOptionToggle("##invis_setting", "Invis while traveling", char_settings.SaveState.general.invisForTravel)
             char_settings.SaveState.general.speedForTravel = draw_gui.RenderOptionToggle("##speed_setting", "Use travel speed skills", char_settings.SaveState.general
                 .speedForTravel)
+            char_settings.SaveState.general.useGroupInvis = draw_gui.RenderOptionToggle("##group_invis_setting", "Use group invis skills if available",
+                char_settings.SaveState.general.useGroupInvis)
             ImGui.PushItemWidth(120)
             char_settings.SaveState.general.xtargClear = ImGui.InputInt("Number of mobs to clear XTarget list.", char_settings.SaveState.general.xtargClear)
             if char_settings.SaveState.general.xtargClear < 1 then char_settings.SaveState.general.xtargClear = 1 end
