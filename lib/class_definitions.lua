@@ -26,3 +26,12 @@
 ---@field zradius number        The z axis radius for farm steps
 ---@field xtarget_ignore string The name of an NPC to ignore on the xtarget list
 ---@field itemID number         The item ID # of the item we are interested in (for use when duplicate item names exist)
+
+---@class Group_Invis_Item
+---@field name string
+---@field class string
+
+---@class Group_Invis_Choice
+---@field name string
+---@field class string
+---@field skill number
