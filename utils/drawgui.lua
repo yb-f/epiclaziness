@@ -184,7 +184,6 @@ end
 ---@param class_settings Class_Settings
 function draw_gui.consoleTab(class_settings)
 	if ImGui.BeginTabItem("Console") then
-		local changed
 		ImGui.SetNextItemWidth(120)
 		class_settings.settings.logger.LogLevel, changed =
 			ImGui.Combo("Debug Levels", class_settings.settings.logger.LogLevel, LogLevels, #LogLevels)
@@ -543,43 +542,66 @@ function draw_gui.settingsTab(themeName, theme, themeID, class_settings, char_se
 						themeID = k
 						class_settings.settings["LoadTheme"] = theme.LoadTheme
 					end
+					if ImGui.IsItemEdited() then
+						class_settings.saveSettings()
+					end
 				end
 				ImGui.EndCombo()
 			end
-			ImGui.PopItemWidth()
-			char_settings.SaveState.general.stopTS = draw_gui.RenderOptionToggle(
+			char_settings.SaveState.general.stopTS, changed = draw_gui.RenderOptionToggle(
 				"##ts_setting",
 				"Stop if tradeskill requirements are unmet",
 				char_settings.SaveState.general.stopTS
 			)
-			char_settings.SaveState.general.useGatePot = draw_gui.RenderOptionToggle(
+			if changed then
+				char_settings.saveState()
+			end
+			char_settings.SaveState.general.useGatePot, changed = draw_gui.RenderOptionToggle(
 				"##pot_setting",
 				"Allow use of gate potions",
 				char_settings.SaveState.general.useGatePot
 			)
-			char_settings.SaveState.general.useOrigin = draw_gui.RenderOptionToggle(
+			if changed then
+				char_settings.saveState()
+			end
+			char_settings.SaveState.general.useOrigin, changed = draw_gui.RenderOptionToggle(
 				"##bind_setting",
 				"Allow use of Origin",
 				char_settings.SaveState.general.useOrigin
 			)
-			char_settings.SaveState.general.invisForTravel = draw_gui.RenderOptionToggle(
+			if changed then
+				char_settings.saveState()
+			end
+			char_settings.SaveState.general.invisForTravel, changed = draw_gui.RenderOptionToggle(
 				"##invis_setting",
 				"Invis while traveling",
 				char_settings.SaveState.general.invisForTravel
 			)
-			char_settings.SaveState.general.speedForTravel = draw_gui.RenderOptionToggle(
+			if changed then
+				char_settings.saveState()
+			end
+			char_settings.SaveState.general.speedForTravel, changed = draw_gui.RenderOptionToggle(
 				"##speed_setting",
 				"Use travel speed skills",
 				char_settings.SaveState.general.speedForTravel
 			)
-			char_settings.SaveState.general.useGroupInvis = draw_gui.RenderOptionToggle(
+			if changed then
+				char_settings.saveState()
+			end
+			char_settings.SaveState.general.useGroupInvis, changed = draw_gui.RenderOptionToggle(
 				"##group_invis_setting",
 				"Use group invis skills if available",
 				char_settings.SaveState.general.useGroupInvis
 			)
+			if changed then
+				char_settings.saveState()
+			end
 			ImGui.PushItemWidth(120)
 			char_settings.SaveState.general.xtargClear =
 				ImGui.InputInt("Number of mobs to clear XTarget list.", char_settings.SaveState.general.xtargClear)
+			if ImGui.IsItemEdited() then
+				char_settings.saveState()
+			end
 			if char_settings.SaveState.general.xtargClear < 1 then
 				char_settings.SaveState.general.xtargClear = 1
 			end
@@ -587,10 +609,6 @@ function draw_gui.settingsTab(themeName, theme, themeID, class_settings, char_se
 				char_settings.SaveState.general.xtargClear = 21
 			end
 			ImGui.PopItemWidth()
-			if ImGui.Button("Save") then
-				char_settings.saveState()
-				class_settings.saveSettings()
-			end
 		end
 		if ImGui.CollapsingHeader("Class Settings") then
 			ImGui.BeginTable("##Class_Settings", 2, ImGuiTableFlags.Borders)
