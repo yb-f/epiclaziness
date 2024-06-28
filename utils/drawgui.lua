@@ -594,6 +594,11 @@ function draw_gui.settingsTab(themeName, theme, themeID, class_settings, char_se
 				char_settings.SaveState.general.useGroupInvis
 			)
 			if changed then
+				if char_settings.SaveState.general.useGroupInvis == true then
+					if char_settings.SaveState.general.invisForTravel == false then
+						char_settings.SaveState.general.invisForTravel = true
+					end
+				end
 				char_settings.saveState()
 			end
 			ImGui.PushItemWidth(120)
