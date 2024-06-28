@@ -1,7 +1,5 @@
 --[[
 
-TODO: Use group invis if available.
-
 FIXME: Ranger 2.0 Step 73 Craftmaster Tieranu determine if npc will spawn if trigger spawns while you are in the room already.
 * In progress -- Can not trigger NPC unless on that step, hooray.
 
@@ -33,7 +31,7 @@ local http = PackageMan.Require("luasocket", "socket.http")
 local ssl = PackageMan.Require("luasec", "ssl")
 
 local version_url = "https://raw.githubusercontent.com/yb-f/EL-Ver/master/latest_ver"
-local version = v("0.4.3")
+local version = v("0.4.4")
 local window_flags = bit32.bor(ImGuiWindowFlags.None)
 local openGUI, drawGUI = true, true
 local myName = mq.TLO.Me.DisplayName()
