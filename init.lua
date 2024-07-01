@@ -27,10 +27,10 @@ local v = require("lib/semver")
 local LoadTheme = require("lib.theme_loader")
 local PackageMan = require("mq/PackageMan")
 local sqlite3 = PackageMan.Require("lsqlite3")
-local http = PackageMan.Require("luasocket", "socket.http")
-local ssl = PackageMan.Require("luasec", "ssl")
+--local http = PackageMan.Require("luasocket", "socket.http")
+--local ssl = PackageMan.Require("luasec", "ssl")
 
-local version_url = "https://raw.githubusercontent.com/yb-f/EL-Ver/master/latest_ver"
+--local version_url = "https://raw.githubusercontent.com/yb-f/EL-Ver/master/latest_ver"
 local version = v("0.4.4")
 local window_flags = bit32.bor(ImGuiWindowFlags.None)
 local openGUI, drawGUI = true, true
@@ -862,7 +862,7 @@ local function init()
 	_G.State:populate_group_combo()
 	_G.State.step_overview()
 	mq.imgui.init("displayGUI", displayGUI)
-	version_check()
+	--version_check()
 	logger.log_warn(
 		"If you encounter any nav mesh issues please ensure you are using the latest mesh from \arhttps://github.com/yb-f/meshes"
 	)
