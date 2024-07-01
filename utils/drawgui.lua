@@ -37,6 +37,9 @@ draw_gui.class_list = {
 	"Warrior",
 	"Wizard",
 }
+local YELLOW_COLOR = { 1.0, 1.0, 0.0, 1.0 }
+local RED_COLOR = { 1.0, 0.0, 0.0, 1.0 }
+local GREEN_COLOR = { 0.0, 1.0, 0.0, 1.0 }
 local changed = false
 local automation_list = { "CWTN", "RGMercs (Lua)", "RGMercs (Macro)", "KissAssist", "MuleAssist" }
 local invis_type = {}
@@ -74,9 +77,7 @@ draw_gui.travelText = ""
 ---@return ImVec4
 function draw_gui.dynamicBarColor(minColor, maxColor, value, midColor)
 	value = math.max(0, math.min(100, value))
-
 	local r, g, b, a
-
 	if midColor then
 		-- If midColor is provided, calculate in two segments
 		if value > 50 then
@@ -100,8 +101,7 @@ function draw_gui.dynamicBarColor(minColor, maxColor, value, midColor)
 		b = minColor[3] + proportion * (maxColor[3] - minColor[3])
 		a = minColor[4] + proportion * (maxColor[4] - minColor[4])
 	end
-
-	return { r, g, b, a }
+	return ImVec4(r, g, b, a)
 end
 
 -- Draw the row of the indicated step in the Full Outline tab
@@ -380,12 +380,19 @@ function draw_gui.generalTab(task_table)
 		end
 
 		ImGui.Separator()
-		ImGui.PushStyleColor(ImGuiCol.PlotHistogram, IM_COL32(40, 150, 40, 255))
-		ImGui.ProgressBar(_G.State.current_step / #task_table, ImGui.GetWindowWidth(), 17, "##prog")
-		ImGui.PopStyleColor()
-		ImGui.SetCursorPosY(ImGui.GetCursorPosY() - 20)
-		ImGui.SetCursorPosX(ImGui.GetCursorPosX() + (ImGui.GetWindowWidth() / 2) - 60)
-		ImGui.Text("Step " .. tostring(_G.State.current_step) .. " of " .. tostring(#task_table))
+
+		if _G.State:readTaskRunning() == true and #task_table > 0 and _G.State.current_step > 0 then
+			--ImGui.PushStyleColor(ImGuiCol.PlotHistogram, IM_COL32(40, 150, 40, 255))
+			ImGui.PushStyleColor(
+				ImGuiCol.PlotHistogram,
+				draw_gui.dynamicBarColor(RED_COLOR, GREEN_COLOR, _G.State.current_step / #task_table, YELLOW_COLOR)
+			)
+			ImGui.ProgressBar(_G.State.current_step / #task_table, ImGui.GetWindowWidth(), 17, "##prog")
+			ImGui.PopStyleColor()
+			ImGui.SetCursorPosY(ImGui.GetCursorPosY() - 20)
+			ImGui.SetCursorPosX(ImGui.GetCursorPosX() + (ImGui.GetWindowWidth() / 2) - 60)
+			ImGui.Text("Step " .. tostring(_G.State.current_step) .. " of " .. tostring(#task_table))
+		end
 		if _G.State.destType ~= "" then
 			--[[if _G.State.destType == 'ZONE' then
                 if mq.TLO.Navigation.CurrentPathDistance() ~= nil then
@@ -399,7 +406,11 @@ function draw_gui.generalTab(task_table)
                 end
             else--]]
 			draw_gui.pathUpdate()
-			ImGui.PushStyleColor(ImGuiCol.PlotHistogram, IM_COL32(150, 150, 40, 255))
+			--ImGui.PushStyleColor(ImGuiCol.PlotHistogram, IM_COL32(150, 150, 40, 255))
+			ImGui.PushStyleColor(
+				ImGuiCol.PlotHistogram,
+				draw_gui.dynamicBarColor(RED_COLOR, GREEN_COLOR, draw_gui.travelPct * 100, YELLOW_COLOR)
+			)
 			ImGui.ProgressBar(draw_gui.travelPct, ImGui.GetWindowWidth(), 17, "##dist")
 			ImGui.PopStyleColor()
 			ImGui.SetCursorPosY(ImGui.GetCursorPosY() - 20)
