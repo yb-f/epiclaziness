@@ -914,10 +914,7 @@ function travel.invisCheck(item, char_settings, class_settings, invis)
 			table.insert(invis_types, word)
 		end
 		local invis_type = invis_types[class_settings.invis[mq.TLO.Me.Class()]]
-		if
-			travel.checkInvisReady(invis_types[mq.TLO.Me.Class()], mq.TLO.Me.CleanName(), class_settings)
-			and mq.TLO.Me.Invis() == false
-		then
+		if travel.checkInvisReady(invis_type, mq.TLO.Me.CleanName(), class_settings) and mq.TLO.Me.Invis() == false then
 			logger.log_super_verbose("\aoYes, we should be invis.")
 			return true
 		end
