@@ -270,8 +270,8 @@ end
 
 -- Set the text of the status section in the GUI
 --- @param text string
-function _G.State:setStatusText(text)
-	self.status = text
+function _G.State:setStatusText(text, ...)
+	self.status = string.format(text, ...)
 end
 
 -- Set the text of the second status section in the GUI
@@ -385,7 +385,7 @@ function _G.State.save(item)
 		_G.State.epicstring = ""
 		_G.State:setTaskRunning(false)
 		_G.State:setStopAtSave(false)
-		_G.State:setStatusText(string.format("Stopped at step: %s", _G.State.current_step))
+		_G.State:setStatusText("Stopped at step: %s", _G.State.current_step)
 		return
 	end
 end
@@ -576,7 +576,7 @@ local function execute_task(task)
 				type = "none"
 			end
 			logger.log_error("\aoUnknown Type: \ar%s!", type)
-			_G.State:setStatusText(string.format("Unknown type: %s -- Step: %s", task_type, _G.State.current_step))
+			_G.State:setStatusText("Unknown type: %s -- Step: %s", task_type, _G.State.current_step)
 			_G.State:setTaskRunning(false)
 			return
 		end
@@ -723,7 +723,7 @@ local function run_epic(class, choice)
 					_G.State.epicstring = ""
 					_G.State:setTaskRunning(false)
 					_G.State:setStopAtSave(false)
-					_G.State:setStatusText(string.format("Stopped at step %s", _G.State.current_step))
+					_G.State:setStatusText("Stopped at step %s", _G.State.current_step)
 					return
 				end
 			end
@@ -738,7 +738,7 @@ local function run_epic(class, choice)
 			return
 		end
 	end
-	_G.State:setStatusText(string.format("Completed %s: %s", mq.TLO.Me.Class(), _G.State.epicstring))
+	_G.State:setStatusText("Completed %s: %s", mq.TLO.Me.Class(), _G.State.epicstring)
 	logger.log_info("\aoCompleted \ay%s \ao- \ar%s!", mq.TLO.Me.Class(), _G.State.epicstring)
 	_G.State.epicstring = ""
 	_G.State:setTaskRunning(false)

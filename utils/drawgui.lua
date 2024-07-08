@@ -312,7 +312,7 @@ function draw_gui.header()
 			_G.State:setTaskRunning(false)
 			_G.State.should_skip = true
 			logger.log_warn("\aoManually stopping script at step: \ar%s", _G.State.current_step)
-			_G.State:setStatusText(string.format("Manually stopped at step %s.", _G.State.current_step))
+			_G.State:setStatusText("Manually stopped at step %s.", _G.State.current_step)
 		end
 		if ImGui.IsItemHovered() then
 			ImGui.SetTooltip("Stop script immedietly.")

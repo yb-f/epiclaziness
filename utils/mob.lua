@@ -108,7 +108,7 @@ function mob.ph_search(item, class_settings, char_settings)
 	if mob.xtargetCheck(char_settings) then
 		mob.clearXtarget(class_settings, char_settings)
 	end
-	_G.State:setStatusText(string.format("Searching for PH for %s.", item.npc))
+	_G.State:setStatusText("Searching for PH for %s.", item.npc)
 	logger.log_info("\aoSearching for PH for \ag%s\ao.", item.npc)
 	local spawn_search = "npc loc "
 		.. item.whereX
@@ -176,9 +176,7 @@ function mob.clearXtarget(class_settings, char_settings)
 							logger.log_verbose("\aoTargeting XTarget #\ag%s\ao.", i)
 							mq.TLO.Me.XTarget(i).DoTarget()
 							ID = mq.TLO.Me.XTarget(i).ID()
-							_G.State:setStatusText(
-								string.format("Clearing XTarget %s: %s (%s).", i, mq.TLO.Me.XTarget(i)(), ID)
-							)
+							_G.State:setStatusText("Clearing XTarget %s: %s (%s).", i, mq.TLO.Me.XTarget(i)(), ID)
 							logger.log_info(
 								"\aoClearing XTarget \ag%s \ao: \ag%s \ao(\ag%s\ao).",
 								i,
@@ -303,7 +301,7 @@ end
 ---@param char_settings Char_Settings_SaveState
 ---@return string|nil
 function mob.findNearestName(npc, item, class_settings, char_settings)
-	_G.State:setStatusText(string.format("Searching for nearest %s.", npc))
+	_G.State:setStatusText("Searching for nearest %s.", npc)
 	searchFilter = npc
 	logger.log_info("\aoSearching for nearest \ag%s\ao.", npc)
 	local mob_list = create_spawn_list()
@@ -432,7 +430,7 @@ function mob.general_search(item, class_settings, char_settings)
 			mob.clearXtarget(class_settings, char_settings)
 		end
 	end
-	_G.State:setStatusText(string.format("Searching for %s.", item.npc))
+	_G.State:setStatusText("Searching for %s.", item.npc)
 	logger.log_info("\aoSearching for \ag%s\ao.", item.npc)
 	local looping = true
 	local i = 1
@@ -561,7 +559,7 @@ end
 ---@param char_settings Char_Settings_SaveState
 function mob.pre_damage_until(item, class_settings, char_settings)
 	logger.log_info("\aoChecking if level is higher than \ag%s\ao.", item.maxlevel)
-	_G.State:setStatusText(string.format("Checking if level is higher than %s.", item.maxlevel))
+	_G.State:setStatusText("Checking if level is higher than %s.", item.maxlevel)
 	if mq.TLO.Me.Level() >= item.maxlevel then
 		if item.npc ~= nil then
 			logger.log_debug(
@@ -571,12 +569,10 @@ function mob.pre_damage_until(item, class_settings, char_settings)
 				item.what
 			)
 			_G.State:setStatusText(
-				string.format(
-					"Level is higher than %s. Preparing low damage skills (%s - %s).",
-					item.maxlevel,
-					item.npc,
-					item.what
-				)
+				"Level is higher than %s. Preparing low damage skills (%s - %s).",
+				item.maxlevel,
+				item.npc,
+				item.what
 			)
 			mq.cmdf('/memspell 1 "%s"', item.npc)
 			mq.delay("1s")
@@ -605,7 +601,9 @@ function mob.pre_damage_until(item, class_settings, char_settings)
 				item.what
 			)
 			_G.State:setStatusText(
-				string.format("Level is higher than %s. Preparing low damage skill (%s).", item.maxlevel, item.what)
+				"Level is higher than %s. Preparing low damage skill (%s).",
+				item.maxlevel,
+				item.what
 			)
 			mq.cmdf('/memspell 1 "%s"', item.what)
 			while mq.TLO.Me.Gem(item.what)() ~= 1 do
@@ -624,7 +622,7 @@ end
 ---@param class_settings Class_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
 function mob.npc_damage_until(item, class_settings, char_settings)
-	_G.State:setStatusText(string.format("Damaging %s to below %s%% health.", item.npc, item.damage_pct))
+	_G.State:setStatusText("Damaging %s to below %s%% health.", item.npc, item.damage_pct)
 	logger.log_info("\aoDamaging \ag%s \aoto below \ag%s%% health\ao.", item.npc, item.damage_pct)
 	ID = mq.TLO.Spawn("npc " .. item.npc).ID()
 	if mq.TLO.Spawn(ID).Distance() ~= nil then
@@ -676,7 +674,7 @@ end
 ---@param char_settings Char_Settings_SaveState
 function mob.npc_kill(item, class_settings, char_settings)
 	manage.removeInvis(item)
-	_G.State:setStatusText(string.format("Killing %s.", item.npc))
+	_G.State:setStatusText("Killing %s.", item.npc)
 	logger.log_info("\aoKilling \ag%s\ao.", item.npc)
 	manage.unpauseGroup(class_settings)
 	mq.delay(200)
@@ -704,7 +702,7 @@ function mob.npc_kill(item, class_settings, char_settings)
 	end
 	if looted == false then
 		if ID ~= 0 then
-			_G.State:setStatusText(string.format("Killing %s (%s).", item.npc, ID))
+			_G.State:setStatusText("Killing %s (%s).", item.npc, ID)
 			logger.log_info("\aoKilling \ag%s \ao(\ag%s\ao).", item.npc, ID)
 			logger.log_verbose("\aoTargeting \ag%s \ao(\ag%s\ao).", item.npc, ID)
 			mq.TLO.Spawn(ID).DoTarget()
@@ -785,7 +783,7 @@ end
 ---@param char_settings Char_Settings_SaveState
 function mob.npc_kill_all(item, class_settings, char_settings)
 	manage.removeInvis(item)
-	_G.State:setStatusText(string.format("Killing all %s.", item.npc))
+	_G.State:setStatusText("Killing all %s.", item.npc)
 	logger.log_info("\aoKilling all \ag%s\ao.", item.npc)
 	manage.unpauseGroup(class_settings)
 	while true do
@@ -858,7 +856,7 @@ function mob.npc_kill_all(item, class_settings, char_settings)
 		end
 		if mq.TLO.FindItem("=" .. item.what)() == nil then
 			inv.loot(item)
-			_G.State:setStatusText(string.format("Killing all %s.", item.npc))
+			_G.State:setStatusText("Killing all %s.", item.npc)
 		end
 	end
 end
