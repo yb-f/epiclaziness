@@ -792,7 +792,7 @@ class_settings.version_check(version)
 
 -- Initialize autosize, only sets stored value for starting size now.
 local function init_autosize()
-	loadsave.SaveState.general["self_size"] = mq.TLO.Autosize.SelfSize()
+	loadsave.SaveState.general["self_size"] = mq.TLO.AutoSize.SelfSize()
 end
 
 local function cmd_el(cmd)
