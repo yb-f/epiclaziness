@@ -27,6 +27,8 @@ local v = require("lib/semver")
 local LoadTheme = require("lib.theme_loader")
 local PackageMan = require("mq/PackageMan")
 local sqlite3 = PackageMan.Require("lsqlite3")
+local hashCheck = require("utils/hashcheck")
+_G.Task_Functions = require("utils/task_functions")
 --local http = PackageMan.Require("luasocket", "socket.http")
 --local ssl = PackageMan.Require("luasec", "ssl")
 
@@ -155,8 +157,8 @@ end
 --- @return number
 function _G.State:getAverageVelocity()
 	local velocitySum = 0
-	for i, v in pairs(self.velocityTable) do
-		velocitySum = velocitySum + v
+	for _, value in pairs(self.velocityTable) do
+		velocitySum = velocitySum + value
 	end
 	return velocitySum / #self.velocityTable
 end
@@ -374,8 +376,7 @@ function _G.State:readGroupSelection()
 end
 
 -- Save the current step to the save state
---- @param item Item
-function _G.State.save(item)
+function _G.State.save()
 	logger.log_info("\aoSaving step: \ar%s", _G.State.current_step)
 	loadsave.prepSave(_G.State.current_step)
 	if _G.State:readStopAtSave() then
@@ -414,9 +415,6 @@ function _G.State.pauseTask(item)
 	_G.State:setStatusText(item.status)
 	_G.State:setTaskRunning(false)
 end
-
-local hashCheck = require("utils/hashcheck")
-_G.Task_Functions = require("utils/task_functions")
 
 class_settings.loadSettings()
 loadsave.loadState()
@@ -476,10 +474,9 @@ end
 -- Check the tradeskills of the player against the requirements for the selected epic return true if they meet the requirements, false if they do not.
 --- @param class string
 --- @param choice number
---- @return boolean
+--- @return boolean|string
 local function check_tradeskills(class, choice)
 	if tsreqs[class] ~= nil then
-		local return_string = nil
 		local quest = ""
 		local quests = {
 			["1.0"] = "10",
@@ -489,55 +486,33 @@ local function check_tradeskills(class, choice)
 		}
 		quest = quests[_G.State.epic_list[choice]]
 		if tsreqs[class][quest] ~= nil then
-			local first = true
+			local return_string = ""
 			for ts, req in pairs(tsreqs[class][quest]) do
 				if ts == "Elder Elvish" then
 					if mq.TLO.Me.LanguageSkill(ts)() < req then
-						if first == true then
-							first = false
-							return_string = " \ag"
-								.. ts
-								.. " \aorequires \ar"
-								.. req
-								.. " \aoskill. Currently \ar"
-								.. mq.TLO.Me.LanguageSkill(ts)()
-								.. "."
-						else
-							return_string = return_string
-								.. " \ag"
-								.. ts
-								.. " \aorequires \ar"
-								.. req
-								.. " \aoskill. Currently \ar"
-								.. mq.TLO.Me.LanguageSkill(ts)()
-								.. "."
-						end
+						return_string = return_string
+							.. " \ag"
+							.. ts
+							.. " \aorequires \ar"
+							.. req
+							.. " \aoskill. Currently \ar"
+							.. mq.TLO.Me.LanguageSkill(ts)()
+							.. "\ao."
 					end
 				else
 					if mq.TLO.Me.Skill(ts)() < req then
-						if first then
-							first = false
-							return_string = " \ag"
-								.. ts
-								.. " \aorequires \ar"
-								.. req
-								.. " \aoskill. Currently \ar"
-								.. mq.TLO.Me.Skill(ts)()
-								.. "."
-						else
-							return_string = return_string
-								.. " \ag"
-								.. ts
-								.. " \aorequires \ar"
-								.. req
-								.. " \aoskill. Currently \ar"
-								.. mq.TLO.Me.Skill(ts)()
-								.. "."
-						end
+						return_string = return_string
+							.. " \ag"
+							.. ts
+							.. " \aorequires \ar"
+							.. req
+							.. " \aoskill. Currently \ar"
+							.. mq.TLO.Me.Skill(ts)()
+							.. "\ao."
 					end
 				end
 			end
-			if not return_string then
+			if return_string == "" then
 				return false
 			else
 				return return_string
@@ -642,9 +617,7 @@ end
 
 -- Run the selected quest. Loop through the steps and execute them until we reach the final step.
 -- Loop checks for paused state, task running state, if the player is in game, if auto attack is on, and if we should remove levitate.
---- @param class string
---- @param choice number
-local function run_epic(class, choice)
+local function run_epic()
 	while _G.State.current_step < #task_table do
 		if overview_steps[_G.State.current_step] ~= nil then
 			if overview_steps[_G.State.current_step] == 1 then
@@ -837,7 +810,7 @@ local function main()
 			_G.State:setStartRun(false)
 			_G.State.current_step = 0
 			init_epic(string.lower(mq.TLO.Me.Class.ShortName()), _G.State.epic_choice)
-			run_epic(string.lower(mq.TLO.Me.Class.ShortName()), _G.State.epic_choice)
+			run_epic()
 		end
 		mq.delay(200)
 	end

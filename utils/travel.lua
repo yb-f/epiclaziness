@@ -232,9 +232,8 @@ function travel.no_nav_travel(item, class_settings, char_settings, choice, name)
 end
 
 -- Open nearest door
----@param item Item
 ---@return boolean
-function travel.open_door(item)
+function travel.open_door()
 	_G.State:setStatusText("Opening door.")
 	mq.delay(200)
 	mq.cmd("/doortarget")
@@ -357,7 +356,7 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
 				return
 			end
 			local temp = _G.State:readStatusText()
-			local door = travel.open_door(item)
+			local door = travel.open_door()
 			mq.cmd("/keypress Page_Up")
 			if door == false then
 				if mq.TLO.AutoSize.ResizeSelf() == false then
@@ -1027,7 +1026,7 @@ function travel.gotSpeedyClass(class, class_settings, level)
 	if (class == "Shaman" or class == "Druid" or class == "Ranger") and level < 85 then
 		return false
 	end
-	for i, speedy in ipairs(speed_classes) do
+	for _, speedy in ipairs(speed_classes) do
 		if class == speedy then
 			local speed_type = {}
 			for word in string.gmatch(class_settings.move_speed[class], "([^|]+)") do
@@ -1052,7 +1051,7 @@ function travel.speedCheck(class_settings, char_settings)
 		end
 	end
 	logger.log_super_verbose("\aoChecking if we are missing travel speed buff.")
-	for i, buff in ipairs(speed_buffs) do
+	for _, buff in ipairs(speed_buffs) do
 		if mq.TLO.Me.Buff(buff)() then
 			logger.log_super_verbose("\aoWe currently have a travel speed buff active: \ag%s\ao.", buff)
 			return "none", "none"
@@ -1749,7 +1748,7 @@ function travel.find_best_path(item, char_settings)
 	--Table has been populated, now lets pick the best path.
 	local shortest_path = 1000
 	local shortest_method = ""
-	for i, p in pairs(paths) do
+	for _, p in pairs(paths) do
 		if p.distance < shortest_path then
 			shortest_path = p.distance
 			shortest_method = p.method
@@ -1892,7 +1891,7 @@ function travel.zone_travel(item, class_settings, char_settings, continue, choic
 					return
 				end
 				local temp = _G.State:readStatusText()
-				local door = travel.open_door(item)
+				local door = travel.open_door()
 				if door == false then
 					if mq.TLO.AutoSize.ResizeSelf() == false then
 						mq.cmd("/autosize self on")
