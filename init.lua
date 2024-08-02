@@ -37,7 +37,7 @@ local openGUI, drawGUI = true, true
 local myName = mq.TLO.Me.DisplayName()
 local dbn = sqlite3.open(mq.luaDir .. "\\epiclaziness\\epiclaziness.db")
 local db_outline = sqlite3.open(mq.luaDir .. "\\epiclaziness\\epiclaziness_outline.db")
-local plugins = { "MQ2Nav", "MQ2EasyFind", "MQ2Relocate", "MQ2PortalSetter" }
+local plugins = { "MQ2Nav", "MQ2EasyFind", "MQ2Relocate", "MQ2PortalSetter", "MQ2Autosize" }
 local task_table = {}
 local task_outline_table = {}
 local running = true
@@ -131,6 +131,13 @@ _G.State = {
 	bad_IDs = {},
 	cannot_count = 0,
 	is_traveling = false,
+	-- autosize = is autosize loaded
+	-- autosize_sizes, autosize_choice = list of possible sizes, and current size value index
+
+	-- TODO: these 2 can likely be removed
+
+	-- autosize_self = is selfsize Enabled
+	-- autosize_on = is autosize enabled
 	autosize = false,
 	autosize_sizes = AUTOSIZE_SIZES,
 	autosize_choice = AUTOSIZE_CHOICE,
@@ -796,25 +803,6 @@ end
 loadsave.versionCheck(version)
 class_settings.version_check(version)
 
--- Event used at script startup to determine current state of MQ2Autosize
---- @param line string
---- @param arg1 string
-local function autosize_self_event(line, arg1)
-	if arg1 == "disabled" then
-		_G.State.autosize_self = false
-	else
-		_G.State.autosize_self = true
-	end
-end
-
--- Event used at script startup to determine current state of MQ2Autosize selfsize
---- @param line string
---- @param arg1 string
-local function autosize_self_size(line, arg1)
-	loadsave.SaveState.general["self_size"] = tonumber(arg1)
-	loadsave.saveState()
-end
-
 -- Initialize the MQ2Autosize plugin. Check current settings and if Mq2Autosize is not loaded disable it's use.
 local function init_autosize()
 	if mq.TLO.Plugin("MQ2Autosize")() == nil then
@@ -826,23 +814,10 @@ local function init_autosize()
 		)
 		_G.State.autosize = false
 	else
-		mq.event("auto_self_on", "MQ2AutoSize:: Option (Self) now #1#", autosize_self_event)
-		mq.cmd("/autosize self")
-		mq.delay(30)
-		mq.doevents()
-		if _G.State.autosize_self == false then
-			mq.cmd("/autosize self")
-		end
-		mq.cmd("/autosize off")
-		if loadsave.SaveState.general["self_size"] == nil then
-			mq.event("auto_self_size", "MQ2AutoSize:: Self size is #1# (was not modified)", autosize_self_size)
-			mq.cmd("/autosize sizeself 0")
-			mq.delay(30)
-			mq.doevents()
-			mq.unevent("autosize_self_size")
-		end
-		_G.State.autosize_on = false
 		_G.State.autosize = true
+		_G.State.autosize_self = mq.TLO.Autosize.ResizeSelf()
+		_G.State.autosize_on = mq.TLO.Autosize.Enabled()
+		loadsave.SaveState.general["self_size"] = mq.TLO.Autosize.SelfSize()
 	end
 end
 
@@ -869,7 +844,8 @@ local function init()
 	for plugin in ipairs(plugins) do
 		if mq.TLO.Plugin(plugin)() == nil then
 			logger.log_error("\ar%s \aois required for this script.", plugin)
-			logger.log_error("\aoPlease load it with the command \ar/plugin %s \aoand rerun this script.", plugin)
+			logger.log_error("\aoLoaded \ar%s \aowith \agnoauto\ao.", plugin)
+			mq.cmdf("/plugin %s noauto", plugin)
 			mq.exit()
 		end
 	end
