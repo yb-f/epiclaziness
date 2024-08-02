@@ -131,18 +131,9 @@ _G.State = {
 	bad_IDs = {},
 	cannot_count = 0,
 	is_traveling = false,
-	-- autosize = is autosize loaded
 	-- autosize_sizes, autosize_choice = list of possible sizes, and current size value index
-
-	-- TODO: these 2 can likely be removed
-
-	-- autosize_self = is selfsize Enabled
-	-- autosize_on = is autosize enabled
-	autosize = false,
 	autosize_sizes = AUTOSIZE_SIZES,
 	autosize_choice = AUTOSIZE_CHOICE,
-	autosize_self = false,
-	autosize_on = false,
 	combineSlot = 0,
 	destType = "",
 	dest = "",
@@ -661,9 +652,7 @@ local function run_epic(class, choice)
 					"\aoYou have selected to complete this step (\ag%s\ao) manually. Stopping script.",
 					_G.State.current_step
 				)
-				if _G.State.autosize == true then
-					mq.cmdf("/autosize sizeself %s", loadsave.SaveState.general["self_size"])
-				end
+				mq.cmdf("/autosize sizeself %s", loadsave.SaveState.general["self_size"])
 				mq.cmd("/afollow off")
 				mq.cmd("/nav stop")
 				mq.cmd("/stick off")
@@ -736,9 +725,7 @@ local function run_epic(class, choice)
 			end
 		end
 		if _G.State:readTaskRunning() == false then
-			if _G.State.autosize == true then
-				mq.cmdf("/autosize sizeself %s", loadsave.SaveState.general["self_size"])
-			end
+			mq.cmdf("/autosize sizeself %s", loadsave.SaveState.general["self_size"])
 			mq.cmd("/afollow off")
 			mq.cmd("/nav stop")
 			mq.cmd("/stick off")
@@ -803,22 +790,9 @@ end
 loadsave.versionCheck(version)
 class_settings.version_check(version)
 
--- Initialize the MQ2Autosize plugin. Check current settings and if Mq2Autosize is not loaded disable it's use.
+-- Initialize autosize, only sets stored value for starting size now.
 local function init_autosize()
-	if mq.TLO.Plugin("MQ2Autosize")() == nil then
-		logger.log_warn(
-			"\aoThe \agMQ2Autosize \aoplugin is not loaded. This is not required for the script to run, but may help if you are frequently becoming stuck while navigating."
-		)
-		logger.log_warn(
-			"\aoIf you would like the script to make use of it please run the command \ar/plugin autosize \aoand restart Epic Laziness."
-		)
-		_G.State.autosize = false
-	else
-		_G.State.autosize = true
-		_G.State.autosize_self = mq.TLO.Autosize.ResizeSelf()
-		_G.State.autosize_on = mq.TLO.Autosize.Enabled()
-		loadsave.SaveState.general["self_size"] = mq.TLO.Autosize.SelfSize()
-	end
+	loadsave.SaveState.general["self_size"] = mq.TLO.Autosize.SelfSize()
 end
 
 local function cmd_el(cmd)
