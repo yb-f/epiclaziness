@@ -359,22 +359,18 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
 			local temp = _G.State:readStatusText()
 			local door = travel.open_door(item)
 			mq.cmd("/keypress Page_Up")
-			if door == false and _G.State.autosize == true then
-				if _G.State.autosize_self == false then
-					mq.cmd("/autosize self")
-					_G.State.autosize_self = true
+			if door == false then
+				if mq.TLO.AutoSize.ResizeSelf() == false then
+					mq.cmd("/autosize self on")
 				end
-				if _G.State.autosize_on == false then
+				if mq.TLO.AutoSize.Enabled() == false then
 					mq.cmd("/autosize on")
-					_G.State.autosize_on = true
-					logger.log_debug("\aoResetting autosize1 %s", _G.State.autosize_sizes[_G.State.autosize_choice])
 					mq.cmdf("/autosize sizeself %s", _G.State.autosize_sizes[_G.State.autosize_choice])
 				else
 					_G.State.autosize_choice = _G.State.autosize_choice + 1
 					if _G.State.autosize_choice == 6 then
 						_G.State.autosize_choice = 1
 					end
-					logger.log_debug("\aoResetting autosize2 %s", _G.State.autosize_sizes[_G.State.autosize_choice])
 					mq.cmdf("/autosize sizeself %s", _G.State.autosize_sizes[_G.State.autosize_choice])
 				end
 			end
@@ -388,8 +384,7 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
 			_G.State.destType = ""
 			_G.State.dest = ""
 			_G.State.is_traveling = false
-			if _G.State.autosize == true then
-				_G.State.autosize_on = false
+			if mq.TLO.AutoSize.Enabled() == true then
 				mq.cmd("/autosize off")
 			end
 			travel.navPause()
@@ -398,8 +393,7 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
 		else
 			_G.State:setLocation(me.X(), me.Y(), me.Z())
 			loopCount = 0
-			if _G.State.autosize_on == true then
-				_G.State.autosize_on = false
+			if mq.TLO.AutoSize.Enabled() == true then
 				mq.cmd("/autosize off")
 			end
 		end
@@ -418,8 +412,7 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
 	_G.State.destType = ""
 	_G.State.dest = ""
 	_G.State.is_traveling = false
-	if _G.State.autosize == true then
-		_G.State.autosize_on = false
+	if mq.TLO.AutoSize.Enabled() == true then
 		mq.cmd("/autosize off")
 	end
 end
@@ -1900,22 +1893,18 @@ function travel.zone_travel(item, class_settings, char_settings, continue, choic
 				end
 				local temp = _G.State:readStatusText()
 				local door = travel.open_door(item)
-				if door == false and _G.State.autosize == true then
-					if _G.State.autosize_self == false then
-						mq.cmd("/autosize self")
-						_G.State.autosize_self = true
+				if door == false then
+					if mq.TLO.AutoSize.ResizeSelf() == false then
+						mq.cmd("/autosize self on")
 					end
-					if _G.State.autosize_on == false then
+					if mq.TLO.AutoSize.Enabled() == false then
 						mq.cmd("/autosize on")
-						_G.State.autosize_on = true
-						logger.log_debug("\aoResetting autosize3 %s", _G.State.autosize_sizes[_G.State.autosize_choice])
 						mq.cmdf("/autosize sizeself %s", _G.State.autosize_sizes[_G.State.autosize_choice])
 					else
 						_G.State.autosize_choice = _G.State.autosize_choice + 1
 						if _G.State.autosize_choice == 6 then
 							_G.State.autosize_choice = 1
 						end
-						logger.log_debug("\aoResetting autosize4 %s", _G.State.autosize_sizes[_G.State.autosize_choice])
 						mq.cmdf("/autosize sizeself %s", _G.State.autosize_sizes[_G.State.autosize_choice])
 					end
 				end
@@ -1927,8 +1916,7 @@ function travel.zone_travel(item, class_settings, char_settings, continue, choic
 			else
 				_G.State:setLocation(mq.TLO.Me.X(), mq.TLO.Me.Y(), mq.TLO.Me.Z())
 				loopCount = 0
-				if _G.State.autosize_on == true then
-					_G.State.autosize_on = false
+				if mq.TLO.AutoSize.Enabled() == true then
 					mq.cmd("/autosize off")
 				end
 			end
@@ -1951,8 +1939,7 @@ function travel.zone_travel(item, class_settings, char_settings, continue, choic
 	_G.State.destType = ""
 	_G.State.dest = ""
 	_G.State.is_traveling = false
-	if _G.State.autosize == true then
-		_G.State.autosize_on = false
+	if mq.TLO.AutoSize.Enabled() == true then
 		mq.cmd("/autosize off")
 	end
 end
