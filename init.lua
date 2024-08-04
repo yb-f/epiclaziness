@@ -27,13 +27,11 @@ local v = require("lib/semver")
 local LoadTheme = require("lib.theme_loader")
 local PackageMan = require("mq/PackageMan")
 local sqlite3 = PackageMan.Require("lsqlite3")
-local hashCheck = require("utils/hashcheck")
-_G.Task_Functions = require("utils/task_functions")
 --local http = PackageMan.Require("luasocket", "socket.http")
 --local ssl = PackageMan.Require("luasec", "ssl")
 
 --local version_url = "https://raw.githubusercontent.com/yb-f/EL-Ver/master/latest_ver"
-local version = v("0.4.6")
+local version = v("0.4.7")
 local window_flags = bit32.bor(ImGuiWindowFlags.None)
 local openGUI, drawGUI = true, true
 local myName = mq.TLO.Me.DisplayName()
@@ -416,6 +414,9 @@ function _G.State.pauseTask(item)
 	_G.State:setTaskRunning(false)
 end
 
+local hashCheck = require("utils/hashcheck")
+_G.Task_Functions = require("utils/task_functions")
+
 class_settings.loadSettings()
 loadsave.loadState()
 if not class_settings.settings.LoadTheme then --whatever your setting is saved as
@@ -765,7 +766,7 @@ class_settings.version_check(version)
 
 -- Initialize autosize, only sets stored value for starting size now.
 local function init_autosize()
-	loadsave.SaveState.general["self_size"] = mq.TLO.AutoSize.SelfSize()
+	loadsave.SaveState.general["self_size"] = mq.TLO.AutoSize.SizeSelf()
 end
 
 local function cmd_el(cmd)
