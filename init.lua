@@ -31,7 +31,7 @@ local sqlite3 = PackageMan.Require("lsqlite3")
 --local ssl = PackageMan.Require("luasec", "ssl")
 
 --local version_url = "https://raw.githubusercontent.com/yb-f/EL-Ver/master/latest_ver"
-local version = v("0.4.7")
+local version = v("0.4.8")
 local window_flags = bit32.bor(ImGuiWindowFlags.None)
 local openGUI, drawGUI = true, true
 local myName = mq.TLO.Me.DisplayName()
@@ -789,12 +789,11 @@ local function init()
 	logger.log_warn(
 		"If you encounter any nav mesh issues please ensure you are using the latest mesh from \arhttps://github.com/yb-f/meshes"
 	)
-	for plugin in ipairs(plugins) do
+	for _, plugin in ipairs(plugins) do
 		if mq.TLO.Plugin(plugin)() == nil then
 			logger.log_error("\ar%s \aois required for this script.", plugin)
 			logger.log_error("\aoLoaded \ar%s \aowith \agnoauto\ao.", plugin)
 			mq.cmdf("/plugin %s noauto", plugin)
-			mq.exit()
 		end
 	end
 	init_autosize()
