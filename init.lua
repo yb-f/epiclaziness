@@ -31,7 +31,7 @@ local sqlite3 = PackageMan.Require("lsqlite3")
 --local ssl = PackageMan.Require("luasec", "ssl")
 
 --local version_url = "https://raw.githubusercontent.com/yb-f/EL-Ver/master/latest_ver"
-local version = v("0.4.8")
+local version = v("0.4.9")
 local window_flags = bit32.bor(ImGuiWindowFlags.None)
 local openGUI, drawGUI = true, true
 local myName = mq.TLO.Me.DisplayName()
@@ -105,16 +105,16 @@ end
 -- Global State table, contains variables and methods necessary in other files
 _G.State = {
 	xtargIgnore = "",
-	is_paused = false, --
-	is_task_running = false, --
-	do_start_run = false, --
+	is_paused = false,        --
+	is_task_running = false,  --
+	do_start_run = false,     --
 	should_stop_at_save = false, --
-	current_step = 0, --
-	status = "", --
-	status2 = "", --
-	requirements = "", --
-	bagslot1 = 0, --0
-	bagslot2 = 0, --0
+	current_step = 0,         --
+	status = "",              --
+	status2 = "",             --
+	requirements = "",        --
+	bagslot1 = 0,             --0
+	bagslot2 = 0,             --0
 	group_combo = {},
 	group_choice = 1,
 	group_selected_member = "",
@@ -419,7 +419,7 @@ _G.Task_Functions = require("utils/task_functions")
 
 class_settings.loadSettings()
 loadsave.loadState()
-if not class_settings.settings.LoadTheme then --whatever your setting is saved as
+if not class_settings.settings.LoadTheme then           --whatever your setting is saved as
 	class_settings.settings["LoadTheme"] = theme.LoadTheme -- load the theme tables default if not set.
 	class_settings.saveSettings()
 end
