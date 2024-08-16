@@ -1,5 +1,5 @@
 --[[
-
+Adding line for testing-----
 FIXME: Ranger 2.0 Step 73 Craftmaster Tieranu determine if npc will spawn if trigger spawns while you are in the room already.
 * In progress -- Can not trigger NPC unless on that step, hooray.
 
