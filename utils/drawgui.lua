@@ -78,7 +78,6 @@ draw_gui.travelText = ""
 function draw_gui.dynamicBarColor(minColor, maxColor, value, midColor)
 	value = math.max(0, math.min(100, value))
 	local r, g, b, a
-	logger.log_debug("value: %s min: %s max: %s mid %s", value, minColor, maxColor, midColor)
 	if midColor then
 		-- If midColor is provided, calculate in two segments
 		if value > 50 then
@@ -102,7 +101,6 @@ function draw_gui.dynamicBarColor(minColor, maxColor, value, midColor)
 		b = minColor[3] + proportion * (maxColor[3] - minColor[3])
 		a = minColor[4] + proportion * (maxColor[4] - minColor[4])
 	end
-	logger.log_warn("r: %s, g: %s, b: %s, a: %s", r, g, b, a)
 	return ImVec4(r, g, b, a)
 end
 
