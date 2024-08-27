@@ -78,6 +78,7 @@ draw_gui.travelText = ""
 function draw_gui.dynamicBarColor(minColor, maxColor, value, midColor)
 	value = math.max(0, math.min(100, value))
 	local r, g, b, a
+	logger.log_debug("value: %s min: %s max: %s mid %s", value, minColor, maxColor, midColor)
 	if midColor then
 		-- If midColor is provided, calculate in two segments
 		if value > 50 then
@@ -101,6 +102,7 @@ function draw_gui.dynamicBarColor(minColor, maxColor, value, midColor)
 		b = minColor[3] + proportion * (maxColor[3] - minColor[3])
 		a = minColor[4] + proportion * (maxColor[4] - minColor[4])
 	end
+	logger.log_warn("r: %s, g: %s, b: %s, a: %s", r, g, b, a)
 	return ImVec4(r, g, b, a)
 end
 
@@ -385,7 +387,8 @@ function draw_gui.generalTab(task_table)
 			--ImGui.PushStyleColor(ImGuiCol.PlotHistogram, IM_COL32(40, 150, 40, 255))
 			ImGui.PushStyleColor(
 				ImGuiCol.PlotHistogram,
-				draw_gui.dynamicBarColor(RED_COLOR, GREEN_COLOR, _G.State.current_step / #task_table, YELLOW_COLOR)
+				draw_gui.dynamicBarColor(RED_COLOR, GREEN_COLOR, (_G.State.current_step / #task_table) * 100,
+					YELLOW_COLOR)
 			)
 			ImGui.ProgressBar(_G.State.current_step / #task_table, ImGui.GetWindowWidth(), 17, "##prog")
 			ImGui.PopStyleColor()
@@ -663,7 +666,7 @@ function draw_gui.settingsTab(themeName, theme, themeID, class_settings, char_se
 			end
 			invis_type = {}
 			for word in
-				string.gmatch(class_settings.settings.class_invis[draw_gui.class_list[class_list_choice]], "([^|]+)")
+			string.gmatch(class_settings.settings.class_invis[draw_gui.class_list[class_list_choice]], "([^|]+)")
 			do
 				table.insert(invis_type, word)
 			end
@@ -682,7 +685,7 @@ function draw_gui.settingsTab(themeName, theme, themeID, class_settings, char_se
 			if class_settings.settings.move_speed[draw_gui.class_list[class_list_choice]] then
 				local speed_type = {}
 				for word in
-					string.gmatch(class_settings.settings.move_speed[draw_gui.class_list[class_list_choice]], "([^|]+)")
+				string.gmatch(class_settings.settings.move_speed[draw_gui.class_list[class_list_choice]], "([^|]+)")
 				do
 					table.insert(speed_type, word)
 				end
