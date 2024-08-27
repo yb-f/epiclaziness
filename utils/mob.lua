@@ -61,7 +61,7 @@ function mob.xtargetCheck(char_settings)
 			for word in string.gmatch(ignore_mob, "([^|]+)") do
 				table.insert(ignore_list, word)
 			end
-			logger.log_info("\aoIgnoring xtarget check.")
+			logger.log_verbose("\aoIgnoring xtarget check.")
 			return false
 		end
 	end
@@ -383,20 +383,20 @@ function mob.findNearestName(npc, item, class_settings, char_settings)
 			if item.named == 1 then
 				if closest_ID == 0 then
 					if mq.TLO.Spawn("corpse " .. item.npc).ID() ~= 0 then
-						if item.gotostep ~= nil then
+						if item.gotostep == nil then
 							logger.log_warn(
 								"\ar%s \aohas already been killed. Advancing to step: \ag%s\ao.",
 								item.npc,
 								item.step + 1
 							)
-							_G.State:handle_step_change(item.gotostep)
+							_G.State:handle_step_change(item.step + 1)
 						else
 							logger.log_warn(
 								"\ar%s \aohas already been killed. Advancing to step: \ag%s\ao.",
 								item.npc,
 								item.gotostep
 							)
-							_G.State:handle_step_change(item.step + 1)
+							_G.State:handle_step_change(item.gotostep)
 						end
 						_G.State:handle_step_change(item.gotostep)
 						return nil
