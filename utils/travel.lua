@@ -26,7 +26,7 @@ local GROUP_PERFECTED_INVIS = 1210
 local GROUP_SILENT_PRESENCE = 630
 local speed_classes = { "Bard", "Druid", "Ranger", "Shaman" }
 local speed_buffs =
-	{ "Selo's Accelerato", "Communion of the Cheetah", "Spirit of Falcons", "Flight of Falcons", "Spirit of Eagle" }
+{ "Selo's Accelerato", "Communion of the Cheetah", "Spirit of Falcons", "Flight of Falcons", "Spirit of Eagle" }
 ---@class Travel
 local travel = {}
 travel.looping = false
@@ -156,6 +156,19 @@ function travel.gate_group(choice, name)
 	else
 		mq.cmd("/relocate gate")
 		mq.cmdf("/dex %s /relocate gate", name)
+	end
+	local loopCount = 0
+	while mq.TLO.Me.Casting() == nil do
+		loopCount = loopCount + 1
+		mq.delay(10)
+		if loopCount >= 200 then
+			logger.log_warn("\aoSpent 2 seconds waiting for gate to cast. Moving on.")
+			break
+		end
+	end
+	loopCount = 0
+	while mq.TLO.Me.Casting() ~= nil do
+		mq.delay(50)
 	end
 end
 
@@ -604,8 +617,8 @@ function travel.invis(class_settings)
 						mq.cmdf('/dex %s /useitem "Circlet of Shadows"', mq.TLO.Group.Member(i).DisplayName())
 					else
 						local ID = class_settings["skill_to_num"][invis_type[class_settings.invis[mq.TLO.Group
-							.Member(i)
-							.Class()]]]
+						.Member(i)
+						.Class()]]]
 						logger.log_super_verbose(
 							"\aoHaving \ag%s \aouse \ag%s \ao(\ag%s\ao).",
 							mq.TLO.Group.Member(i).DisplayName(),
