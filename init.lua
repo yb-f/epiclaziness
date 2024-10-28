@@ -748,7 +748,7 @@ local function displayGUI()
 end
 
 -- Check the version of the script against the latest version. If it is lower than the latest version notify user and exit.
-local function version_check()
+--[[local function version_check()
 	local success, response = pcall(http.request, version_url)
 	if not success then
 		logger.log_error("\aoFailed to fetch version information: %s", response)
@@ -759,7 +759,7 @@ local function version_check()
 		logger.log_error("\aoA new version is available (\arv%s\ao) please download it and try again.", response)
 		mq.exit()
 	end
-end
+end--]]
 
 loadsave.versionCheck(version)
 class_settings.version_check(version)
