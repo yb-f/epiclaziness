@@ -124,7 +124,7 @@ function class_settings.createSettings()
 	class_settings.settings = {
 		["version"] = v("0.4.3"),
 		["class"] = {
-			["Bard"] = 2,
+			["Bard"] = 1,
 			["Beastlord"] = 1,
 			["Berserker"] = 1,
 			["Cleric"] = 1,
