@@ -255,7 +255,7 @@ end
 ---@param spawn spawn
 ---@return boolean
 local function matchFilters(spawn)
-	if (not spawn) then
+	if (not spawn or spawn.CleanName() == nil) then
 		return false
 	end
 	if
