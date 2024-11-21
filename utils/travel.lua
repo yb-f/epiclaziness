@@ -546,7 +546,7 @@ function travel.invis(class_settings)
 				mq.delay(50)
 			end
 			mq.cmdf("/alt act %s", ID)
-			mq.delay(500)
+			mq.delay(750)
 			while mq.TLO.Me.Casting() and mq.TLO.Me.Class() ~= "Bard" do
 				mq.delay(200)
 			end
