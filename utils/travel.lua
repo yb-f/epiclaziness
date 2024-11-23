@@ -146,6 +146,7 @@ end
 ---@param choice number
 ---@param name string
 function travel.gate_group(choice, name)
+	---@diagnostic disable-next-line: redundant-parameter
 	logger.log_info("\aoGating to \ag%s\ao.", mq.TLO.Me.BoundLocation(0)())
 	if choice == 1 then
 		mq.cmd("/relocate gate")
@@ -273,16 +274,20 @@ function travel.check_path(start_short, end_short)
 	mq.TLO.Window("ZoneGuideWnd/ZGW_ClearPath_Btn").LeftMouseUp()
 	mq.TLO.Window("ZoneGuideWnd/ZGW_ClearZonesSearch_Btn").LeftMouseUp()
 	local zone_count = mq.TLO.Window("ZoneGuideWnd/ZGW_Zones_ListBox").Items()
+	---@diagnostic disable-next-line: param-type-mismatch
 	if mq.TLO.Window("ZoneGuideWnd/ZGW_Zones_ListBox").List(start_long)() ~= nil then
 		mq.cmdf(
 			"/notify ZoneGuideWnd ZGW_Zones_ListBox Listselect %s",
+			---@diagnostic disable-next-line: param-type-mismatch
 			mq.TLO.Window("ZoneGuideWnd/ZGW_Zones_ListBox").List(start_long)()
 		)
 		mq.TLO.Window("ZoneGuideWnd/ZGW_SetStart_Btn").LeftMouseUp()
 	end
+	---@diagnostic disable-next-line: param-type-mismatch
 	if mq.TLO.Window("ZoneGuideWnd/ZGW_Zones_ListBox").List(end_long)() ~= nil then
 		mq.cmdf(
 			"/notify ZoneGuideWnd ZGW_Zones_ListBox Listselect %s",
+			---@diagnostic disable-next-line: param-type-mismatch
 			mq.TLO.Window("ZoneGuideWnd/ZGW_Zones_ListBox").List(end_long)()
 		)
 		mq.TLO.Window("ZoneGuideWnd/ZGW_SetEnd_Btn").LeftMouseUp()
@@ -372,9 +377,11 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
 			local door = travel.open_door()
 			mq.cmd("/keypress Page_Up")
 			if door == false then
+				---@diagnostic disable-next-line: undefined-field
 				if mq.TLO.AutoSize.ResizeSelf() == false then
 					mq.cmd("/autosize self on")
 				end
+				---@diagnostic disable-next-line: undefined-field
 				if mq.TLO.AutoSize.Enabled() == false then
 					mq.cmd("/autosize on")
 					mq.cmdf("/autosize sizeself %s", _G.State.autosize_sizes[_G.State.autosize_choice])
@@ -396,6 +403,7 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
 			_G.State.destType = ""
 			_G.State.dest = ""
 			_G.State.is_traveling = false
+			---@diagnostic disable-next-line: undefined-field
 			if mq.TLO.AutoSize.Enabled() == true then
 				mq.cmd("/autosize off")
 			end
@@ -405,6 +413,7 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
 		else
 			_G.State:setLocation(me.X(), me.Y(), me.Z())
 			loopCount = 0
+			---@diagnostic disable-next-line: undefined-field
 			if mq.TLO.AutoSize.Enabled() == true then
 				mq.cmd("/autosize off")
 			end
@@ -424,6 +433,7 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
 	_G.State.destType = ""
 	_G.State.dest = ""
 	_G.State.is_traveling = false
+	---@diagnostic disable-next-line: undefined-field
 	if mq.TLO.AutoSize.Enabled() == true then
 		mq.cmd("/autosize off")
 	end
@@ -1906,9 +1916,11 @@ function travel.zone_travel(item, class_settings, char_settings, continue, choic
 				local temp = _G.State:readStatusText()
 				local door = travel.open_door()
 				if door == false then
+					---@diagnostic disable-next-line: undefined-field
 					if mq.TLO.AutoSize.ResizeSelf() == false then
 						mq.cmd("/autosize self on")
 					end
+					---@diagnostic disable-next-line: undefined-field
 					if mq.TLO.AutoSize.Enabled() == false then
 						mq.cmd("/autosize on")
 						mq.cmdf("/autosize sizeself %s", _G.State.autosize_sizes[_G.State.autosize_choice])
@@ -1928,6 +1940,7 @@ function travel.zone_travel(item, class_settings, char_settings, continue, choic
 			else
 				_G.State:setLocation(mq.TLO.Me.X(), mq.TLO.Me.Y(), mq.TLO.Me.Z())
 				loopCount = 0
+				---@diagnostic disable-next-line: undefined-field
 				if mq.TLO.AutoSize.Enabled() == true then
 					mq.cmd("/autosize off")
 				end
@@ -1951,6 +1964,7 @@ function travel.zone_travel(item, class_settings, char_settings, continue, choic
 	_G.State.destType = ""
 	_G.State.dest = ""
 	_G.State.is_traveling = false
+	---@diagnostic disable-next-line: undefined-field
 	if mq.TLO.AutoSize.Enabled() == true then
 		mq.cmd("/autosize off")
 	end
