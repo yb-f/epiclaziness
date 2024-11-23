@@ -406,7 +406,7 @@ end
 -- Display the ImGui window
 local function displayGUI()
 	if not openGUI then
-		running = false
+		_G.State.running = false
 		mq.exit()
 		return
 	end
@@ -493,7 +493,7 @@ end
 
 -- Main loop of the script. Check if we are in game, if we should start the script, and if we should exit.
 local function main()
-	while running == true do
+	while _G.State.running == true do
 		if mq.TLO.EverQuest.GameState() ~= "INGAME" then
 			logger.log_error("\arNot in game, closing.")
 			mq.exit()
