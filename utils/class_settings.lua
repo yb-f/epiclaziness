@@ -1,5 +1,5 @@
 local mq = require("mq")
-local logger = require("utils/logger")
+local logger = require("lib/logger")
 local v = require("lib/semver")
 
 ---@class Class_Settings

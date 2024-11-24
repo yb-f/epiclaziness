@@ -1,6 +1,6 @@
 local mq = require("mq")
 local manage = require("utils/manageautomation")
-local logger = require("utils/logger")
+local logger = require("lib/logger")
 local travel = require("utils/travel")
 local dist = require("utils/distance")
 local MAX_DISTANCE = 100

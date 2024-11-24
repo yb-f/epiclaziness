@@ -1,6 +1,6 @@
 local mq        = require('mq')
 local sha       = require('lib/sha2')
-local logger    = require('utils/logger')
+local logger    = require('lib/logger')
 
 local path      = mq.luaDir .. "/../resources/MQ2Nav/"
 ---@class HashCheck

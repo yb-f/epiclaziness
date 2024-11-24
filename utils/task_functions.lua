@@ -4,7 +4,7 @@ local inv            = require('utils/inventory')
 local travel         = require('utils/travel')
 local manage         = require('utils/manageautomation')
 local mob            = require('utils/mob')
-local logger         = require('utils/logger')
+local logger         = require('lib/logger')
 
 class_settings.loadSettings()
 loadsave.loadState()
@@ -186,7 +186,8 @@ local task_functions = {
     GROUND_SPAWN               = {
         func   = _G.Actions.ground_spawn,
         params = function() return { class_settings.settings, loadsave.SaveState } end,
-        desc   = function(item) return 'Pickup ground spawn at ' .. item.whereY .. ', ' .. item.whereX .. ', ' .. item.whereZ end
+        desc   = function(item) return 'Pickup ground spawn at ' ..
+            item.whereY .. ', ' .. item.whereX .. ', ' .. item.whereZ end
     },
     GROUND_SPAWN_FARM          = {
         func   = _G.Actions.ground_spawn_farm,
@@ -201,7 +202,8 @@ local task_functions = {
     GROUP_SIZE_CHECK_WITH_ZONE = {
         func   = _G.Actions.group_size_check,
         params = { true },
-        desc   = function(item) return 'Making sure group has at least ' .. item.count .. ' players, and that they are within the same zone.' end
+        desc   = function(item) return 'Making sure group has at least ' ..
+            item.count .. ' players, and that they are within the same zone.' end
     },
     IGNORE_MOB                 = {
         func   = _G.Actions.ignore_mob,
@@ -226,7 +228,8 @@ local task_functions = {
     NO_NAV_TRAVEL              = {
         func   = travel.no_nav_travel,
         params = function() return { class_settings.settings, loadsave.SaveState, _G.State:readGroupSelection() } end,
-        desc   = function(item) return 'Travel without using MQ2Nav to ' .. item.whereY .. ', ' .. item.whereX .. ', ' .. item.whereZ end
+        desc   = function(item) return 'Travel without using MQ2Nav to ' ..
+            item.whereY .. ', ' .. item.whereX .. ', ' .. item.whereZ end
     },
     NPC_BUY                    = {
         func   = inv.npc_buy,

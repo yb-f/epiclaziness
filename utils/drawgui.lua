@@ -2,7 +2,7 @@ local mq = require("mq")
 local ICONS = require("mq.Icons")
 local invis_travel = require("utils/travelandinvis")
 local ImGui = require("ImGui")
-local logger = require("utils/logger")
+local logger = require("lib/logger")
 local loadsave = require("utils/loadsave")
 
 local LogLevels = {

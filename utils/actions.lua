@@ -2,7 +2,7 @@ local mq = require("mq")
 local inv = require("utils/inventory")
 local manage = require("utils/manageautomation")
 local travel = require("utils/travel")
-local logger = require("utils/logger")
+local logger = require("lib/logger")
 local dist = require("utils/distance")
 
 local DESIRED_CHIPS = 1900

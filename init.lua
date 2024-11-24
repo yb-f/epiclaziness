@@ -8,7 +8,7 @@ FIXME: Ranger 2.0 Step 73 Craftmaster Tieranu determine if npc will spawn if tri
 --]]
 local mq = require("mq")
 local ImGui = require("ImGui")
-local logger = require("utils/logger")
+local logger = require("lib/logger")
 _G.State = require("lib/state")
 _G.Common = require("utils/common_func")
 _G.Actions = require("utils/actions")
@@ -46,8 +46,6 @@ local themeID = 5
 local theme = {}
 local FIRST_WINDOW_WIDTH = 415
 local FIRST_WINDOW_HEIGHT = 475
-local AUTOSIZE_SIZES = { 1, 2, 5, 10, 20 }
-local AUTOSIZE_CHOICE = 3
 local class_name_table = {
 	["Bard"] = "brd",
 	["Beastlord"] = "bst",

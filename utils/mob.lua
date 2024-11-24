@@ -2,7 +2,7 @@ local mq = require("mq")
 local manage = require("utils/manageautomation")
 local inv = require("utils/inventory")
 local travel = require("utils/travel")
-local logger = require("utils/logger")
+local logger = require("lib/logger")
 local dist = require("utils/distance")
 local MAX_DISTANCE = 100
 ---@class Mob

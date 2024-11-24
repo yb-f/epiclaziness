@@ -1,5 +1,5 @@
 local mq = require("mq")
-local logger = require("utils/logger")
+local logger = require("lib/logger")
 
 local RANDOM_MIN = 300
 local RANDOM_MAX = 3000
