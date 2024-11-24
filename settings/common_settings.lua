@@ -1,21 +1,23 @@
+--TODO Check for epiclaziness_class_settings.lua if no common_settings.lua exists and move to new naming
+
 local mq = require("mq")
 local logger = require("lib/logger")
 local v = require("lib/semver")
 
----@class Class_Settings
-local class_settings = {}
-class_settings.settings = {}
-class_settings.configPath = mq.configDir .. "/epiclaziness/epiclaziness_class_settings.lua"
+---@class Common_Settings
+local common_settings = {}
+common_settings.settings = {}
+common_settings.configPath = mq.configDir .. "/epiclaziness/common_settings.lua"
 
 -- Load the settings file if it exists
-function class_settings.loadSettings()
-	local configData, err = loadfile(class_settings.configPath)
+function common_settings.loadSettings()
+	local configData, err = loadfile(common_settings.configPath)
 	if err then
-		class_settings.createSettings()
+		common_settings.createSettings()
 	elseif configData then
-		class_settings.settings = configData()
-		if class_settings.settings.skill_to_num == nil then
-			class_settings.settings.skill_to_num = {
+		common_settings.settings = configData()
+		if common_settings.settings.skill_to_num == nil then
+			common_settings.settings.skill_to_num = {
 				["Shauri's Sonorous Clouding"] = 231,
 				["Natural Invisibility"] = 980,
 				["Innate Camouflage"] = 80,
@@ -23,68 +25,68 @@ function class_settings.loadSettings()
 				["Cloak of Shadows"] = 531,
 				["Silent Presence"] = 3730,
 			}
-			class_settings.saveSettings()
+			common_settings.saveSettings()
 		end
-		if class_settings.settings["version"] == nil then
-			class_settings.settings["version"] = "0.3.31"
-			class_settings.settings["class_invis"]["Necromancer"] = "Cloak of Shadows|Potion|Circlet of Shadows"
-			class_settings.settings["class_invis"]["Shadow Knight"] = "Cloak of Shadows|Potion|Circlet of Shadows"
-			class_settings.settings["move_speed"] = {
+		if common_settings.settings["version"] == nil then
+			common_settings.settings["version"] = "0.3.31"
+			common_settings.settings["class_invis"]["Necromancer"] = "Cloak of Shadows|Potion|Circlet of Shadows"
+			common_settings.settings["class_invis"]["Shadow Knight"] = "Cloak of Shadows|Potion|Circlet of Shadows"
+			common_settings.settings["move_speed"] = {
 				["Bard"] = "Selo's Sonata|None",
 				["Druid"] = "Communion of the Cheetah|Spirit of Eagles|None",
 				["Shaman"] = "Communion of the Cheetah|None",
 				["Ranger"] = "Spirit of Eagle|None",
 			}
-			class_settings.settings["speed"] = {
+			common_settings.settings["speed"] = {
 				["Druid"] = 1,
 				["Ranger"] = 1,
 				["Shaman"] = 1,
 				["Bard"] = 1,
 			}
-			class_settings.settings["speed_to_num"] = {
+			common_settings.settings["speed_to_num"] = {
 				["Spirit of Eagles(Druid)"] = 8601,
 				["Spirit of Eagle(Ranger)"] = 8600,
 				["Communion of the Cheetah"] = 939,
 				["Selo's Sonata"] = 3704,
 			}
-			class_settings.saveSettings()
+			common_settings.saveSettings()
 		end
-		if class_settings.settings["version"] == "0.1.5" then
-			class_settings.settings["version"] = "0.3.31"
-			class_settings.settings["move_speed"]["Ranger"] = "Spirit of Eagle|None"
-			class_settings.settings["speed_to_num"]["Spirit of Eagle(Ranger)"] = 8600
-			class_settings.settings["speed_to_num"]["Spirit of Eagles(Ranger)"] = nil
+		if common_settings.settings["version"] == "0.1.5" then
+			common_settings.settings["version"] = "0.3.31"
+			common_settings.settings["move_speed"]["Ranger"] = "Spirit of Eagle|None"
+			common_settings.settings["speed_to_num"]["Spirit of Eagle(Ranger)"] = 8600
+			common_settings.settings["speed_to_num"]["Spirit of Eagles(Ranger)"] = nil
 		end
 	end
-	if class_settings.settings["speed_to_num"] == nil then
-		class_settings.settings["speed_to_num"] = {
+	if common_settings.settings["speed_to_num"] == nil then
+		common_settings.settings["speed_to_num"] = {
 			["Spirit of Eagles(Druid)"] = 8601,
 			["Spirit of Eagles(Ranger)"] = 8600,
 			["Communion of the Cheetah"] = 939,
 			["Selo's Sonata"] = 3704,
 		}
-		class_settings.saveSettings()
+		common_settings.saveSettings()
 	end
-	if class_settings.settings["speed"] == nil then
-		class_settings.settings["speed"] = {
+	if common_settings.settings["speed"] == nil then
+		common_settings.settings["speed"] = {
 			["Druid"] = 1,
 			["Ranger"] = 1,
 			["Shaman"] = 1,
 			["Bard"] = 1,
 		}
-		class_settings.saveSettings()
+		common_settings.saveSettings()
 	end
 end
 
-function class_settings.version_check(version)
+function common_settings.version_check(version)
 	local temp_semver
-	if type(class_settings.settings["version"]) == "string" then
-		temp_semver = v(class_settings.settings["version"])
+	if type(common_settings.settings["version"]) == "string" then
+		temp_semver = v(common_settings.settings["version"])
 	else
-		temp_semver = class_settings.settings["version"]
+		temp_semver = common_settings.settings["version"]
 	end
-	if class_settings.semver_less_than(temp_semver, v("0.4.3")) then
-		class_settings.settings["group_invis"] = {
+	if common_settings.semver_less_than(temp_semver, v("0.4.3")) then
+		common_settings.settings["group_invis"] = {
 			["Bard"] = "Shauri's Sonorous Clouding",
 			["Druid"] = "Shared Camouflage",
 			["Enchanter"] = "Group Perfected Invisibility",
@@ -93,19 +95,19 @@ function class_settings.version_check(version)
 			["Shaman"] = "Group Silent Presence",
 			["Wizard"] = "Group Perfected Invisibility",
 		}
-		class_settings.settings["group_invis_to_num"] = {
+		common_settings.settings["group_invis_to_num"] = {
 			["Shauri's Sonorous Clouding"] = 231,
 			["Shared Camouflage"] = 518,
 			["Group Perfected Invisibility"] = 1210,
 			["Group Silent Presence"] = 630,
 		}
 		logger.log_debug("\aoUpdating general configuration to \ag%s\ao.", version)
-		class_settings.settings["version"] = version
-		class_settings.saveSettings()
+		common_settings.settings["version"] = version
+		common_settings.saveSettings()
 	end
 end
 
-function class_settings.semver_less_than(a, b)
+function common_settings.semver_less_than(a, b)
 	if a.major ~= b.major then
 		return a.major < b.major
 	end
@@ -119,9 +121,9 @@ function class_settings.semver_less_than(a, b)
 end
 
 -- Create default settings
-function class_settings.createSettings()
+function common_settings.createSettings()
 	---@class Class_Settings_Settings
-	class_settings.settings = {
+	common_settings.settings = {
 		["version"] = v("0.4.3"),
 		["class"] = {
 			["Bard"] = 1,
@@ -230,14 +232,14 @@ function class_settings.createSettings()
 			["LogToFile"] = false,
 		},
 	}
-	class_settings.saveSettings()
+	common_settings.saveSettings()
 	logger.log_warn("\aoCreated default settings. Please set them appropriately for your use.")
 end
 
 --Save Settings
-function class_settings.saveSettings()
+function common_settings.saveSettings()
 	logger.log_info("\aoGeneral settings saved.")
-	mq.pickle(class_settings.configPath, class_settings.settings)
+	mq.pickle(common_settings.configPath, common_settings.settings)
 end
 
-return class_settings
+return common_settings

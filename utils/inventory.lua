@@ -117,11 +117,11 @@ end
 
 -- Prepare the indicated combiner to have combines performed in it
 ---@param item Item
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
-function inventory.combine_container(item, class_settings, char_settings)
+function inventory.combine_container(item, common_settings, char_settings)
 	if _G.Mob.xtargetCheck(char_settings) then
-		_G.Mob.clearXtarget(class_settings, char_settings)
+		_G.Mob.clearXtarget(common_settings, char_settings)
 	end
 	_G.State:setStatusText("Preparing combine container (%s).", item.what)
 	logger.log_info("\aoPreparing combine container (\ag%s\ao) for use.", item.what)
@@ -167,12 +167,12 @@ end
 
 -- Move the indicated item to the combine bag
 ---@param item Item
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
 ---@param slot number
-function inventory.combine_item(item, class_settings, char_settings, slot)
+function inventory.combine_item(item, common_settings, char_settings, slot)
 	if _G.Mob.xtargetCheck(char_settings) then
-		_G.Mob.clearXtarget(class_settings, char_settings)
+		_G.Mob.clearXtarget(common_settings, char_settings)
 	end
 	_G.State:setStatusText("Moving %s to combine container.", item.what)
 	logger.log_info("\aoMoving \ag%s \aoto combine container.", item.what)
@@ -221,12 +221,12 @@ end
 
 -- Perform the combine with the indicated container
 ---@param item Item
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
 ---@param slot number
-function inventory.combine_do(item, class_settings, char_settings, slot)
+function inventory.combine_do(item, common_settings, char_settings, slot)
 	if _G.Mob.xtargetCheck(char_settings) then
-		_G.Mob.clearXtarget(class_settings, char_settings)
+		_G.Mob.clearXtarget(common_settings, char_settings)
 	end
 	_G.State:setStatusText("Performing combine.")
 	logger.log_info("\aoPerforming combine in container in slot \ag%s\ao.", slot)
@@ -245,11 +245,11 @@ end
 
 -- Return combine container and any moved item to their previous slots
 ---@param item Item
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
-function inventory.combine_done(item, class_settings, char_settings)
+function inventory.combine_done(item, common_settings, char_settings)
 	if _G.Mob.xtargetCheck(char_settings) then
-		_G.Mob.clearXtarget(class_settings, char_settings)
+		_G.Mob.clearXtarget(common_settings, char_settings)
 	end
 	if _G.State.bagslot1 ~= 0 and _G.State.bagslot2 ~= 0 then
 		_G.State:setStatusText("Moving container back to previous slot.")
@@ -269,9 +269,9 @@ end
 
 -- Move to the indicated enviromental tradeskill container and open it.
 ---@param item Item
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
-function inventory.enviro_combine_container(item, class_settings, char_settings)
+function inventory.enviro_combine_container(item, common_settings, char_settings)
 	_G.State:setStatusText("Moving to %s.", item.what)
 	logger.log_info("\aoMoving to \ag%s \aoto perform combine.", item.what)
 	mq.cmdf("/itemtarget %s", item.what)
@@ -294,7 +294,7 @@ function inventory.enviro_combine_container(item, class_settings, char_settings)
 		_G.State.startDist = mq.TLO.Navigation.PathLength(tempString)()
 		_G.State.destType = "loc"
 		_G.State.dest = string.format("%s %s %s", y, x, z)
-		travel.travelLoop(item, class_settings, char_settings, 0)
+		travel.travelLoop(item, common_settings, char_settings, 0)
 	end
 	_G.State:setStatusText("Opening %s window.", item.what)
 	logger.log_info("\aoOpening \ag%s \aowindow.", item.what)
@@ -708,9 +708,9 @@ end
 
 -- Buy an item (or multiples of an item) from a merchant
 ---@param item Item
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
-function inventory.npc_buy(item, class_settings, char_settings)
+function inventory.npc_buy(item, common_settings, char_settings)
 	manage.removeInvis(item)
 	_G.State:setStatusText("Buying %s from %s.", item.what, item.npc)
 	logger.log_info("\aoBuying \ag%s \ao from \ag%s\ao.", item.what, item.npc)

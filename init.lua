@@ -20,7 +20,7 @@ local class_definitions = require("types/class_definitions")
 local draw_gui = require("utils/drawgui")
 local manage = require("utils/manageautomation")
 local loadsave = require("utils/loadsave")
-local class_settings = require("utils/class_settings")
+local common_settings = require("settings/common_settings")
 local quests_done = require("data/questsdone")
 local reqs = require("data/questrequirements")
 local tsreqs = require("data/tradeskillreqs")
@@ -118,37 +118,37 @@ end
 local hashCheck = require("utils/hashcheck")
 _G.Task_Functions = require("utils/task_functions")
 
-class_settings.loadSettings()
+common_settings.loadSettings()
 loadsave.loadState()
-if not class_settings.settings.LoadTheme then           --whatever your setting is saved as
-	class_settings.settings["LoadTheme"] = theme.LoadTheme -- load the theme tables default if not set.
-	class_settings.saveSettings()
+if not common_settings.settings.LoadTheme then           --whatever your setting is saved as
+	common_settings.settings["LoadTheme"] = theme.LoadTheme -- load the theme tables default if not set.
+	common_settings.saveSettings()
 end
 if loadsave.SaveState["version"] == nil then
 	loadsave.SaveState["version"] = version
 	loadsave.saveState()
 end
 
-themeName = class_settings.settings.LoadTheme
+themeName = common_settings.settings.LoadTheme
 loadTheme()
 
-if class_settings.settings["logger"] == nil then
-	class_settings.settings["logger"] = {
+if common_settings.settings["logger"] == nil then
+	common_settings.settings["logger"] = {
 		["LogLevel"] = 3,
 		["LogToFile"] = false,
 	}
-	class_settings.saveSettings()
+	common_settings.saveSettings()
 end
 
-logger.set_log_level(class_settings.settings.logger.LogLevel)
-logger.set_log_to_file(class_settings.settings.logger.LogToFile)
+logger.set_log_level(common_settings.settings.logger.LogLevel)
+logger.set_log_to_file(common_settings.settings.logger.LogToFile)
 
 if loadsave.SaveState["general"] == nil then
 	loadsave.SaveState["general"] = {
-		["useAOC"] = class_settings.settings.general.useAOC,
-		["invisForTravel"] = class_settings.settings.general.invisForTravel,
-		["stopTS"] = class_settings.settings.general.stopTS,
-		["returnToBind"] = class_settings.settings.general.returnToBind,
+		["useAOC"] = common_settings.settings.general.useAOC,
+		["invisForTravel"] = common_settings.settings.general.invisForTravel,
+		["stopTS"] = common_settings.settings.general.stopTS,
+		["returnToBind"] = common_settings.settings.general.returnToBind,
 		["xtargClear"] = 1,
 	}
 	loadsave.saveState()
@@ -300,9 +300,9 @@ local function init_epic(class, choice)
 	for a in dbn:nrows(sql) do
 		table.insert(task_table, a)
 	end
-	manage.startGroup(class_settings.settings, loadsave.SaveState)
+	manage.startGroup(common_settings.settings, loadsave.SaveState)
 	mq.delay("5s")
-	manage.pauseGroup(class_settings.settings)
+	manage.pauseGroup(common_settings.settings)
 end
 
 -- Run the selected quest. Loop through the steps and execute them until we reach the final step.
@@ -420,13 +420,13 @@ local function displayGUI()
 		draw_gui.header()
 		ImGui.BeginTabBar("##Tabs")
 		draw_gui.generalTab(task_table)
-		theme.LoadTheme, themeName, themeID, class_settings.settings["LoadTheme"] =
-			draw_gui.settingsTab(themeName, theme, themeID, class_settings, loadsave)
+		theme.LoadTheme, themeName, themeID, common_settings.settings["LoadTheme"] =
+			draw_gui.settingsTab(themeName, theme, themeID, common_settings, loadsave)
 		draw_gui.outlineTab(task_outline_table, _G.State.overview_steps, task_table)
 		if _G.State:readTaskRunning() then
 			draw_gui.fullOutlineTab(task_table)
 		end
-		draw_gui.consoleTab(class_settings)
+		draw_gui.consoleTab(common_settings)
 		if draw_gui.dev["dev_on"] == true then
 			draw_gui.dev_tab()
 		end
@@ -451,7 +451,7 @@ end
 end--]]
 
 loadsave.versionCheck(version)
-class_settings.version_check(version)
+common_settings.version_check(version)
 
 -- Initialize autosize, only sets stored value for starting size now.
 local function init_autosize()

@@ -185,22 +185,22 @@ local function gate_needed(class, choice)
 end
 
 -- Draw the Console log tab
----@param class_settings Class_Settings
-function draw_gui.consoleTab(class_settings)
+---@param common_settings Common_Settings
+function draw_gui.consoleTab(common_settings)
 	if ImGui.BeginTabItem("Console") then
 		ImGui.SetNextItemWidth(120)
-		class_settings.settings.logger.LogLevel, changed =
-			ImGui.Combo("Debug Levels", class_settings.settings.logger.LogLevel, LogLevels, #LogLevels)
+		common_settings.settings.logger.LogLevel, changed =
+			ImGui.Combo("Debug Levels", common_settings.settings.logger.LogLevel, LogLevels, #LogLevels)
 		if changed then
-			logger.set_log_level(class_settings.settings.logger.LogLevel)
-			class_settings.saveSettings()
+			logger.set_log_level(common_settings.settings.logger.LogLevel)
+			common_settings.saveSettings()
 		end
 
 		ImGui.SameLine()
-		class_settings.settings.logger.LogToFile, changed =
-			draw_gui.RenderOptionToggle("##log_to_file", "Log to File", class_settings.settings.logger.LogToFile)
+		common_settings.settings.logger.LogToFile, changed =
+			draw_gui.RenderOptionToggle("##log_to_file", "Log to File", common_settings.settings.logger.LogToFile)
 		if changed then
-			class_settings.saveSettings()
+			common_settings.saveSettings()
 		end
 
 		local cur_x, cur_y = ImGui.GetCursorPos()
@@ -538,10 +538,10 @@ end
 ---@param themeName string
 ---@param theme table
 ---@param themeID number
----@param class_settings Class_Settings
+---@param common_settings Common_Settings
 ---@param char_settings Char_Settings
 ---@return string, string, number, string
-function draw_gui.settingsTab(themeName, theme, themeID, class_settings, char_settings)
+function draw_gui.settingsTab(themeName, theme, themeID, common_settings, char_settings)
 	if ImGui.BeginTabItem("Settings") then
 		ImGui.BeginChild("##SettingsChild")
 		if ImGui.CollapsingHeader("General Settings") then
@@ -556,10 +556,10 @@ function draw_gui.settingsTab(themeName, theme, themeID, class_settings, char_se
 						theme.LoadTheme = data.Name
 						themeName = theme.LoadTheme
 						themeID = k
-						class_settings.settings["LoadTheme"] = theme.LoadTheme
+						common_settings.settings["LoadTheme"] = theme.LoadTheme
 					end
 					if ImGui.IsItemEdited() then
-						class_settings.saveSettings()
+						common_settings.saveSettings()
 					end
 				end
 				ImGui.EndCombo()
@@ -632,7 +632,7 @@ function draw_gui.settingsTab(themeName, theme, themeID, class_settings, char_se
 			ImGui.PopItemWidth()
 		end
 		if ImGui.CollapsingHeader("Class Settings") then
-			ImGui.BeginTable("##Class_Settings", 2, ImGuiTableFlags.Borders)
+			ImGui.BeginTable("##Common_Settings", 2, ImGuiTableFlags.Borders)
 			ImGui.TableSetupColumn("##Class_List", ImGuiTableColumnFlags.WidthFixed, 120)
 			ImGui.TableSetupColumn("##Class_Setting", ImGuiTableColumnFlags.None)
 			ImGui.TableNextRow()
@@ -654,9 +654,9 @@ function draw_gui.settingsTab(themeName, theme, themeID, class_settings, char_se
 			ImGui.SetCursorPosX((width - text_width))
 			ImGui.Text(draw_gui.class_list[class_list_choice])
 			ImGui.PushItemWidth(160)
-			class_settings.settings.class[draw_gui.class_list[class_list_choice]], changed = ImGui.Combo(
+			common_settings.settings.class[draw_gui.class_list[class_list_choice]], changed = ImGui.Combo(
 				"##AutomationType",
-				class_settings.settings.class[draw_gui.class_list[class_list_choice]],
+				common_settings.settings.class[draw_gui.class_list[class_list_choice]],
 				automation_list,
 				#automation_list,
 				#automation_list
@@ -664,43 +664,43 @@ function draw_gui.settingsTab(themeName, theme, themeID, class_settings, char_se
 			ImGui.PopItemWidth()
 			if changed then
 				changed = false
-				class_settings.saveSettings()
+				common_settings.saveSettings()
 			end
 			invis_type = {}
 			for word in
-			string.gmatch(class_settings.settings.class_invis[draw_gui.class_list[class_list_choice]], "([^|]+)")
+			string.gmatch(common_settings.settings.class_invis[draw_gui.class_list[class_list_choice]], "([^|]+)")
 			do
 				table.insert(invis_type, word)
 			end
 			ImGui.PushItemWidth(230)
-			class_settings.settings.invis[draw_gui.class_list[class_list_choice]], changed = ImGui.Combo(
+			common_settings.settings.invis[draw_gui.class_list[class_list_choice]], changed = ImGui.Combo(
 				"##InvisType",
-				class_settings.settings.invis[draw_gui.class_list[class_list_choice]],
+				common_settings.settings.invis[draw_gui.class_list[class_list_choice]],
 				invis_type,
 				#invis_type,
 				#invis_type
 			)
 			if changed then
 				changed = false
-				class_settings.saveSettings()
+				common_settings.saveSettings()
 			end
-			if class_settings.settings.move_speed[draw_gui.class_list[class_list_choice]] then
+			if common_settings.settings.move_speed[draw_gui.class_list[class_list_choice]] then
 				local speed_type = {}
 				for word in
-				string.gmatch(class_settings.settings.move_speed[draw_gui.class_list[class_list_choice]], "([^|]+)")
+				string.gmatch(common_settings.settings.move_speed[draw_gui.class_list[class_list_choice]], "([^|]+)")
 				do
 					table.insert(speed_type, word)
 				end
-				class_settings.settings.speed[draw_gui.class_list[class_list_choice]], changed = ImGui.Combo(
+				common_settings.settings.speed[draw_gui.class_list[class_list_choice]], changed = ImGui.Combo(
 					"##SpeedType",
-					class_settings.settings.speed[draw_gui.class_list[class_list_choice]],
+					common_settings.settings.speed[draw_gui.class_list[class_list_choice]],
 					speed_type,
 					#speed_type,
 					#speed_type
 				)
 				if changed then
 					changed = false
-					class_settings.saveSettings()
+					common_settings.saveSettings()
 				end
 			end
 			ImGui.EndTable()
@@ -708,7 +708,7 @@ function draw_gui.settingsTab(themeName, theme, themeID, class_settings, char_se
 		ImGui.EndChild()
 		ImGui.EndTabItem()
 	end
-	return theme.LoadTheme, themeName, themeID, class_settings.settings.LoadTheme
+	return theme.LoadTheme, themeName, themeID, common_settings.settings.LoadTheme
 end
 
 -- Generate the outline text for the indicated step (via task_fuctions desc field)

@@ -146,9 +146,9 @@ end
 
 -- Check if we received the correct dynamic zone (instance)
 ---@param item Item
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
-function actions.dz_check(item, class_settings, char_settings)
+function actions.dz_check(item, common_settings, char_settings)
 	if mq.TLO.DynamicZone.Name() ~= item.zone then
 		logger.log_verbose("\aoDid not receive the correct dynamic zone. Moving to step \ar%s\ao.", item.backstep)
 		_G.State:handle_step_change(item.backstep)
@@ -160,11 +160,11 @@ end
 
 -- Check if we have the desired item in our inventory. If true goto gotostep, if false goto backstep
 ---@param item Item
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
-function actions.farm_check(item, class_settings, char_settings)
+function actions.farm_check(item, common_settings, char_settings)
 	if _G.Mob.xtargetCheck(char_settings) then
-		_G.Mob.clearXtarget(class_settings, char_settings)
+		_G.Mob.clearXtarget(common_settings, char_settings)
 	end
 	mq.delay("2s")
 	local check_list = {}
@@ -201,16 +201,16 @@ end
 
 --Check LDON adventure text to determine where we need to enter
 ---@param item Item
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
-function actions.adventure_entrance(item, class_settings, char_settings)
+function actions.adventure_entrance(item, common_settings, char_settings)
 	while string.find(mq.TLO.Window("AdventureRequestWnd/AdvRqst_NPCText").Text(), item.zone) do
 		mq.delay(50)
 	end
 	logger.log_verbose('\aoSearching for string "\ag%s\ao" in adventure text.', item.what)
 	if string.find(mq.TLO.Window("AdventureRequestWnd/AdvRqst_NPCText").Text(), item.what) then
 		mq.delay(50)
-		travel.loc_travel(item, class_settings, char_settings, _G.State:readGroupSelection())
+		travel.loc_travel(item, common_settings, char_settings, _G.State:readGroupSelection())
 		_G.State:handle_step_change(item.gotostep)
 	end
 end
@@ -232,11 +232,11 @@ end
 
 -- Check if we have the desired item in our inventory, if not pause the task
 ---@param item Item
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
-function actions.farm_check_pause(item, class_settings, char_settings)
+function actions.farm_check_pause(item, common_settings, char_settings)
 	if _G.Mob.xtargetCheck(char_settings) then
-		_G.Mob.clearXtarget(class_settings, char_settings)
+		_G.Mob.clearXtarget(common_settings, char_settings)
 	end
 	_G.State:setStatusText("Checking for %s.", item.what)
 	local check_list = {}
@@ -278,10 +278,10 @@ end
 
 -- Farm for items at a specific location/radius
 ---@param item Item
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
 ---@param event boolean|nil
-function actions.farm_radius(item, class_settings, char_settings, event)
+function actions.farm_radius(item, common_settings, char_settings, event)
 	event = event or false
 	if not event then
 		if item.count then
@@ -298,7 +298,7 @@ function actions.farm_radius(item, class_settings, char_settings, event)
 		--logger.log_debug("\aoEvent trigger is \ag%s\ao.", item.what)
 		mq.event("farm_event", item.phrase, actions.farm_event)
 	end
-	travel.loc_travel(item, class_settings, char_settings, _G.State:readGroupSelection())
+	travel.loc_travel(item, common_settings, char_settings, _G.State:readGroupSelection())
 	local distance =
 		dist.GetDistance3D(mq.TLO.Me.X(), mq.TLO.Me.Y(), mq.TLO.Me.Z(), item.whereX, item.whereY, item.whereZ)
 	if distance > 30 then
@@ -310,8 +310,8 @@ function actions.farm_radius(item, class_settings, char_settings, event)
 		_G.State:handle_step_change(_G.State.current_step)
 		return
 	end
-	manage.campGroup(item.radius, item.zradius, class_settings, char_settings)
-	manage.unpauseGroup(class_settings)
+	manage.campGroup(item.radius, item.zradius, common_settings, char_settings)
+	manage.unpauseGroup(common_settings)
 	local item_list = {}
 	local item_status = ""
 	local looping = true
@@ -332,15 +332,15 @@ function actions.farm_radius(item, class_settings, char_settings, event)
 			while looping do
 				if _G.State.should_skip then
 					travel.navPause()
-					manage.uncampGroup(class_settings)
-					manage.pauseGroup(class_settings)
+					manage.uncampGroup(common_settings)
+					manage.pauseGroup(common_settings)
 					_G.State.should_skip = false
 					return
 				end
 				if _G.State:readPaused() then
-					manage.pauseGroup(class_settings)
+					manage.pauseGroup(common_settings)
 					actions.pauseTask(_G.State:readStatusText())
-					manage.unpauseGroup(class_settings)
+					manage.unpauseGroup(common_settings)
 				end
 				item_status = ""
 				loop_check = true
@@ -403,11 +403,11 @@ function actions.farm_radius(item, class_settings, char_settings, event)
 				if item.npc ~= nil then
 					local ID = _G.Mob.checkSpawn(item)
 					if ID ~= 0 then
-						manage.pauseGroup(class_settings)
-						travel.npc_travel(item, class_settings, false, char_settings)
-						_G.Mob.npc_kill(item, class_settings, char_settings)
+						manage.pauseGroup(common_settings)
+						travel.npc_travel(item, common_settings, false, char_settings)
+						_G.Mob.npc_kill(item, common_settings, char_settings)
 						mq.delay(500)
-						manage.unpauseGroup(class_settings)
+						manage.unpauseGroup(common_settings)
 					end
 				end
 			end
@@ -415,15 +415,15 @@ function actions.farm_radius(item, class_settings, char_settings, event)
 			while mq.TLO.FindItemCount("=" .. item.what)() < item.count do
 				if _G.State.should_skip then
 					travel.navPause()
-					manage.uncampGroup(class_settings)
-					manage.pauseGroup(class_settings)
+					manage.uncampGroup(common_settings)
+					manage.pauseGroup(common_settings)
 					_G.State.should_skip = false
 					return
 				end
 				if _G.State:readPaused() then
-					manage.pauseGroup(class_settings)
+					manage.pauseGroup(common_settings)
 					actions.pauseTask(_G.State:readStatusText())
-					manage.unpauseGroup(class_settings)
+					manage.unpauseGroup(common_settings)
 				end
 				if mq.TLO.AdvLoot.SCount() > 0 then
 					for i = 1, mq.TLO.AdvLoot.SCount() do
@@ -452,11 +452,11 @@ function actions.farm_radius(item, class_settings, char_settings, event)
 				if item.npc ~= nil then
 					local ID = _G.Mob.checkSpawn(item)
 					if ID ~= 0 then
-						manage.pauseGroup(class_settings)
-						travel.npc_travel(item, class_settings, false, char_settings)
-						_G.Mob.npc_kill(item, class_settings, char_settings)
+						manage.pauseGroup(common_settings)
+						travel.npc_travel(item, common_settings, false, char_settings)
+						_G.Mob.npc_kill(item, common_settings, char_settings)
 						mq.delay(500)
-						manage.unpauseGroup(class_settings)
+						manage.unpauseGroup(common_settings)
 					end
 				end
 			end
@@ -465,24 +465,24 @@ function actions.farm_radius(item, class_settings, char_settings, event)
 		while looping do
 			if _G.State.should_skip then
 				travel.navPause()
-				manage.uncampGroup(class_settings)
-				manage.pauseGroup(class_settings)
+				manage.uncampGroup(common_settings)
+				manage.pauseGroup(common_settings)
 				_G.State.should_skip = false
 				return
 			end
 			if _G.State:readPaused() then
-				manage.pauseGroup(class_settings)
+				manage.pauseGroup(common_settings)
 				actions.pauseTask(_G.State:readStatusText())
-				manage.unpauseGroup(class_settings)
+				manage.unpauseGroup(common_settings)
 			end
 			if item.npc ~= nil then
 				local ID = _G.Mob.checkSpawn(item)
 				if ID ~= 0 then
-					manage.pauseGroup(class_settings)
-					travel.npc_travel(item, class_settings, false, char_settings)
-					_G.Mob.npc_kill(item, class_settings, char_settings)
+					manage.pauseGroup(common_settings)
+					travel.npc_travel(item, common_settings, false, char_settings)
+					_G.Mob.npc_kill(item, common_settings, char_settings)
 					mq.delay(500)
-					manage.unpauseGroup(class_settings)
+					manage.unpauseGroup(common_settings)
 				end
 			end
 			mq.delay(250)
@@ -496,20 +496,20 @@ function actions.farm_radius(item, class_settings, char_settings, event)
 			end
 		end
 	end
-	manage.uncampGroup(class_settings)
-	manage.pauseGroup(class_settings)
+	manage.uncampGroup(common_settings)
+	manage.pauseGroup(common_settings)
 end
 
 -- Farm at location while NPC is nearby
 ---@param item Item
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
-function actions.farm_while_near(item, class_settings, char_settings)
+function actions.farm_while_near(item, common_settings, char_settings)
 	_G.State:setStatusText("Killing nearby mobs until %s moves.", item.npc)
 	logger.log_info("\aoKilling nearby mobs until \ag%s \aomoves.", item.npc)
-	travel.loc_travel(item, class_settings, char_settings, _G.State:readGroupSelection())
-	manage.campGroup(item.radius, item.zradius, class_settings, char_settings)
-	manage.unpauseGroup(class_settings)
+	travel.loc_travel(item, common_settings, char_settings, _G.State:readGroupSelection())
+	manage.campGroup(item.radius, item.zradius, common_settings, char_settings)
+	manage.unpauseGroup(common_settings)
 	manage.removeInvis(item)
 	local not_found_count = 0
 	local distance = mq.TLO.Spawn("npc " .. item.npc).Distance() or 0
@@ -529,16 +529,16 @@ function actions.farm_while_near(item, class_settings, char_settings)
 		mq.delay(200)
 	end
 	logger.log_info("\ag%s \aohas moved, proceeding.", item.npc)
-	manage.uncampGroup(class_settings)
-	manage.pauseGroup(class_settings)
+	manage.uncampGroup(common_settings)
+	manage.pauseGroup(common_settings)
 end
 
 -- Fish for a specific item
 ---@param item Item
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
 ---@param once boolean|nil
-function actions.fish_farm(item, class_settings, char_settings, once)
+function actions.fish_farm(item, common_settings, char_settings, once)
 	once = once or false
 	if item.count ~= nil then
 		_G.State:setStatusText("Fishing for %s (%s).", item.what, item.count)
@@ -582,7 +582,7 @@ function actions.fish_farm(item, class_settings, char_settings, once)
 				actions.pauseTask(_G.State:readStatusText())
 			end
 			if _G.Mob.xtargetCheck(char_settings) then
-				_G.Mob.clearXtarget(class_settings, char_settings)
+				_G.Mob.clearXtarget(common_settings, char_settings)
 			end
 			item_status = ""
 			loop_check = true
@@ -650,9 +650,9 @@ end
 
 -- Forage for specific items
 ---@param item Item
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
-function actions.forage_farm(item, class_settings, char_settings)
+function actions.forage_farm(item, common_settings, char_settings)
 	if item.count == nil then
 		_G.State:setStatusText("Foraging for %s.", item.what)
 		logger.log_info("\aoForaging for \ag%s\ao.", item.what)
@@ -674,7 +674,7 @@ function actions.forage_farm(item, class_settings, char_settings)
 				actions.pauseTask(_G.State:readStatusText())
 			end
 			if _G.Mob.xtargetCheck(char_settings) then
-				_G.Mob.clearXtarget(class_settings, char_settings)
+				_G.Mob.clearXtarget(common_settings, char_settings)
 			end
 			item_status = ""
 			loop_check = true
@@ -728,7 +728,7 @@ function actions.forage_farm(item, class_settings, char_settings)
 				actions.pauseTask(_G.State:readStatusText())
 			end
 			if _G.Mob.xtargetCheck(char_settings) then
-				_G.Mob.clearXtarget(class_settings, char_settings)
+				_G.Mob.clearXtarget(common_settings, char_settings)
 			end
 			_G.State:setStatusText(
 				"Foraging for %s (%s/%s).",
@@ -789,11 +789,11 @@ end
 
 -- Move to location and pick up ground spawn
 ---@param item Item
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
-function actions.ground_spawn(item, class_settings, char_settings)
+function actions.ground_spawn(item, common_settings, char_settings)
 	_G.State:setStatusText("Traveling to ground spawn @ %s %s %s.", item.whereX, item.whereY, item.whereZ)
-	travel.loc_travel(item, class_settings, char_settings, _G.State:readGroupSelection())
+	travel.loc_travel(item, common_settings, char_settings, _G.State:readGroupSelection())
 	if dist.GetDistance3D(item.whereX, item.whereY, item.whereZ, mq.TLO.Me.X(), mq.TLO.Me.Y(), mq.TLO.Me.Z()) > 15 then
 		logger.log_warn(
 			"\aoWe are to far away from the necessary location (\ar%s %s %s\ao). Reseting step.",
@@ -824,9 +824,9 @@ end
 
 -- Farm ground spawns in the zone until we obtain desired item
 ---@param item Item
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
-function actions.ground_spawn_farm(item, class_settings, char_settings)
+function actions.ground_spawn_farm(item, common_settings, char_settings)
 	_G.State:setStatusText("Farming for ground spawns: %s.", item.what)
 	logger.log_info("\aoFarming for \ag%s", item.what)
 	local item_list = {}
@@ -840,15 +840,15 @@ function actions.ground_spawn_farm(item, class_settings, char_settings)
 		loop_check = true
 		if _G.State.should_skip == true then
 			travel.navPause()
-			manage.uncampGroup(class_settings)
-			manage.pauseGroup(class_settings)
+			manage.uncampGroup(common_settings)
+			manage.pauseGroup(common_settings)
 			_G.State.should_skip = false
 			return
 		end
 		if _G.State:readPaused() then
-			manage.pauseGroup(class_settings)
+			manage.pauseGroup(common_settings)
 			actions.pauseTask(_G.State:readStatusText())
-			manage.unpauseGroup(class_settings)
+			manage.unpauseGroup(common_settings)
 		end
 		item_status = ""
 		local item_remove = 0
@@ -877,7 +877,7 @@ function actions.ground_spawn_farm(item, class_settings, char_settings)
 			item.whereZ = item.whereZ * 100
 			item.whereZ = math.floor(item.whereZ)
 			item.whereZ = item.whereZ / 100
-			travel.loc_travel(item, class_settings, char_settings, _G.State:readGroupSelection())
+			travel.loc_travel(item, common_settings, char_settings, _G.State:readGroupSelection())
 			mq.delay(200)
 			mq.cmd("/click left itemtarget")
 			mq.delay(200)
@@ -946,40 +946,40 @@ end
 
 -- Add mob to the ignore list for class automation
 ---@param item Item
----@param class_settings Class_Settings_Settings
-function actions.ignore_mob(item, class_settings)
+---@param common_settings Common_Settings_Settings
+function actions.ignore_mob(item, common_settings)
 	logger.log_verbose("\aoAdding \ag%s\ao to mob ignore list.", item.npc)
-	if class_settings.class[mq.TLO.Me.Class()] == 1 then
+	if common_settings.class[mq.TLO.Me.Class()] == 1 then
 		mq.cmdf('/%s ignore "%s"', mq.TLO.Me.Class.ShortName(), item.npc)
-	elseif class_settings.class[mq.TLO.Me.Class()] == 2 then
+	elseif common_settings.class[mq.TLO.Me.Class()] == 2 then
 		mq.cmdf('/rgl pulldeny "%s"', item.npc)
-	elseif class_settings.class[mq.TLO.Me.Class()] == 3 then
+	elseif common_settings.class[mq.TLO.Me.Class()] == 3 then
 		mq.TLO.Spawn("npc " .. item.npc).DoTarget()
 		mq.delay(200)
 		mq.cmd("/addignore")
-	elseif class_settings.class[mq.TLO.Me.Class()] == 4 then
+	elseif common_settings.class[mq.TLO.Me.Class()] == 4 then
 		mq.cmdf('/addignore "%s"', item.npc)
-	elseif class_settings.class[mq.TLO.Me.Class()] == 5 then
+	elseif common_settings.class[mq.TLO.Me.Class()] == 5 then
 		mq.cmdf('/addignore "%s"', item.npc)
 	end
 end
 
 -- Remove mob from the ignore list for class automation
 ---@param item Item
----@param class_settings Class_Settings_Settings
-function actions.unignore_mob(item, class_settings)
+---@param common_settings Common_Settings_Settings
+function actions.unignore_mob(item, common_settings)
 	logger.log_verbose("\aoRemoving \ag%s\ao from mob ignore list.", item.npc)
-	if class_settings.class[mq.TLO.Me.Class()] == 1 then
+	if common_settings.class[mq.TLO.Me.Class()] == 1 then
 		mq.cmdf('/%s unignore "%s"', mq.TLO.Me.Class.ShortName(), item.npc)
-	elseif class_settings.class[mq.TLO.Me.Class()] == 2 then
+	elseif common_settings.class[mq.TLO.Me.Class()] == 2 then
 		mq.cmdf('/rgl pulldenyrm "%s"', item.npc)
-	elseif class_settings.class[mq.TLO.Me.Class()] == 3 then
+	elseif common_settings.class[mq.TLO.Me.Class()] == 3 then
 		mq.TLO.Spawn("npc " .. item.npc).DoTarget()
 		mq.delay(200)
 		mq.cmd("/clearignore")
-		--[[elseif class_settings.class[mq.TLO.Me.Class()] == 4 then
+		--[[elseif common_settings.class[mq.TLO.Me.Class()] == 4 then
         mq.cmdf('/addignore "%s"', item.npc)
-    elseif class_settings.class[mq.TLO.Me.Class()] == 5 then
+    elseif common_settings.class[mq.TLO.Me.Class()] == 5 then
         mq.cmdf('/addignore "%s"', item.npc)--]]
 	end
 end
@@ -1013,9 +1013,9 @@ end
 
 -- Give the indicated item to the indicated npc
 ---@param item Item
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
-function actions.npc_give(item, class_settings, char_settings)
+function actions.npc_give(item, common_settings, char_settings)
 	manage.removeInvis(item)
 	_G.State:setStatusText("Giving %s to %s.", item.what, item.npc)
 	logger.log_info("\aoGiving \ag%s\ao to \ag%s\ao.", item.what, item.npc)
@@ -1113,9 +1113,9 @@ end
 
 -- Add an item to the give window with the indicated NPC
 ---@param item Item
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
-function actions.npc_give_add(item, class_settings, char_settings)
+function actions.npc_give_add(item, common_settings, char_settings)
 	manage.removeInvis(item)
 	_G.State:setStatusText("Giving %s to %s.", item.what, item.npc)
 	logger.log_info("\aoAdding \ag%s\ao to give window with \ag%s\ao.", item.what, item.npc)
@@ -1160,9 +1160,9 @@ end
 
 -- Click the give button on the give window
 ---@param item Item
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
-function actions.npc_give_click(item, class_settings, char_settings)
+function actions.npc_give_click(item, common_settings, char_settings)
 	manage.removeInvis(item)
 	_G.State:setStatusText("Giving items.")
 	mq.TLO.Window("GiveWnd").Child("GVW_Give_Button").LeftMouseUp()
@@ -1180,9 +1180,9 @@ end
 
 -- Give money to NPC
 ---@param item Item
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
-function actions.npc_give_money(item, class_settings, char_settings)
+function actions.npc_give_money(item, common_settings, char_settings)
 	manage.removeInvis(item)
 	_G.State:setStatusText("Giving %spp to %s.", item.what, item.npc)
 	logger.log_info("\aoGiving \ag%s\ao platinum to \ag%s\ao.", item.what, item.npc)
@@ -1231,9 +1231,9 @@ end
 
 -- Hail the NPC
 ---@param item Item
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
-function actions.npc_hail(item, class_settings, char_settings)
+function actions.npc_hail(item, common_settings, char_settings)
 	manage.removeInvis(item)
 	_G.State:setStatusText("Hailing %s.", item.npc)
 	logger.log_info("\aoHailing \ag%s\ao.", item.npc)
@@ -1293,9 +1293,9 @@ end
 
 -- Wait for the NPC to spawn
 ---@param item Item
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
-function actions.npc_wait(item, class_settings, char_settings)
+function actions.npc_wait(item, common_settings, char_settings)
 	_G.State:setStatusText("Waiting for %s (%s).", item.npc, item.waittime)
 	logger.log_info("\aoWaiting for \ag%s\ao. This may take \ag%s\ao.", item.npc, item.waittime)
 	while mq.TLO.Spawn("npc " .. item.npc).ID() == 0 do
@@ -1304,7 +1304,7 @@ function actions.npc_wait(item, class_settings, char_settings)
 			return
 		end
 		if _G.Mob.xtargetCheck(char_settings) then
-			_G.Mob.clearXtarget(class_settings, char_settings)
+			_G.Mob.clearXtarget(common_settings, char_settings)
 		end
 		if _G.State.should_skip == true then
 			_G.State.should_skip = false
@@ -1319,15 +1319,15 @@ end
 
 -- Wait for the NPC to despawn
 ---@param item Item
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
-function actions.npc_wait_despawn(item, class_settings, char_settings)
+function actions.npc_wait_despawn(item, common_settings, char_settings)
 	_G.State:setStatusText("Waiting for %s to despawn (%s).", item.npc, item.waittime)
 	logger.log_info("\aoWaiting for \ag%s\ao to despawn. This may take \ag%s\ao.", item.npc, item.waittime)
 	local unpause_automation = false
 	while mq.TLO.Spawn("npc " .. item.npc).ID() ~= 0 do
 		if _G.Mob.xtargetCheck(char_settings) then
-			_G.Mob.clearXtarget(class_settings, char_settings)
+			_G.Mob.clearXtarget(common_settings, char_settings)
 		end
 		if _G.State.should_skip == true then
 			_G.State.should_skip = false
@@ -1383,11 +1383,11 @@ end
 
 -- Check if we have the desired item, if so advance to gotostep
 ---@param item Item
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
-function actions.pre_farm_check(item, class_settings, char_settings)
+function actions.pre_farm_check(item, common_settings, char_settings)
 	if _G.Mob.xtargetCheck(char_settings) then
-		_G.Mob.clearXtarget(class_settings, char_settings)
+		_G.Mob.clearXtarget(common_settings, char_settings)
 	end
 	_G.State:setStatusText("Checking for pre-farmable items (%s).", item.what)
 	logger.log_info("\aoChecking for prefarmable items (\ag%s\ao).", item.what)
@@ -1493,9 +1493,9 @@ end
 
 -- Wait for the specified amount of time (in ms)
 ---@param item Item
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
-function actions.wait(item, class_settings, char_settings)
+function actions.wait(item, common_settings, char_settings)
 	_G.State:setStatusText("Waiting for %s seconds.", item.wait / 1000)
 	logger.log_info("Waiting for \ag%s \ao seconds.", item.wait / 1000)
 	local waiting = true
@@ -1508,7 +1508,7 @@ function actions.wait(item, class_settings, char_settings)
 	while waiting do
 		mq.delay(50)
 		if _G.Mob.xtargetCheck(char_settings) then
-			_G.Mob.clearXtarget(class_settings, char_settings)
+			_G.Mob.clearXtarget(common_settings, char_settings)
 		end
 		if _G.State.should_skip == true then
 			_G.State.should_skip = false

@@ -101,21 +101,21 @@ end
 
 -- Move forward until we have zoned
 ---@param item Item
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
 ---@param choice number
 ---@param name string
-function travel.forward_zone(item, class_settings, char_settings, choice, name)
+function travel.forward_zone(item, common_settings, char_settings, choice, name)
 	if char_settings.general.speedForTravel == true then
-		local speedChar, speedSkill = travel.speedCheck(class_settings, char_settings)
+		local speedChar, speedSkill = travel.speedCheck(common_settings, char_settings)
 		if speedChar ~= "none" then
 			travel.navPause()
 			travel.doSpeed(speedChar, speedSkill)
-			travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
+			travel.navUnpause(item, common_settings, char_settings, _G.State:readGroupSelection())
 		end
 	end
-	if travel.invisCheck(item, char_settings, class_settings, item.invis) then
-		travel.invis(class_settings)
+	if travel.invisCheck(item, char_settings, common_settings, item.invis) then
+		travel.invis(common_settings)
 	end
 	_G.State:setStatusText("Traveling forward to zone: %s.", item.zone)
 	logger.log_info("\aoTraveling forward to zone: \ag%s\ao.", item.zone)
@@ -179,24 +179,24 @@ end
 
 -- Travel to a location manually without using MQ2Nav
 ---@param item Item
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
 ---@param choice number
 ---@param name string
-function travel.no_nav_travel(item, class_settings, char_settings, choice, name)
+function travel.no_nav_travel(item, common_settings, char_settings, choice, name)
 	local x = item.whereX
 	local y = item.whereY
 	local z = item.whereZ
 	if char_settings.general.speedForTravel == true then
-		local speedChar, speedSkill = travel.speedCheck(class_settings, char_settings)
+		local speedChar, speedSkill = travel.speedCheck(common_settings, char_settings)
 		if speedChar ~= "none" then
 			travel.navPause()
 			travel.doSpeed(speedChar, speedSkill)
-			travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
+			travel.navUnpause(item, common_settings, char_settings, _G.State:readGroupSelection())
 		end
 	end
-	if travel.invisCheck(item, char_settings, class_settings, item.invis) then
-		travel.invis(class_settings)
+	if travel.invisCheck(item, char_settings, common_settings, item.invis) then
+		travel.invis(common_settings)
 	end
 	_G.State:setStatusText("Traveling forward to location: %s %s %s.", y, x, z)
 	logger.log_info("\aoTraveling without MQ2Nav to \ag%s, %s, %s\ao.", y, x, z)
@@ -318,10 +318,10 @@ end
 
 -- Loop while traveling to a location
 ---@param item Item
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
 ---@param ID number|string
-function travel.travelLoop(item, class_settings, char_settings, ID)
+function travel.travelLoop(item, common_settings, char_settings, ID)
 	local me = mq.TLO.Me
 	_G.State:setLocation(me.X(), me.Y(), me.Z())
 	ID = ID or 0
@@ -341,7 +341,7 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
 			mq.exit()
 		end
 		if mq.TLO.Navigation.Paused() == true then
-			travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
+			travel.navUnpause(item, common_settings, char_settings, _G.State:readGroupSelection())
 		end
 		if _G.State.should_skip == true then
 			travel.navPause()
@@ -351,27 +351,27 @@ function travel.travelLoop(item, class_settings, char_settings, ID)
 		if item.zone == nil then
 			if _G.Mob.xtargetCheck(char_settings) then
 				travel.navPause()
-				_G.Mob.clearXtarget(class_settings, char_settings)
-				travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
+				_G.Mob.clearXtarget(common_settings, char_settings)
+				travel.navUnpause(item, common_settings, char_settings, _G.State:readGroupSelection())
 			end
 		end
 		if _G.State:readPaused() then
 			travel.navPause()
 			_G.Actions.pauseTask(_G.State:readStatusText())
-			travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
+			travel.navUnpause(item, common_settings, char_settings, _G.State:readGroupSelection())
 		end
 		if char_settings.general.speedForTravel == true then
-			local speedChar, speedSkill = travel.speedCheck(class_settings, char_settings)
+			local speedChar, speedSkill = travel.speedCheck(common_settings, char_settings)
 			if speedChar ~= "none" then
 				travel.navPause()
 				travel.doSpeed(speedChar, speedSkill)
-				travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
+				travel.navUnpause(item, common_settings, char_settings, _G.State:readGroupSelection())
 			end
 		end
-		if travel.invisCheck(item, char_settings, class_settings, item.invis) then
+		if travel.invisCheck(item, char_settings, common_settings, item.invis) then
 			travel.navPause()
-			travel.invis(class_settings)
-			travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
+			travel.invis(common_settings)
+			travel.navUnpause(item, common_settings, char_settings, _G.State:readGroupSelection())
 		end
 		if loopCount == 10 then
 			if item.radius == 1 then
@@ -445,23 +445,23 @@ end
 
 -- Travel to npc or location
 ---@param item Item
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
 ---@param ID number|string
 ---@param choice number
 ---@param name string
-function travel.general_travel(item, class_settings, char_settings, ID, choice, name)
-	ID = ID or _G.Mob.findNearestName(item.npc, item, class_settings, char_settings) or 0
+function travel.general_travel(item, common_settings, char_settings, ID, choice, name)
+	ID = ID or _G.Mob.findNearestName(item.npc, item, common_settings, char_settings) or 0
 	if char_settings.general.speedForTravel == true then
-		local speedChar, speedSkill = travel.speedCheck(class_settings, char_settings)
+		local speedChar, speedSkill = travel.speedCheck(common_settings, char_settings)
 		if speedChar ~= "none" then
 			travel.navPause()
 			travel.doSpeed(speedChar, speedSkill)
-			travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
+			travel.navUnpause(item, common_settings, char_settings, _G.State:readGroupSelection())
 		end
 	end
-	if travel.invisCheck(item, char_settings, class_settings, item.invis) then
-		travel.invis(class_settings)
+	if travel.invisCheck(item, char_settings, common_settings, item.invis) then
+		travel.invis(common_settings)
 	end
 	_G.State:setStatusText("Waiting for %s.", item.npc)
 	logger.log_info("\aoLooking for \ag%s\ao.", item.npc)
@@ -475,13 +475,13 @@ function travel.general_travel(item, class_settings, char_settings, ID, choice, 
 		if _G.State:readPaused() then
 			travel.navPause()
 			_G.Actions.pauseTask(_G.State:readStatusText())
-			travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
+			travel.navUnpause(item, common_settings, char_settings, _G.State:readGroupSelection())
 		end
-		ID = _G.Mob.findNearestName(item.npc, item, class_settings, char_settings) or 0
+		ID = _G.Mob.findNearestName(item.npc, item, common_settings, char_settings) or 0
 	end
 	_G.State:setStatusText("Navigating to %s.", item.npc)
 	if ID == 0 then
-		ID = _G.Mob.findNearestName(item.npc, item, class_settings, char_settings) or 0
+		ID = _G.Mob.findNearestName(item.npc, item, common_settings, char_settings) or 0
 	end
 	if
 		dist.GetDistance3D(
@@ -508,12 +508,12 @@ function travel.general_travel(item, class_settings, char_settings, ID, choice, 
 	_G.State.destType = "ID"
 	_G.State.dest = ID
 	mq.delay(200)
-	travel.travelLoop(item, class_settings, char_settings, ID)
+	travel.travelLoop(item, common_settings, char_settings, ID)
 end
 
 -- Use invis
----@param class_settings Class_Settings_Settings
-function travel.invis(class_settings)
+---@param common_settings Common_Settings_Settings
+function travel.invis(common_settings)
 	local choice, name = _G.State:readGroupSelection()
 	local temp = _G.State:readStatusText()
 	_G.State:setStatusText("Using invis.")
@@ -522,18 +522,18 @@ function travel.invis(class_settings)
 	if mq.TLO.Me.Combat() == true then
 		mq.cmd("/attack off")
 	end
-	for word in string.gmatch(class_settings.class_invis[mq.TLO.Me.Class()], "([^|]+)") do
+	for word in string.gmatch(common_settings.class_invis[mq.TLO.Me.Class()], "([^|]+)") do
 		table.insert(invis_type, word)
 	end
 	if mq.TLO.Me.Invis() == false then
-		logger.log_debug("\aoI am using \ag%s \aoto invis myself.", invis_type[class_settings.invis[mq.TLO.Me.Class()]])
-		if invis_type[class_settings.invis[mq.TLO.Me.Class()]] == "Potion" then
+		logger.log_debug("\aoI am using \ag%s \aoto invis myself.", invis_type[common_settings.invis[mq.TLO.Me.Class()]])
+		if invis_type[common_settings.invis[mq.TLO.Me.Class()]] == "Potion" then
 			logger.log_super_verbose("\aoUsing a cloudy potion.")
 			mq.cmd('/useitem "Cloudy Potion"')
-		elseif invis_type[class_settings.invis[mq.TLO.Me.Class()]] == "Circlet of Shadows" then
+		elseif invis_type[common_settings.invis[mq.TLO.Me.Class()]] == "Circlet of Shadows" then
 			logger.log_super_verbose("\aoUsing Circlet of Shadows.")
 			mq.cmd('/useitem "Circlet of Shadows"')
-		elseif invis_type[class_settings.invis[mq.TLO.Me.Class()]] == "Hide/Sneak" then
+		elseif invis_type[common_settings.invis[mq.TLO.Me.Class()]] == "Hide/Sneak" then
 			logger.log_super_verbose("\aoUsing hide/sneak.")
 			while mq.TLO.Me.Invis() == false do
 				mq.delay(100)
@@ -550,10 +550,10 @@ function travel.invis(class_settings)
 				end
 			end
 		else
-			local ID = class_settings["skill_to_num"][invis_type[class_settings.invis[mq.TLO.Me.Class()]]]
+			local ID = common_settings["skill_to_num"][invis_type[common_settings.invis[mq.TLO.Me.Class()]]]
 			logger.log_super_verbose(
 				"\aoUsing alt ability \ag%s \ao(\ag%s\ao).",
-				invis_type[class_settings.invis[mq.TLO.Me.Class()]],
+				invis_type[common_settings.invis[mq.TLO.Me.Class()]],
 				ID
 			)
 			while mq.TLO.Me.AltAbilityReady(ID)() == false do
@@ -572,15 +572,15 @@ function travel.invis(class_settings)
 			invis_type = {}
 			if mq.TLO.Group.Member(i).DisplayName() ~= mq.TLO.Me.DisplayName() then
 				if mq.TLO.Group.Member(i).Invis() == false then
-					for word in string.gmatch(class_settings.class_invis[mq.TLO.Group.Member(i).Class()], "([^|]+)") do
+					for word in string.gmatch(common_settings.class_invis[mq.TLO.Group.Member(i).Class()], "([^|]+)") do
 						table.insert(invis_type, word)
 					end
 					logger.log_debug(
 						"\aoUsing \ag%s \aoon \ag%s \aoto invis them.",
-						invis_type[class_settings.invis[mq.TLO.Group.Member(i).Class()]],
+						invis_type[common_settings.invis[mq.TLO.Group.Member(i).Class()]],
 						mq.TLO.Group.Member(i).DisplayName()
 					)
-					if invis_type[class_settings.invis[mq.TLO.Group.Member(i).Class()]] == "Potion" then
+					if invis_type[common_settings.invis[mq.TLO.Group.Member(i).Class()]] == "Potion" then
 						mq.cmdf(
 							"/dquery %s -q FindItem[Cloudy Potion].TimerReady",
 							mq.TLO.Group.Member(i).DisplayName()
@@ -592,7 +592,7 @@ function travel.invis(class_settings)
 							)
 							mq.cmdf('/dex %s /useitem "Cloudy Potion"', mq.TLO.Group.Member(i).DisplayName())
 						end
-					elseif invis_type[class_settings.invis[mq.TLO.Group.Member(i).Class()]] == "Hide/Sneak" then
+					elseif invis_type[common_settings.invis[mq.TLO.Group.Member(i).Class()]] == "Hide/Sneak" then
 						logger.log_super_verbose(
 							"\aoHaving \ag%s \aouse hide/sneak.",
 							mq.TLO.Group.Member(i).DisplayName()
@@ -623,20 +623,20 @@ function travel.invis(class_settings)
 							mq.cmdf("/dex %s /doability hide", mq.TLO.Group.Member(i).DisplayName())
 							mq.cmdf("/dobserve %s -q Me.AbilityReady[Hide] -drop", mq.TLO.Group.Member(i).DisplayName())
 						end
-					elseif invis_type[class_settings.invis[mq.TLO.Group.Member(i).Class()]] == "Circlet of Shadows" then
+					elseif invis_type[common_settings.invis[mq.TLO.Group.Member(i).Class()]] == "Circlet of Shadows" then
 						logger.log_super_verbose(
 							"\aoHaving \ag%s \aouse circlet of shadows.",
 							mq.TLO.Group.Member(i).DisplayName()
 						)
 						mq.cmdf('/dex %s /useitem "Circlet of Shadows"', mq.TLO.Group.Member(i).DisplayName())
 					else
-						local ID = class_settings["skill_to_num"][invis_type[class_settings.invis[mq.TLO.Group
+						local ID = common_settings["skill_to_num"][invis_type[common_settings.invis[mq.TLO.Group
 						.Member(i)
 						.Class()]]]
 						logger.log_super_verbose(
 							"\aoHaving \ag%s \aouse \ag%s \ao(\ag%s\ao).",
 							mq.TLO.Group.Member(i).DisplayName(),
-							invis_type[class_settings.invis[mq.TLO.Group.Member(i).Class()]],
+							invis_type[common_settings.invis[mq.TLO.Group.Member(i).Class()]],
 							ID
 						)
 						mq.cmdf('/dex %s /alt act "%s"', mq.TLO.Group.Member(i).DisplayName(), ID)
@@ -647,13 +647,13 @@ function travel.invis(class_settings)
 		mq.delay("4s")
 	else
 		if mq.TLO.Group.Member(name)() ~= nil then
-			for word in string.gmatch(class_settings.class_invis[mq.TLO.Group.Member(name).Class()], "([^|]+)") do
+			for word in string.gmatch(common_settings.class_invis[mq.TLO.Group.Member(name).Class()], "([^|]+)") do
 				table.insert(invis_type, word)
 			end
-			if invis_type[class_settings.invis[mq.TLO.Group.Member(name).Class()]] == "Potion" then
+			if invis_type[common_settings.invis[mq.TLO.Group.Member(name).Class()]] == "Potion" then
 				logger.log_super_verbose("\aoHaving \ag%s \aouse a cloudy potion.", name)
 				mq.cmdf('/dex %s /useitem "Cloudy Potion"', name)
-			elseif invis_type[class_settings.invis[mq.TLO.Group.Member(name).Class()]] == "Hide/Sneak" then
+			elseif invis_type[common_settings.invis[mq.TLO.Group.Member(name).Class()]] == "Hide/Sneak" then
 				logger.log_super_verbose("\aoHaving \ag%s \aouse hide/sneak.", name)
 				mq.cmdf("/dquery %s -q Me.Sneaking", name)
 				if mq.TLO.DanNet.Query() == "FALSE" then
@@ -673,11 +673,12 @@ function travel.invis(class_settings)
 				end
 			else
 				local ID =
-					class_settings["skill_to_num"][invis_type[class_settings.invis[mq.TLO.Group.Member(name).Class()]]]
+					common_settings["skill_to_num"]
+					[invis_type[common_settings.invis[mq.TLO.Group.Member(name).Class()]]]
 				logger.log_super_verbose(
 					"\aoHaving \ag%s \aouse \ag%s \ao(\ag%s\ao).",
 					name,
-					invis_type[class_settings.invis[mq.TLO.Group.Member(name).Class()]],
+					invis_type[common_settings.invis[mq.TLO.Group.Member(name).Class()]],
 					ID
 				)
 				mq.cmdf('/dex %s /alt act "%s"', name, ID)
@@ -691,12 +692,12 @@ end
 
 --Check if we have group invis options
 ---@param char_settings Char_Settings_SaveState
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param invis number
 ---@param choice number
 ---@param name string
 ---@return Group_Invis_Choice
-function travel.groupInvisCheck(char_settings, class_settings, invis, choice, name)
+function travel.groupInvisCheck(char_settings, common_settings, invis, choice, name)
 	---@type Group_Invis_Choice
 	local invisChoice = {
 		["name"] = "",
@@ -866,9 +867,9 @@ end
 --Use a group invisibility skill
 ---@param item Item
 ---@param char_settings Char_Settings_SaveState
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param invisChoice Group_Invis_Choice
-function travel.groupInvis(item, char_settings, class_settings, invisChoice)
+function travel.groupInvis(item, char_settings, common_settings, invisChoice)
 	travel.navPause()
 	if invisChoice.name == "me" then
 		mq.cmdf("/alt act %s", invisChoice.skill)
@@ -882,16 +883,16 @@ function travel.groupInvis(item, char_settings, class_settings, invisChoice)
 			mq.delay(200)
 		end
 	end
-	travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
+	travel.navUnpause(item, common_settings, char_settings, _G.State:readGroupSelection())
 end
 
 -- Check if we are invis, or if we should be
 ---@param item Item
 ---@param char_settings Char_Settings_SaveState
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param invis number
 ---@return boolean
-function travel.invisCheck(item, char_settings, class_settings, invis)
+function travel.invisCheck(item, char_settings, common_settings, invis)
 	local choice, name = _G.State:readGroupSelection()
 	if choice > 1 and char_settings.general["useGroupInvis"] == true and invis == 1 then
 		local need_invis = false
@@ -918,10 +919,10 @@ function travel.invisCheck(item, char_settings, class_settings, invis)
 		end
 		if need_invis == true then
 			logger.log_debug("\aoChecking if we should use a group invis skill.")
-			local invisChoice = travel.groupInvisCheck(char_settings, class_settings, invis, choice, name)
+			local invisChoice = travel.groupInvisCheck(char_settings, common_settings, invis, choice, name)
 			if invisChoice.skill ~= 0 then
 				logger.log_debug("\aoUsing group invisibility instead of single target.")
-				travel.groupInvis(item, char_settings, class_settings, invisChoice)
+				travel.groupInvis(item, char_settings, common_settings, invisChoice)
 				return false
 			end
 		end
@@ -929,11 +930,11 @@ function travel.invisCheck(item, char_settings, class_settings, invis)
 	logger.log_super_verbose("\aoChecking if we should be invis.")
 	if invis == 1 and char_settings.general.invisForTravel == true then
 		local invis_types = {}
-		for word in string.gmatch(class_settings.class_invis[mq.TLO.Me.Class()], "([^|]+)") do
+		for word in string.gmatch(common_settings.class_invis[mq.TLO.Me.Class()], "([^|]+)") do
 			table.insert(invis_types, word)
 		end
-		local invis_type = invis_types[class_settings.invis[mq.TLO.Me.Class()]]
-		if travel.checkInvisReady(invis_type, mq.TLO.Me.CleanName(), class_settings) and mq.TLO.Me.Invis() == false then
+		local invis_type = invis_types[common_settings.invis[mq.TLO.Me.Class()]]
+		if travel.checkInvisReady(invis_type, mq.TLO.Me.CleanName(), common_settings) and mq.TLO.Me.Invis() == false then
 			logger.log_super_verbose("\aoYes, we should be invis.")
 			return true
 		end
@@ -942,14 +943,14 @@ function travel.invisCheck(item, char_settings, class_settings, invis)
 				if mq.TLO.Group.Member(i).DisplayName() ~= mq.TLO.Me.DisplayName() then
 					if mq.TLO.Group.Member(i).Invis() == false then
 						invis_type = {}
-						for word in string.gmatch(class_settings.class_invis[mq.TLO.Group.Member(i).Class()], "([^|]+)") do
+						for word in string.gmatch(common_settings.class_invis[mq.TLO.Group.Member(i).Class()], "([^|]+)") do
 							table.insert(invis_type, word)
 						end
 						if
 							travel.checkInvisReady(
-								invis_type[class_settings.invis[mq.TLO.Group.Member(i).Class()]],
+								invis_type[common_settings.invis[mq.TLO.Group.Member(i).Class()]],
 								mq.TLO.Group.Member(i).CleanName(),
-								class_settings
+								common_settings
 							)
 						then
 							logger.log_super_verbose(
@@ -964,14 +965,14 @@ function travel.invisCheck(item, char_settings, class_settings, invis)
 		elseif choice > 2 then
 			if mq.TLO.Group.Member(name).Invis() == false then
 				invis_type = {}
-				for word in string.gmatch(class_settings.class_invis[mq.TLO.Group.Member(name).Class()], "([^|]+)") do
+				for word in string.gmatch(common_settings.class_invis[mq.TLO.Group.Member(name).Class()], "([^|]+)") do
 					table.insert(invis_type, word)
 				end
 				if
 					travel.checkInvisReady(
-						invis_type[class_settings.invis[mq.TLO.Group.Member(name).Class()]],
+						invis_type[common_settings.invis[mq.TLO.Group.Member(name).Class()]],
 						name,
-						class_settings
+						common_settings
 					)
 				then
 					logger.log_super_verbose("\aoYes, \ag%s \aoshould be invis.", name)
@@ -985,9 +986,9 @@ end
 
 ---@param invis_type string
 ---@param character string
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@return boolean
-function travel.checkInvisReady(invis_type, character, class_settings)
+function travel.checkInvisReady(invis_type, character, common_settings)
 	if character == mq.TLO.Me.CleanName() then
 		if invis_type == "Potion" then
 			if mq.TLO.FindItem("=Cloudy Potion").TimerReady() ~= 0 then
@@ -1005,7 +1006,7 @@ function travel.checkInvisReady(invis_type, character, class_settings)
 				return false
 			end
 		else
-			local aaNum = class_settings["skill_to_num"][invis_type]
+			local aaNum = common_settings["skill_to_num"][invis_type]
 			if mq.TLO.Me.AltAbilityReady(aaNum)() == false then
 				return false
 			end
@@ -1031,7 +1032,7 @@ function travel.checkInvisReady(invis_type, character, class_settings)
 				return false
 			end
 		else
-			local aaNum = class_settings["skill_to_num"][invis_type]
+			local aaNum = common_settings["skill_to_num"][invis_type]
 			mq.cmdf("/dquery %s -q Me.AltAbilityReady[%s]", character, aaNum)
 			if mq.TLO.DanNet.Query() == "FALSE" then
 				return false
@@ -1043,10 +1044,10 @@ end
 
 -- Check if we have a class with a travel speed buff
 ---@param class string
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param level number
 ---@return boolean
-function travel.gotSpeedyClass(class, class_settings, level)
+function travel.gotSpeedyClass(class, common_settings, level)
 	if class == "Bard" and level < 76 then
 		return false
 	end
@@ -1056,10 +1057,10 @@ function travel.gotSpeedyClass(class, class_settings, level)
 	for _, speedy in ipairs(speed_classes) do
 		if class == speedy then
 			local speed_type = {}
-			for word in string.gmatch(class_settings.move_speed[class], "([^|]+)") do
+			for word in string.gmatch(common_settings.move_speed[class], "([^|]+)") do
 				table.insert(speed_type, word)
 			end
-			local speed_skill = speed_type[class_settings.speed[class]]
+			local speed_skill = speed_type[common_settings.speed[class]]
 			return speed_skill ~= nil
 		end
 	end
@@ -1067,10 +1068,10 @@ function travel.gotSpeedyClass(class, class_settings, level)
 end
 
 -- Check if we are missing a travel speed buff, and should have one applied
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
 ---@return string, number|string
-function travel.speedCheck(class_settings, char_settings)
+function travel.speedCheck(common_settings, char_settings)
 	local choice, name = _G.State:readGroupSelection()
 	if choice > 1 then
 		if travel.GroupZoneCheck(choice, name) == false then
@@ -1089,16 +1090,16 @@ function travel.speedCheck(class_settings, char_settings)
 	local foundSpeed = false
 	if choice == 1 then
 		local class = mq.TLO.Me.Class()
-		amSpeedy = travel.gotSpeedyClass(class, class_settings, mq.TLO.Me.Level())
+		amSpeedy = travel.gotSpeedyClass(class, common_settings, mq.TLO.Me.Level())
 		if amSpeedy == false then
 			logger.log_verbose("\aoWe do not have a travel speed buff to cast.")
 			return "none", "none"
 		else
 			local speed_type = {}
-			for word in string.gmatch(class_settings.move_speed[class], "([^|]+)") do
+			for word in string.gmatch(common_settings.move_speed[class], "([^|]+)") do
 				table.insert(speed_type, word)
 			end
-			local speed_skill = speed_type[class_settings.speed[class]]
+			local speed_skill = speed_type[common_settings.speed[class]]
 			logger.log_verbose("\agI \aocan cast \ag%s\ao.", speed_skill)
 			if speed_skill == "Spirit of Eagle" then
 				if class == "Ranger" then
@@ -1108,7 +1109,7 @@ function travel.speedCheck(class_settings, char_settings)
 					speed_skill = "Spirit of Eagles(Druid)"
 				end
 			end
-			local aaNum = class_settings["speed_to_num"][speed_skill]
+			local aaNum = common_settings["speed_to_num"][speed_skill]
 			if mq.TLO.Me.AltAbilityReady(aaNum)() == false then
 				return "none", "none"
 			end
@@ -1117,14 +1118,14 @@ function travel.speedCheck(class_settings, char_settings)
 	elseif choice == 2 then
 		for i = 1, mq.TLO.Group.Members() do
 			local class = mq.TLO.Group.Member(i).Class()
-			amSpeedy = travel.gotSpeedyClass(class, class_settings, mq.TLO.Group.Member(i).Level())
+			amSpeedy = travel.gotSpeedyClass(class, common_settings, mq.TLO.Group.Member(i).Level())
 			if amSpeedy == true then
 				local speed_type = {}
-				for word in string.gmatch(class_settings.move_speed[class], "([^|]+)") do
+				for word in string.gmatch(common_settings.move_speed[class], "([^|]+)") do
 					table.insert(speed_type, word)
 				end
-				if speed_type[class_settings.speed[class]] ~= "none" then
-					local speed_skill = speed_type[class_settings.speed[class]]
+				if speed_type[common_settings.speed[class]] ~= "none" then
+					local speed_skill = speed_type[common_settings.speed[class]]
 					logger.log_verbose("\ag%s \aocan cast \ag%s\ao.", mq.TLO.Group.Member(i).DisplayName(), speed_skill)
 					if speed_skill == "Spirit of Eagle" then
 						if class == "Ranger" then
@@ -1134,7 +1135,7 @@ function travel.speedCheck(class_settings, char_settings)
 							speed_skill = "Spirit of Eagles(Druid)"
 						end
 					end
-					local aaNum = class_settings["speed_to_num"][speed_skill]
+					local aaNum = common_settings["speed_to_num"][speed_skill]
 					aanums[mq.TLO.Group.Member(i).DisplayName()] = aaNum
 					mq.cmdf("/dquery %s -q Me.AltAbilityReady[%s]", mq.TLO.Group.Member(i).DisplayName(), aaNum)
 					if mq.TLO.DanNet.Q() ~= "FALSE" then
@@ -1173,13 +1174,13 @@ function travel.speedCheck(class_settings, char_settings)
 		local aaNum = 0
 		local casterName = ""
 		local class = mq.TLO.Me.Class()
-		amSpeedy = travel.gotSpeedyClass(class, class_settings, mq.TLO.Me.Level())
+		amSpeedy = travel.gotSpeedyClass(class, common_settings, mq.TLO.Me.Level())
 		if amSpeedy == true then
 			local speed_type = {}
-			for word in string.gmatch(class_settings.move_speed[class], "([^|]+)") do
+			for word in string.gmatch(common_settings.move_speed[class], "([^|]+)") do
 				table.insert(speed_type, word)
 			end
-			local speed_skill = speed_type[class_settings.speed[class]]
+			local speed_skill = speed_type[common_settings.speed[class]]
 			logger.log_verbose("\agI \aocan cast \ag%s\ao.", speed_skill)
 			if speed_skill == "Spirit of Eagle" then
 				if class == "Ranger" then
@@ -1189,7 +1190,7 @@ function travel.speedCheck(class_settings, char_settings)
 					speed_skill = "Spirit of Eagles(Druid)"
 				end
 			end
-			aaNum = class_settings["speed_to_num"][speed_skill]
+			aaNum = common_settings["speed_to_num"][speed_skill]
 			casterName = mq.TLO.Me.DisplayName()
 			if mq.TLO.Me.AltAbilityReady(aaNum)() == false then
 				amSpeedy = false
@@ -1203,13 +1204,13 @@ function travel.speedCheck(class_settings, char_settings)
 		end
 		aanums[mq.TLO.Me.DisplayName()] = aaNum
 		class = mq.TLO.Group.Member(name).Class()
-		amSpeedy = travel.gotSpeedyClass(class, class_settings, mq.TLO.Group.Member(name).Level())
+		amSpeedy = travel.gotSpeedyClass(class, common_settings, mq.TLO.Group.Member(name).Level())
 		if amSpeedy == true then
 			local speed_type = {}
-			for word in string.gmatch(class_settings.move_speed[class], "([^|]+)") do
+			for word in string.gmatch(common_settings.move_speed[class], "([^|]+)") do
 				table.insert(speed_type, word)
 			end
-			local speed_skill = speed_type[class_settings.speed[class]]
+			local speed_skill = speed_type[common_settings.speed[class]]
 			logger.log_verbose("\ag%s \aocan cast \ag%s\ao.", name, speed_skill)
 			if speed_skill == "Spirit of Eagle" then
 				if class == "Ranger" then
@@ -1219,7 +1220,7 @@ function travel.speedCheck(class_settings, char_settings)
 					speed_skill = "Spirit of Eagles(Druid)"
 				end
 			end
-			aaNum = class_settings["speed_to_num"][speed_skill]
+			aaNum = common_settings["speed_to_num"][speed_skill]
 			aanums[name] = aaNum
 			for names, num in pairs(aanums) do
 				if num == SELOS_BUFF then
@@ -1284,11 +1285,11 @@ end
 
 -- Travel to the indicated location
 ---@param item Item
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
 ---@param choice number
 ---@param name string
-function travel.loc_travel(item, class_settings, char_settings, choice, name)
+function travel.loc_travel(item, common_settings, char_settings, choice, name)
 	local x = item.whereX
 	local y = item.whereY
 	local z = item.whereZ
@@ -1319,7 +1320,7 @@ function travel.loc_travel(item, class_settings, char_settings, choice, name)
 	_G.State.destType = "loc"
 	_G.State.dest = string.format("%s %s %s", y, x, z)
 	mq.delay(100)
-	travel.travelLoop(item, class_settings, char_settings, 0)
+	travel.travelLoop(item, common_settings, char_settings, 0)
 end
 
 -- Pause navigation
@@ -1339,11 +1340,11 @@ end
 
 -- Unpause navigation
 ---@param item Item
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
 ---@param choice number
 ---@param name string
-function travel.navUnpause(item, class_settings, char_settings, choice, name)
+function travel.navUnpause(item, common_settings, char_settings, choice, name)
 	if item.whereX then
 		local x = item.whereX
 		local y = item.whereY
@@ -1401,28 +1402,28 @@ end
 
 -- Folow the indicated NPC. Can follow to location, until event, or until otherwise stopped
 ---@param item Item
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
 ---@param event boolean
 ---@param choice number
 ---@param name string
-function travel.npc_follow(item, class_settings, char_settings, event, choice, name)
+function travel.npc_follow(item, common_settings, char_settings, event, choice, name)
 	event = event or false
 	if _G.Mob.xtargetCheck(char_settings) then
 		travel.navPause()
-		_G.Mob.clearXtarget(class_settings, char_settings)
-		travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
+		_G.Mob.clearXtarget(common_settings, char_settings)
+		travel.navUnpause(item, common_settings, char_settings, _G.State:readGroupSelection())
 	end
 	if char_settings.general.speedForTravel == true then
-		local speedChar, speedSkill = travel.speedCheck(class_settings, char_settings)
+		local speedChar, speedSkill = travel.speedCheck(common_settings, char_settings)
 		if speedChar ~= "none" then
 			travel.navPause()
 			travel.doSpeed(speedChar, speedSkill)
-			travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
+			travel.navUnpause(item, common_settings, char_settings, _G.State:readGroupSelection())
 		end
 	end
-	if travel.invisCheck(item, char_settings, class_settings, item.invis) then
-		travel.invis(class_settings)
+	if travel.invisCheck(item, char_settings, common_settings, item.invis) then
+		travel.invis(common_settings)
 	end
 	_G.State:setStatusText("Following %s.", item.npc)
 	logger.log_info("\aoFollowing \ag%s\ao.", item.npc)
@@ -1483,7 +1484,7 @@ function travel.npc_follow(item, class_settings, char_settings, event, choice, n
 			mq.doevents()
 			if _G.Mob.xtargetCheck(char_settings) then
 				mq.cmd("/afollow off")
-				_G.Mob.clearXtarget(class_settings, char_settings)
+				_G.Mob.clearXtarget(common_settings, char_settings)
 				mq.TLO.Spawn("npc " .. item.npc).DoTarget()
 				mq.delay(300)
 				mq.cmd("/afollow")
@@ -1512,35 +1513,35 @@ end
 
 -- Travel to the indicated NPC
 ---@param item Item
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param ignore_path_check boolean
 ---@param char_settings Char_Settings_SaveState
-function travel.npc_travel(item, class_settings, ignore_path_check, char_settings)
+function travel.npc_travel(item, common_settings, ignore_path_check, char_settings)
 	ignore_path_check = ignore_path_check or false
 	if item.zone == nil then
 		if _G.Mob.xtargetCheck(char_settings) then
 			travel.navPause()
-			_G.Mob.clearXtarget(class_settings, char_settings)
-			travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
+			_G.Mob.clearXtarget(common_settings, char_settings)
+			travel.navUnpause(item, common_settings, char_settings, _G.State:readGroupSelection())
 		end
 	end
 	if char_settings.general.speedForTravel == true then
-		local speedChar, speedSkill = travel.speedCheck(class_settings, char_settings)
+		local speedChar, speedSkill = travel.speedCheck(common_settings, char_settings)
 		if speedChar ~= "none" then
 			travel.navPause()
 			travel.doSpeed(speedChar, speedSkill)
-			travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
+			travel.navUnpause(item, common_settings, char_settings, _G.State:readGroupSelection())
 		end
 	end
-	if travel.invisCheck(item, char_settings, class_settings, item.invis) then
-		travel.invis(class_settings)
+	if travel.invisCheck(item, char_settings, common_settings, item.invis) then
+		travel.invis(common_settings)
 	end
 	if item.whereX ~= nil then
-		travel.loc_travel(item, class_settings, char_settings, _G.State:readGroupSelection())
+		travel.loc_travel(item, common_settings, char_settings, _G.State:readGroupSelection())
 	else
 		_G.State:setStatusText("Waiting for NPC %s.", item.npc)
-		local ID = _G.Mob.findNearestName(item.npc, item, class_settings, char_settings) or 0
-		travel.general_travel(item, class_settings, char_settings, ID, _G.State:readGroupSelection())
+		local ID = _G.Mob.findNearestName(item.npc, item, common_settings, char_settings) or 0
+		travel.general_travel(item, common_settings, char_settings, ID, _G.State:readGroupSelection())
 	end
 end
 
@@ -1580,17 +1581,17 @@ end
 
 -- Check if we can relocate (findReadyReloctate) and use MQ2Relocate to do so with the indicated relocation method
 ---@param item Item
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
 ---@param choice number
 ---@param name string
 ---@param relocate string
-function travel.relocate(item, class_settings, char_settings, choice, name, relocate)
+function travel.relocate(item, common_settings, char_settings, choice, name, relocate)
 	local currentZone = mq.TLO.Zone.Name()
 	if _G.Mob.xtargetCheck(char_settings) then
 		travel.navPause()
-		_G.Mob.clearXtarget(class_settings, char_settings)
-		travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
+		_G.Mob.clearXtarget(common_settings, char_settings)
+		travel.navUnpause(item, common_settings, char_settings, _G.State:readGroupSelection())
 	end
 	_G.State:setStatusText("Relocating to %s.", relocate)
 	logger.log_info("\aoRelocating to \ag%s\ao.", relocate)
@@ -1614,7 +1615,7 @@ function travel.relocate(item, class_settings, char_settings, choice, name, relo
 		if _G.State:readPaused() then
 			travel.navPause()
 			_G.Actions.pauseTask(_G.State:readStatusText())
-			travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
+			travel.navUnpause(item, common_settings, char_settings, _G.State:readGroupSelection())
 		end
 		if loopCount >= 200 then
 			logger.log_warn("\aoSpent 2 seconds waiting for relocate to \ar%s \aoto cast. Moving on.", relocate)
@@ -1633,7 +1634,7 @@ function travel.relocate(item, class_settings, char_settings, choice, name, relo
 		if _G.State:readPaused() then
 			travel.navPause()
 			_G.Actions.pauseTask(_G.State:readStatusText())
-			travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
+			travel.navUnpause(item, common_settings, char_settings, _G.State:readGroupSelection())
 		end
 	end
 	mq.delay("2s")
@@ -1787,12 +1788,12 @@ end
 
 -- Travel to the indicated zone. Return to bind first if returnToBind is true and continue is false
 ---@param item Item
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
 ---@param continue boolean
 ---@param choice number
 ---@param name string
-function travel.zone_travel(item, class_settings, char_settings, continue, choice, name)
+function travel.zone_travel(item, common_settings, char_settings, continue, choice, name)
 	if continue == false then
 		local method = travel.find_best_path(item, char_settings)
 		if method == "straight" then
@@ -1800,39 +1801,39 @@ function travel.zone_travel(item, class_settings, char_settings, continue, choic
 		elseif method == "gate" then
 			travel.gate_group(choice, name)
 		elseif method == "slide_dreadlands" then
-			travel.relocate(item, class_settings, char_settings, choice, name, "dreadlands")
+			travel.relocate(item, common_settings, char_settings, choice, name, "dreadlands")
 		elseif method == "slide_greatdivide" then
-			travel.relocate(item, class_settings, char_settings, choice, name, "greatdivide")
+			travel.relocate(item, common_settings, char_settings, choice, name, "greatdivide")
 		elseif method == "slide_nektulos" then
-			travel.relocate(item, class_settings, char_settings, choice, name, "nek")
+			travel.relocate(item, common_settings, char_settings, choice, name, "nek")
 		elseif method == "slide_nro" then
-			travel.relocate(item, class_settings, char_settings, choice, name, "nro")
+			travel.relocate(item, common_settings, char_settings, choice, name, "nro")
 		elseif method == "slide_skyfire" then
-			travel.relocate(item, class_settings, char_settings, choice, name, "skyfire")
+			travel.relocate(item, common_settings, char_settings, choice, name, "skyfire")
 		elseif method == "slide_stonebrunt" then
-			travel.relocate(item, class_settings, char_settings, choice, name, "stonebrunt")
+			travel.relocate(item, common_settings, char_settings, choice, name, "stonebrunt")
 		elseif method == "stein" then
-			travel.relocate(item, class_settings, char_settings, choice, name, "pok")
+			travel.relocate(item, common_settings, char_settings, choice, name, "pok")
 		elseif method == "throne" then
-			travel.relocate(item, class_settings, char_settings, choice, name, "lobby")
+			travel.relocate(item, common_settings, char_settings, choice, name, "lobby")
 		elseif method == "origin" then
-			travel.relocate(item, class_settings, char_settings, choice, name, "origin")
+			travel.relocate(item, common_settings, char_settings, choice, name, "origin")
 		elseif method == "lamp_stratos" then
-			travel.relocate(item, class_settings, char_settings, choice, name, "air")
+			travel.relocate(item, common_settings, char_settings, choice, name, "air")
 		end
 	end
 	if char_settings.general.speedForTravel == true then
-		local speedChar, speedSkill = travel.speedCheck(class_settings, char_settings)
+		local speedChar, speedSkill = travel.speedCheck(common_settings, char_settings)
 		if speedChar ~= "none" then
 			travel.navPause()
 			travel.doSpeed(speedChar, speedSkill)
-			travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
+			travel.navUnpause(item, common_settings, char_settings, _G.State:readGroupSelection())
 		end
 	end
-	if travel.invisCheck(item, char_settings, class_settings, item.invis) then
+	if travel.invisCheck(item, char_settings, common_settings, item.invis) then
 		travel.navPause()
-		travel.invis(class_settings)
-		travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
+		travel.invis(common_settings)
+		travel.navUnpause(item, common_settings, char_settings, _G.State:readGroupSelection())
 	end
 	_G.State:setStatusText("Traveling to %s.", item.zone)
 	logger.log_info("\aoTraveling to \ag%s\ao.", item.zone)
@@ -1858,7 +1859,7 @@ function travel.zone_travel(item, class_settings, char_settings, continue, choic
 			mq.exit()
 		end
 		if mq.TLO.Navigation.Paused() == true then
-			travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
+			travel.navUnpause(item, common_settings, char_settings, _G.State:readGroupSelection())
 		end
 		if _G.State.should_skip == true then
 			travel.navPause()
@@ -1868,27 +1869,27 @@ function travel.zone_travel(item, class_settings, char_settings, continue, choic
 		mq.delay(500)
 		if _G.Mob.xtargetCheck(char_settings) then
 			travel.navPause()
-			_G.Mob.clearXtarget(class_settings, char_settings)
-			travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
+			_G.Mob.clearXtarget(common_settings, char_settings)
+			travel.navUnpause(item, common_settings, char_settings, _G.State:readGroupSelection())
 		end
 		if _G.State:readPaused() then
 			travel.navPause()
 			_G.Actions.pauseTask(_G.State:readStatusText())
-			travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
+			travel.navUnpause(item, common_settings, char_settings, _G.State:readGroupSelection())
 		end
 		if char_settings.general.speedForTravel == true then
-			local speedChar, speedSkill = travel.speedCheck(class_settings, char_settings)
+			local speedChar, speedSkill = travel.speedCheck(common_settings, char_settings)
 			if speedChar ~= "none" then
 				travel.navPause()
 				travel.doSpeed(speedChar, speedSkill)
-				travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
+				travel.navUnpause(item, common_settings, char_settings, _G.State:readGroupSelection())
 			end
 		end
-		if travel.invisCheck(item, char_settings, class_settings, item.invis) then
+		if travel.invisCheck(item, char_settings, common_settings, item.invis) then
 			if travel.invisTranslocatorCheck() == false then
 				travel.navPause()
-				travel.invis(class_settings)
-				travel.navUnpause(item, class_settings, char_settings, _G.State:readGroupSelection())
+				travel.invis(common_settings)
+				travel.navUnpause(item, common_settings, char_settings, _G.State:readGroupSelection())
 			end
 		end
 		if not mq.TLO.Navigation.Active() then

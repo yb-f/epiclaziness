@@ -2,22 +2,22 @@
     Table of commands to their applicable functions, parameters, and description
 --]]
 
-local class_settings = require('utils/class_settings')
-local loadsave       = require('utils/loadsave')
-local inv            = require('utils/inventory')
-local travel         = require('utils/travel')
-local manage         = require('utils/manageautomation')
-local mob            = require('utils/mob')
-local logger         = require('lib/logger')
+local common_settings = require('utils/common_settings')
+local loadsave        = require('utils/loadsave')
+local inv             = require('utils/inventory')
+local travel          = require('utils/travel')
+local manage          = require('utils/manageautomation')
+local mob             = require('utils/mob')
+local logger          = require('lib/logger')
 
-class_settings.loadSettings()
+common_settings.loadSettings()
 loadsave.loadState()
 
 ---@class Task_Functions
 local task_functions = {
     ADVENTURE_ENTRANCE         = {
         func   = _G.Actions.adventure_entrance,
-        params = function() return { class_settings.settings, loadsave.SaveState } end,
+        params = function() return { common_settings.settings, loadsave.SaveState } end,
         desc   = 'Determine which LDON Entrance to use.',
     },
     AUTO_INV                   = {
@@ -27,12 +27,12 @@ local task_functions = {
     },
     BACKSTAB                   = {
         func   = mob.backstab,
-        params = function() return { class_settings.settings, loadsave.SaveState } end,
+        params = function() return { common_settings.settings, loadsave.SaveState } end,
         desc   = function(item) return 'Backstab' .. item.npc end
     },
     CAST_ALT                   = {
         func   = _G.Actions.cast_alt,
-        params = function() return { class_settings.settings, loadsave.SaveState } end,
+        params = function() return { common_settings.settings, loadsave.SaveState } end,
         desc   = function(item) return 'Cast alt ability ' .. item.what end
     },
     CLEAR_STORED_ITEMS         = {
@@ -47,22 +47,22 @@ local task_functions = {
     },
     COMBINE_CONTAINER          = {
         func   = inv.combine_container,
-        params = function() return { class_settings.settings, loadsave.SaveState } end,
+        params = function() return { common_settings.settings, loadsave.SaveState } end,
         desc   = function(item) return 'Prepare to combine items in ' .. item.what end
     },
     COMBINE_DO                 = {
         func   = inv.combine_do,
-        params = function() return { class_settings.settings, loadsave.SaveState, _G.State.combineSlot } end,
+        params = function() return { common_settings.settings, loadsave.SaveState, _G.State.combineSlot } end,
         desc   = 'Perform combine'
     },
     COMBINE_DONE               = {
         func   = inv.combine_done,
-        params = function() return { class_settings.settings, loadsave.SaveState } end,
+        params = function() return { common_settings.settings, loadsave.SaveState } end,
         desc   = 'Combine complete, restore item to previous bag slot.'
     },
     COMBINE_ITEM               = {
         func   = inv.combine_item,
-        params = function() return { class_settings.settings, loadsave.SaveState, _G.State.combineSlot } end,
+        params = function() return { common_settings.settings, loadsave.SaveState, _G.State.combineSlot } end,
         desc   = function(item) return 'Add ' .. item.what .. ' to combine container' end
     },
     DROP_ADVENTURE             = {
@@ -72,7 +72,7 @@ local task_functions = {
     },
     DZ_CHECK                   = {
         func   = _G.Actions.dz_check,
-        params = function() return { class_settings.settings, loadsave.SaveState } end,
+        params = function() return { common_settings.settings, loadsave.SaveState } end,
         desc   = function(item) return 'Check if we received the proper DZ (' .. item.zone .. ')' end
     },
     ELEVATOR_CHECK             = {
@@ -82,7 +82,7 @@ local task_functions = {
     },
     ENVIRO_COMBINE_CONTAINER   = {
         func   = inv.enviro_combine_container,
-        params = function() return { class_settings.settings, loadsave.SaveState } end,
+        params = function() return { common_settings.settings, loadsave.SaveState } end,
         desc   = function(item) return 'Travel to ' .. item.what .. ' and prepare combine' end
     },
     ENVIRO_COMBINE_DO          = {
@@ -127,7 +127,7 @@ local task_functions = {
     },
     FARM_CHECK                 = {
         func   = _G.Actions.farm_check,
-        params = function() return { class_settings.settings, loadsave.SaveState } end,
+        params = function() return { common_settings.settings, loadsave.SaveState } end,
         desc   = function(item)
             if item.count == nil then
                 return 'Check if we have the items we need: ' .. item.what
@@ -139,57 +139,57 @@ local task_functions = {
     },
     FARM_CHECK_PAUSE           = {
         func   = _G.Actions.farm_check_pause,
-        params = function() return { class_settings.settings, loadsave.SaveState } end,
+        params = function() return { common_settings.settings, loadsave.SaveState } end,
         desc   = function(item) return 'Check if we have ' .. item.what .. ' pause script of we do not' end
     },
     FARM_RADIUS                = {
         func   = _G.Actions.farm_radius,
-        params = function() return { class_settings.settings, loadsave.SaveState } end,
+        params = function() return { common_settings.settings, loadsave.SaveState } end,
         desc   = function(item) return 'Farm for ' .. item.what end
     },
     FARM_RADIUS_EVENT          = {
         func   = _G.Actions.farm_radius,
-        params = function() return { class_settings.settings, loadsave.SaveState, true } end,
+        params = function() return { common_settings.settings, loadsave.SaveState, true } end,
         desc   = function(item) return 'Farm until event occurs. (' .. item.phrase .. ')' end
     },
     FARM_WHILE_NEAR            = {
         func   = _G.Actions.farm_while_near,
-        params = function() return { class_settings.settings, loadsave.SaveState } end,
+        params = function() return { common_settings.settings, loadsave.SaveState } end,
         desc   = function(item) return 'Farm until ' .. item.npc .. ' moves away.' end
     },
     FISH_FARM                  = {
         func   = _G.Actions.fish_farm,
-        params = function() return { class_settings.settings, loadsave.SaveState } end,
+        params = function() return { common_settings.settings, loadsave.SaveState } end,
         desc   = function(item) return 'Fish for ' .. item.what end
     },
     FISH_ONCE                  = {
         func   = _G.Actions.fish_farm,
-        params = function() return { class_settings.settings, loadsave.SaveState, true } end,
+        params = function() return { common_settings.settings, loadsave.SaveState, true } end,
         desc   = 'Fish for one cast'
     },
     FORAGE_FARM                = {
         func   = _G.Actions.forage_farm,
-        params = function() return { class_settings.settings, loadsave.SaveState } end,
+        params = function() return { common_settings.settings, loadsave.SaveState } end,
         desc   = function(item) return 'Forage for ' .. item.what end
     },
     FORWARD_ZONE               = {
         func   = travel.forward_zone,
-        params = function() return { class_settings.settings, loadsave.SaveState, _G.State:readGroupSelection() } end,
+        params = function() return { common_settings.settings, loadsave.SaveState, _G.State:readGroupSelection() } end,
         desc   = function(item) return 'Move forward to zone into ' .. item.zone end
     },
     GENERAL_SEARCH             = {
         func   = mob.general_search,
-        params = function() return { class_settings.settings, loadsave.SaveState } end,
+        params = function() return { common_settings.settings, loadsave.SaveState } end,
         desc   = function(item) return 'Searching for ' .. item.npc end
     },
     GENERAL_TRAVEL             = {
         func   = travel.general_travel,
-        params = function() return { class_settings.settings, loadsave.SaveState, _G.State:readGroupSelection() } end,
+        params = function() return { common_settings.settings, loadsave.SaveState, _G.State:readGroupSelection() } end,
         desc   = function(item) return 'Travel to ' .. item.npc end
     },
     GROUND_SPAWN               = {
         func   = _G.Actions.ground_spawn,
-        params = function() return { class_settings.settings, loadsave.SaveState } end,
+        params = function() return { common_settings.settings, loadsave.SaveState } end,
         desc   = function(item)
             return 'Pickup ground spawn at ' ..
                 item.whereY .. ', ' .. item.whereX .. ', ' .. item.whereZ
@@ -197,7 +197,7 @@ local task_functions = {
     },
     GROUND_SPAWN_FARM          = {
         func   = _G.Actions.ground_spawn_farm,
-        params = function() return { class_settings.settings, loadsave.SaveState } end,
+        params = function() return { common_settings.settings, loadsave.SaveState } end,
         desc   = function(item) return 'Pickup ground spawns until we obtain ' .. item.what end
     },
     GROUP_SIZE_CHECK           = {
@@ -215,7 +215,7 @@ local task_functions = {
     },
     IGNORE_MOB                 = {
         func   = _G.Actions.ignore_mob,
-        params = function() return { class_settings.settings } end,
+        params = function() return { common_settings.settings } end,
         desc   = function(item) return 'Add ' .. item.npc .. ' to pull ignore list' end
     },
     LDON_COUNT_CHECK           = {
@@ -225,17 +225,17 @@ local task_functions = {
     },
     LOC_TRAVEL                 = {
         func   = travel.loc_travel,
-        params = function() return { class_settings.settings, loadsave.SaveState, _G.State:readGroupSelection() } end,
+        params = function() return { common_settings.settings, loadsave.SaveState, _G.State:readGroupSelection() } end,
         desc   = function(item) return 'Travel to ' .. item.whereY .. ', ' .. item.whereX .. ', ' .. item.whereZ end
     },
     LOOT                       = {
         func   = inv.loot,
-        params = function() return { class_settings.settings, loadsave.SaveState } end,
+        params = function() return { common_settings.settings, loadsave.SaveState } end,
         desc   = function(item) return 'Attempt to loot ' .. item.what end
     },
     NO_NAV_TRAVEL              = {
         func   = travel.no_nav_travel,
-        params = function() return { class_settings.settings, loadsave.SaveState, _G.State:readGroupSelection() } end,
+        params = function() return { common_settings.settings, loadsave.SaveState, _G.State:readGroupSelection() } end,
         desc   = function(item)
             return 'Travel without using MQ2Nav to ' ..
                 item.whereY .. ', ' .. item.whereX .. ', ' .. item.whereZ
@@ -243,62 +243,62 @@ local task_functions = {
     },
     NPC_BUY                    = {
         func   = inv.npc_buy,
-        params = function() return { class_settings.settings, loadsave.SaveState } end,
+        params = function() return { common_settings.settings, loadsave.SaveState } end,
         desc   = function(item) return 'Purchase ' .. item.what .. ' from ' .. item.npc end
     },
     NPC_DAMAGE_UNTIL           = {
         func   = mob.npc_damage_until,
-        params = function() return { class_settings.settings, loadsave.SaveState } end,
+        params = function() return { common_settings.settings, loadsave.SaveState } end,
         desc   = function(item) return 'Damage ' .. item.npc .. ' to ' .. item.damage_pct .. '% health' end
     },
     NPC_FOLLOW                 = {
         func   = travel.npc_follow,
-        params = function() return { class_settings.settings, loadsave.SaveState, false, _G.State:readGroupSelection() } end,
+        params = function() return { common_settings.settings, loadsave.SaveState, false, _G.State:readGroupSelection() } end,
         desc   = function(item) return 'Follow ' .. item.npc end
     },
     NPC_FOLLOW_EVENT           = {
         func   = travel.npc_follow,
-        params = function() return { class_settings.settings, loadsave.SaveState, true, _G.State:readGroupSelection() } end,
+        params = function() return { common_settings.settings, loadsave.SaveState, true, _G.State:readGroupSelection() } end,
         desc   = function(item) return 'Follow ' .. item.npc .. ' until event: ' .. item.phrase end
     },
     NPC_GIVE                   = {
         func   = _G.Actions.npc_give,
-        params = function() return { class_settings.settings, loadsave.SaveState } end,
+        params = function() return { common_settings.settings, loadsave.SaveState } end,
         desc   = function(item) return 'Give ' .. item.what .. ' to ' .. item.npc end
     },
     NPC_GIVE_ADD               = {
         func   = _G.Actions.npc_give_add,
-        params = function() return { class_settings.settings, loadsave.SaveState } end,
+        params = function() return { common_settings.settings, loadsave.SaveState } end,
         desc   = function(item) return 'Add ' .. item.what .. ' to give window with ' .. item.npc end
     },
     NPC_GIVE_CLICK             = {
         func   = _G.Actions.npc_give_click,
-        params = function() return { class_settings.settings, loadsave.SaveState } end,
+        params = function() return { common_settings.settings, loadsave.SaveState } end,
         desc   = 'Click give button'
     },
     NPC_GIVE_MONEY             = {
         func   = _G.Actions.npc_give_money,
-        params = function() return { class_settings.settings, loadsave.SaveState } end,
+        params = function() return { common_settings.settings, loadsave.SaveState } end,
         desc   = function(item) return 'Give money (' .. item.what .. ') to ' .. item.npc end
     },
     NPC_HAIL                   = {
         func   = _G.Actions.npc_hail,
-        params = function() return { class_settings.settings, loadsave.SaveState } end,
+        params = function() return { common_settings.settings, loadsave.SaveState } end,
         desc   = function(item) return 'Hail ' .. item.npc end
     },
     NPC_KILL                   = {
         func   = mob.npc_kill,
-        params = function() return { class_settings.settings, loadsave.SaveState } end,
+        params = function() return { common_settings.settings, loadsave.SaveState } end,
         desc   = function(item) return 'Kill ' .. item.npc end
     },
     NPC_KILL_ALL               = {
         func   = mob.npc_kill_all,
-        params = function() return { class_settings.settings, loadsave.SaveState } end,
+        params = function() return { common_settings.settings, loadsave.SaveState } end,
         desc   = function(item) return 'Kill all ' .. item.npc end
     },
     NPC_SEARCH                 = {
         func   = mob.general_search,
-        params = function() return { class_settings.settings, loadsave.SaveState } end,
+        params = function() return { common_settings.settings, loadsave.SaveState } end,
         desc   = function(item) return 'Look for ' .. item.npc end
     },
     NPC_STOP_FOLLOW            = {
@@ -318,22 +318,22 @@ local task_functions = {
     },
     NPC_TRAVEL                 = {
         func   = travel.npc_travel,
-        params = function() return { class_settings.settings, false, loadsave.SaveState } end,
+        params = function() return { common_settings.settings, false, loadsave.SaveState } end,
         desc   = function(item) return 'Move to ' .. item.npc end
     },
     NPC_TRAVEL_NO_PATH_CHECK   = {
         func   = travel.npc_travel,
-        params = function() return { class_settings.settings, true, loadsave.SaveState } end,
+        params = function() return { common_settings.settings, true, loadsave.SaveState } end,
         desc   = function(item) return 'Move to ' .. item.npc .. ' (ignore path)' end
     },
     NPC_WAIT                   = {
         func   = _G.Actions.npc_wait,
-        params = function() return { class_settings.settings, loadsave.SaveState } end,
+        params = function() return { common_settings.settings, loadsave.SaveState } end,
         desc   = function(item) return 'Wait for ' .. item.npc .. ' to spawn' end
     },
     NPC_WAIT_DESPAWN           = {
         func   = _G.Actions.npc_wait_despawn,
-        params = function() return { class_settings.settings, loadsave.SaveState } end,
+        params = function() return { common_settings.settings, loadsave.SaveState } end,
         desc   = function(item) return 'Wait for ' .. item.npc .. ' to despawn' end
     },
     OPEN_DOOR                  = {
@@ -353,7 +353,7 @@ local task_functions = {
     },
     PH_SEARCH                  = {
         func   = mob.ph_search,
-        params = function() return { class_settings.settings, loadsave.SaveState } end,
+        params = function() return { common_settings.settings, loadsave.SaveState } end,
         desc   = function(item) return 'Search for PH ' .. item.npc end
     },
     PICK_DOOR                  = {
@@ -378,17 +378,17 @@ local task_functions = {
     },
     PRE_DAMAGE_UNTIL           = {
         func   = mob.pre_damage_until,
-        params = function() return { class_settings.settings, loadsave.SaveState } end,
+        params = function() return { common_settings.settings, loadsave.SaveState } end,
         desc   = 'Check if we need to ready a lower level skill to not kill mob.'
     },
     PRE_FARM_CHECK             = {
         func   = _G.Actions.pre_farm_check,
-        params = function() return { class_settings.settings, loadsave.SaveState } end,
+        params = function() return { common_settings.settings, loadsave.SaveState } end,
         desc   = 'Check if we have the items to skip the next steps'
     },
     RELOCATE                   = {
         func   = function() return end,
-        params = {}, --function() return { class_settings.settings, loadsave.SaveState, _G.State:readGroupSelection() } end,
+        params = {}, --function() return { common_settings.settings, loadsave.SaveState, _G.State:readGroupSelection() } end,
         desc   = "Removed function -- disregard"
     },
     REMOVE_INVIS               = {
@@ -438,12 +438,12 @@ local task_functions = {
     },
     UNIGNORE_MOB               = {
         func   = _G.Actions.unignore_mob,
-        params = function() return { class_settings.settings } end,
+        params = function() return { common_settings.settings } end,
         desc   = function(item) return 'Remove ' .. item.npc .. ' from pull ignore list.' end
     },
     WAIT                       = {
         func   = _G.Actions.wait,
-        params = function() return { class_settings.settings, loadsave.SaveState } end,
+        params = function() return { common_settings.settings, loadsave.SaveState } end,
         desc   = function(item) return 'Wait for ' .. item.wait / 1000 .. ' seconds' end
     },
     WAIT_CURSOR                = {
@@ -468,12 +468,12 @@ local task_functions = {
     },
     ZONE_CONTINUE_TRAVEL       = {
         func   = travel.zone_travel,
-        params = function() return { class_settings.settings, loadsave.SaveState, true, _G.State:readGroupSelection() } end,
+        params = function() return { common_settings.settings, loadsave.SaveState, true, _G.State:readGroupSelection() } end,
         desc   = function(item) return 'Travel to ' .. item.zone end
     },
     ZONE_TRAVEL                = {
         func   = travel.zone_travel,
-        params = function() return { class_settings.settings, loadsave.SaveState, false, _G.State:readGroupSelection() } end,
+        params = function() return { common_settings.settings, loadsave.SaveState, false, _G.State:readGroupSelection() } end,
         desc   = function(item) return 'Travel to ' .. item.zone end
     },
 }

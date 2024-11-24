@@ -20,11 +20,11 @@ end
 
 -- Backstab the indicated NPC
 ---@param item Item
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
-function mob.backstab(item, class_settings, char_settings)
+function mob.backstab(item, common_settings, char_settings)
 	logger.log_info("\aoBackstabbing \ag%s\ao.", item.npc)
-	local ID = mob.findNearestName(item.npc, item, class_settings, char_settings)
+	local ID = mob.findNearestName(item.npc, item, common_settings, char_settings)
 	if mq.TLO.Spawn(item.npc).Distance() ~= nil then
 		if mq.TLO.Spawn(item.npc).Distance() > MAX_DISTANCE then
 			logger.log_warn(
@@ -106,11 +106,11 @@ end
 
 -- Search for placeholder at the indicated location, goto gotostep if found, next step if not
 ---@param item Item
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
-function mob.ph_search(item, class_settings, char_settings)
+function mob.ph_search(item, common_settings, char_settings)
 	if mob.xtargetCheck(char_settings) then
-		mob.clearXtarget(class_settings, char_settings)
+		mob.clearXtarget(common_settings, char_settings)
 	end
 	_G.State:setStatusText("Searching for PH for %s.", item.npc)
 	logger.log_info("\aoSearching for PH for \ag%s\ao.", item.npc)
@@ -130,9 +130,9 @@ function mob.ph_search(item, class_settings, char_settings)
 end
 
 -- Clear the mobs from the Xtarget List
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
-function mob.clearXtarget(class_settings, char_settings)
+function mob.clearXtarget(common_settings, char_settings)
 	logger.log_info("\aoClearing all auto hater targets from XTarget list.")
 	local temp = _G.State:readStatusText()
 	local max_xtargs = mq.TLO.Me.XTargetSlots()
@@ -187,7 +187,7 @@ function mob.clearXtarget(class_settings, char_settings)
 								mq.TLO.Me.XTarget(i)(),
 								ID
 							)
-							manage.unpauseGroup(class_settings)
+							manage.unpauseGroup(common_settings)
 							mq.cmd("/stick")
 							mq.delay(100)
 							mq.cmd("/attack on")
@@ -247,7 +247,7 @@ function mob.clearXtarget(class_settings, char_settings)
 			looping = false
 		end
 	end
-	manage.pauseGroup(class_settings)
+	manage.pauseGroup(common_settings)
 	logger.log_info("\aoAll auto hater targets cleared from XTarget list.")
 	if mq.TLO.Stick.Active() == true then
 		mq.cmd("/stick off")
@@ -304,10 +304,10 @@ end
 -- find the nearest NPC by name
 ---@param npc string
 ---@param item Item
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
 ---@return string|nil
-function mob.findNearestName(npc, item, class_settings, char_settings)
+function mob.findNearestName(npc, item, common_settings, char_settings)
 	_G.State:setStatusText("Searching for nearest %s.", npc)
 	searchFilter = npc
 	logger.log_info("\aoSearching for nearest \ag%s\ao.", npc)
@@ -361,19 +361,19 @@ function mob.findNearestName(npc, item, class_settings, char_settings)
 			return
 		end
 		if mob.xtargetCheck(char_settings) then
-			mob.clearXtarget(class_settings, char_settings)
+			mob.clearXtarget(common_settings, char_settings)
 		end
 		if _G.State:readPaused() then
 			_G.Actions.pauseTask(_G.State:readStatusText())
 		end
 		if char_settings.general.speedForTravel == true then
-			local speedChar, speedSkill = travel.speedCheck(class_settings, char_settings)
+			local speedChar, speedSkill = travel.speedCheck(common_settings, char_settings)
 			if speedChar ~= "none" then
 				travel.doSpeed(speedChar, speedSkill)
 			end
 		end
-		if travel.invisCheck(item, char_settings, class_settings, item.invis) then
-			travel.invis(class_settings)
+		if travel.invisCheck(item, char_settings, common_settings, item.invis) then
+			travel.invis(common_settings)
 		end
 		if item.type == "NPC_KILL" then
 			if item.what ~= nil then
@@ -429,12 +429,12 @@ end
 
 -- Find the nearest spawn, non-npc
 ---@param item Item
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
-function mob.general_search(item, class_settings, char_settings)
+function mob.general_search(item, common_settings, char_settings)
 	if item.zone == nil then
 		if mob.xtargetCheck(char_settings) then
-			mob.clearXtarget(class_settings, char_settings)
+			mob.clearXtarget(common_settings, char_settings)
 		end
 	end
 	_G.State:setStatusText("Searching for %s.", item.npc)
@@ -446,7 +446,7 @@ function mob.general_search(item, class_settings, char_settings)
 			_G.State.should_skip = false
 			return
 		end
-		local ID = mob.findNearestName(item.npc, item, class_settings, char_settings) or 0
+		local ID = mob.findNearestName(item.npc, item, common_settings, char_settings) or 0
 		if ID ~= 0 then
 			logger.log_verbose(
 				"\aoFound \ag%s \ao(\ag%s\ao) going to step \ar%s\ao.",
@@ -474,9 +474,9 @@ end
 
 -- Damage npc slowly
 ---@param item Item
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
-function mob.npc_slow_kill(item, class_settings, char_settings)
+function mob.npc_slow_kill(item, common_settings, char_settings)
 	local ID = 0
 	if mq.TLO.Spawn("npc " .. item.npc).ID() ~= 0 then
 		ID = mq.TLO.Spawn("npc " .. item.npc).ID()
@@ -562,9 +562,9 @@ end
 
 -- Check if we are too high of level and prepare a lower level skill/spell/song if so
 ---@param item Item
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
-function mob.pre_damage_until(item, class_settings, char_settings)
+function mob.pre_damage_until(item, common_settings, char_settings)
 	logger.log_info("\aoChecking if level is higher than \ag%s\ao.", item.maxlevel)
 	_G.State:setStatusText("Checking if level is higher than %s.", item.maxlevel)
 	if mq.TLO.Me.Level() >= item.maxlevel then
@@ -586,7 +586,7 @@ function mob.pre_damage_until(item, class_settings, char_settings)
 			while mq.TLO.Me.Gem(item.npc)() ~= 1 do
 				logger.log_verbose("\aoWaiting for \ag%s \aoto memorize in spell slot \ag1\ao.", item.npc)
 				if mob.xtargetCheck(char_settings) then
-					mob.clearXtarget(class_settings, char_settings)
+					mob.clearXtarget(common_settings, char_settings)
 				end
 				mq.delay("1s")
 				mq.cmdf('/memspell 1 "%s"', item.npc)
@@ -596,7 +596,7 @@ function mob.pre_damage_until(item, class_settings, char_settings)
 			while mq.TLO.Me.Gem(item.what)() ~= 2 do
 				logger.log_verbose("\aoWaiting for \ag%s \aoto memorize in spell slot \ag2\ao.", item.what)
 				if mob.xtargetCheck(char_settings) then
-					mob.clearXtarget(class_settings, char_settings)
+					mob.clearXtarget(common_settings, char_settings)
 				end
 				mq.delay("1s")
 				mq.cmdf('/memspell 2 "%s"', item.what)
@@ -615,7 +615,7 @@ function mob.pre_damage_until(item, class_settings, char_settings)
 			mq.cmdf('/memspell 1 "%s"', item.what)
 			while mq.TLO.Me.Gem(item.what)() ~= 1 do
 				if mob.xtargetCheck(char_settings) then
-					mob.clearXtarget(class_settings, char_settings)
+					mob.clearXtarget(common_settings, char_settings)
 				end
 				mq.delay(100)
 				mq.cmdf('/mem 1 "%s"', item.what)
@@ -626,9 +626,9 @@ end
 
 -- Damage npc until below a certain percentage of health
 ---@param item Item
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
-function mob.npc_damage_until(item, class_settings, char_settings)
+function mob.npc_damage_until(item, common_settings, char_settings)
 	_G.State:setStatusText("Damaging %s to below %s percent health.", item.npc, item.damage_pct)
 	logger.log_info("\aoDamaging \ag%s \aoto below \ag%s percent health\ao.", item.npc, item.damage_pct)
 	ID = mq.TLO.Spawn("npc " .. item.npc).ID()
@@ -649,7 +649,7 @@ function mob.npc_damage_until(item, class_settings, char_settings)
 	if item.maxlevel ~= nil then
 		if mq.TLO.Me.Level() >= item.maxlevel then
 			logger.log_warn("\aoOur level is \ag%s \aoor higher. Being cautious.", item.maxlevel)
-			mob.npc_slow_kill(item, class_settings, char_settings)
+			mob.npc_slow_kill(item, common_settings, char_settings)
 		end
 	end
 	mq.TLO.Spawn(ID).DoTarget()
@@ -677,15 +677,15 @@ end
 
 -- Kill the indicated npc, loot indicated items if present.
 ---@param item Item
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
-function mob.npc_kill(item, class_settings, char_settings)
+function mob.npc_kill(item, common_settings, char_settings)
 	manage.removeInvis(item)
 	_G.State:setStatusText("Killing %s.", item.npc)
 	logger.log_info("\aoKilling \ag%s\ao.", item.npc)
-	manage.unpauseGroup(class_settings)
+	manage.unpauseGroup(common_settings)
 	mq.delay(200)
-	local ID = mob.findNearestName(item.npc, item, class_settings, char_settings) or 0
+	local ID = mob.findNearestName(item.npc, item, common_settings, char_settings) or 0
 	if mq.TLO.Spawn(ID).Distance() ~= nil then
 		if mq.TLO.Spawn(ID).Distance() > MAX_DISTANCE then
 			logger.log_warn(
@@ -767,7 +767,7 @@ function mob.npc_kill(item, class_settings, char_settings)
 		end
 		mq.unevent("cannot_see")
 		mq.unevent("cannot_cast")
-		manage.pauseGroup(class_settings)
+		manage.pauseGroup(common_settings)
 		mq.delay("2s")
 		_G.State.cannot_count = 0
 	end
@@ -786,13 +786,13 @@ end
 
 -- Kill all of the npc of the indicated name
 ---@param item Item
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
-function mob.npc_kill_all(item, class_settings, char_settings)
+function mob.npc_kill_all(item, common_settings, char_settings)
 	manage.removeInvis(item)
 	_G.State:setStatusText("Killing all %s.", item.npc)
 	logger.log_info("\aoKilling all \ag%s\ao.", item.npc)
-	manage.unpauseGroup(class_settings)
+	manage.unpauseGroup(common_settings)
 	while true do
 		if _G.State.should_skip == true then
 			_G.State.should_skip = false
@@ -806,8 +806,8 @@ function mob.npc_kill_all(item, class_settings, char_settings)
 		if _G.State:readPaused() then
 			_G.Actions.pauseTask(_G.State:readStatusText())
 		end
-		local ID = mob.findNearestName(item.npc, item, class_settings, char_settings) or 0
-		travel.general_travel(item, class_settings, char_settings, ID, _G.State:readGroupSelection())
+		local ID = mob.findNearestName(item.npc, item, common_settings, char_settings) or 0
+		travel.general_travel(item, common_settings, char_settings, ID, _G.State:readGroupSelection())
 		if mq.TLO.Spawn(ID).Distance() ~= nil then
 			if mq.TLO.Spawn(ID).Distance() > MAX_DISTANCE then
 				logger.log_warn("\ar%s \aois over %s units away. Moving closer.", item.npc, MAX_DISTANCE)
@@ -832,7 +832,7 @@ function mob.npc_kill_all(item, class_settings, char_settings)
 		local loopCount = 0
 		while mq.TLO.Spawn(ID).Type() == "NPC" do
 			if _G.State.should_skip == true then
-				manage.pauseGroup(class_settings)
+				manage.pauseGroup(common_settings)
 				_G.State.should_skip = false
 				return
 			end

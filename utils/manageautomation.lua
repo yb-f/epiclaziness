@@ -16,16 +16,16 @@ local group = mq.TLO.Group
 -- Set class automation script to camp and kill in a certain radius
 ---@param radius number
 ---@param zradius number
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
-function manage.campGroup(radius, zradius, class_settings, char_settings)
+function manage.campGroup(radius, zradius, common_settings, char_settings)
 	local choice, name = _G.State:readGroupSelection()
 	logger.log_info("\aoSetting camp mode with radius \ag%s\ao.", radius)
-	manage.doAutomation(me.DisplayName(), me.Class.ShortName(), class_settings.class[me.Class.Name()], "camp")
+	manage.doAutomation(me.DisplayName(), me.Class.ShortName(), common_settings.class[me.Class.Name()], "camp")
 	manage.setRadius(
 		me.DisplayName(),
 		me.Class.ShortName(),
-		class_settings.class[me.Class.Name()],
+		common_settings.class[me.Class.Name()],
 		radius,
 		zradius,
 		char_settings
@@ -38,7 +38,7 @@ function manage.campGroup(radius, zradius, class_settings, char_settings)
 				manage.doAutomation(
 					group.Member(i).DisplayName(),
 					group.Member(i).Class.ShortName(),
-					class_settings.class[group.Member(i).Class.Name()],
+					common_settings.class[group.Member(i).Class.Name()],
 					"camp"
 				)
 			end
@@ -47,7 +47,7 @@ function manage.campGroup(radius, zradius, class_settings, char_settings)
 		manage.doAutomation(
 			name,
 			group.Member(name).Class.ShortName(),
-			class_settings.class[group.Member(name).Class.Name()],
+			common_settings.class[group.Member(name).Class.Name()],
 			"camp"
 		)
 	end
@@ -482,11 +482,11 @@ function manage.openDoorAll(item, choice, name)
 end
 
 -- Pause class automation for all group members
----@param class_settings Class_Settings_Settings
-function manage.pauseGroup(class_settings)
+---@param common_settings Common_Settings_Settings
+function manage.pauseGroup(common_settings)
 	local choice, name = _G.State:readGroupSelection()
 	logger.log_info("\aoPausing class automation for all group members.")
-	manage.doAutomation(me.DisplayName(), me.Class.ShortName(), class_settings.class[me.Class.Name()], "pause")
+	manage.doAutomation(me.DisplayName(), me.Class.ShortName(), common_settings.class[me.Class.Name()], "pause")
 	if choice == 1 then
 		return
 	elseif choice == 2 then
@@ -495,7 +495,7 @@ function manage.pauseGroup(class_settings)
 				manage.doAutomation(
 					group.Member(i).DisplayName(),
 					group.Member(i).Class.ShortName(),
-					class_settings.class[group.Member(i).Class.Name()],
+					common_settings.class[group.Member(i).Class.Name()],
 					"pause"
 				)
 			end
@@ -504,7 +504,7 @@ function manage.pauseGroup(class_settings)
 		manage.doAutomation(
 			name,
 			group.Member(name).Class.ShortName(),
-			class_settings.class[group.Member(name).Class.Name()],
+			common_settings.class[group.Member(name).Class.Name()],
 			"pause"
 		)
 	end
@@ -704,9 +704,9 @@ function manage.setRadius(character, class, script, radius, zradius, char_settin
 end
 
 -- Start class automation for group
----@param class_settings Class_Settings_Settings
+---@param common_settings Common_Settings_Settings
 ---@param char_settings Char_Settings_SaveState
-function manage.startGroup(class_settings, char_settings)
+function manage.startGroup(common_settings, char_settings)
 	local choice, name = _G.State:readGroupSelection()
 	logger.log_verbose("\aoStarting class automation for group and setting group roles.")
 	if me.Grouped() == true and group.Leader() == me.DisplayName() then
@@ -714,7 +714,7 @@ function manage.startGroup(class_settings, char_settings)
 		mq.cmdf("/grouprole set %s 1", mq.TLO.Me.DisplayName())
 		mq.cmdf("/grouprole set %s 2", mq.TLO.Me.DisplayName())
 	end
-	manage.doAutomation(me.DisplayName(), me.Class.ShortName(), class_settings.class[me.Class.Name()], "start")
+	manage.doAutomation(me.DisplayName(), me.Class.ShortName(), common_settings.class[me.Class.Name()], "start")
 	if choice == 1 then
 		return
 	elseif choice == 2 then
@@ -723,7 +723,7 @@ function manage.startGroup(class_settings, char_settings)
 				manage.doAutomation(
 					group.Member(i).DisplayName(),
 					group.Member(i).Class.ShortName(),
-					class_settings.class[group.Member(i).Class.Name()],
+					common_settings.class[group.Member(i).Class.Name()],
 					"start"
 				)
 			end
@@ -732,18 +732,18 @@ function manage.startGroup(class_settings, char_settings)
 		manage.doAutomation(
 			name,
 			group.Member(name).Class.ShortName(),
-			class_settings.class[group.Member(name).Class.Name()],
+			common_settings.class[group.Member(name).Class.Name()],
 			"start"
 		)
 	end
 end
 
 -- Stop class automation from farming the current area
----@param class_settings Class_Settings_Settings
-function manage.uncampGroup(class_settings)
+---@param common_settings Common_Settings_Settings
+function manage.uncampGroup(common_settings)
 	local choice, name = _G.State:readGroupSelection()
 	logger.log_info("\aoEnding camp mode.")
-	manage.doAutomation(me.DisplayName(), me.Class.ShortName(), class_settings.class[me.Class.Name()], "uncamp")
+	manage.doAutomation(me.DisplayName(), me.Class.ShortName(), common_settings.class[me.Class.Name()], "uncamp")
 	if choice == 1 then
 		return
 	elseif choice == 2 then
@@ -752,7 +752,7 @@ function manage.uncampGroup(class_settings)
 				manage.doAutomation(
 					group.Member(i).DisplayName(),
 					group.Member(i).Class.ShortName(),
-					class_settings.class[group.Member(i).Class.Name()],
+					common_settings.class[group.Member(i).Class.Name()],
 					"uncamp"
 				)
 			end
@@ -761,18 +761,18 @@ function manage.uncampGroup(class_settings)
 		manage.doAutomation(
 			name,
 			group.Member(name).Class.ShortName(),
-			class_settings.class[group.Member(name).Class.Name()],
+			common_settings.class[group.Member(name).Class.Name()],
 			"uncamp"
 		)
 	end
 end
 
 -- Unpause class automation for group
----@param class_settings Class_Settings_Settings
-function manage.unpauseGroup(class_settings)
+---@param common_settings Common_Settings_Settings
+function manage.unpauseGroup(common_settings)
 	local choice, name = _G.State:readGroupSelection()
 	logger.log_info("\aoUnpausing class automation for group.")
-	manage.doAutomation(me.DisplayName(), me.Class.ShortName(), class_settings.class[me.Class.Name()], "unpause")
+	manage.doAutomation(me.DisplayName(), me.Class.ShortName(), common_settings.class[me.Class.Name()], "unpause")
 	if choice == 1 then
 		return
 	elseif choice == 2 then
@@ -781,7 +781,7 @@ function manage.unpauseGroup(class_settings)
 				manage.doAutomation(
 					group.Member(i).DisplayName(),
 					group.Member(i).Class.ShortName(),
-					class_settings.class[group.Member(i).Class.Name()],
+					common_settings.class[group.Member(i).Class.Name()],
 					"unpause"
 				)
 			end
@@ -790,7 +790,7 @@ function manage.unpauseGroup(class_settings)
 		manage.doAutomation(
 			name,
 			group.Member(name).Class.ShortName(),
-			class_settings.class[group.Member(name).Class.Name()],
+			common_settings.class[group.Member(name).Class.Name()],
 			"unpause"
 		)
 	end
