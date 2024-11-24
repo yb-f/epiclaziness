@@ -122,7 +122,7 @@ end
 
 -- Create default settings
 function common_settings.createSettings()
-	---@class Class_Settings_Settings
+	---@class Common_Settings_Settings
 	common_settings.settings = {
 		["version"] = v("0.4.3"),
 		["class"] = {
