@@ -1,6 +1,6 @@
 local mq = require("mq")
 local ICONS = require("mq.Icons")
-local invis_travel = require("utils/travelandinvis")
+local invis_travel = require("data/travelandinvis")
 local ImGui = require("ImGui")
 local logger = require("lib/logger")
 local loadsave = require("utils/loadsave")
