@@ -7,7 +7,7 @@ local ICONS = require("mq.Icons")
 local invis_travel = require("data/travelandinvis")
 local ImGui = require("ImGui")
 local logger = require("lib/logger")
-local loadsave = require("utils/loadsave")
+local char_settings = require("utils/char_settings")
 
 local LogLevels = {
 	"Errors",
@@ -141,7 +141,7 @@ function draw_gui.dev_tab()
 	if ImGui.BeginTabItem("Dev") then
 		draw_gui.dev["save_step"] = ImGui.InputInt("Save Step", draw_gui.dev["save_step"])
 		if ImGui.Button("Save") then
-			loadsave.prepSave(draw_gui.dev["save_step"])
+			char_settings.prepSave(draw_gui.dev["save_step"])
 		end
 		draw_gui.dev["force_class"] = ImGui.Combo("##ForcedClass", draw_gui.dev["force_class"], draw_gui.class_list)
 		ImGui.EndTabItem()

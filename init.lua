@@ -19,7 +19,7 @@ _G.Mob = require("utils/mob")
 local class_definitions = require("types/class_definitions")
 local draw_gui = require("utils/drawgui")
 local manage = require("utils/manageautomation")
-local loadsave = require("utils/loadsave")
+local char_settings = require("utils/char_settings")
 local common_settings = require("settings/common_settings")
 local quests_done = require("data/questsdone")
 local reqs = require("data/questrequirements")
@@ -119,14 +119,14 @@ local hashCheck = require("utils/hashcheck")
 _G.Task_Functions = require("utils/task_functions")
 
 common_settings.loadSettings()
-loadsave.loadState()
+char_settings.loadState()
 if not common_settings.settings.LoadTheme then           --whatever your setting is saved as
 	common_settings.settings["LoadTheme"] = theme.LoadTheme -- load the theme tables default if not set.
 	common_settings.saveSettings()
 end
-if loadsave.SaveState["version"] == nil then
-	loadsave.SaveState["version"] = version
-	loadsave.saveState()
+if char_settings.SaveState["version"] == nil then
+	char_settings.SaveState["version"] = version
+	char_settings.saveState()
 end
 
 themeName = common_settings.settings.LoadTheme
@@ -143,19 +143,19 @@ end
 logger.set_log_level(common_settings.settings.logger.LogLevel)
 logger.set_log_to_file(common_settings.settings.logger.LogToFile)
 
-if loadsave.SaveState["general"] == nil then
-	loadsave.SaveState["general"] = {
+if char_settings.SaveState["general"] == nil then
+	char_settings.SaveState["general"] = {
 		["useAOC"] = common_settings.settings.general.useAOC,
 		["invisForTravel"] = common_settings.settings.general.invisForTravel,
 		["stopTS"] = common_settings.settings.general.stopTS,
 		["returnToBind"] = common_settings.settings.general.returnToBind,
 		["xtargClear"] = 1,
 	}
-	loadsave.saveState()
+	char_settings.saveState()
 end
-if loadsave.SaveState.general["speedForTravel"] == nil then
-	loadsave.SaveState.general["speedForTravel"] = true
-	loadsave.saveState()
+if char_settings.SaveState.general["speedForTravel"] == nil then
+	char_settings.SaveState.general["speedForTravel"] = true
+	char_settings.saveState()
 end
 
 -- Populate the values of the group combo box. (None, Group, and all members of group currently in zone)
@@ -254,7 +254,7 @@ local function init_epic(class, choice)
 	local tablename = ""
 	_G.State:setTaskRunning(true)
 	_G.State:setPaused(false)
-	loadsave.loadState()
+	char_settings.loadState()
 	draw_gui.jumpStep = _G.State.current_step
 	draw_gui.dev.save_step = _G.State.current_step
 	if draw_gui.dev["dev_on"] == true then
@@ -283,7 +283,7 @@ local function init_epic(class, choice)
 	end
 	local ts_return = check_tradeskills(class, choice)
 	if ts_return then
-		if loadsave.SaveState.general.stopTS == true then
+		if char_settings.SaveState.general.stopTS == true then
 			logger.log_error(
 				'\aoPlease raise your tradeskills to continue, or turn off the "\agStop if tradeskill requirements are unmet\ao" setting.'
 			)
@@ -300,7 +300,7 @@ local function init_epic(class, choice)
 	for a in dbn:nrows(sql) do
 		table.insert(task_table, a)
 	end
-	manage.startGroup(common_settings.settings, loadsave.SaveState)
+	manage.startGroup(common_settings.settings, char_settings.SaveState)
 	mq.delay("5s")
 	manage.pauseGroup(common_settings.settings)
 end
@@ -315,7 +315,7 @@ local function run_epic()
 					"\aoYou have selected to complete this step (\ag%s\ao) manually. Stopping script.",
 					_G.State.current_step
 				)
-				mq.cmdf("/autosize sizeself %s", loadsave.SaveState.general["self_size"])
+				mq.cmdf("/autosize sizeself %s", char_settings.SaveState.general["self_size"])
 				mq.cmd("/afollow off")
 				mq.cmd("/nav stop")
 				mq.cmd("/stick off")
@@ -376,7 +376,7 @@ local function run_epic()
 		if task_table[_G.State.current_step].SaveStep == 1 then
 			if _G.State:readTaskRunning() then
 				logger.log_info("\aoSaving step: \ar%s", _G.State.current_step)
-				loadsave.prepSave(_G.State.current_step)
+				char_settings.prepSave(_G.State.current_step)
 				if _G.State:readStopAtSave() then
 					logger.log_warn("\aoStopping at step \ar%s.", _G.State.current_step)
 					_G.State.epicstring = ""
@@ -388,7 +388,7 @@ local function run_epic()
 			end
 		end
 		if _G.State:readTaskRunning() == false then
-			mq.cmdf("/autosize sizeself %s", loadsave.SaveState.general["self_size"])
+			mq.cmdf("/autosize sizeself %s", char_settings.SaveState.general["self_size"])
 			mq.cmd("/afollow off")
 			mq.cmd("/nav stop")
 			mq.cmd("/stick off")
@@ -421,7 +421,7 @@ local function displayGUI()
 		ImGui.BeginTabBar("##Tabs")
 		draw_gui.generalTab(task_table)
 		theme.LoadTheme, themeName, themeID, common_settings.settings["LoadTheme"] =
-			draw_gui.settingsTab(themeName, theme, themeID, common_settings, loadsave)
+			draw_gui.settingsTab(themeName, theme, themeID, common_settings, char_settings)
 		draw_gui.outlineTab(task_outline_table, _G.State.overview_steps, task_table)
 		if _G.State:readTaskRunning() then
 			draw_gui.fullOutlineTab(task_table)
@@ -450,13 +450,13 @@ end
 	end
 end--]]
 
-loadsave.versionCheck(version)
+char_settings.versionCheck(version)
 common_settings.version_check(version)
 
 -- Initialize autosize, only sets stored value for starting size now.
 local function init_autosize()
 	---@diagnostic disable-next-line: undefined-field
-	loadsave.SaveState.general["self_size"] = mq.TLO.AutoSize.SizeSelf()
+	char_settings.SaveState.general["self_size"] = mq.TLO.AutoSize.SizeSelf()
 end
 
 local function cmd_el(cmd)

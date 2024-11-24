@@ -1,7 +1,7 @@
 local mq = require("mq")
 local quests_done = require("data/questsdone")
 local logger = require("utils/logger")
-local loadsave = require("utils/loadsave")
+local char_settings = require("utils/char_settings")
 local PackageMan = require("mq/PackageMan")
 local sqlite3 = PackageMan.Require("lsqlite3")
 local reqs = require("data/questrequirements")
@@ -270,7 +270,7 @@ end
 -- Save the current step to the save state
 function State.save()
     logger.log_info("\aoSaving step: \ar%s", State.current_step)
-    loadsave.prepSave(State.current_step)
+    char_settings.prepSave(State.current_step)
     if State:readStopAtSave() then
         logger.log_warn("\aoStopping at step: \ar%s\ao.", State.current_step)
         State.epicstring = ""
