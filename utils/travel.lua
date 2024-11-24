@@ -5,7 +5,7 @@
 --TODO: If we have an invalid connection in the path find an alternate straight path
 local mq = require("mq")
 local logger = require("lib/logger")
-local dist = require("utils/distance")
+local dist = require("lib/distance")
 
 local translocators = {
 	"Magus",

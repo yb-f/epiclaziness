@@ -7,7 +7,7 @@ local inv = require("utils/inventory")
 local manage = require("utils/manageautomation")
 local travel = require("utils/travel")
 local logger = require("lib/logger")
-local dist = require("utils/distance")
+local dist = require("lib/distance")
 
 local DESIRED_CHIPS = 1900
 local MAX_DISTANCE = 100
