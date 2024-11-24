@@ -1,5 +1,3 @@
---TODO Check for epiclaziness_class_settings.lua if no common_settings.lua exists and move to new naming
-
 local mq = require("mq")
 local logger = require("lib/logger")
 local v = require("lib/semver")
