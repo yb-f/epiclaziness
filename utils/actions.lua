@@ -1,3 +1,7 @@
+--[[
+	Functions which perform an action within the game
+--]]
+
 local mq = require("mq")
 local inv = require("utils/inventory")
 local manage = require("utils/manageautomation")

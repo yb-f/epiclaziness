@@ -1,3 +1,8 @@
+--[[
+	Currently a lone function.
+	TODO Determine if this file is necessary, or if there are additional functions that should be moved here as well
+--]]
+
 local mq = require("mq")
 
 local common = {}

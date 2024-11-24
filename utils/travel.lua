@@ -1,3 +1,7 @@
+--[[
+	Functions related to travel
+--]]
+
 --TODO: If we have an invalid connection in the path find an alternate straight path
 local mq = require("mq")
 local logger = require("lib/logger")

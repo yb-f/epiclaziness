@@ -1,3 +1,7 @@
+--[[
+	Functions for drawing our ImGui window
+--]]
+
 local mq = require("mq")
 local ICONS = require("mq.Icons")
 local invis_travel = require("data/travelandinvis")

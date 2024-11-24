@@ -1,3 +1,7 @@
+--[[
+	Functions for managing ourself and group members
+--]]
+
 local mq = require("mq")
 local logger = require("lib/logger")
 

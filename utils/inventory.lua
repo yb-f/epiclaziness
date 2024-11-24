@@ -1,3 +1,7 @@
+--[[
+	Functions which handle various inventory related tasks.
+--]]
+
 local mq = require("mq")
 local manage = require("utils/manageautomation")
 local logger = require("lib/logger")

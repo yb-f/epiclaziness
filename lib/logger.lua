@@ -1,3 +1,9 @@
+--[[
+    Our functionality for displaying information via the console to the user
+    Written by: Derple
+    Thank you Derple!
+--]]
+
 --- @type Mq
 local mq              = require('mq')
 
@@ -46,7 +52,8 @@ local function getCallStack()
     local info = debug.getinfo(4, "Snl")
 
     local callerTracer = string.format("\ao%s\aw::\ao%s()\aw:\ao%-04d\ax",
-        info and info.short_src and info.short_src:match("[^\\^/]*.lua$") or "unknown_file", info and info.name or "unknown_func", info and info.currentline or 0)
+        info and info.short_src and info.short_src:match("[^\\^/]*.lua$") or "unknown_file",
+        info and info.name or "unknown_func", info and info.currentline or 0)
 
     return callerTracer
 end
@@ -78,14 +85,16 @@ local function log(logLevel, output, ...)
     end
 
     if actions.LogConsole ~= nil then
-        local consoleText = string.format('[%s] [%s%s-%s%s] %s', logLevels[logLevel].header, mq.TLO.Me.Class.ShortName(), _G.State.epic_list[_G.State.epic_choice],
+        local consoleText = string.format('[%s] [%s%s-%s%s] %s', logLevels[logLevel].header, mq.TLO.Me.Class.ShortName(),
+            _G.State.epic_list[_G.State.epic_choice],
             _G.State.current_step,
             badMesh,
             output)
         actions.LogConsole:AppendText(consoleText)
     end
 
-    printf('%s\aw:%s \aw<\at%s\aw> \aw(\ag%s%s-%s\ar%s\aw) \aw(%s\aw)%s \ax%s', elHeaderStart, logLevels[logLevel].header, now, mq.TLO.Me.Class.ShortName(),
+    printf('%s\aw:%s \aw<\at%s\aw> \aw(\ag%s%s-%s\ar%s\aw) \aw(%s\aw)%s \ax%s', elHeaderStart, logLevels[logLevel]
+        .header, now, mq.TLO.Me.Class.ShortName(),
         _G.State.epic_list[_G.State.epic_choice], _G.State.current_step, badMesh, callerTracer, elHeaderEnd,
         output)
 end

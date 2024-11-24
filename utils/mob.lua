@@ -1,3 +1,7 @@
+--[[
+	Functions related to actions taken on mobs
+--]]
+
 local mq = require("mq")
 local manage = require("utils/manageautomation")
 local inv = require("utils/inventory")

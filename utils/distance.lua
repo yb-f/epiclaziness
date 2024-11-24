@@ -1,3 +1,7 @@
+--[[
+    Distance calculation functions
+--]]
+
 ---@class Distance
 local Utils = {}
 
