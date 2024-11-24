@@ -32,7 +32,7 @@ local sqlite3 = PackageMan.Require("lsqlite3")
 --local ssl = PackageMan.Require("luasec", "ssl")
 
 --local version_url = "https://raw.githubusercontent.com/yb-f/EL-Ver/master/latest_ver"
-local version = v("0.4.15")
+local version = v("0.4.18")
 local window_flags = bit32.bor(ImGuiWindowFlags.None)
 local openGUI, drawGUI = true, true
 local myName = mq.TLO.Me.DisplayName()
