@@ -8,12 +8,36 @@ local v = require("lib/semver")
 local common_settings = {}
 common_settings.settings = {}
 common_settings.configPath = mq.configDir .. "/epiclaziness/common_settings.lua"
+common_settings.oldConfigPath = mq.configDir .. "/epiclaziness/epiclaziness_class_settings.lua"
+
+function common_settings.checkOldFilename()
+	local file = io.open(common_settings.oldConfigPath, "r") -- Open the old file in read mode
+	if file then
+		file:close()                                      -- Close the file if it exists
+		return true                                       -- Old file exists
+	end
+	return false
+end
 
 -- Load the settings file if it exists
 function common_settings.loadSettings()
 	local configData, err = loadfile(common_settings.configPath)
 	if err then
-		common_settings.createSettings()
+		logger.log_info("Common settings file not found, checking old file name...")
+		local oldSettingsExist = common_settings.checkOldFilename()
+		if oldSettingsExist then
+			logger.log_info("Old settings file found. Loading old settings...")
+			local oldConfigData, oldErr = loadfile(common_settings.oldConfigPath)
+			if oldErr then
+				logger.log_info("Failed to load old settings file: " .. oldErr)
+				common_settings.createSettings()
+			elseif oldConfigData then
+				common_settings.settings = oldConfigData()
+				logger.log_info("Old settings loaded successfully.")
+			end
+		else
+			common_settings.createSettings()
+		end
 	elseif configData then
 		common_settings.settings = configData()
 		if common_settings.settings.skill_to_num == nil then
