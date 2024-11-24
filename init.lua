@@ -25,7 +25,7 @@ local quests_done = require("data/questsdone")
 local reqs = require("data/questrequirements")
 local tsreqs = require("data/tradeskillreqs")
 local v = require("lib/semver")
-local LoadTheme = require("lib.theme_loader")
+local LoadTheme = require("theme/theme_loader")
 local PackageMan = require("mq/PackageMan")
 local sqlite3 = PackageMan.Require("lsqlite3")
 --local http = PackageMan.Require("luasocket", "socket.http")
@@ -82,7 +82,7 @@ local function loadTheme()
 	if File_Exists(themeFile) then
 		theme = dofile(themeFile)
 	else
-		theme = require("lib/themes") -- your local themes file incase the user doesn't have one in config folder
+		theme = require("theme/themes") -- your local themes file incase the user doesn't have one in config folder
 	end
 	if not themeName then
 		themeName = theme.LoadTheme or "Default"
