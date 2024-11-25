@@ -2,8 +2,8 @@
     Table of commands to their applicable functions, parameters, and description
 --]]
 
-local common_settings = require('utils/common_settings')
-local char_settings   = require('utils/char_settings')
+local common_settings = require('settings/common_settings')
+local char_settings   = require('settings/char_settings')
 local inv             = require('utils/inventory')
 local travel          = require('utils/travel')
 local manage          = require('utils/manageautomation')
@@ -253,14 +253,18 @@ local task_functions = {
     },
     NPC_FOLLOW                 = {
         func   = travel.npc_follow,
-        params = function() return { common_settings.settings, char_settings.SaveState, false, _G.State
-                :readGroupSelection() } end,
+        params = function()
+            return { common_settings.settings, char_settings.SaveState, false, _G.State
+                :readGroupSelection() }
+        end,
         desc   = function(item) return 'Follow ' .. item.npc end
     },
     NPC_FOLLOW_EVENT           = {
         func   = travel.npc_follow,
-        params = function() return { common_settings.settings, char_settings.SaveState, true, _G.State
-                :readGroupSelection() } end,
+        params = function()
+            return { common_settings.settings, char_settings.SaveState, true, _G.State
+                :readGroupSelection() }
+        end,
         desc   = function(item) return 'Follow ' .. item.npc .. ' until event: ' .. item.phrase end
     },
     NPC_GIVE                   = {
@@ -470,14 +474,18 @@ local task_functions = {
     },
     ZONE_CONTINUE_TRAVEL       = {
         func   = travel.zone_travel,
-        params = function() return { common_settings.settings, char_settings.SaveState, true, _G.State
-                :readGroupSelection() } end,
+        params = function()
+            return { common_settings.settings, char_settings.SaveState, true, _G.State
+                :readGroupSelection() }
+        end,
         desc   = function(item) return 'Travel to ' .. item.zone end
     },
     ZONE_TRAVEL                = {
         func   = travel.zone_travel,
-        params = function() return { common_settings.settings, char_settings.SaveState, false, _G.State
-                :readGroupSelection() } end,
+        params = function()
+            return { common_settings.settings, char_settings.SaveState, false, _G.State
+                :readGroupSelection() }
+        end,
         desc   = function(item) return 'Travel to ' .. item.zone end
     },
 }
