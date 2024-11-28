@@ -4,7 +4,6 @@
 
 local mq = require("mq")
 local ICONS = require("mq.Icons")
-local invis_travel = require("data/travelandinvis")
 local ImGui = require("ImGui")
 local logger = require("lib/logger")
 local char_settings = require("settings/char_settings")
@@ -148,42 +147,6 @@ function draw_gui.dev_tab()
 	end
 end
 
--- Return how many invis potions are needed for the given class and quest
----@param class string
----@param choice number
----@return number
-local function invis_needed(class, choice)
-	local class_epic = ""
-	if choice == 1 then
-		class_epic = string.lower(class) .. "_10"
-	elseif choice == 2 then
-		class_epic = string.lower(class) .. "_pre15"
-	elseif choice == 3 then
-		class_epic = string.lower(class) .. "_15"
-	elseif choice == 4 then
-		class_epic = string.lower(class) .. "_20"
-	end
-	return invis_travel[class_epic].invis
-end
-
--- Return how many gate potions are needed for the given class and quest
----@param class string
----@param choice number
----@return number
-local function gate_needed(class, choice)
-	local class_epic = ""
-	if choice == 1 then
-		class_epic = string.lower(class) .. "_10"
-	elseif choice == 2 then
-		class_epic = string.lower(class) .. "_pre15"
-	elseif choice == 3 then
-		class_epic = string.lower(class) .. "_15"
-	elseif choice == 4 then
-		class_epic = string.lower(class) .. "_20"
-	end
-	return invis_travel[class_epic].gate
-end
-
 -- Draw the Console log tab
 ---@param common_settings Common_Settings
 function draw_gui.consoleTab(common_settings)
@@ -274,16 +237,6 @@ function draw_gui.header()
 	if _G.State:readTaskRunning() == false then
 		if ImGui.Button("Begin") then
 			_G.State:setStartRun(true)
-		end
-		if ImGui.IsItemHovered() then
-			local invis_num = invis_needed(mq.TLO.Me.Class.ShortName(), _G.State.epic_choice)
-			local gate_num = gate_needed(mq.TLO.Me.Class.ShortName(), _G.State.epic_choice)
-			local tooltip = "Begin/resume epic quest\nThis may require at least "
-				.. invis_num
-				.. " invis potions.\nThis may require at least "
-				.. gate_num
-				.. " gate potions."
-			ImGui.SetTooltip(tooltip)
 		end
 	end
 	if _G.State:readTaskRunning() then
