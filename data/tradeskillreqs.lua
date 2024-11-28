@@ -67,7 +67,6 @@ local tradeskill_requirements = {
             ['Baking'] = 15,
             ['Brewing'] = 226
         }
-
     },
     ['rng'] = {
         ['15'] = {
