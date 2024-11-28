@@ -6,6 +6,7 @@ local path      = mq.luaDir .. "/../resources/MQ2Nav/"
 ---@class HashCheck
 local hashCheck = {}
 
+---@class HashFiles
 hashCheck.files = {
     ['dulak.navmesh']         = 'ecf63ad53a4eec334334363b9a6bbd3e',
     ['erudnext.navmesh']      = '8e9d29613098e2e4268ecc8f36b7e5e9',

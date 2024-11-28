@@ -136,6 +136,7 @@ function draw_gui.full_outline_row(item, step, outlineText)
 	ImGui.TextWrapped(outlineText)
 end
 
+-- Draw the developer tab if developer mode is set
 function draw_gui.dev_tab()
 	if ImGui.BeginTabItem("Dev") then
 		draw_gui.dev["save_step"] = ImGui.InputInt("Save Step", draw_gui.dev["save_step"])

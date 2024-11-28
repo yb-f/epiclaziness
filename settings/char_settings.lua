@@ -1,6 +1,7 @@
 local mq = require("mq")
 local logger = require("lib/logger")
 local v = require("lib/semver")
+local types = require("types/class_definitions")
 
 ---@class Char_Settings
 local char_settings = {}
@@ -93,6 +94,7 @@ function char_settings.loadState()
 end
 
 -- Prepare to save the current step
+--- @param step number
 function char_settings.prepSave(step)
 	char_settings.SaveState[class][_G.State.epic_choice].Step = step
 	char_settings.SaveState[class].Last_Ran = _G.State.epic_choice
@@ -105,6 +107,8 @@ function char_settings.saveState()
 	mq.pickle(char_settings.configPath, char_settings.SaveState)
 end
 
+-- Check version of saved settings
+--- @param version semver
 function char_settings.versionCheck(version)
 	local temp_semver
 	if type(char_settings.SaveState["version"]) == "string" then
@@ -120,6 +124,10 @@ function char_settings.versionCheck(version)
 	end
 end
 
+-- Compare two semver values
+---@param a semver
+---@param b semver
+---@return boolean
 function char_settings.semver_less_than(a, b)
 	if a.major ~= b.major then
 		return a.major < b.major

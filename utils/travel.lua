@@ -7,6 +7,7 @@ local mq = require("mq")
 local logger = require("lib/logger")
 local dist = require("lib/distance")
 
+---@class TranslocatorNames
 local translocators = {
 	"Magus",
 	"Translocator",
@@ -36,6 +37,7 @@ local travel = {}
 travel.looping = false
 travel.timeStamp = 0
 
+---@class InvalidConnections
 travel.invalid_connections = {
 	["Dragon Necropolis"] = {
 		"The Breeding Grounds",

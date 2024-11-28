@@ -459,6 +459,8 @@ local function init_autosize()
 	char_settings.SaveState.general["self_size"] = mq.TLO.AutoSize.SizeSelf()
 end
 
+-- Function to handle start up options when running script
+---@param cmd string
 local function cmd_el(cmd)
 	if cmd == "dev" then
 		if draw_gui.dev["dev_on"] == true then

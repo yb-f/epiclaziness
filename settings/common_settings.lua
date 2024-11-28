@@ -8,6 +8,8 @@ common_settings.settings = {}
 common_settings.configPath = mq.configDir .. "/epiclaziness/common_settings.lua"
 common_settings.oldConfigPath = mq.configDir .. "/epiclaziness/epiclaziness_class_settings.lua"
 
+-- Check if the old name for common_settings configuration file is present
+---@return boolean
 function common_settings.checkOldFilename()
 	local file = io.open(common_settings.oldConfigPath, "r") -- Open the old file in read mode
 	if file then
@@ -100,7 +102,10 @@ function common_settings.loadSettings()
 	end
 end
 
+-- Check the version of the settings file
+---@param version semver
 function common_settings.version_check(version)
+	---@type semver
 	local temp_semver
 	if type(common_settings.settings["version"]) == "string" then
 		temp_semver = v(common_settings.settings["version"])
@@ -129,6 +134,10 @@ function common_settings.version_check(version)
 	end
 end
 
+-- Compare two semvers
+---@param a semver
+---@param b semver
+---@return boolean
 function common_settings.semver_less_than(a, b)
 	if a.major ~= b.major then
 		return a.major < b.major

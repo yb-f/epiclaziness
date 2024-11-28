@@ -25,6 +25,7 @@ local elHeaderEnd     = "\ag]"
 local currentLogLevel = 3
 local logToFileAlways = false
 
+---@class LogLevels
 local logLevels       = {
     ['super_verbose'] = { level = 6, header = "\atSUPER\aw-\apVERBOSE\ax", },
     ['verbose']       = { level = 5, header = "\apVERBOSE\ax", },

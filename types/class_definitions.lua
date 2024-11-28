@@ -35,3 +35,8 @@
 ---@field name string
 ---@field class string
 ---@field skill number
+
+---@class semver
+---@field major number
+---@field minor number
+---@field patch number

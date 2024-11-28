@@ -10,6 +10,7 @@ local db_outline = sqlite3.open(mq.luaDir .. "\\epiclaziness\\epiclaziness_outli
 local AUTOSIZE_SIZES = { 1, 2, 5, 10, 20 }
 local AUTOSIZE_CHOICE = 3
 
+---@class StateTable
 local State = {}
 
 State = {
@@ -181,6 +182,7 @@ end
 
 -- Set the text of the status section in the GUI
 --- @param text string
+--- @vararg any
 function State:setStatusText(text, ...)
     self.status = string.format(text, ...)
 end
@@ -301,13 +303,13 @@ function State.execute_command(item)
 end
 
 -- Pause the script
-
 --- @param item Item
 function State.pauseTask(item)
     State:setStatusText(item.status)
     State:setTaskRunning(false)
 end
 
+-- Populate combo box with characters in current zone
 function State:populate_group_combo()
     logger.log_info("\aoPopulating group combo box with characters in your current zone.")
     self.group_combo = {}

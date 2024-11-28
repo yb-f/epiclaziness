@@ -108,7 +108,7 @@ function actions.merchant_window()
 	return mq.TLO.Window("MerchantWnd").Open()
 end
 
--- Callback to dtermine if the Inventory window is open
+-- Callback to determine if the Inventory window is open
 ---@return boolean
 function actions.inventory_window()
 	return mq.TLO.Window("InventoryWindow").Open()
