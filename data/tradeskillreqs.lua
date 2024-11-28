@@ -36,7 +36,9 @@ local tradeskill_requirements = {
         }
     },
     ['enc'] = {
-        ['Brewing'] = 162
+        ['15'] = {
+            ['Brewing'] = 162
+        }
     },
     ['mag'] = {
         ['15'] = {
