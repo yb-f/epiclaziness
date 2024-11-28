@@ -1,5 +1,11 @@
 ---@class Quest_Requirements
 local quests_requirements = {
+    ['ber'] = {
+        ['10'] = '',
+        ['pre15'] = 'No tradeskill or requirements for assistance from other classes.',
+        ['15'] = 'Requires brewing 125.',
+        ['20'] = 'Requires manually obtaining a Globe of Discordant Energy'
+    },
     ['brd'] = {
         ['10']    = '',
         ['pre15'] = 'No tradeskill or requirements for assistance from other classes.',
@@ -14,47 +20,41 @@ local quests_requirements = {
         ['20']    =
         'Requires baking 100, blacksmithing 100, pottery 100. Also requires manually obtaining a Globe of Discordant Energy.'
     },
-    ['ber'] = {
-        ['10']    = '',
-        ['pre15'] = '',
-        ['15']    = '',
-        ['20']    = '',
-    },
     ['clr'] = {
         ['10']    = '',
         ['pre15'] = 'No tradeskill or requirements for assistance from other classes.',
-        ['15']    = 'Requires brewing 100 (120+ recomended).',
+        ['15']    = 'Requires brewing 100 (120+ recommended).',
         ['20']    = 'Requires manually obtaining a Globe of Discordant Energy.'
     },
     ['dru'] = {
         ['10']    = '',
-        ['pre15'] = '',
-        ['15']    = '',
-        ['20']    = '',
+        ['pre15'] = 'Requires foraging 200.',
+        ['15']    = 'Requires brewing 60, fishing 20, pottery 100, and Goblin language to 100.',
+        ['20']    = 'Requires manually farming a Globe of Discordant Energy.',
     },
     ['enc'] = {
         ['10']    = '',
-        ['pre15'] = '',
-        ['15']    = '',
-        ['20']    = '',
+        ['pre15'] = 'No tradeskill or requirements for assistance from other classes.',
+        ['15']    = 'Requires brewing 162.',
+        ['20']    = 'Requires manually farming a Globe of Discordant Energy.',
     },
     ['mag'] = {
         ['10']    = '',
-        ['pre15'] = '',
+        ['pre15'] = 'No tradeskill or requirements for assistance from other classes.',
         ['15']    = 'Requires brewing 100.',
-        ['20']    = '',
+        ['20']    = 'Requires manually farming a Globe of Discordant Energy.',
     },
     ['mnk'] = {
         ['10']    = '',
-        ['pre15'] = '',
+        ['pre15'] = 'No tradeskill or requirements for assistance from other classes.',
         ['15']    = 'Requires Pottery 140 and Tailoring 66.',
-        ['20']    = '',
+        ['20']    = 'Requires baking 191, and manually farming a Globe of Discordant Energy.',
     },
     ['nec'] = {
         ['10']    = '',
-        ['pre15'] = '',
-        ['15']    = '',
-        ['20']    = '',
+        ['pre15'] = 'No tradeskill or requirements for assistance from other classes.',
+        ['15']    = 'Requires blacksmithing 100.',
+        ['20']    = 'Requires manually farming a Globe of Discordant Energy.',
     },
     ['pal'] = {
         ['10']    = '',
@@ -67,7 +67,7 @@ local quests_requirements = {
         ['10']    = '',
         ['pre15'] = 'Lockpicker required for step 93-105 in Howling Stones.',
         ['15']    = 'Requires Fletching 102.',
-        ['20']    = '',
+        ['20']    = 'Requires manually farming a Globe of Discordant Energy.',
     },
     ['rog'] = {
         ['10']    = '',
@@ -79,7 +79,8 @@ local quests_requirements = {
     },
     ['shd'] = {
         ['10']    = '',
-        ['pre15'] = 'No tradeskill or requirements for assistance from other classes. You are required to be in a guild in order to use the guildhall portal to Plane of Hate.',
+        ['pre15'] =
+        'No tradeskill or requirements for assistance from other classes. You are required to be in a guild in order to use the guildhall portal to Plane of Hate.',
         ['15']    = 'Requires tailoring 100.',
         ['20']    = 'Requires manually obtaining a Globe of Discordant Energy.'
     },
@@ -87,20 +88,21 @@ local quests_requirements = {
         ['10']    =
         'Requires a lockpicker for several steps in City of Mist. Group with your lockpicker and select their name in the 2nd dropdown box. (They must be in the same zone.)',
         ['pre15'] = '',
-        ['15']    = 'Requires alchemy 100. You are required to be in a guild in order to use the guildhall portal to Plane of SKy.',
+        ['15']    =
+        'Requires alchemy 100. You are required to be in a guild in order to use the guildhall portal to Plane of SKy.',
         ['20']    = 'Requires manually obtaining a Globe of Discordant Energy.'
     },
     ['war'] = {
         ['10']    = '',
         ['pre15'] = 'Requires brewing 100.',
         ['15']    = 'Requires Jewelry Making 100, Blacksmithing 115, and Elder Elvish 100.',
-        ['20']    = '',
+        ['20']    = 'Requires manually obtaining a Globe of Discordant Energy.',
     },
     ['wiz'] = {
         ['10']    = '',
-        ['pre15'] = '',
-        ['15']    = '',
-        ['20']    = '',
+        ['pre15'] = 'Requires fishing 120, and research 190.',
+        ['15']    = 'Requires tailoring 125.',
+        ['20']    = 'Requires manually obtaining a Globe of Discordant Energy.',
     },
 }
 
