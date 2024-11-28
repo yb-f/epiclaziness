@@ -1,5 +1,10 @@
 ---@class Tradeskill_Requirements
 local tradeskill_requirements = {
+    ['ber'] = {
+        ['15'] = {
+            ['Brewing'] = 125
+        }
+    },
     ['bst'] = {
         ['pre15'] = {
             ['Tailoring'] = 100,
@@ -19,6 +24,20 @@ local tradeskill_requirements = {
             ['Brewing'] = 100
         }
     },
+    ['dru'] = {
+        ['pre15'] = {
+            ['Foraging'] = 200
+        },
+        ['15'] = {
+            ['Brewing'] = 60,
+            ['Goblin'] = 100,
+            ['Fishing'] = 20,
+            ['Pottery'] = 100,
+        }
+    },
+    ['enc'] = {
+        ['Brewing'] = 162
+    },
     ['mag'] = {
         ['15'] = {
             ['Brewing'] = 100
@@ -28,7 +47,14 @@ local tradeskill_requirements = {
         ['15'] = {
             ['Pottery'] = 140,
             ['Tailoring'] = 66
-
+        },
+        ['20'] = {
+            ['Baking'] = 191
+        }
+    },
+    ['nec'] = {
+        ['15'] = {
+            ['Blacksmithing'] = 100,
         }
     },
     ['pal'] = {
@@ -74,6 +100,15 @@ local tradeskill_requirements = {
             ['Jewelry Making'] = 100,
             ['Blacksmithing'] = 115,
             ['Elder Elvish'] = 100
+        }
+    },
+    ['wiz'] = {
+        ['pre15'] = {
+            ['Fishing'] = 120,
+            ['Research'] = 190
+        },
+        ['15'] = {
+            ['Tailoring'] = 125
         }
     }
 }
