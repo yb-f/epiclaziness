@@ -32,7 +32,7 @@ local sqlite3 = PackageMan.Require("lsqlite3")
 --local ssl = PackageMan.Require("luasec", "ssl")
 
 --local version_url = "https://raw.githubusercontent.com/yb-f/EL-Ver/master/latest_ver"
-local version = v("0.4.21")
+local version = v("0.4.22")
 local window_flags = bit32.bor(ImGuiWindowFlags.None)
 local openGUI, drawGUI = true, true
 local myName = mq.TLO.Me.DisplayName()
@@ -459,8 +459,7 @@ local function init_autosize()
 	char_settings.SaveState.general["self_size"] = mq.TLO.AutoSize.SizeSelf()
 end
 
--- Function to handle start up options when running script
----@param cmd string
+
 local function cmd_el(cmd)
 	if cmd == "dev" then
 		if draw_gui.dev["dev_on"] == true then
