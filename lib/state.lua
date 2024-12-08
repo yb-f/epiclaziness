@@ -2,11 +2,9 @@ local mq = require("mq")
 local quests_done = require("data/questsdone")
 local logger = require("lib/logger")
 local char_settings = require("settings/char_settings")
-local PackageMan = require("mq/PackageMan")
-local sqlite3 = PackageMan.Require("lsqlite3")
 local reqs = require("data/questrequirements")
 
-local db_outline = sqlite3.open(mq.luaDir .. "\\epiclaziness\\epiclaziness_outline.db")
+local db_outline = _G.sqlite3.open(mq.luaDir .. "\\epiclaziness\\epiclaziness_outline.db")
 local AUTOSIZE_SIZES = { 1, 2, 5, 10, 20 }
 local AUTOSIZE_CHOICE = 3
 
